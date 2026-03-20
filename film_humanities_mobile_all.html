@@ -3728,6 +3728,28 @@ article h3 {
 #archiveGrid.has-query .arc-item {
   border-color: rgba(184,146,74,0.25);
 }
+
+/* ── 검색 결과 레이어 ── */
+#searchResultLayer {
+  display: none;
+}
+#searchResultLayer.open {
+  display: flex !important;
+}
+/* 검색 결과 레이어 카드 */
+#searchResultGrid .arc-item {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border2, rgba(180,145,90,0.12));
+  border-radius: 4px;
+  padding: 0.4rem 0.5rem;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+#searchResultGrid .arc-item:active {
+  background: rgba(184,146,74,0.15);
+  border-color: var(--gold);
+}
 </style>
 
 
@@ -7395,54 +7417,88 @@ window.emoLoadMore = function() {
 };
 
 // ── 소장 검색 ──
-window.archiveSearch = function(query) { window.arcSearchInput(query, false); };
-window.archiveSearchNow = function(query) { window.arcSearchInput(query, true); };
+window.archiveSearch = function(q) { window.arcSearchInput(q, false); };
+window.archiveSearchNow = function(q) { window.arcSearchInput(q, true); };
 
-// 통합 검색 함수
+// 검색 레이어 열기/닫기
+window.closeSearchLayer = function() {
+  var layer = document.getElementById('searchResultLayer');
+  if (layer) layer.classList.remove('open');
+  // 검색창 초기화
+  var si = document.getElementById('archiveSearchInput');
+  if (si) si.value = '';
+  window._arc.query = '';
+};
+
+// 검색 결과 레이어에 카드 렌더
+window._renderSearchLayer = function(films, query) {
+  var layer = document.getElementById('searchResultLayer');
+  var grid = document.getElementById('searchResultGrid');
+  var count = document.getElementById('searchResultCount');
+  var noResult = document.getElementById('searchNoResult');
+  if (!layer || !grid) return;
+
+  if (films.length === 0) {
+    // 결과 없음
+    grid.style.display = 'none';
+    noResult.style.display = 'flex';
+    var naverLink = document.getElementById('searchNaverLink');
+    if (naverLink) naverLink.href = 'https://search.naver.com/search.naver?query=' + encodeURIComponent(query + ' 영화');
+    if (count) count.textContent = '검색 결과 없음';
+    layer.classList.add('open');
+    return;
+  }
+
+  // 결과 있음
+  grid.style.display = 'grid';
+  noResult.style.display = 'none';
+  if (count) count.textContent = films.length + '편 발견';
+
+  var meta = window._arcMeta || {};
+  var html = films.slice(0, 100).map(function(film) {
+    var title = film.t || '';
+    var year = film.y ? String(film.y).slice(0,4) : '';
+    var k = film.k || '';
+    var cls = (meta.arcClass && meta.arcClass[k]) || 'arc-item-movie';
+    var url = 'https://search.naver.com/search.naver?query=' + encodeURIComponent('영화 ' + title);
+    return '<a class="arc-item ' + cls + '" href="' + url + '" target="_blank" rel="noopener" onclick="closeSearchLayer()">' +
+      '<span class="arc-item-title" style="display:block;font-size:0.72rem;color:var(--cream,#e8e0d0);line-height:1.3;word-break:keep-all;">' + title + '</span>' +
+      (year ? '<span class="arc-item-year" style="display:block;font-size:0.58rem;color:var(--muted);margin-top:0.15rem;">' + year + '</span>' : '') +
+    '</a>';
+  }).join('');
+  grid.innerHTML = html;
+  layer.classList.add('open');
+};
+
+// 통합 검색 함수 (화면 이동 없음)
 window.arcSearchInput = function(query, immediate) {
   var q = (query || '').trim();
-  window._arc.query = q;
-  window._arc.page = 1;
-
   if (window._searchTimer) clearTimeout(window._searchTimer);
 
-  function doIt() {
-    // 필터 적용 및 그리드 렌더
-    window.arcApplyFilter();
-
-    // 검색 결과 요약 표시
+  if (!q) {
+    // 빈 검색: 레이어 닫기
+    var layer = document.getElementById('searchResultLayer');
+    if (layer) layer.classList.remove('open');
     var msg = document.getElementById('searchMsg');
-    if (!msg) return;
-    if (!q) {
-      msg.style.display = 'none';
-      return;
-    }
-    var count = window._arc.list.length;
-    if (count > 0) {
-      msg.style.display = 'block';
-      msg.style.borderLeftColor = 'var(--gold)';
-      msg.style.color = 'var(--cream,#e8e0d0)';
-      msg.textContent = '✓ ' + count + '편 발견';
-    } else {
-      var nu = 'https://search.naver.com/search.naver?query=' + encodeURIComponent(q + ' 영화');
-      msg.style.display = 'block';
-      msg.style.borderLeftColor = '#ff6464';
-      msg.style.color = '#ff9999';
-      msg.innerHTML = '✗ 미보유 — <a href="' + nu + '" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:underline;">네이버 검색</a>';
-    }
+    if (msg) msg.style.display = 'none';
+    return;
+  }
+
+  function doSearch() {
+    // ALL_FILMS에서 직접 필터 (arcRenderGrid 호출 안 함 → 화면 이동 없음)
+    var films = window.ALL_FILMS || [];
+    var ql = q.toLowerCase();
+    var hits = films.filter(function(f) {
+      return (f.t || '').toLowerCase().indexOf(ql) !== -1;
+    });
+    window._renderSearchLayer(hits, q);
   }
 
   if (immediate) {
-    doIt();
+    doSearch();
   } else {
-    window._searchTimer = setTimeout(doIt, 250);
+    window._searchTimer = setTimeout(doSearch, 250);
   }
-};
-
-// ── 분류 변경 핸들러 ──
-window.onKindChange = function() {
-  var kEl=document.getElementById("addFilmKind"), cWr=document.getElementById("addCountryWrap");
-  if(kEl&&cWr) cWr.style.display=kEl.value===""?"block":"none";
 };
 
 // ── localStorage 로드 ──
@@ -13264,5 +13320,43 @@ window.goToEp = function(id) {
 
 </script>
 
+
+<!-- 검색 결과 레이어 (position:fixed, 모바일 키보드 위에 표시) -->
+<div id="searchResultLayer" style="
+  display:none;
+  position:fixed;
+  left:0; right:0; bottom:0;
+  height:55vh;
+  z-index:8000;
+  background:var(--bg,#0e0c0a);
+  border-top:2px solid var(--gold,#c8a46a);
+  flex-direction:column;
+  overflow:hidden;
+">
+  <div style="display:flex; align-items:center; justify-content:space-between; padding:0.6rem 1rem; border-bottom:1px solid var(--border);">
+    <span id="searchResultCount" style="font-size:0.82rem; color:var(--gold,#c8a46a); font-weight:700;"></span>
+    <button onclick="closeSearchLayer()" style="
+      background:none; border:1px solid var(--border); color:var(--muted);
+      padding:0.25rem 0.7rem; border-radius:4px; font-size:0.75rem; cursor:pointer;
+    ">닫기 ✕</button>
+  </div>
+  <div id="searchResultGrid" style="
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(90px,1fr));
+    gap:0.35rem;
+    padding:0.6rem;
+    align-content:start;
+  "></div>
+  <div id="searchNoResult" style="
+    display:none; flex:1; align-items:center; justify-content:center;
+    flex-direction:column; gap:0.8rem; padding:1.5rem;
+  ">
+    <span style="font-size:2rem;">🔍</span>
+    <p style="color:var(--muted); font-size:0.85rem; text-align:center;">소장 목록에 없습니다</p>
+    <a id="searchNaverLink" href="#" target="_blank" rel="noopener"
+       style="color:var(--gold); font-size:0.8rem; text-decoration:underline;">네이버에서 검색 →</a>
+  </div>
+</div>
 </body>
 </html>
