@@ -160,6 +160,28 @@ footer{text-align:center;padding:60px 5% 80px;border-top:1px solid var(--divider
 #btt.visible{opacity:1;pointer-events:auto;}
 #btt:hover{border-color:var(--gold);color:var(--gold);}
 [data-epc="ep01"]{--epc:var(--ep01);}[data-epc="ep02"]{--epc:var(--ep02);}[data-epc="ep03"]{--epc:var(--ep03);}[data-epc="ep04"]{--epc:var(--ep04);}[data-epc="ep05"]{--epc:var(--ep05);}[data-epc="ep06"]{--epc:var(--ep06);}[data-epc="ep07"]{--epc:var(--ep07);}[data-epc="ep08"]{--epc:var(--ep08);}[data-epc="ep09"]{--epc:var(--ep09);}[data-epc="ep10"]{--epc:var(--ep10);}
+.footer-credit {
+  margin-top: 28px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: rgba(200,149,106,0.7);
+  border-top: 1px solid rgba(200,149,106,0.25);
+  display: inline-block;
+  padding: 16px 24px 0 24px;
+  width: auto;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+
+.credit-icon {
+  display: inline-block;
+  margin: 0 8px;
+  color: var(--gold);
+  font-size: 0.8rem;
+  vertical-align: middle;
+  opacity: 0.7;
+}
 </style>
 </head>
 <body>
@@ -2586,9 +2608,14 @@ footer{text-align:center;padding:60px 5% 80px;border-top:1px solid var(--divider
 
 <!-- FOOTER -->
 <footer>
-  <p class="footer-series">필름 인문학 시리즈 V</p>
-  <p class="footer-title">심연의 선율, 스크린을 읽다 — 5부</p>
-  <p class="footer-sub">Abyssal Melodies — Cinema Music &amp; Humanities · 5부 · © 2026</p>
+  <p class="footer-series">필름 인문학 시리즈 II</p>
+  <p class="footer-title">심연의 선율, 스크린을 읽다</p>
+  <p class="footer-sub">Abyssal Melodies — Cinema Music &amp; Humanities &nbsp;·&nbsp; © 2026 &nbsp;·&nbsp; Rev. 12 · 1부 완성본</p>
+  <div class="footer-credit">
+    <span class="credit-icon">♪</span>
+    Co-created by 지혜의 쉼터 with Claude
+    <span class="credit-icon">♩</span>
+  </div>
 </footer>
 
 <button id="btt" aria-label="맨 위로">
