@@ -2111,6 +2111,25 @@ body { padding-bottom: 0 !important; }
         <span class="stat-l">소장 영화</span>
       </div>
     </div>
+
+    <!-- ✦ 통합 검색 -->
+    <div class="cover-search-wrap" id="coverSearchWrap">
+      <div class="cover-search-bar">
+        <span class="cover-search-icon">🔍</span>
+        <input
+          id="coverSearchInput"
+          class="cover-search-input"
+          type="text"
+          placeholder="영화 제목 · 에피소드 · 테마 검색..."
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        />
+        <button class="cover-search-clear" id="coverSearchClear" onclick="coverSearchClear()" aria-label="지우기">✕</button>
+      </div>
+      <div class="cover-search-results" id="coverSearchResults"></div>
+    </div>
+
   </div>
 </section>
 
@@ -10817,6 +10836,185 @@ body[data-theme-vol] .sidebar-vol-active {
 })();
 </script>
 
+<style id="cover-search-styles">
+/* ══════════════════════════════
+   커버 통합 검색
+══════════════════════════════ */
+.cover-search-wrap {
+  margin-top: 2.5rem;
+  max-width: 560px;
+  opacity: 0;
+  animation: riseIn 1s 1.1s forwards;
+}
+
+.cover-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid rgba(180,145,90,0.35);
+  background: rgba(14,12,10,0.7);
+  backdrop-filter: blur(10px);
+  transition: border-color 0.25s, box-shadow 0.25s;
+  position: relative;
+}
+
+.cover-search-wrap:focus-within .cover-search-bar {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(184,146,74,0.15), 0 4px 24px rgba(184,146,74,0.08);
+}
+
+.cover-search-icon {
+  flex: 0 0 auto;
+  padding: 0 0.85rem;
+  font-size: 0.9rem;
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cover-search-input {
+  flex: 1 1 auto;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--cream);
+  font-family: 'Noto Serif KR', serif;
+  font-size: 0.9rem;
+  padding: 0.85rem 0;
+  letter-spacing: 0.01em;
+  min-width: 0;
+}
+
+.cover-search-input::placeholder {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.82rem;
+}
+
+.cover-search-clear {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 0.75rem;
+  padding: 0 1rem;
+  cursor: pointer;
+  display: none;
+  transition: color 0.2s;
+  line-height: 1;
+}
+.cover-search-clear:hover { color: var(--gold); }
+.cover-search-clear.visible { display: block; }
+
+.cover-search-results {
+  display: none;
+  margin-top: 0.3rem;
+  border: 1px solid var(--border);
+  background: rgba(20,18,16,0.97);
+  backdrop-filter: blur(16px);
+  max-height: 420px;
+  overflow-y: auto;
+  position: relative;
+  z-index: 500;
+}
+
+.cover-search-results.open { display: block; }
+
+.csr-label {
+  padding: 0.55rem 1.2rem 0.35rem;
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border2);
+}
+
+.csr-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.85rem 1.2rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border2);
+  transition: background 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.csr-item:last-child { border-bottom: none; }
+.csr-item:hover, .csr-item:focus { background: rgba(184,146,74,0.06); outline: none; }
+
+.csr-emoji {
+  font-size: 1.1rem;
+  flex: 0 0 auto;
+  margin-top: 0.05rem;
+}
+
+.csr-body { flex: 1 1 auto; min-width: 0; }
+
+.csr-type {
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.2rem;
+}
+
+.csr-title {
+  font-family: 'Nanum Myeongjo', serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.35;
+}
+
+.csr-sub {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 0.18rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.csr-mark {
+  background: rgba(184,146,74,0.22);
+  color: var(--gold-lt);
+  border-radius: 1px;
+  padding: 0 1px;
+}
+
+.csr-empty {
+  padding: 1.5rem 1.2rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+}
+
+.csr-hint {
+  padding: 0.55rem 1.2rem;
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  border-top: 1px solid var(--border2);
+  text-align: center;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .cover-search-wrap {
+    margin-top: 1.6rem;
+    max-width: 100%;
+  }
+  .cover-search-results {
+    max-height: 340px;
+  }
+  .cover-search-input { font-size: 16px; }
+}
+</style>
+
 <style id="hide-global-bottom-tab">
 #globalBottomTab, .global-bottom-tab,
 #globalVolumeOverlay, .global-volume-overlay,
@@ -10830,5 +11028,312 @@ body[data-theme-vol] .sidebar-vol-active {
   }
 }
 </style>
+<script id="cover-search-engine">
+(function () {
+  'use strict';
+
+  /* ── 검색 인덱스 빌드 ── */
+  function buildIndex() {
+    var index = [];
+
+    // 1) 에피소드 헤더 수집
+    document.querySelectorAll('article[id]').forEach(function (article) {
+      var badge   = article.querySelector('.ep-badge');
+      var title   = article.querySelector('.ep-title');
+      var sub     = article.querySelector('.ep-subtitle');
+      var lede    = article.querySelector('.ep-lede');
+      var films   = article.querySelector('.ep-meta .emv');
+      var emotion = article.querySelector('.ep-emotion');
+      var section = article.closest('.vol-section');
+      var vol     = section ? (parseInt(section.getAttribute('data-vol'), 10) || 1) : 1;
+
+      var badgeText  = badge  ? badge.textContent.trim()  : '';
+      var titleText  = title  ? title.textContent.trim()  : '';
+      var subText    = sub    ? sub.textContent.trim()    : '';
+      var ledeText   = lede   ? lede.textContent.trim()   : '';
+      var filmsText  = films  ? films.textContent.trim()  : '';
+      var emojiText  = emotion? emotion.textContent.trim(): '◈';
+
+      // 테마 추출 (badge: "Episode 01 · 사랑" → "사랑")
+      var themeMatch = badgeText.match(/[·ㆍ]\s*(.+)$/);
+      var theme      = themeMatch ? themeMatch[1].trim() : '';
+
+      index.push({
+        type:    'episode',
+        id:      article.getAttribute('id'),
+        vol:     vol,
+        emoji:   emojiText,
+        badge:   badgeText,
+        title:   titleText,
+        subtitle:subText,
+        lede:    ledeText,
+        films:   filmsText,
+        theme:   theme,
+        search:  [badgeText, titleText, subText, ledeText, filmsText, theme].join(' ').toLowerCase()
+      });
+
+      // 2) 수록 영화 개별 수집
+      if (filmsText) {
+        filmsText.split(/[·ㆍ,，、]/).forEach(function (raw) {
+          var film = raw.trim();
+          if (!film) return;
+          index.push({
+            type:   'film',
+            id:     article.getAttribute('id'),
+            vol:    vol,
+            emoji:  '🎬',
+            film:   film,
+            episode:titleText,
+            theme:  theme,
+            search: (film + ' ' + titleText + ' ' + theme).toLowerCase()
+          });
+        });
+      }
+    });
+
+    // 3) h3 섹션 내 개별 영화 링크 수집 (cite-film-name)
+    document.querySelectorAll('.cite-film-name').forEach(function (el) {
+      var name    = el.textContent.replace(/[《》]/g, '').trim();
+      var article = el.closest('article[id]');
+      if (!article || !name) return;
+      var section = article.closest('.vol-section');
+      var vol     = section ? (parseInt(section.getAttribute('data-vol'), 10) || 1) : 1;
+      var titleEl = article.querySelector('.ep-title');
+      var themeEl = article.querySelector('.ep-badge');
+      var themeMatch = themeEl ? themeEl.textContent.match(/[·ㆍ]\s*(.+)$/) : null;
+      var theme   = themeMatch ? themeMatch[1].trim() : '';
+      var info    = el.parentElement ? el.parentElement.textContent.trim() : '';
+      // 중복 방지: 이미 같은 이름이 있으면 skip
+      var already = index.some(function (it) {
+        return it.type === 'film_cite' && it.film === name && it.id === article.getAttribute('id');
+      });
+      if (!already) {
+        index.push({
+          type:    'film_cite',
+          id:      article.getAttribute('id'),
+          vol:     vol,
+          emoji:   '🎬',
+          film:    name,
+          episode: titleEl ? titleEl.textContent.trim() : '',
+          theme:   theme,
+          info:    info.replace(name, '').replace(/^[·ㆍ\s]+/, '').trim(),
+          search:  (name + ' ' + theme + ' ' + info).toLowerCase()
+        });
+      }
+    });
+
+    return index;
+  }
+
+  var INDEX = [];
+  var searchTimeout = null;
+
+  function init() {
+    INDEX = buildIndex();
+    var input   = document.getElementById('coverSearchInput');
+    var results = document.getElementById('coverSearchResults');
+    var clear   = document.getElementById('coverSearchClear');
+
+    if (!input) return;
+
+    input.addEventListener('input', function () {
+      var q = input.value.trim();
+      clear.classList.toggle('visible', q.length > 0);
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(function () { render(q); }, 160);
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { coverSearchClear(); }
+      if (e.key === 'Enter') {
+        // 첫 번째 결과로 이동
+        var first = results.querySelector('.csr-item');
+        if (first) first.click();
+      }
+    });
+
+    // 바깥 클릭 시 닫기
+    document.addEventListener('click', function (e) {
+      var wrap = document.getElementById('coverSearchWrap');
+      if (wrap && !wrap.contains(e.target)) {
+        results.classList.remove('open');
+      }
+    });
+
+    input.addEventListener('focus', function () {
+      if (input.value.trim()) results.classList.add('open');
+    });
+  }
+
+  function highlight(text, q) {
+    if (!q) return escHtml(text);
+    var escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return escHtml(text).replace(new RegExp('(' + escaped + ')', 'gi'), '<mark class="csr-mark">$1</mark>');
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function scrollToEp(id, vol) {
+    // 볼륨 전환 후 스크롤
+    var switchFn = window.navSwitchVol || window.switchVol || window.mbnSwitchVol;
+    var currentSection = document.querySelector('.vol-section.v-act');
+    var currentVol = currentSection ? (parseInt(currentSection.getAttribute('data-vol'), 10) || 1) : 1;
+
+    function doScroll() {
+      var target = document.getElementById(id);
+      if (!target) {
+        var active = document.querySelector('.vol-section.v-act');
+        if (active) {
+          target = active.querySelector('[id="' + id + '"]') || active.querySelector('[id$="-' + id + '"]');
+        }
+      }
+      if (target) {
+        var off = window.innerWidth <= 768 ? 75 : 30;
+        window.scrollTo({ top: Math.max(0, window.pageYOffset + target.getBoundingClientRect().top - off), behavior: 'smooth' });
+      }
+    }
+
+    if (currentVol !== vol && typeof switchFn === 'function') {
+      switchFn(vol);
+      setTimeout(doScroll, 380);
+    } else {
+      doScroll();
+    }
+  }
+
+  function render(q) {
+    var results = document.getElementById('coverSearchResults');
+    if (!results) return;
+
+    if (!q) {
+      results.classList.remove('open');
+      results.innerHTML = '';
+      return;
+    }
+
+    var qLow = q.toLowerCase();
+    var matched = INDEX.filter(function (it) {
+      return it.search.indexOf(qLow) !== -1;
+    });
+
+    // 우선순위 정렬: 에피소드 제목/테마 직접 일치 > 영화 제목 직접 일치 > 기타
+    matched.sort(function (a, b) {
+      var aScore = score(a, qLow);
+      var bScore = score(b, qLow);
+      return bScore - aScore;
+    });
+
+    // 중복 제거: film_cite vs film 같은 이름
+    var seen = {};
+    matched = matched.filter(function (it) {
+      var key = it.type + '|' + it.id + '|' + (it.film || it.title || '');
+      if (seen[key]) return false;
+      seen[key] = true;
+      return true;
+    });
+
+    // 최대 12개
+    matched = matched.slice(0, 12);
+
+    if (matched.length === 0) {
+      results.innerHTML = '<p class="csr-empty">검색 결과가 없습니다 — <em>' + escHtml(q) + '</em></p>';
+      results.classList.add('open');
+      return;
+    }
+
+    var html = '';
+    var lastType = '';
+
+    matched.forEach(function (it) {
+      var typeLabel = it.type === 'episode' ? 'EPISODE' : 'FILM';
+      if (typeLabel !== lastType) {
+        html += '<div class="csr-label">' + typeLabel + '</div>';
+        lastType = typeLabel;
+      }
+
+      if (it.type === 'episode') {
+        html += '<div class="csr-item" tabindex="0" data-id="' + escHtml(it.id) + '" data-vol="' + it.vol + '">'
+          + '<span class="csr-emoji">' + escHtml(it.emoji) + '</span>'
+          + '<span class="csr-body">'
+          +   '<span class="csr-type">' + escHtml(it.badge) + ' · ' + it.vol + '부</span>'
+          +   '<span class="csr-title">' + highlight(it.title, q) + '</span>'
+          +   '<span class="csr-sub">' + highlight(it.subtitle || it.films.slice(0, 60), q) + '</span>'
+          + '</span>'
+          + '</div>';
+      } else {
+        var filmName = it.film;
+        html += '<div class="csr-item" tabindex="0" data-id="' + escHtml(it.id) + '" data-vol="' + it.vol + '">'
+          + '<span class="csr-emoji">🎬</span>'
+          + '<span class="csr-body">'
+          +   '<span class="csr-type">수록 영화 · ' + it.vol + '부</span>'
+          +   '<span class="csr-title">' + highlight(filmName, q) + '</span>'
+          +   '<span class="csr-sub">에피소드: ' + escHtml(it.episode) + (it.theme ? ' · ' + escHtml(it.theme) : '') + '</span>'
+          + '</span>'
+          + '</div>';
+      }
+    });
+
+    if (matched.length >= 12) {
+      html += '<div class="csr-hint">검색 결과가 더 있을 수 있습니다. 검색어를 좁혀보세요.</div>';
+    }
+
+    results.innerHTML = html;
+    results.classList.add('open');
+
+    // 결과 클릭 이벤트
+    results.querySelectorAll('.csr-item').forEach(function (item) {
+      function go() {
+        var id  = item.getAttribute('data-id');
+        var vol = parseInt(item.getAttribute('data-vol'), 10) || 1;
+        results.classList.remove('open');
+        document.getElementById('coverSearchInput').value = '';
+        document.getElementById('coverSearchClear').classList.remove('visible');
+        scrollToEp(id, vol);
+      }
+      item.addEventListener('click', go);
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+      });
+    });
+  }
+
+  function score(item, q) {
+    var s = 0;
+    if (item.type === 'episode') {
+      if (item.theme.toLowerCase().indexOf(q) === 0) s += 20;
+      else if (item.theme.toLowerCase().indexOf(q) !== -1) s += 15;
+      if (item.title.toLowerCase().indexOf(q) !== -1) s += 10;
+      s += 5;
+    } else {
+      if (item.film.toLowerCase().indexOf(q) === 0) s += 18;
+      else if (item.film.toLowerCase().indexOf(q) !== -1) s += 12;
+    }
+    return s;
+  }
+
+  window.coverSearchClear = function () {
+    var input   = document.getElementById('coverSearchInput');
+    var results = document.getElementById('coverSearchResults');
+    var clear   = document.getElementById('coverSearchClear');
+    if (input)   { input.value = ''; input.focus(); }
+    if (results) { results.classList.remove('open'); results.innerHTML = ''; }
+    if (clear)   { clear.classList.remove('visible'); }
+  };
+
+  // DOM 준비 후 초기화
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 500); });
+  } else {
+    setTimeout(init, 500);
+  }
+})();
+</script>
+
 </body>
 </html>
