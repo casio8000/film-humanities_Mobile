@@ -1,1 +1,1765 @@
-tools/AI_Tools_Directory.html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 도구 완전 정복 디렉토리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--surface:#111118;--card:#16161f;--border:#252535;--a1:#7c5cfc;--a2:#00d4b4;--a3:#ff6b6b;--a4:#ffd166;--tx:#e8e8f0;--muted:#8888a8;--dim:#555570;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--tx);font-family:'Noto Sans KR',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,92,252,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,252,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+/* HEADER */
+header{position:relative;z-index:1;text-align:center;padding:52px 24px 24px;}
+.badge{display:inline-block;font-family:'Space Mono',monospace;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--a2);border:1px solid rgba(0,212,180,.3);padding:7px 18px;border-radius:999px;margin-bottom:16px;background:rgba(0,212,180,.05);}
+h1{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:12px;background:linear-gradient(135deg,#fff 0%,var(--a1) 50%,var(--a2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.subtitle{color:var(--muted);font-size:16px;font-weight:300;max-width:540px;margin:0 auto 24px;}
+
+/* SEARCH */
+.search-wrap{position:relative;z-index:1;max-width:620px;margin:0 auto 22px;}
+.search-input{width:100%;padding:16px 56px 16px 52px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--tx);font-size:17px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;caret-color:var(--a1);}
+.search-input::placeholder{color:var(--dim);}
+.search-input:focus{border-color:var(--a1);box-shadow:0 0 0 3px rgba(124,92,252,.15);}
+.si{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:20px;pointer-events:none;}
+.sc{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:var(--border);border:none;color:var(--muted);border-radius:999px;width:22px;height:22px;font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:background .2s;}
+.sc:hover{background:var(--a3);color:#fff;}
+.sc.v{display:flex;}
+.shortcut{position:absolute;right:44px;top:50%;transform:translateY(-50%);font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);background:var(--surface);border:1px solid var(--border);padding:2px 6px;border-radius:4px;pointer-events:none;transition:opacity .2s;}
+.search-input:focus~.shortcut{opacity:0;}
+
+/* STATS */
+.stats{display:flex;justify-content:center;gap:36px;flex-wrap:wrap;margin-bottom:32px;}
+.stat{text-align:center;}
+.sn{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;color:var(--a1);display:block;}
+.sl{font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;}
+
+/* ACTION BUTTONS */
+.action-bar{display:flex;justify-content:center;gap:10px;margin-bottom:0;flex-wrap:wrap;}
+.btn-add-site{padding:12px 22px;border-radius:11px;border:1px solid var(--a1);background:rgba(124,92,252,.12);color:var(--a1);font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.btn-add-site:hover{background:rgba(124,92,252,.25);box-shadow:0 4px 20px rgba(124,92,252,.3);}
+.btn-add-cat{padding:12px 22px;border-radius:11px;border:1px solid var(--a2);background:rgba(0,212,180,.1);color:var(--a2);font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.btn-add-cat:hover{background:rgba(0,212,180,.22);box-shadow:0 4px 20px rgba(0,212,180,.25);}
+
+/* FILTER BAR */
+/* ── FILTER BAR ── */
+.filter-bar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,10,15,.98);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  padding:14px 22px 12px;
+  display:flex;flex-wrap:wrap;gap:8px;
+  box-shadow:0 4px 20px rgba(0,0,0,.35);
+}
+.fb-row-label{
+  width:100%;
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--dim);margin-bottom:2px;margin-top:2px;
+}
+.fb-divider{width:1px;background:var(--border);margin:2px 4px;align-self:stretch;flex-shrink:0;}
+.fb{
+  flex-shrink:0;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 18px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  color:var(--muted);
+  font-size:15px;font-weight:500;
+  font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;transition:all .22s;white-space:nowrap;
+  line-height:1;
+}
+.fb .fb-emoji{font-size:18px;line-height:1;}
+.fb .fb-name{letter-spacing:-.2px;}
+.fb .fb-cnt{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:22px;height:20px;padding:0 6px;
+  border-radius:999px;
+  font-size:11px;font-weight:700;font-family:'Space Mono',monospace;
+  background:rgba(255,255,255,.07);color:var(--dim);
+  transition:all .22s;
+}
+.fb:hover{
+  border-color:rgba(124,92,252,.5);
+  color:var(--tx);
+  background:rgba(124,92,252,.1);
+  transform:translateY(-1px);
+  box-shadow:0 4px 14px rgba(0,0,0,.3);
+}
+.fb:hover .fb-cnt{background:rgba(124,92,252,.25);color:#c4b0ff;}
+.fb.active{
+  border-color:var(--a1);
+  color:#fff;
+  background:linear-gradient(135deg,rgba(124,92,252,.35),rgba(124,92,252,.2));
+  box-shadow:0 0 0 1px rgba(124,92,252,.4),0 4px 18px rgba(124,92,252,.25);
+}
+.fb.active .fb-cnt{background:var(--a1);color:#fff;}
+.fb.fb-all{
+  border-color:rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
+  color:var(--tx);font-weight:700;
+}
+.fb.fb-all:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1);}
+.fb.fb-all.active{
+  border-color:rgba(0,212,180,.6);
+  background:linear-gradient(135deg,rgba(0,212,180,.25),rgba(0,212,180,.12));
+  box-shadow:0 0 0 1px rgba(0,212,180,.4),0 4px 18px rgba(0,212,180,.2);
+  color:#fff;
+}
+.fb.fb-all.active .fb-cnt{background:var(--a2);color:#000;}
+
+/* MAIN */
+main{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:28px 18px 80px;}
+.sri{text-align:center;font-size:15px;color:var(--muted);margin-bottom:20px;display:none;}
+.sri.v{display:block;}
+.sri strong{color:var(--a2);}
+.no-res{display:none;text-align:center;padding:60px 24px;color:var(--muted);}
+.no-res.v{display:block;}
+.no-res .em{font-size:52px;margin-bottom:10px;}
+
+/* TIPS */
+.tips{background:linear-gradient(135deg,rgba(124,92,252,.08),rgba(0,212,180,.05));border:1px solid rgba(124,92,252,.2);border-radius:14px;padding:20px 24px;margin-bottom:28px;}
+.tips h3{font-size:16px;font-weight:700;color:var(--a2);margin-bottom:12px;}
+.tg{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;}
+.ti{display:flex;gap:9px;align-items:flex-start;}
+.tic{font-size:16px;flex-shrink:0;margin-top:1px;}
+.tt{font-size:14px;color:var(--muted);line-height:1.6;}
+.tt strong{color:var(--tx);display:block;margin-bottom:1px;}
+
+/* LEGEND */
+.legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:11px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:26px;font-size:14px;color:var(--muted);}
+.lt{font-weight:600;color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:1px;}
+.li{display:flex;align-items:center;gap:5px;}
+
+/* CATEGORY SECTION */
+.cat-sec{margin-bottom:42px;animation:fu .35s ease both;}
+.cat-hd{display:flex;align-items:center;gap:11px;margin-bottom:13px;padding-bottom:9px;border-bottom:1px solid var(--border);}
+.cico{font-size:24px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:11px;flex-shrink:0;}
+.ctitle{font-size:21px;font-weight:700;letter-spacing:-.5px;}
+.csub{font-size:14px;color:var(--muted);margin-top:2px;}
+.ccnt{font-family:'Space Mono',monospace;font-size:13px;color:var(--dim);background:var(--surface);border:1px solid var(--border);padding:2px 9px;border-radius:999px;margin-left:auto;flex-shrink:0;}
+
+/* CARDS GRID */
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px;}
+
+/* TOOL CARD */
+.tc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:52px 20px 18px;transition:all .22s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;}
+.tc:hover{border-color:rgba(124,92,252,.4);transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,0,0,.4),0 0 0 1px rgba(124,92,252,.15);}
+.ct{display:flex;align-items:flex-start;gap:10px;}
+.fav{width:40px;height:40px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.ti2{flex:1;min-width:0;}
+.tn{font-size:16px;font-weight:700;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tu{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.td{font-size:14px;color:var(--muted);line-height:1.65;flex:1;}
+.cf{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tag{font-size:12px;padding:3px 9px;border-radius:999px;font-weight:500;}
+.tf{background:rgba(0,212,180,.1);color:var(--a2);border:1px solid rgba(0,212,180,.2);}
+.tp{background:rgba(255,107,107,.1);color:var(--a3);border:1px solid rgba(255,107,107,.2);}
+.tfm{background:rgba(255,209,102,.1);color:var(--a4);border:1px solid rgba(255,209,102,.2);}
+.tk{background:rgba(124,92,252,.1);color:var(--a1);border:1px solid rgba(124,92,252,.2);}
+.th{background:rgba(255,107,107,.13);color:#ff9f9f;border:1px solid rgba(255,107,107,.28);}
+.vb{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--a1);text-decoration:none;padding:6px 14px;border-radius:999px;border:1px solid rgba(124,92,252,.3);background:rgba(124,92,252,.08);transition:all .2s;white-space:nowrap;flex-shrink:0;}
+.vb:hover{background:rgba(124,92,252,.2);border-color:var(--a1);}
+.rb{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:var(--a4);background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.35);padding:3px 9px;border-radius:999px;flex-shrink:0;}
+
+/* CARD CONTROLS (hover) */
+.card-ctrl{position:absolute;top:12px;left:0;right:0;padding:0 14px;display:flex;gap:5px;z-index:10;flex-wrap:nowrap;}
+.card-ctrl .ctrl-btn:not(.ctrl-fav){opacity:0;transition:opacity .2s,background .15s;}
+.tc:hover .card-ctrl .ctrl-btn:not(.ctrl-fav){opacity:1;}
+.ctrl-btn{padding:4px 10px;border-radius:7px;border:none;font-size:11px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;display:flex;align-items:center;gap:3px;white-space:nowrap;transition:all .15s;}
+.ctrl-move{background:rgba(0,212,180,.15);color:var(--a2);border:1px solid rgba(0,212,180,.3);}
+.ctrl-move:hover{background:rgba(0,212,180,.3);}
+.ctrl-edit{background:rgba(255,209,102,.15);color:var(--a4);border:1px solid rgba(255,209,102,.3);}
+.ctrl-edit:hover{background:rgba(255,209,102,.3);}
+.ctrl-del{background:rgba(255,107,107,.15);color:var(--a3);border:1px solid rgba(255,107,107,.3);}
+.ctrl-del:hover{background:rgba(255,107,107,.3);}
+
+/* CATEGORY HEADER CONTROLS */
+.cat-hd-btns{display:flex;gap:5px;margin-left:auto;flex-shrink:0;}
+.cat-ctrl-btn{padding:4px 12px;border-radius:7px;border:none;font-size:11px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;display:flex;align-items:center;gap:3px;white-space:nowrap;transition:all .15s;opacity:0;pointer-events:none;}
+.cat-hd:hover .cat-ctrl-btn{opacity:1;pointer-events:auto;}
+.cat-edit-btn{background:rgba(255,209,102,.15);color:var(--a4);border:1px solid rgba(255,209,102,.3);}
+.cat-edit-btn:hover{background:rgba(255,209,102,.3);}
+.cat-del-btn{background:rgba(255,107,107,.15);color:var(--a3);border:1px solid rgba(255,107,107,.3);}
+.cat-del-btn:hover{background:rgba(255,107,107,.3);}
+
+/* MOVE POPOVER */
+.move-pop{position:absolute;top:50px;right:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.5);min-width:160px;display:none;}
+.move-pop.open{display:block;}
+.mp-title{font-size:10px;color:var(--dim);padding:4px 8px 6px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--border);margin-bottom:4px;}
+.mp-item{padding:7px 12px;border-radius:6px;font-size:14px;color:var(--muted);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;}
+.mp-item:hover{background:rgba(124,92,252,.12);color:var(--tx);}
+
+/* HIGHLIGHT */
+.hl{background:rgba(124,92,252,.25);color:#c4b0ff;border-radius:3px;padding:0 2px;}
+
+/* ======================== MODALS ======================== */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:mIn .25s ease;box-shadow:0 24px 64px rgba(0,0,0,.6);}
+@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.modal-title{font-size:20px;font-weight:800;letter-spacing:-.5px;}
+.modal-close{background:var(--border);border:none;color:var(--muted);width:34px;height:34px;border-radius:9px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.modal-close:hover{background:var(--a3);color:#fff;}
+.form-row{margin-bottom:18px;}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:7px;letter-spacing:.3px;}
+.form-input,.form-select,.form-textarea{width:100%;padding:12px 16px;border-radius:11px;border:1px solid var(--border);background:var(--bg);color:var(--tx);font-size:15px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .2s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--a1);}
+.form-textarea{resize:vertical;min-height:90px;line-height:1.65;}
+.form-select option{background:var(--card);}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:18px;}
+.radio-group{display:flex;gap:10px;flex-wrap:wrap;}
+.radio-item{display:flex;align-items:center;gap:6px;cursor:pointer;}
+.radio-item input{accent-color:var(--a1);}
+.radio-item span{font-size:14px;color:var(--muted);}
+.check-group{display:flex;gap:16px;flex-wrap:wrap;}
+.check-item{display:flex;align-items:center;gap:6px;cursor:pointer;}
+.check-item input{accent-color:var(--a1);}
+.check-item span{font-size:14px;color:var(--muted);}
+.btn-submit{width:100%;padding:14px;border-radius:12px;border:none;background:var(--a1);color:#fff;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all .2s;margin-top:4px;}
+.btn-submit:hover{background:#6a4de8;box-shadow:0 4px 20px rgba(124,92,252,.4);}
+.btn-cancel{width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:14px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;margin-top:8px;transition:all .2s;}
+.btn-cancel:hover{border-color:var(--a3);color:var(--a3);}
+
+/* CONFIRM MODAL */
+.confirm-modal{max-width:380px;text-align:center;}
+.confirm-icon{font-size:42px;margin-bottom:14px;}
+.confirm-msg{font-size:15px;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+.confirm-msg strong{color:var(--tx);}
+.confirm-btns{display:flex;gap:10px;}
+.btn-danger{flex:1;padding:11px;border-radius:10px;border:none;background:var(--a3);color:#fff;font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:background .2s;}
+.btn-danger:hover{background:#e55;}
+.btn-safe{flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.modal::-webkit-scrollbar{width:4px;}
+
+@keyframes fu{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.cat-sec:nth-child(n){animation-delay:calc(var(--i,0)*.05s);}
+.hidden{display:none!important;}
+footer{text-align:center;color:var(--dim);font-size:14px;padding:24px;border-top:1px solid var(--border);position:relative;z-index:1;}
+kbd{background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-family:monospace;}
+@media(max-width:600px){.cg{grid-template-columns:1fr;}.stats{gap:18px;}h1{font-size:1.8rem;}.form-row-2{grid-template-columns:1fr;}}
+
+/* ── FAVORITE STAR BUTTON (in card-ctrl) ── */
+.ctrl-fav{
+  background:rgba(255,209,102,.1);
+  color:var(--dim);
+  border:1px solid rgba(255,209,102,.2);
+  font-size:14px;
+  transition:all .2s;
+  opacity:1!important; /* 항상 표시 */
+}
+.ctrl-fav:hover{background:rgba(255,209,102,.3);color:var(--a4);}
+.ctrl-fav.starred{background:rgba(255,209,102,.2);color:var(--a4);border-color:rgba(255,209,102,.5);}
+
+/* ── SPECIAL SECTION HEADER (최근/즐겨찾기) ── */
+.special-sec-hd{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:11px;padding-bottom:9px;
+  border-bottom:2px solid;
+}
+.special-sec-hd.recent{border-color:rgba(0,212,180,.4);}
+.special-sec-hd.favorites{border-color:rgba(255,209,102,.4);}
+.special-badge{
+  font-size:10px;font-weight:700;font-family:'Space Mono',monospace;
+  letter-spacing:1px;text-transform:uppercase;
+  padding:3px 10px;border-radius:999px;
+}
+.special-badge.recent{background:rgba(0,212,180,.12);color:var(--a2);border:1px solid rgba(0,212,180,.3);}
+.special-badge.favorites{background:rgba(255,209,102,.12);color:var(--a4);border:1px solid rgba(255,209,102,.3);}
+.special-clear-btn{
+  margin-left:auto;padding:3px 10px;border-radius:6px;border:1px solid var(--border);
+  background:transparent;color:var(--dim);font-size:11px;font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;transition:all .15s;
+}
+.special-clear-btn:hover{border-color:var(--a3);color:var(--a3);}
+
+/* visited time label on card */
+.visit-time{display:inline-block;font-size:11px;color:var(--a4);font-family:'Space Mono',monospace;margin-top:4px;background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.2);padding:2px 8px;border-radius:999px;}
+/* ── SPECIAL FILTER BUTTONS ── */
+.fb.fb-recent{border-color:rgba(255,209,102,.35);color:#ffd166;}
+.fb.fb-recent:hover{border-color:rgba(255,209,102,.7);background:rgba(255,209,102,.12);}
+.fb.fb-recent.active{border-color:var(--a4);background:linear-gradient(135deg,rgba(255,209,102,.3),rgba(255,209,102,.15));box-shadow:0 0 0 1px rgba(255,209,102,.4),0 4px 18px rgba(255,209,102,.2);color:#fff;}
+.fb.fb-recent.active .fb-cnt{background:var(--a4);color:#000;}
+.fb.fb-fav{border-color:rgba(255,107,107,.35);color:#ff9f9f;}
+.fb.fb-fav:hover{border-color:rgba(255,107,107,.7);background:rgba(255,107,107,.12);}
+.fb.fb-fav.active{border-color:var(--a3);background:linear-gradient(135deg,rgba(255,107,107,.3),rgba(255,107,107,.15));box-shadow:0 0 0 1px rgba(255,107,107,.4),0 4px 18px rgba(255,107,107,.2);color:#fff;}
+.fb.fb-fav.active .fb-cnt{background:var(--a3);color:#fff;}
+
+/* ── RECENT / FAVORITES SECTIONS ── */
+.special-sec{margin-bottom:38px;}
+.special-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.special-hd .cico{font-size:22px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:11px;}
+.special-hd .ctitle{font-size:20px;font-weight:700;letter-spacing:-.5px;}
+.special-hd .csub{font-size:13px;color:var(--muted);margin-top:2px;}
+.special-hd-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.sp-clear-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--dim);font-size:12px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all .15s;}
+.sp-clear-btn:hover{border-color:var(--a3);color:var(--a3);}
+.sp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px;}
+.sp-empty{text-align:center;padding:40px;color:var(--dim);font-size:14px;}
+.sp-empty .em{font-size:36px;margin-bottom:8px;}
+/* .fav-star 구버전 스타일 제거됨 — ctrl-fav 사용 */
+.tc-rank{position:absolute;bottom:10px;left:12px;font-family:'Space Mono',monospace;font-size:10px;color:var(--dim);background:var(--surface);border:1px solid var(--border);padding:2px 7px;border-radius:4px;}
+
+/* ── EMOJI PICKER ── */
+.emoji-preview-btn{
+  width:100%;height:64px;border-radius:12px;
+  border:2px solid var(--border);
+  background:var(--bg);
+  font-size:30px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .2s;color:var(--tx);
+  font-family:'Noto Sans KR',sans-serif;
+}
+.emoji-preview-btn:hover{border-color:var(--a1);background:rgba(124,92,252,.08);}
+.emoji-preview-btn.open{border-color:var(--a1);box-shadow:0 0 0 3px rgba(124,92,252,.2);}
+.emoji-preview-btn .epb-hint{font-size:11px;color:var(--dim);}
+.emoji-picker-panel{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  z-index:500;
+  box-shadow:0 16px 48px rgba(0,0,0,.6);
+  overflow:hidden;
+  display:none;
+  animation:mIn .18s ease;
+}
+.emoji-picker-panel.open{display:block;}
+.ep-search{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;border-bottom:1px solid var(--border);
+}
+.ep-search input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--tx);font-size:14px;font-family:'Noto Sans KR',sans-serif;
+}
+.ep-search input::placeholder{color:var(--dim);}
+.ep-tabs{
+  display:flex;gap:0;border-bottom:1px solid var(--border);
+  overflow-x:auto;scrollbar-width:none;
+}
+.ep-tabs::-webkit-scrollbar{display:none;}
+.ep-tab{
+  flex-shrink:0;padding:7px 10px;
+  font-size:18px;cursor:pointer;
+  border:none;background:transparent;
+  transition:background .15s;border-radius:0;
+}
+.ep-tab:hover{background:rgba(255,255,255,.06);}
+.ep-tab.active{background:rgba(124,92,252,.18);box-shadow:inset 0 -2px 0 var(--a1);}
+.ep-grid{
+  display:grid;grid-template-columns:repeat(8,1fr);
+  gap:2px;padding:10px;
+  max-height:210px;overflow-y:auto;
+}
+.ep-grid button{
+  border:none;background:transparent;
+  font-size:22px;padding:6px;border-radius:8px;
+  cursor:pointer;transition:all .12s;
+  line-height:1;
+}
+.ep-grid button:hover{background:rgba(124,92,252,.2);transform:scale(1.2);}
+.ep-grid button.selected{background:rgba(124,92,252,.35);box-shadow:0 0 0 2px var(--a1);}
+.ep-custom-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border-top:1px solid var(--border);
+}
+.ep-custom-input{
+  flex:1;background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:6px 10px;
+  color:var(--tx);font-size:18px;text-align:center;
+  outline:none;transition:border-color .2s;width:60px;
+}
+.ep-custom-input:focus{border-color:var(--a1);}
+.ep-custom-label{font-size:12px;color:var(--dim);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="badge">✦ AI TOOLS COMPLETE DIRECTORY 2025 ✦</div>
+  <h1>AI 도구 완전 정복<br>디렉토리</h1>
+  <p class="subtitle">북마크에 저장된 모든 AI 도구를 카테고리별로 완전 정리한 나만의 AI 활용 가이드</p>
+  <div class="search-wrap">
+    <span class="si">🔍</span>
+    <input class="search-input" id="searchInput" type="text" autocomplete="off"
+      placeholder="도구 이름, 기능, 특징으로 검색... (예: 무료 이미지, 영상 편집, 한국어)"
+      oninput="handleSearch(this.value)"/>
+    <span class="shortcut">/ 단축키</span>
+    <button class="sc" id="scBtn" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="sn" id="totalCount">0</span><span class="sl">AI 도구</span></div>
+    <div class="stat"><span class="sn" id="catCount">0</span><span class="sl">카테고리</span></div>
+    <div class="stat"><span class="sn">2025</span><span class="sl">최신 정리</span></div>
+  </div>
+  <div class="action-bar">
+    <button class="btn-add-site" onclick="openModal('addSite')">＋ 사이트 추가</button>
+    <button class="btn-add-cat" onclick="openModal('addCat')">＋ 카테고리 추가</button>
+  </div>
+</header>
+
+<!-- FILTER BAR -->
+<div class="filter-bar" id="filterBar"></div>
+
+<!-- MAIN -->
+<main>
+  <div class="sri" id="sri"></div>
+  <div class="no-res" id="noRes"><div class="em">🤔</div><p id="noResText">검색 결과가 없습니다.</p></div>
+
+  <div class="tips">
+    <h3>💡 AI 도구 활용 꿀팁 — 처음 사용하는 분들께</h3>
+    <div class="tg">
+      <div class="ti"><span class="tic">🆓</span><div class="tt"><strong>무료로 시작하세요</strong>대부분은 무료 플랜을 제공합니다. 먼저 써보고 유료 전환을 결정하세요.</div></div>
+      <div class="ti"><span class="tic">🔐</span><div class="tt"><strong>구글 계정으로 로그인</strong>대부분 구글·카카오 계정으로 간편하게 가입할 수 있어요.</div></div>
+      <div class="ti"><span class="tic">🇰🇷</span><div class="tt"><strong>한국어 지원 확인</strong>한국어 태그가 붙은 사이트는 한국어 입출력이 원활합니다.</div></div>
+      <div class="ti"><span class="tic">🎯</span><div class="tt"><strong>목적에 맞게 선택</strong>글쓰기→Claude, 이미지→Midjourney·Flux, 영상→Sora·HeyGen</div></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="lt">범례</span>
+    <span class="li"><span class="tag tf">무료</span>완전 무료</span>
+    <span class="li"><span class="tag tfm">부분무료</span>기본 무료+유료 플랜</span>
+    <span class="li"><span class="tag tp">유료</span>유료 구독 필요</span>
+    <span class="li"><span class="tag tk">한국어</span>한국어 지원</span>
+    <span class="li"><span class="tag th">🔥 인기</span>현재 주목받는 도구</span>
+  </div>
+
+  <div id="categorySections"></div>
+</main>
+
+<footer>
+  <div style="margin-bottom:6px;font-size:13px;color:var(--muted)">
+    총 <strong style="color:var(--a1)" id="ftTotal">0</strong>개 AI 도구 &nbsp;·&nbsp; <strong style="color:var(--a2)" id="ftCat">0</strong>개 카테고리 완전 정리
+  </div>
+  <div>AI 도구는 빠르게 변화합니다. 각 사이트에서 최신 정보를 확인하세요.</div>
+  <div style="margin-top:8px"><kbd>/</kbd> 검색 포커스 &nbsp; <kbd>Esc</kbd> 검색 초기화</div>
+  <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:13px;">
+    <span style="color:var(--dim)">Co-created by</span>
+    <strong style="color:var(--a2);margin:0 4px">지혜의 쉼터</strong>
+    <span style="color:var(--dim)">with</span>
+    <strong style="background:linear-gradient(135deg,var(--a1),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-left:4px">Claude</strong>
+    <span style="color:var(--dim);margin-left:6px;font-size:11px">✦ Anthropic</span>
+  </div>
+</footer>
+
+<!-- ===================== ADD SITE MODAL ===================== -->
+<div class="overlay" id="addSiteModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title">➕ 사이트 추가</div>
+      <button class="modal-close" onclick="closeModal('addSite')">✕</button>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">아이콘 이모지 *</label>
+        <div class="emoji-wrap">
+          <button type="button" class="emoji-preview-btn" id="f-fav-btn" onclick="toggleEmojiPicker('f-fav')">
+            <span id="f-fav-display">🔧</span>
+            <span class="epb-hint">클릭해서 선택</span>
+          </button>
+          <div class="emoji-picker-panel" id="f-fav-panel"></div>
+          <input type="hidden" id="f-fav" value="🔧">
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">도구 이름 *</label>
+        <input class="form-input" id="f-name" placeholder="예: ChatGPT">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">URL *</label>
+      <input class="form-input" id="f-url" placeholder="https://example.com" type="url">
+    </div>
+    <div class="form-row">
+      <label class="form-label">설명 (간단하게)</label>
+      <textarea class="form-textarea" id="f-desc" placeholder="이 도구의 특징과 장점을 간단히 적어주세요..."></textarea>
+    </div>
+    <div class="form-row">
+      <label class="form-label">카테고리 *</label>
+      <select class="form-select" id="f-cat"></select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">요금제</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="fprice" value="free" checked><span>🆓 무료</span></label>
+        <label class="radio-item"><input type="radio" name="fprice" value="freemium"><span>🔓 부분무료</span></label>
+        <label class="radio-item"><input type="radio" name="fprice" value="paid"><span>💳 유료</span></label>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">옵션</label>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" id="f-ko"><span>🇰🇷 한국어 지원</span></label>
+        <label class="check-item"><input type="checkbox" id="f-hot"><span>🔥 인기 도구</span></label>
+        <label class="check-item"><input type="checkbox" id="f-rec"><span>⭐ 추천 도구</span></label>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="submitSite()">사이트 추가하기</button>
+    <button class="btn-cancel" onclick="closeModal('addSite')">취소</button>
+  </div>
+</div>
+
+<!-- ===================== ADD CATEGORY MODAL ===================== -->
+<div class="overlay" id="addCatModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-hd">
+      <div class="modal-title">📂 카테고리 추가</div>
+      <button class="modal-close" onclick="closeModal('addCat')">✕</button>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">이모지 아이콘 *</label>
+        <div class="emoji-wrap">
+          <button type="button" class="emoji-preview-btn" id="c-emoji-btn" onclick="toggleEmojiPicker('c-emoji')">
+            <span id="c-emoji-display">📌</span>
+            <span class="epb-hint">클릭해서 선택</span>
+          </button>
+          <div class="emoji-picker-panel" id="c-emoji-panel"></div>
+          <input type="hidden" id="c-emoji" value="📌">
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">카테고리 이름 *</label>
+        <input class="form-input" id="c-name" placeholder="예: 번역 AI">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">서브 타이틀 (선택)</label>
+      <input class="form-input" id="c-sub" placeholder="예: 다국어 번역을 도와주는 AI 도구">
+    </div>
+    <div class="form-row">
+      <label class="form-label">카드 배경 색상</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="ccolor" value="rgba(124,92,252,.15)" checked><span style="color:#a78bfa">● 보라</span></label>
+        <label class="radio-item"><input type="radio" name="ccolor" value="rgba(0,212,180,.15)"><span style="color:#00d4b4">● 청록</span></label>
+        <label class="radio-item"><input type="radio" name="ccolor" value="rgba(255,107,107,.15)"><span style="color:#ff6b6b">● 빨강</span></label>
+        <label class="radio-item"><input type="radio" name="ccolor" value="rgba(255,209,102,.15)"><span style="color:#ffd166">● 노랑</span></label>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="submitCat()">카테고리 추가하기</button>
+    <button class="btn-cancel" onclick="closeModal('addCat')">취소</button>
+  </div>
+</div>
+
+<!-- ===================== EDIT SITE MODAL ===================== -->
+<div class="overlay" id="editSiteModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title">✏️ 사이트 수정</div>
+      <button class="modal-close" onclick="closeModal('editSite')">✕</button>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">아이콘 이모지</label>
+        <div class="emoji-wrap">
+          <button type="button" class="emoji-preview-btn" id="ef-fav-btn" onclick="toggleEmojiPicker('ef-fav')">
+            <span id="ef-fav-display">🔧</span>
+            <span class="epb-hint">클릭해서 선택</span>
+          </button>
+          <div class="emoji-picker-panel" id="ef-fav-panel"></div>
+          <input type="hidden" id="ef-fav" value="🔧">
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">도구 이름 *</label>
+        <input class="form-input" id="ef-name" placeholder="예: ChatGPT">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">URL *</label>
+      <input class="form-input" id="ef-url" placeholder="https://example.com" type="url">
+    </div>
+    <div class="form-row">
+      <label class="form-label">설명</label>
+      <textarea class="form-textarea" id="ef-desc" placeholder="이 도구의 특징과 장점을 간단히 적어주세요..."></textarea>
+    </div>
+    <div class="form-row">
+      <label class="form-label">카테고리 *</label>
+      <select class="form-select" id="ef-cat"></select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">요금제</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="efprice" value="free"><span>🆓 무료</span></label>
+        <label class="radio-item"><input type="radio" name="efprice" value="freemium"><span>🔓 부분무료</span></label>
+        <label class="radio-item"><input type="radio" name="efprice" value="paid"><span>💳 유료</span></label>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">옵션</label>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" id="ef-ko"><span>🇰🇷 한국어 지원</span></label>
+        <label class="check-item"><input type="checkbox" id="ef-hot"><span>🔥 인기 도구</span></label>
+        <label class="check-item"><input type="checkbox" id="ef-rec"><span>⭐ 추천 도구</span></label>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="submitEditSite()">수정 저장하기</button>
+    <button class="btn-cancel" onclick="closeModal('editSite')">취소</button>
+  </div>
+</div>
+
+<!-- ===================== EDIT CATEGORY MODAL ===================== -->
+<div class="overlay" id="editCatModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-hd">
+      <div class="modal-title">✏️ 카테고리 수정</div>
+      <button class="modal-close" onclick="closeModal('editCat')">✕</button>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">이모지 아이콘</label>
+        <div class="emoji-wrap">
+          <button type="button" class="emoji-preview-btn" id="ec-emoji-btn" onclick="toggleEmojiPicker('ec-emoji')">
+            <span id="ec-emoji-display">📌</span>
+            <span class="epb-hint">클릭해서 선택</span>
+          </button>
+          <div class="emoji-picker-panel" id="ec-emoji-panel"></div>
+          <input type="hidden" id="ec-emoji" value="📌">
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">카테고리 이름 *</label>
+        <input class="form-input" id="ec-name" placeholder="예: 번역 AI">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">서브 타이틀</label>
+      <input class="form-input" id="ec-sub" placeholder="예: 다국어 번역을 도와주는 AI 도구">
+    </div>
+    <div class="form-row">
+      <label class="form-label">카드 배경 색상</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="eccolor" value="rgba(124,92,252,.15)"><span style="color:#a78bfa">● 보라</span></label>
+        <label class="radio-item"><input type="radio" name="eccolor" value="rgba(0,212,180,.15)"><span style="color:#00d4b4">● 청록</span></label>
+        <label class="radio-item"><input type="radio" name="eccolor" value="rgba(255,107,107,.15)"><span style="color:#ff6b6b">● 빨강</span></label>
+        <label class="radio-item"><input type="radio" name="eccolor" value="rgba(255,209,102,.15)"><span style="color:#ffd166">● 노랑</span></label>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="submitEditCat()">수정 저장하기</button>
+    <button class="btn-cancel" onclick="closeModal('editCat')">취소</button>
+  </div>
+</div>
+
+<!-- ===================== CONFIRM DELETE CAT MODAL ===================== -->
+<div class="overlay" id="confirmCatModal">
+  <div class="modal confirm-modal">
+    <div class="confirm-icon">📂</div>
+    <div class="confirm-msg" id="confirmCatMsg">정말 삭제하시겠어요?</div>
+    <div class="confirm-btns">
+      <button class="btn-danger" id="confirmCatOk">삭제</button>
+      <button class="btn-safe" onclick="closeModal('confirmCat')">취소</button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="confirmModal">
+  <div class="modal confirm-modal">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-msg" id="confirmMsg">정말 삭제하시겠어요?</div>
+    <div class="confirm-btns">
+      <button class="btn-danger" id="confirmOk">삭제</button>
+      <button class="btn-safe" onclick="closeModal('confirm')">취소</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DEFAULT DATA
+// ═══════════════════════════════════════════════════════════════
+const DEFAULT_CATS = [
+  {id:'chat',   name:'종합 AI 챗봇',       emoji:'💬', sub:'텍스트로 질문하면 뭐든 답해주는 만능 AI 도우미들',      color:'rgba(124,92,252,.15)'},
+  {id:'image',  name:'이미지 생성 AI',      emoji:'🖼️', sub:'텍스트 한 줄로 원하는 이미지를 뚝딱 만들어주는 도구',  color:'rgba(255,107,107,.15)'},
+  {id:'video',  name:'영상 생성/편집 AI',   emoji:'🎬', sub:'텍스트·이미지로 영상을 만들거나 손쉽게 편집하는 도구', color:'rgba(255,107,107,.15)'},
+  {id:'ppt',    name:'PPT/슬라이드 AI',     emoji:'📊', sub:'주제만 입력하면 슬라이드를 자동으로 만들어주는 도구',  color:'rgba(255,209,102,.15)'},
+  {id:'doc',    name:'문서/요약 AI',        emoji:'📄', sub:'긴 문서·논문·PDF를 순식간에 요약하고 분석해주는 도구', color:'rgba(0,212,180,.15)'},
+  {id:'music',  name:'음악/음성/더빙 AI',   emoji:'🎵', sub:'AI로 음악을 작곡하고, 목소리를 복제하고, 자막을 달아주는 도구', color:'rgba(255,107,107,.12)'},
+  {id:'design', name:'디자인/그래픽 AI',    emoji:'🎨', sub:'로고·포스터·UI를 전문 디자이너처럼 뚝딱 만드는 도구', color:'rgba(255,107,107,.12)'},
+  {id:'mind',   name:'마인드맵/다이어그램', emoji:'🗺️', sub:'아이디어를 시각적으로 정리하고 구조화하는 도구',      color:'rgba(0,212,180,.12)'},
+  {id:'search', name:'검색/리서치 AI',      emoji:'🔍', sub:'최신 정보를 출처와 함께 검색해주는 AI 기반 검색 도구', color:'rgba(124,92,252,.15)'},
+  {id:'web',    name:'웹/앱 제작 AI',       emoji:'🌐', sub:'코딩 없이 말 한마디로 웹사이트와 앱을 만드는 도구',   color:'rgba(0,212,180,.12)'},
+  {id:'auto',   name:'자동화/생산성 AI',    emoji:'⚡', sub:'반복 업무를 자동화하고 팀 협업 효율을 높이는 도구',   color:'rgba(255,209,102,.12)'},
+  {id:'write',  name:'글쓰기/마케팅 AI',    emoji:'✍️', sub:'카피라이팅·광고문구·블로그 글을 자동으로 작성하는 도구 + 프롬프트 모음', color:'rgba(255,107,107,.12)'},
+  {id:'etc',    name:'기타 특수 도구',      emoji:'🛠️', sub:'특별한 목적을 위한 유니크한 AI 서비스들',            color:'rgba(124,92,252,.12)'},
+  {id:'gpts',   name:'GPTs / GEMs',         emoji:'🤖', sub:'ChatGPT GPT 스토어 및 Gemini Gems — 목적별 특화 AI 봇 모음', color:'rgba(0,212,180,.15)'},
+];
+
+// price: 'free'|'freemium'|'paid'  ko: T/F  hot: T/F  rec: T/F
+// ─── CHAT (13) ───────────────────────────────────────────────
+const DEFAULT_TOOLS = [
+{id:'chatgpt',  name:'ChatGPT',         url:'https://chat.openai.com/',                         fav:'🤖', cat:'chat',   price:'freemium', ko:true,  hot:true,  rec:true,  desc:'OpenAI가 만든 세계 1위 AI 챗봇. 글쓰기·코딩·번역·요약·아이디어 생성 등 거의 모든 작업 가능. GPT-4o 무료 제공.'},
+{id:'claude',   name:'Claude (클로드)', url:'https://claude.ai/',                               fav:'🧠', cat:'chat',   price:'freemium', ko:true,  hot:true,  rec:true,  desc:'Anthropic의 고성능 AI. 글쓰기 능력이 특히 뛰어나고 긴 문서 분석·코딩·논리 사고에 강점. 창작·업무 문서에 탁월.'},
+{id:'gemini',   name:'Gemini (제미나이)',url:'https://bard.google.com/?hl=ko',                  fav:'✨', cat:'chat',   price:'freemium', ko:true,  hot:true,  rec:false, desc:'Google의 AI. 구글 검색과 연동되어 최신 정보를 실시간 반영. 구글 Docs·Gmail 연동 가능. 크롬 주소창에서도 사용 가능.'},
+{id:'grok',     name:'Grok',            url:'https://grok.com/',                                fav:'⚡', cat:'chat',   price:'freemium', ko:false, hot:true,  rec:false, desc:'X(트위터) 운영사 xAI의 AI. 실시간 웹·트윗 데이터 활용. 유머러스하고 직설적인 답변 스타일. 이미지 생성도 지원.'},
+{id:'deepseek', name:'DeepSeek',        url:'https://chat.deepseek.com/',                       fav:'🐋', cat:'chat',   price:'free',     ko:true,  hot:true,  rec:false, desc:'중국산 오픈소스 AI. ChatGPT급 성능을 완전 무료로 제공해 화제. 수학·코딩·논리 추론에 강함.'},
+{id:'mistral',  name:'Mistral AI',      url:'https://chat.mistral.ai/chat',                     fav:'🌊', cat:'chat',   price:'freemium', ko:false, hot:false, rec:false, desc:'프랑스 스타트업의 유럽산 AI. 빠르고 효율적인 모델. 개발자들 사이에서 인기. 오픈소스 모델도 제공.'},
+{id:'kimi',     name:'Kimi AI',         url:'https://www.kimi.com/',                            fav:'🌙', cat:'chat',   price:'free',     ko:false, hot:false, rec:false, desc:'중국 Moonshot AI의 챗봇. 매우 긴 문서 처리(100만 토큰)에 특화. PDF·논문 분석에 유용.'},
+{id:'moonshot', name:'Moonshot AI',     url:'https://www.moonshot.ai/',                         fav:'🚀', cat:'chat',   price:'freemium', ko:false, hot:false, rec:false, desc:'Kimi AI를 만든 중국 AI 스타트업 공식 플랫폼. 초장문 컨텍스트 처리 기술로 주목받는 AI 회사.'},
+{id:'poe',      name:'Poe',             url:'https://poe.com/',                                 fav:'🤝', cat:'chat',   price:'freemium', ko:false, hot:false, rec:false, desc:'Quora가 만든 AI 플랫폼. ChatGPT·Claude·Gemini 등 여러 AI를 한 곳에서 비교·사용 가능.'},
+{id:'lmarena',  name:'LM Arena',        url:'https://lmarena.ai/',                              fav:'🔬', cat:'chat',   price:'free',     ko:false, hot:false, rec:false, desc:'여러 AI 모델을 익명으로 동시 테스트·비교하는 플랫폼. AI 성능 순위 확인 가능.'},
+{id:'wrtn',     name:'뤼튼 (Wrtn)',     url:'https://wrtn.ai/',                                 fav:'🟢', cat:'chat',   price:'free',     ko:true,  hot:true,  rec:false, desc:'국내 AI 플랫폼. GPT-4를 무료로 무제한 사용 가능. 문서 자동 요약·글쓰기·이미지 생성 등 통합 제공.'},
+{id:'clovax',   name:'Clova X (클로바X)',url:'https://clova-x.naver.com/',                     fav:'🔵', cat:'chat',   price:'free',     ko:true,  hot:false, rec:false, desc:'네이버의 대화형 AI 서비스. 한국어 최적화. 한국 법률·문화·지역 정보에 강함.'},
+{id:'baichat',  name:'BAI Chat',        url:'https://chat.theb.ai/',                            fav:'🌟', cat:'chat',   price:'free',     ko:false, hot:false, rec:false, desc:'ChatGPT API 기반 무료 AI 챗봇. 가입 없이도 ChatGPT와 유사한 대화를 무료로 이용 가능.'},
+// ─── IMAGE (15) ──────────────────────────────────────────────
+{id:'midjourney',name:'Midjourney (미드저니)',url:'https://www.midjourney.com/explore?tab=top',fav:'🎨',cat:'image',price:'paid',     ko:false,hot:true,  rec:true,  desc:'세계 최고 수준의 이미지 생성 AI. 예술적이고 고품질의 이미지 생성에 특화. 디스코드 기반 작동. 유료 구독 필요.'},
+{id:'leonardo', name:'Leonardo AI',     url:'https://leonardo.ai/',                             fav:'🦁', cat:'image',  price:'freemium', ko:false, hot:true,  rec:true,  desc:'무료로 고품질 이미지를 생성할 수 있는 AI. 게임 아트·캐릭터·배경 이미지에 특화. 다양한 스타일 모델 제공.'},
+{id:'flux',     name:'Flux AI (플럭스)', url:'https://flux-ai.io/ko/',                         fav:'⚡', cat:'image',  price:'freemium', ko:true,  hot:true,  rec:false, desc:'Black Forest Labs의 최신 이미지 생성 모델. 사실적인 인물 사진과 디테일한 이미지 생성에 강점.'},
+{id:'firefly',  name:'Adobe Firefly',   url:'https://firefly.adobe.com/',                       fav:'🔥', cat:'image',  price:'freemium', ko:false, hot:false, rec:false, desc:'Adobe의 AI 이미지 생성 도구. 상업적 사용에 안전한 이미지 제공. Photoshop과 연동. 생성형 채우기 기능이 탁월.'},
+{id:'ideogram', name:'Ideogram',        url:'https://ideogram.ai/t/explore',                   fav:'🎯', cat:'image',  price:'freemium', ko:false, hot:false, rec:false, desc:'이미지 안에 텍스트를 정확하게 삽입하는 AI. 포스터·로고·타이포그래피 이미지 생성에 탁월.'},
+{id:'playground',name:'Playground AI', url:'https://playgroundai.com/',                        fav:'🌐', cat:'image',  price:'freemium', ko:false, hot:false, rec:false, desc:'무료로 하루 1,000장 이미지 생성 가능. Stable Diffusion 기반. 이미지 편집·배경 제거 등 다양한 기능 제공.'},
+{id:'tensor',   name:'Tensor.Art',      url:'https://tensor.art/',                              fav:'🎭', cat:'image',  price:'free',     ko:false, hot:false, rec:false, desc:'완전 무료 AI 이미지 생성 플랫폼. 다양한 오픈소스 모델 사용 가능. 애니메이션·실사·판타지 등 폭넓은 스타일 지원.'},
+{id:'bingimg',  name:'MS AI 이미지 생성기',url:'https://www.bing.com/images/create',           fav:'🖼️', cat:'image',  price:'free',     ko:true,  hot:false, rec:false, desc:'Microsoft Bing의 무료 AI 이미지 생성기. DALL-E 3 모델 기반. 마이크로소프트 계정으로 무료. 한국어 프롬프트 지원.'},
+{id:'stability',name:'Stability AI',    url:'https://stability.ai/',                            fav:'🏗️', cat:'image',  price:'freemium', ko:false, hot:false, rec:false, desc:'Stable Diffusion 오픈소스 이미지 AI 개발사. 이미지·영상·3D 생성 모델 다수 제공. 개발자들에게 특히 유용.'},
+{id:'photomaker',name:'PhotoMaker V2',  url:'https://huggingface.co/spaces/TencentARC/PhotoMaker-V2',fav:'🎠',cat:'image',price:'free',ko:false,hot:false,rec:false,desc:'사진 속 인물의 얼굴을 유지하면서 다양한 스타일로 변환. 셀카를 애니메이션이나 유화 스타일로 변환 가능.'},
+{id:'imagefx',  name:'Google ImageFX',  url:'https://labs.google/fx/ko/tools/image-fx',        fav:'🌈', cat:'image',  price:'free',     ko:false, hot:false, rec:false, desc:'구글의 Imagen 3 모델 기반 이미지 생성 도구. 사실적이고 고품질의 이미지 생성. 구글 계정으로 무료 사용 가능.'},
+{id:'whisk',    name:'Google Whisk',    url:'https://labs.google/fx/ko/tools/whisk',            fav:'🌀', cat:'image',  price:'free',     ko:false, hot:false, rec:false, desc:'이미지 3장을 조합해 새로운 이미지를 생성하는 구글의 실험적 AI. 주제·장면·스타일 이미지를 합쳐 창의적 결과물 생성.'},
+{id:'vheer',    name:'Vheer',           url:'https://vheer.com/',                               fav:'🎪', cat:'image',  price:'free',     ko:false, hot:false, rec:false, desc:'무료 온라인 AI 이미지 생성기. 간단한 인터페이스로 누구나 쉽게 사용 가능. 다양한 스타일과 해상도 옵션 제공.'},
+{id:'abocado',  name:'Abocado AI',      url:'https://abocado.ai/ko/intro',                      fav:'🌱', cat:'image',  price:'free',     ko:true,  hot:false, rec:false, desc:'세계 최초 이미지 AI 에이전트. 무료 AI 이미지 생성 및 자동화된 이미지 제작 워크플로우 지원.'},
+{id:'artbot',   name:'ArtBot',          url:'https://artbot.site/create',                       fav:'🤖', cat:'image',  price:'free',     ko:false, hot:false, rec:false, desc:'Stable Diffusion 기반 무료 이미지 생성 서비스. 브라우저에서 바로 사용 가능. 가입 불필요. 다양한 모델 선택 가능.'},
+// ─── VIDEO (14) ──────────────────────────────────────────────
+{id:'sora',     name:'Sora (소라)',      url:'https://openai.com/index/sora/',                  fav:'🎥', cat:'video',  price:'paid',     ko:false, hot:true,  rec:true,  desc:'OpenAI의 텍스트→영상 AI. 텍스트 설명만으로 최대 1분 고품질 영상 생성. 영화 같은 장면 연출 가능. ChatGPT Pro에서 사용.'},
+{id:'heygen',   name:'HeyGen',          url:'https://www.heygen.com/',                          fav:'🎤', cat:'video',  price:'freemium', ko:false, hot:true,  rec:true,  desc:'텍스트를 입력하면 실제 사람처럼 말하는 AI 아바타 영상 자동 생성. 다국어 더빙·내 얼굴로 아바타 제작 가능.'},
+{id:'vrew',     name:'Vrew (브루)',      url:'https://vrew.ai/ko',                              fav:'✂️', cat:'video',  price:'freemium', ko:true,  hot:true,  rec:true,  desc:'국내 No.1 AI 영상 편집 프로그램. 자막 자동 생성·AI 보이스·영상 자르기 자동화. 유튜버·콘텐츠 크리에이터 필수 도구.'},
+{id:'hailuo',   name:'Hailuo AI',       url:'https://hailuoai.video/',                          fav:'🌊', cat:'video',  price:'freemium', ko:false, hot:true,  rec:false, desc:'텍스트와 이미지로 영상을 생성하는 AI. 부드럽고 사실적인 영상 품질. 무료 크레딧 제공. 빠르게 성장 중인 서비스.'},
+{id:'hedra',    name:'Hedra',           url:'https://www.hedra.com/',                           fav:'👤', cat:'video',  price:'freemium', ko:false, hot:false, rec:false, desc:'사진 한 장으로 말하는 AI 영상 제작. 음성 파일 업로드 시 사진 속 인물이 그 목소리로 말하는 영상 생성.'},
+{id:'synthesys',name:'Synthesys.io',    url:'https://synthesys.io/',                            fav:'🧑‍💻',cat:'video',  price:'paid',     ko:false, hot:false, rec:false, desc:'가상 인간 아바타 영상 제작 전문 플랫폼. 60개 이상 언어 지원. 다양한 AI 아바타 선택 가능.'},
+{id:'vivago',   name:'Vivago AI',       url:'https://vivago.ai/home',                           fav:'🎞️', cat:'video',  price:'freemium', ko:false, hot:false, rec:false, desc:'텍스트를 이미지·영상으로 변환하는 AI. 원하는 분위기나 모습을 글로 표현하면 AI가 이미지나 동영상을 자동 생성.'},
+{id:'topview',  name:'Topview AI',      url:'https://www.topview.ai/',                          fav:'🎦', cat:'video',  price:'freemium', ko:false, hot:false, rec:false, desc:'제품 URL을 입력하면 자동으로 마케팅 영상 제작. SNS 광고 영상·제품 홍보 영상 자동 생성에 특화.'},
+{id:'capcut',   name:'CapCut (캡컷)',   url:'https://www.capcut.com/',                          fav:'✂️', cat:'video',  price:'freemium', ko:true,  hot:true,  rec:false, desc:'TikTok 모회사 ByteDance의 영상 편집 앱. 자막 자동 생성·AI 효과·템플릿 제공. 초보자도 쉽게 릴스·쇼츠 제작 가능.'},
+{id:'faceswap', name:'Face Swap (vidmage)',url:'https://vidmage.ai/ko/video-face-swap',         fav:'😊', cat:'video',  price:'freemium', ko:true,  hot:false, rec:false, desc:'영상이나 이미지 속 얼굴을 다른 얼굴로 자연스럽게 교체하는 AI 기술. 재미있는 콘텐츠 제작에 활용.'},
+{id:'veo4',     name:'Veo-4',           url:'https://veo-4.org/',                               fav:'🌊', cat:'video',  price:'freemium', ko:false, hot:false, rec:false, desc:'Google의 최신 영상 생성 AI Veo 모델 기반 서비스. 텍스트·이미지에서 고품질 영상 생성. 영화급 영상 제작 가능.'},
+{id:'veo5',     name:'Veo-5',           url:'https://veo5.org/',                                fav:'🌊', cat:'video',  price:'freemium', ko:false, hot:false, rec:false, desc:'Veo-4의 업그레이드 버전. 더욱 향상된 영상 품질과 긴 클립 생성 가능. Google DeepMind의 차세대 비디오 AI.'},
+{id:'vmeg',     name:'VMEG AI',         url:'https://www.vmeg.ai/ko/',                          fav:'📹', cat:'video',  price:'freemium', ko:true,  hot:false, rec:false, desc:'AI 기반 영상 생성 및 편집 도구. 텍스트나 이미지로부터 영상 콘텐츠를 빠르게 제작. 한국어 인터페이스 제공.'},
+{id:'flow',     name:'Google Flow',     url:'https://labs.google/fx/ko/tools/flow',             fav:'🎯', cat:'video',  price:'free',     ko:false, hot:false, rec:false, desc:'구글이 만든 AI 영상 편집·스토리보드 제작 도구. 직관적인 인터페이스로 영상 흐름을 설계하고 생성.'},
+// ─── PPT (6) ─────────────────────────────────────────────────
+{id:'gamma',    name:'Gamma (감마)',     url:'https://gamma.app/',                               fav:'✨', cat:'ppt',    price:'freemium', ko:false, hot:true,  rec:true,  desc:'텍스트만 입력하면 AI가 자동으로 PPT 제작. 아름다운 디자인 템플릿과 AI 이미지 자동 삽입. 공유·임베드도 쉬움.'},
+{id:'pitch',    name:'Pitch AI',        url:'https://pitch.com/',                               fav:'🎯', cat:'ppt',    price:'freemium', ko:false, hot:false, rec:false, desc:'Gamma보다 강력한 AI PPT 도구. 팀 협업 기능 내장. 고품질 비즈니스 프레젠테이션에 최적화.'},
+{id:'workppt',  name:'WorkPPT',         url:'https://ppt.softtooler.com/kr/aiPowerPoint',       fav:'📊', cat:'ppt',    price:'freemium', ko:true,  hot:false, rec:false, desc:'주제 입력만으로 PPT를 자동 생성하는 AI 도구. 비즈니스·교육용 슬라이드 제작. 한국어 지원.'},
+{id:'napkin',   name:'Napkin AI',       url:'https://www.napkin.ai/',                           fav:'📈', cat:'ppt',    price:'freemium', ko:false, hot:true,  rec:false, desc:'텍스트를 인포그래픽·다이어그램으로 자동 변환. PPT 삽입 자료 제작에 최적. "인포그래픽 끝판왕"으로 불림.'},
+{id:'visme',    name:'Visme',           url:'https://www.visme.co/',                            fav:'🌈', cat:'ppt',    price:'freemium', ko:false, hot:false, rec:false, desc:'프레젠테이션·인포그래픽·보고서를 만드는 올인원 시각화 도구. 수천 개의 템플릿, AI 콘텐츠 생성 기능 포함.'},
+{id:'aislide',  name:'AI 슬라이드 스튜디오',url:'https://www.aislidestudio.com/',              fav:'🖼️', cat:'ppt',    price:'freemium', ko:false, hot:false, rec:false, desc:'주제를 입력하면 AI가 몇 초 만에 10개 슬라이드 세트를 자동 생성. 이미지로 영상도 제작 가능.'},
+// ─── DOC (8) ─────────────────────────────────────────────────
+{id:'notebooklm',name:'NotebookLM (노트북LM)',url:'https://notebooklm.google.com/',             fav:'📒', cat:'doc',    price:'free',     ko:false, hot:true,  rec:true,  desc:'구글의 맞춤형 AI 리서치 도구. PDF·문서·유튜브 업로드 후 AI가 분석·요약·질답. 팟캐스트 자동 생성 기능도 화제.'},
+{id:'lilys',    name:'Lilys AI (릴리스AI)',url:'https://lilys.ai/',                             fav:'📋', cat:'doc',    price:'freemium', ko:true,  hot:false, rec:false, desc:'유튜브 영상·웹사이트·PDF·녹음 파일을 빠르게 요약. 모르는 단어 클릭 시 AI가 맥락에 맞게 설명.'},
+{id:'chatpdf',  name:'ChatPDF',         url:'https://www.chatpdf.com/',                         fav:'💬', cat:'doc',    price:'freemium', ko:true,  hot:false, rec:false, desc:'PDF 파일을 업로드하고 AI와 대화하듯 질문. 논문·계약서·보고서 핵심 내용을 빠르게 파악.'},
+{id:'scispace', name:'SciSpace',        url:'https://scispace.com/ko',                          fav:'🔬', cat:'doc',    price:'freemium', ko:true,  hot:false, rec:false, desc:'과학 논문 전용 AI 도우미. 어려운 영문 논문을 쉽게 요약·번역. 관련 논문 검색·인용 등 연구자에게 필수 도구.'},
+{id:'storytell',name:'Storytell',       url:'https://storytell.ai/',                            fav:'📝', cat:'doc',    price:'freemium', ko:false, hot:false, rec:false, desc:'문서·회의록·영상을 AI로 분석하고 인사이트 추출. 기업 내 지식 관리와 문서 요약에 특화된 팀 협업 도구.'},
+{id:'liner',    name:'라이너 (Liner)',  url:'https://app.liner.com/ko',                         fav:'🔎', cat:'doc',    price:'freemium', ko:true,  hot:false, rec:false, desc:'신뢰도 있는 학술 논문 작성과 연구를 위한 AI 검색엔진. 하이라이팅·요약·논문 찾기까지 연구자에게 최적화.'},
+{id:'updf',     name:'UPDF AI',         url:'https://ai.updf.com/',                             fav:'📁', cat:'doc',    price:'freemium', ko:true,  hot:false, rec:false, desc:'PDF 편집·요약·번역을 한 번에 해결하는 AI PDF 도구. 여러 PDF 파일을 동시 분석하고 대화하듯 내용 파악 가능.'},
+{id:'slid',     name:'Slid (슬리드)',   url:'https://app.slid.cc/',                             fav:'📓', cat:'doc',    price:'freemium', ko:true,  hot:false, rec:false, desc:'온라인 강의를 들으며 자동으로 노트 필기하는 AI. 강의 화면 캡처+AI 요약 동시 진행. 수강생들에게 인기.'},
+// ─── MUSIC (8) ───────────────────────────────────────────────
+{id:'suno',     name:'Suno (수노)',     url:'https://suno.com/',                                fav:'🎸', cat:'music',  price:'freemium', ko:false, hot:true,  rec:true,  desc:'가사와 장르를 입력하면 AI가 실제 노래를 작곡·제작. 보컬·멜로디·악기 편성까지 자동. 가장 인기 있는 AI 음악 생성 도구.'},
+{id:'udio',     name:'Udio',           url:'https://www.udio.com/create',                      fav:'🎹', cat:'music',  price:'freemium', ko:false, hot:false, rec:false, desc:'Suno와 함께 양대 AI 음악 생성 도구. 다양한 음악 장르 지원. 고품질 음원 생성. 가사 커스터마이징 가능.'},
+{id:'producer', name:'Producer.AI',    url:'https://www.producer.ai/',                         fav:'🎛️', cat:'music',  price:'freemium', ko:false, hot:false, rec:false, desc:'AI 기반 음악 프로듀싱 플랫폼. 비트 생성·트랙 편집·믹싱을 AI가 도와주는 음악 제작 도구. 전문 음악 프로덕션을 간편하게.'},
+{id:'typecast', name:'Typecast (타입캐스트)',url:'https://typecast.ai/kr',                     fav:'🎙️', cat:'music',  price:'freemium', ko:true,  hot:false, rec:false, desc:'텍스트를 입력하면 실제 성우 같은 목소리로 더빙. 다양한 AI 성우 선택, 감정·속도·음높이 조절. 유튜브·광고 더빙에 활용.'},
+{id:'otter',    name:'Otter.AI',       url:'https://otter.ai/',                                fav:'🎧', cat:'music',  price:'freemium', ko:false, hot:false, rec:false, desc:'회의나 강의 내용을 실시간으로 텍스트로 변환·기록하는 AI 메모 도구. Zoom·Teams 연동 가능. 영어 특화.'},
+{id:'clovanote',name:'클로바노트',     url:'https://clovanote.naver.com/',                      fav:'📱', cat:'music',  price:'free',     ko:true,  hot:false, rec:false, desc:'네이버 클로바의 한국어 회의록 AI. 음성을 텍스트로 변환하고 요약. 한국어 인식률이 뛰어남. 네이버 계정으로 무료 사용.'},
+{id:'jocasso',  name:'Jocasso (조카소)',url:'https://jocasso.codemafia.io/ko',                 fav:'🌐', cat:'music',  price:'freemium', ko:true,  hot:false, rec:false, desc:'자막·번역·더빙을 한 번에 처리하는 국내 AI 도구. 영상에 한국어 자막 자동 삽입 및 AI 사진 생성 기능도 제공.'},
+{id:'tiro',     name:'Tiro (티로)',    url:'https://tiro.ooo/ko',                              fav:'🏫', cat:'music',  price:'freemium', ko:true,  hot:false, rec:false, desc:'실시간 대화 기록 및 AI 요약 노트 서비스. 회의·강의·인터뷰를 실시간으로 기록하고 완벽한 요약 노트를 자동 생성.'},
+// ─── DESIGN (7) ──────────────────────────────────────────────
+{id:'canva',    name:'Canva (캔바)',    url:'https://www.canva.com/',                            fav:'🎨', cat:'design', price:'freemium', ko:true,  hot:true,  rec:true,  desc:'세계 최고 온라인 디자인 플랫폼. SNS 카드뉴스·포스터·명함·영상 제작. AI 이미지 생성·배경 제거 등 AI 기능 다수 내장.'},
+{id:'figma',    name:'Figma',          url:'https://www.figma.com/ko-kr/',                      fav:'🖍️', cat:'design', price:'freemium', ko:true,  hot:false, rec:false, desc:'UI/UX 디자인의 표준 협업 도구. 웹/앱 디자인·프로토타입 제작. AI 플러그인으로 자동 디자인 생성 기능 확장 중.'},
+{id:'creatie',  name:'Creatie.AI',     url:'https://creatie.ai/',                               fav:'🔮', cat:'design', price:'freemium', ko:false, hot:false, rec:false, desc:'AI 기반 UI/UX 디자인 도구. 텍스트로 UI 화면을 자동 생성. Figma 대체재로 주목받는 차세대 디자인 플랫폼.'},
+{id:'recraft',  name:'Recraft AI (리크레프트)',url:'https://www.recraft.ai/',                  fav:'🪄', cat:'design', price:'freemium', ko:false, hot:false, rec:false, desc:'로고·아이콘·벡터 그래픽 생성에 특화된 AI. SVG 형식 출력 지원. 브랜딩·로고 제작에 최적화된 이미지 AI.'},
+{id:'vistacreate',name:'VistaCreate',  url:'https://create.vista.com/',                         fav:'🌈', cat:'design', price:'freemium', ko:false, hot:false, rec:false, desc:'수천 개의 무료 템플릿과 AI 이미지 생성기가 포함된 무료 그래픽 디자인 도구. Canva의 강력한 경쟁자.'},
+{id:'lovart',   name:'Lovart AI',      url:'https://www.lovart.ai/',                            fav:'💡', cat:'design', price:'freemium', ko:false, hot:true,  rec:false, desc:'문장 하나로 전체 디자인 작업을 완성하는 AI 디자인 에이전트. 브랜드 디자인 패키지를 자동으로 생성.'},
+{id:'graphy',   name:'Graphy',         url:'https://graphy.app/',                               fav:'📊', cat:'design', price:'freemium', ko:false, hot:false, rec:false, desc:'데이터를 입력하면 아름다운 차트·그래프를 자동 생성. 인스타그램·PPT에 바로 사용할 수 있는 데이터 시각화 도구.'},
+// ─── MIND (3) ────────────────────────────────────────────────
+{id:'mapify',   name:'Mapify (맵피파이)',url:'https://mapify.so/ko',                            fav:'🌐', cat:'mind',   price:'freemium', ko:true,  hot:false, rec:false, desc:'PDF·유튜브·텍스트를 AI가 마인드맵으로 자동 변환. 복잡한 내용을 한눈에 파악. 한국어 콘텐츠도 지원.'},
+{id:'whimsical',name:'Whimsical',      url:'https://whimsical.com/',                            fav:'✏️', cat:'mind',   price:'freemium', ko:false, hot:false, rec:false, desc:'플로우차트·마인드맵·와이어프레임을 직관적으로 제작. AI가 마인드맵 자동 생성. 팀 협업 및 아이디어 정리에 최적.'},
+{id:'edrawmind',name:'EdrawMind 온라인',url:'https://www.edrawmind.com/app/create?lang=ko',    fav:'🧠', cat:'mind',   price:'freemium', ko:true,  hot:false, rec:false, desc:'AI 기반 마인드맵 제작 도구. 다양한 마인드맵 스타일과 템플릿. 파워포인트·PDF 내보내기 지원.'},
+// ─── SEARCH (7) ──────────────────────────────────────────────
+{id:'perplexity',name:'Perplexity (퍼플렉시티)',url:'https://www.perplexity.ai/',              fav:'🔭', cat:'search', price:'freemium', ko:false, hot:true,  rec:true,  desc:'질문하면 즉각 출처와 함께 답변하는 AI 검색엔진. 구글 검색의 혁신적 대안. 최신 정보를 정확한 출처와 함께 제공.'},
+{id:'genspark',  name:'Genspark.AI',   url:'https://www.genspark.ai/',                         fav:'⚡', cat:'search', price:'freemium', ko:false, hot:true,  rec:false, desc:'웹 검색 결과를 AI가 자동 정리해 맞춤 요약 페이지 생성. 빠른 리서치에 최적화된 스파크페이지 제공.'},
+{id:'felo',     name:'Felo AI (펠로AI)',url:'https://felo.ai/ko/search',                       fav:'🌟', cat:'search', price:'freemium', ko:true,  hot:false, rec:false, desc:'다국어 AI 검색엔진. 한국어로 검색하면 전 세계 정보를 수집·번역·요약. 일본어·중국어 자료도 한국어로 요약.'},
+{id:'goover',   name:'Goover',         url:'https://goover.ai/home',                           fav:'🎯', cat:'search', price:'freemium', ko:false, hot:false, rec:false, desc:'AI 기반 뉴스 큐레이션 및 리서치 도구. 관심 분야의 최신 뉴스를 요약 제공. 정보 과부하를 해결하는 스마트 뉴스 리더.'},
+{id:'scira',    name:'Scira AI',       url:'https://scira.ai/',                                fav:'⭐', cat:'search', price:'free',     ko:false, hot:false, rec:false, desc:'오픈소스 AI 검색 도구. 실시간 웹 검색과 함께 GPT-4o·Claude 등 여러 AI 모델로 답변 생성. 투명한 검색 과정 제공.'},
+{id:'navercue', name:'네이버 큐 (Cue:)',url:'https://search.naver.com/search.naver?query=Cue:', fav:'🔵', cat:'search', price:'free',     ko:true,  hot:false, rec:false, desc:'네이버의 AI 검색 서비스. 복잡한 질문을 이해하고 여러 출처를 종합해 답변. 한국 맥락의 정보 검색에 강점.'},
+{id:'ooai',     name:'oo.AI (카카오)', url:'https://oo.ai/',                                   fav:'🟡', cat:'search', price:'free',     ko:true,  hot:false, rec:false, desc:'카카오에서 만든 가장 빠른 AI 검색 서비스. 실시간 웹 검색 기반으로 빠르고 정확한 한국어 답변 제공.'},
+// ─── WEB (8) ─────────────────────────────────────────────────
+{id:'v0',       name:'v0 (버셀)',       url:'https://v0.dev/',                                  fav:'🚀', cat:'web',    price:'freemium', ko:false, hot:true,  rec:true,  desc:'텍스트로 웹 UI 컴포넌트를 즉시 생성하는 Vercel의 AI 도구. React 코드를 자동 생성하고 실시간 미리보기. 개발자 필수 도구.'},
+{id:'lovable',  name:'Lovable',        url:'https://lovable.dev/',                              fav:'❤️', cat:'web',    price:'freemium', ko:false, hot:true,  rec:true,  desc:'대화하듯 설명하면 완성된 웹앱을 자동 제작하는 AI. 코딩 없이 풀스택 앱 개발 가능. "vibe coding"의 대표 도구.'},
+{id:'framer',   name:'Framer AI',      url:'https://www.framer.com/features/ai/',               fav:'🖼️', cat:'web',    price:'freemium', ko:false, hot:false, rec:false, desc:'AI를 이용해 5분 만에 홈페이지 제작. 텍스트 설명만으로 완성된 반응형 웹사이트 생성. 디자인 퀄리티가 높음.'},
+{id:'readdy',   name:'Readdy 웹제작',  url:'https://readdy.ai/',                                fav:'📱', cat:'web',    price:'freemium', ko:true,  hot:false, rec:false, desc:'AI로 랜딩페이지·포트폴리오 웹사이트를 빠르게 제작. 한국어 입력 지원. 코딩 지식 없이도 전문적인 웹사이트 완성.'},
+{id:'same',     name:'Same (홈피 복제)',url:'https://same.new/',                                fav:'🔵', cat:'web',    price:'freemium', ko:false, hot:true,  rec:false, desc:'마음에 드는 홈페이지 URL을 입력하면 AI가 즉시 클론 생성. "클릭 한 번으로 홈페이지 복제"로 유명. 빠른 프로토타이핑에 활용.'},
+{id:'metagptx', name:'MetaGPT X',      url:'https://mgx.dev/',                                 fav:'🏗️', cat:'web',    price:'freemium', ko:false, hot:true,  rec:false, desc:'AI 에이전트 팀이 협력해 소프트웨어를 자동 개발. 요구사항을 입력하면 기획·설계·코딩까지 자동화. 개발자용 고급 도구.'},
+{id:'stitch',   name:'Google Stitch',  url:'https://stitch.withgoogle.com/',                   fav:'🎨', cat:'web',    price:'free',     ko:false, hot:false, rec:false, desc:'구글의 AI UI 생성 도구. 프롬프트나 이미지로 모바일·웹 앱 UI를 자동 생성. Flutter·Android 코드로 내보내기 가능.'},
+{id:'wordpress',name:'WordPress (워드프레스)',url:'https://ko.wordpress.org/',                 fav:'🌐', cat:'web',    price:'free',     ko:true,  hot:false, rec:false, desc:'세계 최다 사용 오픈소스 CMS. 전체 웹사이트의 약 43%가 워드프레스로 제작. 블로그·쇼핑몰·기업 홈페이지 구축에 활용.'},
+// ─── AUTO (11) ───────────────────────────────────────────────
+{id:'zapier',   name:'Zapier',         url:'https://zapier.com/',                               fav:'🔗', cat:'auto',   price:'freemium', ko:false, hot:true,  rec:true,  desc:'6,000개 이상의 앱을 연결해 자동화하는 노코드 플랫폼. Gmail→Slack 자동전송, 폼→스프레드시트 자동 기록 등 반복 업무 자동화.'},
+{id:'make',     name:'Make (메이크)',  url:'https://www.make.com/en',                           fav:'⚙️', cat:'auto',   price:'freemium', ko:false, hot:false, rec:false, desc:'시각적 자동화 플랫폼. Zapier보다 강력하고 복잡한 워크플로우 구성 가능. 무료 플랜이 넉넉하고 한국어 지원.'},
+{id:'notion',   name:'Notion AI',      url:'https://www.notion.com/ko/product',                 fav:'📓', cat:'auto',   price:'freemium', ko:true,  hot:true,  rec:false, desc:'AI가 탑재된 올인원 노트·문서·프로젝트 관리 도구. AI 글쓰기 도우미·요약·번역 등 생산성 기능 내장.'},
+{id:'m365',     name:'Microsoft 365 Copilot',url:'https://www.office.com/',                    fav:'🏢', cat:'auto',   price:'paid',     ko:true,  hot:false, rec:false, desc:'Word·Excel·PowerPoint·Teams에 AI 탑재. 문서 초안 작성·데이터 분석·PPT 자동 생성·회의 요약까지 MS 오피스 전반에 AI 통합.'},
+{id:'onlyoffice',name:'ONLYOFFICE',    url:'https://www.onlyoffice.com/',                       fav:'🖥️', cat:'auto',   price:'free',     ko:false, hot:false, rec:false, desc:'오픈소스 온라인 오피스 스위트. 문서·스프레드시트·프레젠테이션을 브라우저에서 편집. MS Office 호환. 협업 기능 내장.'},
+{id:'manus',    name:'Manus',          url:'https://manus.im/app',                              fav:'🤖', cat:'auto',   price:'freemium', ko:false, hot:true,  rec:false, desc:'복잡한 작업을 자율적으로 수행하는 AI 에이전트. 조사·작성·코딩을 스스로 계획하고 실행. "두 번째 뇌"로 불리는 AI.'},
+{id:'flowith',  name:'Flowith.io',     url:'https://beta.flowith.io/blank',                    fav:'💡', cat:'auto',   price:'freemium', ko:false, hot:true,  rec:false, desc:'캔버스 형태의 AI 협업 플랫폼. 여러 AI 모델을 노드로 연결해 복잡한 작업 플로우를 시각적으로 구성하고 실행.'},
+{id:'aistudio', name:'Google AI Studio',url:'https://aistudio.google.com/prompts/new_chat',    fav:'📊', cat:'auto',   price:'free',     ko:false, hot:false, rec:false, desc:'구글의 Gemini 모델을 직접 사용해볼 수 있는 개발자 플랫폼. 이미지 생성부터 편집까지 무료. API 키 발급도 가능.'},
+{id:'cluely',   name:'Cluely',         url:'https://cluely.com/',                               fav:'🕵️', cat:'auto',   price:'freemium', ko:false, hot:true,  rec:false, desc:'화면을 실시간으로 분석하고 도움을 주는 AI 어시스턴트. 회의·인터뷰 중 실시간 힌트와 답변 제공. 독특한 활용 방식으로 화제.'},
+{id:'blackbox', name:'Blackbox AI',    url:'https://www.blackbox.ai/',                          fav:'💻', cat:'auto',   price:'freemium', ko:false, hot:false, rec:false, desc:'개발자를 위한 AI 코딩 도우미. 코드 작성·디버깅·설명을 AI가 지원. 웹페이지 내 코드 추출·재사용 기능도 제공.'},
+{id:'skywork',  name:'Skywork',        url:'https://skywork.ai/',                               fav:'⚡', cat:'auto',   price:'freemium', ko:false, hot:false, rec:false, desc:'중국 Kunlun Tech의 AI 에이전트 플랫폼. 복잡한 리서치·분석 작업을 자율적으로 수행하는 딥 리서치 전문 AI.'},
+// ─── WRITE (6) ───────────────────────────────────────────────
+{id:'jasper',   name:'Jasper AI',      url:'https://www.jasper.ai/',                            fav:'📝', cat:'write',  price:'paid',     ko:false, hot:false, rec:false, desc:'마케팅용 텍스트 생성에 최적화된 AI 글쓰기 도구. 블로그·SNS·광고 문구·이메일 등 마케팅 콘텐츠 자동화.'},
+{id:'copyai',   name:'Copy.AI',        url:'https://www.copy.ai/',                              fav:'✏️', cat:'write',  price:'freemium', ko:false, hot:false, rec:false, desc:'카피라이팅 자동화 도구. 광고 문구·제품 설명·SNS 포스트를 빠르게 생성. 마케터·사업자에게 필수 도구.'},
+{id:'maskara',  name:'Maskara.AI',     url:'https://www.maskara.ai/',                           fav:'🎯', cat:'write',  price:'freemium', ko:false, hot:false, rec:false, desc:'AI 프롬프트를 최적화해주는 AI. 좋은 결과를 얻기 위한 프롬프트 작성법을 자동으로 개선해주는 메타 AI 도구.'},
+{id:'pocketprompt',name:'포켓 프롬프트',url:'https://pocket-prompt.com/prompt/text',            fav:'📚', cat:'write',  price:'free',     ko:true,  hot:false, rec:false, desc:'ChatGPT 등 AI에서 활용할 수 있는 검증된 프롬프트 모음집. 목적별·분야별로 정리된 한국어 프롬프트 라이브러리.'},
+{id:'nanobanana',name:'나노 바나나 프롬프트',url:'https://nanobananaprompts.ai/ko',             fav:'🍌', cat:'write',  price:'free',     ko:true,  hot:false, rec:false, desc:'AI 이미지 생성을 위한 한국어 프롬프트 플랫폼. 다른 사용자들의 성공적인 이미지 프롬프트를 참고하고 복사해 활용 가능.'},
+{id:'nanogallery',name:'나노 바나나 갤러리',url:'https://nanobananaprompt.org/prompts/',        fav:'🖼️', cat:'write',  price:'free',     ko:true,  hot:false, rec:false, desc:'AI 이미지 프롬프트 갤러리 사이트. 다양한 스타일·주제의 이미지 생성 프롬프트를 갤러리 형식으로 제공. 영감 얻기에 최적.'},
+// ─── ETC (11) ────────────────────────────────────────────────
+{id:'tidio',    name:'Tidio (고객서비스 챗봇)',url:'https://www.tidio.com/',                    fav:'💬', cat:'etc',    price:'freemium', ko:false, hot:false, rec:false, desc:'쇼핑몰·웹사이트용 AI 고객서비스 챗봇. 자동으로 고객 질문에 답변하고 문의를 처리. CS 비용 절감에 탁월.'},
+{id:'guru',     name:'Guru (기업 위키)',url:'https://www.getguru.com/ko',                       fav:'🏢', cat:'etc',    price:'freemium', ko:true,  hot:false, rec:false, desc:'AI 기반 기업 지식 검색·인트라넷·위키 플랫폼. 직원들이 필요한 정보를 AI로 빠르게 검색. 기업 내부 지식 관리에 최적.'},
+{id:'minimax',  name:'MiniMax Agent',  url:'https://agent.minimax.io/',                         fav:'🤖', cat:'etc',    price:'freemium', ko:false, hot:false, rec:false, desc:'명령 한 문장으로 챗봇을 만드는 차세대 AI 에이전트. 커스텀 AI 어시스턴트를 코딩 없이 제작하고 배포 가능.'},
+{id:'adot',     name:'에이닷 (SKT)',   url:'https://adot.ai/multillm',                          fav:'🌟', cat:'etc',    price:'free',     ko:true,  hot:false, rec:false, desc:'SKT가 만든 나만의 AI 개인 비서. 여러 AI 모델을 하나의 앱에서 사용. 통화 요약·일정 관리·생활 정보 제공.'},
+{id:'monica',   name:'Monica',         url:'https://monica.im/home',                            fav:'🌈', cat:'etc',    price:'freemium', ko:false, hot:false, rec:false, desc:'크롬 확장 프로그램 형태의 AI 어시스턴트. 웹 브라우징 중 AI 도움·번역·요약·이미지 생성 등 다기능 통합 AI 사이드바.'},
+{id:'yeschat',  name:'YesChat AI',     url:'https://www.yeschat.ai/',                           fav:'🔍', cat:'etc',    price:'free',     ko:false, hot:false, rec:false, desc:'ChatGPT·Claude·Gemini 등 다양한 AI 모델을 가입 없이 무료로 체험. AI 모델 비교에 유용한 멀티 AI 접속 플랫폼.'},
+{id:'sider',    name:'Sider',          url:'https://sider.ai/ko/chat',                          fav:'🌐', cat:'etc',    price:'freemium', ko:true,  hot:false, rec:false, desc:'크롬 사이드바에서 AI와 대화하는 도구. 웹 브라우징 중 페이지 요약·번역·글쓰기 도움을 바로 받을 수 있음.'},
+{id:'mixboard', name:'Google 믹스보드',url:'https://mixboard.google.com/projects',              fav:'🎪', cat:'etc',    price:'free',     ko:false, hot:false, rec:false, desc:'구글의 실험적 AI 크리에이티브 도구. 이미지·음악·텍스트를 혼합해 새로운 미디어를 생성하는 멀티모달 창작 플랫폼.'},
+{id:'opal',     name:'Opal (Google)', url:'https://opal.google/',                               fav:'🔮', cat:'etc',    price:'free',     ko:false, hot:false, rec:false, desc:'구글의 실험적 AI 창작 도구. Google Labs에서 개발한 새로운 형태의 AI 생성 도구. 다양한 크리에이티브 기능 탐색 가능.'},
+{id:'toolify',  name:'Toolify AI',     url:'https://www.toolify.ai/ko/',                        fav:'💡', cat:'etc',    price:'free',     ko:true,  hot:false, rec:false, desc:'최고의 AI 도구 디렉토리 및 목록 사이트. 새로운 AI 도구를 발견하고 비교. AI 도구 트렌드를 파악하는 데 유용.'},
+{id:'daven',    name:'Daven AI',       url:'https://www.daven.ai/',                             fav:'🤖', cat:'etc',    price:'freemium', ko:false, hot:false, rec:false, desc:'AI 기반 다용도 어시스턴트 플랫폼. 다양한 AI 작업을 통합 지원하는 서비스. AI 에이전트 기반의 작업 자동화 도구.'},
+// ─── GPTs / GEMs ─────────────────────────────────────────────
+{id:'gpts_muzbox',      name:'무료 GPTs 공개 블로그',       url:'https://muzbox.tistory.com/category/AI%2C%20%EB%AF%B8%EB%9E%98%EA%B8%B0%EC%88%A0/%EB%AC%B4%EB%A3%8C%20GPTS%20%EA%B3%B5%EA%B0%9C', fav:'📦', cat:'gpts', price:'free', ko:true,  hot:false, rec:false, desc:'다양한 실용 GPTs를 무료로 공개하는 블로그. ChatGPT GPT 스토어에서 바로 사용 가능한 봇들을 소개·배포.'},
+{id:'gpts_watermark',   name:'AI 텍스트 워터마크 감지·제거',url:'https://muzbox.tistory.com/483574',                                                                                                   fav:'🔍', cat:'gpts', price:'free', ko:true,  hot:false, rec:false, desc:'ChatGPT 등 AI가 생성한 텍스트에 숨겨진 워터마크를 감지하고 제거하는 도구 소개 포스팅.'},
+{id:'gpts_deepresearch', name:'딥리서치 프롬프트 아키텍트', url:'https://chatgpt.com/g/g-67bfb09513648191a2d188e90d708def-caesgpt-dibriseoci-peurompeuteu-akitegteu',                                fav:'🔬', cat:'gpts', price:'freemium', ko:true, hot:true,  rec:true,  desc:'ChatGPT 딥리서치 기능을 극대화하는 프롬프트를 설계해주는 전문 GPT. 체계적 리서치 구조 수립에 특화.'},
+{id:'gpts_stylegen',    name:'시각 스타일 분석 프롬프트 생성기', url:'https://chatgpt.com/g/g-67eb251c31b48191bcb40301534bc257-sigag-seutail-bunseog-mic-peurompeuteu-saengseonggi',               fav:'🎨', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'이미지를 분석해 시각적 스타일을 파악하고 유사한 이미지를 생성할 수 있는 최적 프롬프트를 만들어주는 GPT.'},
+{id:'gpts_humanize',    name:'AI 작성글 인간화',             url:'https://chatgpt.com/g/g-6786ffee60c48191a207fb7e1dd4a2e3-ingan-naemsae-ai-jagseonggeul-inganhwa',                                fav:'👤', cat:'gpts', price:'freemium', ko:true, hot:true,  rec:true,  desc:'AI가 쓴 글을 자연스러운 인간 문체로 변환해주는 GPT. AI 감지기를 우회하고 개성 있는 글쓰기로 탈바꿈.'},
+{id:'gpts_imgprompt',   name:'고화질 이미지 생성 프롬프트 전문가', url:'https://chatgpt.com/g/g-67a5778c01a081919a6deb7ea4615ace-caesgpt-gohwajil-imiji-saengseong-peurompeuteu-jeonmunga',      fav:'🖼️', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'Midjourney·DALL-E·Stable Diffusion 등을 위한 고품질 이미지 생성 프롬프트를 전문적으로 작성해주는 GPT.'},
+{id:'gpts_expandprompt',name:'확장 프롬프트 생성기(딥리서치)', url:'https://chatgpt.com/g/g-67b6b43aae588191b484b19eac452b7b-caesgpt-hwagjang-peurompeuteu-saengseonggi-curon-dibriseoci-coejeoghwa', fav:'⚡', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'추론 모드·딥리서치에 최적화된 확장 프롬프트를 자동 생성. 복잡한 질문을 체계적 구조로 변환하는 GPT.'},
+{id:'gpts_wizard',      name:'프롬프트 마법사 (Prompt Wizard)', url:'https://chatgpt.com/g/g-67ef0ae741348191a62f8e43dd1451ad-peurompeuteu-mabeobsa-prompt-wizard',                              fav:'🪄', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'원하는 목적에 맞는 최적 프롬프트를 마법처럼 만들어주는 GPT. 초보자도 전문가 수준의 프롬프트 작성 가능.'},
+{id:'gpts_screenshot2code', name:'Screenshot To Code GPT', url:'https://chatgpt.com/g/g-hz8Pw1quF-screenshot-to-code-gpt',                                                                     fav:'💻', cat:'gpts', price:'freemium', ko:false, hot:true, rec:true, desc:'스크린샷이나 UI 이미지를 업로드하면 HTML/CSS/React 코드로 변환해주는 GPT. 디자인→코드 변환에 특화.'},
+{id:'gpts_corpreport',  name:'기업분석보고서 GPT',          url:'https://chatgpt.com/g/g-ZIHLXoVfP-gieobbunseogbogoseo',                                                                          fav:'📊', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'기업명 입력만으로 체계적인 기업분석 보고서를 자동 작성해주는 GPT. 투자·경쟁사 분석에 활용.'},
+{id:'gpts_mjprompt',    name:'미드저니 V6 프롬프트 GPT',   url:'https://chatgpt.com/g/g-b2o6lRpMI-mideujeoni-v6-peurompeuteu-gpt-professional-version',                                          fav:'🎭', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'Midjourney V6 전용 고품질 프롬프트를 생성하는 GPT. 프로페셔널 버전으로 세밀한 스타일 제어 가능.'},
+{id:'gpts_playground',  name:'ChatGPT Playground GPT',   url:'https://chatgpt.com/g/g-5VFOJosej-playground',                                                                                   fav:'🧪', cat:'gpts', price:'freemium', ko:false, hot:false, rec:false, desc:'ChatGPT 내에서 다양한 AI 실험을 자유롭게 할 수 있는 플레이그라운드 GPT.'},
+{id:'gpts_roleprompt',  name:'역할 프롬프트 작성 지시문',   url:'https://chatgpt.com/g/g-7w81e8lkw-yeoghal-peurompeuteu-jagseong-jisimun',                                                        fav:'🎯', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'AI에게 효과적으로 역할을 부여하는 시스템 프롬프트·지시문을 전문적으로 작성해주는 GPT.'},
+{id:'gpts_motherprompt',name:'마더 프롬프트 작성 GPT',     url:'https://chatgpt.com/g/g-PZiipyGHO-madeo-peurompeuteu-jagseong-mirakeulmaketing',                                                  fav:'💎', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'미라클마케팅 방식의 마더 프롬프트(핵심 프롬프트)를 작성해주는 GPT. 반복 활용 가능한 강력한 프롬프트 설계.'},
+{id:'gpts_ytsummary',   name:'유튜브 요약 왕 GPT',        url:'https://chatgpt.com/g/g-fjnI5Cr8i-yutyubeu-yoyag-wang-3jul-yoyag-jaesaengseong-syoceu-gisa-beulrogeu',                          fav:'▶️', cat:'gpts', price:'freemium', ko:true, hot:true, rec:false, desc:'유튜브 영상을 3줄 요약·재생성하고 쇼츠·기사·블로그 포스팅으로 변환해주는 GPT.'},
+{id:'gpts_startup',     name:'정부지원사업 기획 GPT',       url:'https://chatgpt.com/g/g-6789cb52ff0c8191b30144a9a3a1310c-v2-jeongbujiweonsaeob-aitem-gihoeg-gpt',                               fav:'🏛️', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'정부지원사업 아이템 기획을 도와주는 GPT v2. 사업 아이템 발굴부터 사업계획서 방향 설정까지 지원.'},
+{id:'gpts_changpa',     name:'창파봇 — 창업패키지 사업계획서', url:'https://chatgpt.com/g/g-26Qul4RkJ-yebicangeobpaekiji-cogicangeobpaekiji-saeobgyehoegseo-jagseongeul-dowadeuribnida-cangpabos', fav:'🚀', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'예비창업패키지·초기창업패키지 사업계획서 작성을 전문으로 도와주는 GPT 봇. 합격률 높은 계획서 작성 지원.'},
+{id:'gpts_soragpt',     name:'Sora GPT',                  url:'https://chatgpt.com/g/g-67b1f455eb688191925186fc2b622d99-sora-gpt',                                                              fav:'🎬', cat:'gpts', price:'freemium', ko:false, hot:false, rec:false, desc:'OpenAI Sora 영상 생성을 위한 최적 프롬프트를 작성해주는 GPT. 텍스트→영상 생성 효율을 극대화.'},
+{id:'gpts_writeforme',  name:'Write For Me GPT',          url:'https://chatgpt.com/g/g-B3hgivKK9-write-for-me',                                                                                  fav:'✍️', cat:'gpts', price:'freemium', ko:false, hot:true, rec:false, desc:'목적·톤·스타일을 지정하면 고품질 영문 글쓰기를 대신 해주는 GPT. 블로그·에세이·카피라이팅에 탁월.'},
+{id:'gpts_rio',         name:'RIO 프롬프트 엔지니어 GPT', url:'https://chatgpt.com/g/g-I8p2ncXFo-caesgpt-peurompeuteu-saengseonggi-rio-peurompeuteu-enjinieo',                                  fav:'🔧', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'Role·Instruction·Output 구조의 RIO 프레임워크로 체계적인 프롬프트를 생성해주는 챗GPT 전용 GPT.'},
+{id:'gpts_gamma1',      name:'Gamma PPT 생성기 — 개요',  url:'https://chatgpt.com/g/g-8PGoJ0DpX-gamma-gamma-ppt-mandeulgi-gaeyo',                                                               fav:'📑', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'Gamma.app용 PPT 개요(아웃라인)를 자동 생성해주는 GPT. 주제 입력 시 슬라이드 구조를 설계해줌.'},
+{id:'gpts_gamma2',      name:'Gamma PPT 생성기 — 주제',  url:'https://chatgpt.com/g/g-pyUIxJFUi-gamma-gamma-ppt-mandeulgi-juje',                                                               fav:'📋', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'주제 기반으로 Gamma.app 슬라이드 콘텐츠를 작성해주는 GPT. 단계별 발표 스크립트까지 생성.'},
+{id:'gpts_gamma3',      name:'Gamma PPT 생성기 — 파일', url:'https://chatgpt.com/g/g-Bzqw5bMRp-gamma-gamma-ppt-mandeulgi-pail',                                                                fav:'📂', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'파일(PDF·DOCX)을 업로드하면 내용을 분석해 Gamma.app용 PPT 슬라이드를 자동 제작해주는 GPT.'},
+{id:'gpts_whatsearch',  name:'무엇이든 검색 GPT',         url:'https://chatgpt.com/g/g-cymc6AS6f-mueosideun-geomsaeg-whateversearch',                                                            fav:'🔎', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'어떤 주제든 심층 검색해 체계적으로 정리해주는 ChatGPT GPT. 복잡한 정보 탐색에 강점.'},
+{id:'gpts_ytchatbot',   name:'유튜브챗봇 GPT',            url:'https://chatgpt.com/g/g-63Zo7RiYw-yutyubeucaesbos',                                                                               fav:'💬', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'유튜브 링크를 입력하면 영상 내용에 대해 대화형으로 질문·답변할 수 있는 유튜브 전용 챗봇 GPT.'},
+{id:'gpts_jjincoding',  name:'찐코딩 프롬프트 엔지니어',  url:'https://chatgpt.com/g/g-673b17a5a76481919e9f5275041d8621-jjinkodingyi-peurompeuteu-enjinieo-gpt',                                fav:'🧑‍💻', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'찐코딩 채널의 프롬프트 엔지니어 GPT. 개발·코딩 관련 프롬프트 최적화와 AI 활용 팁 제공.'},
+{id:'gpts_naverblog',   name:'네이버 블로그 SEO 글작성기', url:'https://chatgpt.com/g/g-680597db4af08191a16d2de7617155fc-neibeo-beulrogeu-seocoejeogyi-geul-jagseonggi',                        fav:'🟢', cat:'gpts', price:'freemium', ko:true, hot:true, rec:false, desc:'네이버 블로그 SEO에 최적화된 포스팅을 자동 작성해주는 GPT. 키워드 배치·글 구조까지 SEO 맞춤 설계.'},
+{id:'gpts_mkcoach',     name:'AI 마케팅코치 — 4060세대',  url:'https://chatgpt.com/g/g-68317350a7088191b98db0b2bc06313c-ai-maketingkoci-4060sedaereul-wihan-kontenceu-maketing-jeonryag-gpt',  fav:'📣', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'4060세대를 위한 콘텐츠 마케팅 전략을 수립해주는 AI 마케팅코치 GPT. 디지털 마케팅 입문자에게 친화적.'},
+{id:'gpts_sapling',     name:'Sapling AI Detector',       url:'https://sapling.ai/ai-content-detector',                                                                                          fav:'🔬', cat:'gpts', price:'freemium', ko:false, hot:true, rec:false, desc:'ChatGPT·Llama·Gemini 등 AI가 작성한 텍스트를 감지하는 도구. 문장별 AI 작성 확률을 시각적으로 표시.'},
+{id:'gpts_imagefxprompt',name:'ImageFX 한→영 프롬프트 변환', url:'https://chatgpt.com/g/g-67b57a46311881918298ddf03ffd167a-google-image-fx-hangugeo-yeongeopeurompeuteu',                      fav:'🔄', cat:'gpts', price:'freemium', ko:true, hot:false, rec:false, desc:'한국어로 입력한 이미지 아이디어를 Google ImageFX에 최적화된 영어 프롬프트로 변환해주는 GPT.'},
+{id:'gpts_gptzero',     name:'GPTZero',                   url:'https://app.gptzero.me/home',                                                                                                     fav:'🕵️', cat:'gpts', price:'freemium', ko:false, hot:true, rec:false, desc:'AI 작성 글 감지 전문 플랫폼. 업로드한 문서의 AI 작성 비율과 신뢰도를 정밀 분석. 교육·언론계에서 널리 사용.'},
+{id:'gpts_gptstore',    name:'GPT Store — PARK JOON 봇',  url:'https://gptstore.ai/creators/user-SQmsjZkkSQfZE8Yst2Dn5b6G',                                                                   fav:'🏪', cat:'gpts', price:'free', ko:true, hot:false, rec:false, desc:'PARK JOON이 제작해 GPT 스토어에 공개한 다양한 GPT 봇 모음. 한국어 특화 업무용 GPT 다수 포함.'},
+{id:'gpts_communityreview',name:'GPTs 스토어 50개 리뷰',  url:'https://news.aikoreacommunity.com/gpts-seutoeo-50gaeyi-gpt-bos-ribyu/',                                                          fav:'📰', cat:'gpts', price:'free', ko:true, hot:false, rec:false, desc:'AI Korea 커뮤니티의 GPT 스토어 인기 봇 50개 3시간 분량 리뷰. 유용한 GPTs를 한눈에 파악 가능.'},
+{id:'gpts_thumbnail',   name:'한글 유튜브 썸네일 GPT 가이드', url:'https://muzbox.tistory.com/483576',                                                                                           fav:'🖼️', cat:'gpts', price:'free', ko:true, hot:false, rec:false, desc:'GPT-4o로 완벽한 한글 유튜브 썸네일을 만드는 방법 소개. 무료 GPTS 공개 포스팅.'},
+{id:'gpts_xmltemplate', name:'XML 구조화 프롬프트 템플릿',  url:'https://muzbox.tistory.com/483564',                                                                                             fav:'📄', cat:'gpts', price:'free', ko:true, hot:false, rec:false, desc:'초보자도 쉽게 따라하는 XML 기반 구조화 프롬프트 템플릿 사용법. 고급 프롬프트 엔지니어링 가이드.'},
+{id:'gpts_styleanalysis',name:'이미지 스타일 분석 GPTS',  url:'https://muzbox.tistory.com/483563',                                                                                              fav:'🎨', cat:'gpts', price:'free', ko:true, hot:false, rec:false, desc:'이미지 한 장만 올려도 프로처럼 스타일을 분석해주는 무료 GPTS 배포 포스팅. 이미지 AI 활용 팁 포함.'},
+{id:'gpts_toolify',     name:'GPT 헌터 — Toolify',        url:'https://www.toolify.ai/ko/gpts',                                                                                                  fav:'🔍', cat:'gpts', price:'free', ko:true, hot:false, rec:false, desc:'최고의 GPT 스토어 목록을 탐색하는 AI 도구 디렉토리. 카테고리별·인기별로 GPT를 검색·발견 가능.'},
+{id:'gpts_janggpm',     name:'일잘러 장피엠 프롬프트 생성기', url:'https://chatgpt.com/g/g-67ce8e810fc48191ba9b84a75d1aedc3-iljalreo-jangpiem-peurompeuteu-saengseonggi',                    fav:'💼', cat:'gpts', price:'freemium', ko:true, hot:true, rec:true, desc:'일잘러 PM 유튜버 장피엠이 만든 업무 프롬프트 생성기 GPT. 기획·보고서·전략문서 등 실무 프롬프트 전문.'},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE & PERSISTENCE  (자동 병합: DEFAULT에 추가된 항목 → 저장 데이터에 합산)
+// ═══════════════════════════════════════════════════════════════
+const LS_CATS  = 'aidir_cats_v3';
+const LS_TOOLS = 'aidir_tools_v3';
+const LS_RECENT = 'aidir_recent_v1';   // [{id, ts}]
+const LS_FAVS   = 'aidir_favs_v1';     // [id, ...]
+
+function loadState(){
+  try{
+    let cats  = JSON.parse(localStorage.getItem(LS_CATS))  || null;
+    let tools = JSON.parse(localStorage.getItem(LS_TOOLS)) || null;
+
+    // 저장 데이터 없으면 기본값
+    if(!cats  || cats.length===0)  cats  = [...DEFAULT_CATS];
+    if(!tools || tools.length===0) tools = [...DEFAULT_TOOLS];
+
+    // ── 신규 기본 카테고리 자동 병합
+    DEFAULT_CATS.forEach(dc=>{
+      if(!cats.find(c=>c.id===dc.id)) cats.push({...dc});
+    });
+    // ── 신규 기본 도구 자동 병합
+    DEFAULT_TOOLS.forEach(dt=>{
+      if(!tools.find(t=>t.id===dt.id)) tools.push({...dt});
+    });
+
+    return {cats, tools};
+  }catch(e){ return {cats:[...DEFAULT_CATS], tools:[...DEFAULT_TOOLS]}; }
+}
+function saveState(cats, tools){
+  try{
+    localStorage.setItem(LS_CATS,  JSON.stringify(cats));
+    localStorage.setItem(LS_TOOLS, JSON.stringify(tools));
+  }catch(e){}
+}
+
+// ─ Recent visits helpers ─
+function loadRecent(){ try{ return JSON.parse(localStorage.getItem(LS_RECENT))||[]; }catch(e){ return []; } }
+function saveRecent(list){ try{ localStorage.setItem(LS_RECENT, JSON.stringify(list)); }catch(e){} }
+function recordVisit(toolId){
+  let list = loadRecent();
+  list = list.filter(r=>r.id!==toolId);          // 중복 제거
+  list.unshift({id:toolId, ts:Date.now()});       // 최신 맨 앞
+  if(list.length>30) list=list.slice(0,30);       // 최대 30개 보관
+  saveRecent(list);
+}
+
+// ─ Favorites helpers ─
+function loadFavs(){ try{ return JSON.parse(localStorage.getItem(LS_FAVS))||[]; }catch(e){ return []; } }
+function saveFavs(list){ try{ localStorage.setItem(LS_FAVS, JSON.stringify(list)); }catch(e){} }
+function isFav(toolId){ return loadFavs().includes(toolId); }
+function toggleFav(toolId){
+  let list = loadFavs();
+  if(list.includes(toolId)){
+    list = list.filter(id=>id!==toolId);
+  } else {
+    if(list.length>=50) showToast('⚠️ 즐겨찾기는 최대 50개까지 저장됩니다');
+    else list.push(toolId);
+  }
+  saveFavs(list);
+}
+
+let STATE = loadState();
+if(!STATE.cats || STATE.cats.length===0) STATE.cats=[...DEFAULT_CATS];
+if(!STATE.tools|| STATE.tools.length===0) STATE.tools=[...DEFAULT_TOOLS];
+
+let currentFilter = 'all';  // 'all' | catId | 'recent' | 'favorites'
+let currentSearch = '';
+let pendingDeleteId = null;
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function render(){
+  renderFilterBar();
+  renderSections();
+  renderCatSelectOptions();
+  updateStats();
+}
+
+function renderFilterBar(){
+  const fb = document.getElementById('filterBar');
+  fb.innerHTML = '';
+
+  const totalCnt = STATE.tools.length;
+
+  // ── 전체 보기 버튼
+  const allBtn = document.createElement('button');
+  allBtn.className = 'fb fb-all'+(currentFilter==='all'?' active':'');
+  allBtn.innerHTML = `<span class="fb-emoji">🌐</span><span class="fb-name">전체 보기</span><span class="fb-cnt">${totalCnt}</span>`;
+  allBtn.title = '모든 카테고리 보기';
+  allBtn.onclick = ()=>{ currentFilter='all'; clearSearch(); render(); };
+  fb.appendChild(allBtn);
+
+  // ── 구분선
+  const div = document.createElement('div');
+  div.className = 'fb-divider';
+  fb.appendChild(div);
+
+  // ── 🕐 최근 방문 버튼
+  const recentList = loadRecent();
+  const recentTools = recentList.map(r=>STATE.tools.find(t=>t.id===r.id)).filter(Boolean);
+  const recentBtn = document.createElement('button');
+  recentBtn.className = 'fb fb-recent'+(currentFilter==='recent'?' active':'');
+  recentBtn.title = '최근 방문한 사이트';
+  recentBtn.innerHTML = `<span class="fb-emoji">🕐</span><span class="fb-name">최근 방문</span><span class="fb-cnt">${Math.min(recentTools.length,20)}</span>`;
+  recentBtn.onclick = ()=>{ currentFilter='recent'; clearSearch(); render(); };
+  fb.appendChild(recentBtn);
+
+  // ── ⭐ 즐겨찾기 버튼
+  const favIds = loadFavs();
+  const favTools = favIds.filter(id=>STATE.tools.find(t=>t.id===id));
+  const favBtn = document.createElement('button');
+  favBtn.className = 'fb fb-fav'+(currentFilter==='favorites'?' active':'');
+  favBtn.title = '즐겨찾기 저장 목록';
+  favBtn.innerHTML = `<span class="fb-emoji">⭐</span><span class="fb-name">즐겨찾기</span><span class="fb-cnt">${favTools.length}</span>`;
+  favBtn.onclick = ()=>{ currentFilter='favorites'; clearSearch(); render(); };
+  fb.appendChild(favBtn);
+
+  // ── 구분선2
+  const div2 = document.createElement('div');
+  div2.className = 'fb-divider';
+  fb.appendChild(div2);
+
+  // ── 카테고리 버튼들
+  STATE.cats.forEach(c=>{
+    const cnt = STATE.tools.filter(t=>t.cat===c.id).length;
+    const b = document.createElement('button');
+    b.className = 'fb'+(currentFilter===c.id?' active':'');
+    b.title = c.sub || c.name;
+    b.innerHTML = `<span class="fb-emoji">${c.emoji}</span><span class="fb-name">${c.name}</span><span class="fb-cnt">${cnt}</span>`;
+    b.onclick = ()=>{
+      currentFilter=c.id;
+      currentSearch='';
+      renderSections();
+      renderFilterBar();
+      document.getElementById('searchInput').value='';
+      updateSearchUI('');
+    };
+    fb.appendChild(b);
+  });
+}
+
+function renderSections(){
+  const container = document.getElementById('categorySections');
+  container.innerHTML = '';
+
+  const sri = document.getElementById('sri');
+  const noRes = document.getElementById('noRes');
+  const q = currentSearch.toLowerCase().trim();
+
+  let totalVisible = 0;
+
+  // ── 최근 방문 모드
+  if(currentFilter === 'recent'){
+    const recentList = loadRecent();
+    const tools = recentList
+      .map(r=>({tool: STATE.tools.find(t=>t.id===r.id), ts: r.ts}))
+      .filter(x=>x.tool)
+      .slice(0, 20);
+
+    const sec = document.createElement('div');
+    sec.className = 'cat-sec';
+    sec.innerHTML = `
+      <div class="special-sec-hd recent">
+        <span style="font-size:24px">🕐</span>
+        <div>
+          <div class="ctitle" style="font-size:21px;">최근 방문한 사이트</div>
+          <div class="csub">최근 클릭한 사이트 (내림차순, 최대 20개 · 중복 없음)</div>
+        </div>
+        <span class="special-badge recent">${tools.length}개</span>
+        <button class="special-clear-btn" onclick="clearRecent()">기록 지우기</button>
+      </div>
+      <div class="cg" id="cg_recent"></div>
+    `;
+    container.appendChild(sec);
+    const cg = sec.querySelector('.cg');
+
+    if(tools.length === 0){
+      cg.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:40px;font-size:14px;">
+        아직 방문 기록이 없습니다.<br><small style="font-size:12px;">"방문 →" 버튼을 클릭하면 여기에 기록됩니다.</small>
+      </div>`;
+    } else {
+      tools.forEach(({tool, ts})=>{
+        const card = createCard(tool, '');
+        // 방문 시간 표시
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'visit-time';
+        timeDiv.textContent = '🕐 ' + formatVisitTime(ts);
+        card.querySelector('.td').after(timeDiv);
+        cg.appendChild(card);
+      });
+    }
+    totalVisible = tools.length;
+    sri.classList.remove('v'); noRes.classList.remove('v');
+    return;
+  }
+
+  // ── 즐겨찾기 모드
+  if(currentFilter === 'favorites'){
+    const favIds = loadFavs();
+    const tools = favIds.map(id=>STATE.tools.find(t=>t.id===id)).filter(Boolean);
+
+    const sec = document.createElement('div');
+    sec.className = 'cat-sec';
+    sec.innerHTML = `
+      <div class="special-sec-hd favorites">
+        <span style="font-size:24px">⭐</span>
+        <div>
+          <div class="ctitle" style="font-size:21px;">즐겨찾기</div>
+          <div class="csub">내가 저장한 즐겨찾기 목록 (최대 50개)</div>
+        </div>
+        <span class="special-badge favorites">${tools.length}개</span>
+        <button class="special-clear-btn" onclick="clearFavs()">전체 해제</button>
+      </div>
+      <div class="cg" id="cg_favorites"></div>
+    `;
+    container.appendChild(sec);
+    const cg = sec.querySelector('.cg');
+
+    if(tools.length === 0){
+      cg.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:40px;font-size:14px;">
+        즐겨찾기가 비어 있습니다.<br><small style="font-size:12px;">카드 우측 하단 ☆ 버튼으로 추가하세요.</small>
+      </div>`;
+    } else {
+      tools.forEach(t=> cg.appendChild(createCard(t, '')));
+    }
+    totalVisible = tools.length;
+    sri.classList.remove('v'); noRes.classList.remove('v');
+    return;
+  }
+
+  const catsToShow = currentFilter==='all'
+    ? STATE.cats
+    : STATE.cats.filter(c=>c.id===currentFilter);
+
+  catsToShow.forEach(cat=>{
+    let tools = STATE.tools.filter(t=>t.cat===cat.id);
+
+    if(q){
+      tools = tools.filter(t=>{
+        const hay = (t.name+' '+t.desc+' '+t.url+' '+t.cat).toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    if(tools.length===0) return;
+    totalVisible += tools.length;
+
+    const sec = document.createElement('div');
+    sec.className='cat-sec';
+    sec.dataset.cat=cat.id;
+
+    sec.innerHTML=`
+      <div class="cat-hd">
+        <div class="cico" style="background:${cat.color}">${cat.emoji}</div>
+        <div>
+          <div class="ctitle">${escHtml(cat.name)}</div>
+          ${cat.sub?`<div class="csub">${escHtml(cat.sub)}</div>`:''}
+        </div>
+        <span class="ccnt">${tools.length}개</span>
+        <div class="cat-hd-btns">
+          <button class="cat-ctrl-btn cat-edit-btn" onclick="openEditCat('${escHtml(cat.id)}')">✏️ 수정</button>
+          <button class="cat-ctrl-btn cat-del-btn" onclick="confirmDeleteCat('${escHtml(cat.id)}')">✕ 삭제</button>
+        </div>
+      </div>
+      <div class="cg" id="cg_${cat.id}"></div>
+    `;
+    container.appendChild(sec);
+
+    const cg = sec.querySelector('.cg');
+    tools.forEach(t=> cg.appendChild(createCard(t, q)));
+  });
+
+  if(q){
+    if(totalVisible>0){
+      sri.innerHTML=`<strong>"${escHtml(currentSearch)}"</strong> 검색 결과 — <strong>${totalVisible}개</strong> 도구 발견`;
+      sri.classList.add('v'); noRes.classList.remove('v');
+    } else {
+      document.getElementById('noResText').textContent=`"${currentSearch}"에 대한 검색 결과가 없습니다. 다른 키워드로 검색해 보세요.`;
+      sri.classList.remove('v'); noRes.classList.add('v');
+    }
+  } else {
+    sri.classList.remove('v'); noRes.classList.remove('v');
+  }
+}
+
+function createCard(t, q=''){
+  const div = document.createElement('div');
+  div.className='tc';
+  div.id='card_'+t.id;
+
+  const priceTag = t.price==='free'
+    ? '<span class="tag tf">무료</span>'
+    : t.price==='paid'
+    ? '<span class="tag tp">유료</span>'
+    : '<span class="tag tfm">부분무료</span>';
+  const koTag  = t.ko  ? '<span class="tag tk">한국어</span>' : '';
+  const hotTag = t.hot ? '<span class="tag th">🔥 인기</span>' : '';
+  const recBadge = t.rec ? '<div class="rb">⭐ 추천</div>' : '';
+
+  // highlight
+  const nameHl = q ? hlText(t.name, q) : escHtml(t.name);
+  const descHl = q ? hlText(t.desc, q) : escHtml(t.desc);
+  const urlShort = t.url.replace(/^https?:\/\/(www\.)?/,'').split('/')[0];
+
+  const isStarred = isFav(t.id);
+
+  div.innerHTML=`
+    <div class="card-ctrl">
+      <button class="ctrl-btn ctrl-fav${isStarred?' starred':''}" title="${isStarred?'즐겨찾기 해제':'즐겨찾기 추가'}"
+        onclick="handleStarClick(this,'${escHtml(t.id)}')">${isStarred?'★':'☆'} 즐겨찾기</button>
+      <button class="ctrl-btn ctrl-edit" onclick="openEditSite('${escHtml(t.id)}')">✏️ 수정</button>
+      <button class="ctrl-btn ctrl-move" onclick="openMovePopover('${escHtml(t.id)}',this)">↗ 이동</button>
+      <button class="ctrl-btn ctrl-del" onclick="confirmDelete('${escHtml(t.id)}')">✕ 삭제</button>
+    </div>
+    <div class="move-pop" id="mpop_${t.id}"></div>
+    <div class="ct">
+      <div class="fav">${t.fav||'🔧'}</div>
+      <div class="ti2">
+        <div class="tn">${nameHl}</div>
+        <div class="tu">${urlShort}</div>
+      </div>
+    </div>
+    <div class="td">${descHl}</div>
+    <div class="cf">
+      ${recBadge}${priceTag}${koTag}${hotTag}
+      <a href="${escHtml(t.url)}" target="_blank" class="vb" onclick="recordVisit('${escHtml(t.id)}')">방문 →</a>
+    </div>
+  `;
+  return div;
+}
+
+function openMovePopover(toolId, btn){
+  // Close any other open popovers
+  document.querySelectorAll('.move-pop.open').forEach(p=>{
+    if(p.id!=='mpop_'+toolId) p.classList.remove('open');
+  });
+  const pop = document.getElementById('mpop_'+toolId);
+  if(pop.classList.contains('open')){ pop.classList.remove('open'); return; }
+
+  const tool = STATE.tools.find(t=>t.id===toolId);
+  if(!tool) return;
+
+  pop.innerHTML = `<div class="mp-title">카테고리 이동</div>` +
+    STATE.cats
+      .filter(c=>c.id!==tool.cat)
+      .map(c=>`<div class="mp-item" onclick="moveTool('${escHtml(toolId)}','${escHtml(c.id)}')">${c.emoji} ${escHtml(c.name)}</div>`)
+      .join('');
+  pop.classList.add('open');
+
+  // Close on outside click
+  setTimeout(()=>{
+    document.addEventListener('click', function handler(e){
+      if(!pop.contains(e.target) && !btn.contains(e.target)){
+        pop.classList.remove('open');
+        document.removeEventListener('click', handler);
+      }
+    });
+  }, 10);
+}
+
+function moveTool(toolId, catId){
+  const tool = STATE.tools.find(t=>t.id===toolId);
+  if(!tool) return;
+  const oldCat = tool.cat;
+  tool.cat = catId;
+  saveState(STATE.cats, STATE.tools);
+  // Close popover
+  const pop = document.getElementById('mpop_'+toolId);
+  if(pop) pop.classList.remove('open');
+  renderSections();
+  renderFilterBar();
+  updateStats();
+  showToast(`✅ "${tool.name}"을(를) 이동했습니다`);
+}
+
+function confirmDelete(toolId){
+  const tool = STATE.tools.find(t=>t.id===toolId);
+  if(!tool) return;
+  pendingDeleteId = toolId;
+  document.getElementById('confirmMsg').innerHTML = `<strong>"${escHtml(tool.name)}"</strong>을(를) 삭제하시겠어요?<br><small style="font-size:12px;color:var(--dim)">이 작업은 되돌릴 수 없습니다.</small>`;
+  document.getElementById('confirmOk').onclick = ()=>{
+    STATE.tools = STATE.tools.filter(t=>t.id!==pendingDeleteId);
+    saveState(STATE.cats, STATE.tools);
+    closeModal('confirm');
+    renderSections();
+    renderFilterBar();
+    updateStats();
+    showToast('🗑️ 도구가 삭제되었습니다');
+  };
+  openModal('confirm');
+}
+
+function updateStats(){
+  const total = STATE.tools.length;
+  const cats  = STATE.cats.length;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('catCount').textContent   = cats;
+  document.getElementById('ftTotal').textContent    = total;
+  document.getElementById('ftCat').textContent      = cats;
+}
+
+function renderCatSelectOptions(){
+  const sel = document.getElementById('f-cat');
+  sel.innerHTML = STATE.cats.map(c=>
+    `<option value="${escHtml(c.id)}">${c.emoji} ${escHtml(c.name)}</option>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════════
+function handleSearch(val){
+  currentSearch = val;
+  currentFilter = 'all';
+  updateSearchUI(val);
+  renderSections();
+  renderFilterBar();
+}
+function updateSearchUI(val){
+  document.getElementById('scBtn').classList.toggle('v', val.length>0);
+}
+function clearSearch(){
+  document.getElementById('searchInput').value='';
+  currentSearch='';
+  updateSearchUI('');
+  renderSections();
+  renderFilterBar();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADD SITE
+// ═══════════════════════════════════════════════════════════════
+function submitSite(){
+  const name = document.getElementById('f-name').value.trim();
+  const url  = document.getElementById('f-url').value.trim();
+  const fav  = document.getElementById('f-fav').value.trim()||'🔧';
+  const desc = document.getElementById('f-desc').value.trim();
+  const cat  = document.getElementById('f-cat').value;
+  const price= document.querySelector('input[name="fprice"]:checked')?.value||'freemium';
+  const ko   = document.getElementById('f-ko').checked;
+  const hot  = document.getElementById('f-hot').checked;
+  const rec  = document.getElementById('f-rec').checked;
+
+  if(!name){ alert('도구 이름을 입력해주세요.'); return; }
+  if(!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+    alert('올바른 URL을 입력해주세요. (https://로 시작해야 합니다)'); return;
+  }
+
+  const id = 'user_'+Date.now();
+  STATE.tools.push({id, name, url, fav, desc, cat, price, ko, hot, rec, isNew:true});
+  saveState(STATE.cats, STATE.tools);
+
+  // reset form
+  document.getElementById('f-name').value='';
+  document.getElementById('f-url').value='';
+  document.getElementById('f-fav').value='🔧';
+  document.getElementById('f-fav-display').textContent='🔧';
+  document.getElementById('f-desc').value='';
+  document.getElementById('f-ko').checked=false;
+  document.getElementById('f-hot').checked=false;
+  document.getElementById('f-rec').checked=false;
+  document.querySelector('input[name="fprice"][value="freemium"]').checked=true;
+
+  closeModal('addSite');
+  currentFilter = cat;
+  renderSections();
+  renderFilterBar();
+  updateStats();
+  showToast(`✅ "${name}"이(가) 추가되었습니다!`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADD CATEGORY
+// ═══════════════════════════════════════════════════════════════
+function submitCat(){
+  const name  = document.getElementById('c-name').value.trim();
+  const emoji = document.getElementById('c-emoji').value.trim()||'📌';
+  const sub   = document.getElementById('c-sub').value.trim();
+  const color = document.querySelector('input[name="ccolor"]:checked')?.value||'rgba(124,92,252,.15)';
+
+  if(!name){ alert('카테고리 이름을 입력해주세요.'); return; }
+
+  const id = 'cat_'+Date.now();
+  STATE.cats.push({id, name, emoji, sub, color});
+  saveState(STATE.cats, STATE.tools);
+
+  document.getElementById('c-name').value='';
+  document.getElementById('c-sub').value='';
+  document.getElementById('c-emoji').value='📌';
+  document.getElementById('c-emoji-display').textContent='📌';
+
+  closeModal('addCat');
+  renderCatSelectOptions();
+  renderFilterBar();
+  updateStats();
+  showToast(`✅ "${name}" 카테고리가 추가되었습니다!`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODAL HELPERS
+// ═══════════════════════════════════════════════════════════════
+function openModal(name){
+  const ids = {addSite:'addSiteModal',addCat:'addCatModal',confirm:'confirmModal',editSite:'editSiteModal',editCat:'editCatModal',confirmCat:'confirmCatModal'};
+  const el = document.getElementById(ids[name]);
+  if(el) el.classList.add('open');
+}
+function closeModal(name){
+  const ids = {addSite:'addSiteModal',addCat:'addCatModal',confirm:'confirmModal',editSite:'editSiteModal',editCat:'editCatModal',confirmCat:'confirmCatModal'};
+  const el = document.getElementById(ids[name]);
+  if(el) el.classList.remove('open');
+}
+// Close modal on overlay click
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click', e=>{
+    if(e.target===ov){
+      ov.classList.remove('open');
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+function showToast(msg){
+  const t = document.createElement('div');
+  t.style.cssText=`position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--tx);padding:11px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:mIn .2s ease;white-space:nowrap;`;
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2500);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════
+function escHtml(s){
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function hlText(text, q){
+  const escaped = escHtml(text);
+  const qEsc = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return escaped.replace(new RegExp(`(${qEsc})`,'gi'),'<span class="hl">$1</span>');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  }
+  if(e.key==='Escape'){
+    document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'));
+    document.querySelectorAll('.move-pop.open').forEach(p=>p.classList.remove('open'));
+    if(currentSearch) clearSearch();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// FILTER ALL
+// ═══════════════════════════════════════════════════════════════
+function filterAll(){
+  currentFilter='all';
+  currentSearch='';
+  document.getElementById('searchInput').value='';
+  updateSearchUI('');
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EDIT SITE
+// ═══════════════════════════════════════════════════════════════
+let editingToolId = null;
+
+function openEditSite(toolId){
+  const tool = STATE.tools.find(t=>t.id===toolId);
+  if(!tool) return;
+  editingToolId = toolId;
+
+  // Populate edit form with existing values
+  document.getElementById('ef-fav').value  = tool.fav  || '🔧';
+  document.getElementById('ef-fav-display').textContent = tool.fav || '🔧';
+  document.getElementById('ef-name').value = tool.name || '';
+  document.getElementById('ef-url').value  = tool.url  || '';
+  document.getElementById('ef-desc').value = tool.desc || '';
+  document.getElementById('ef-ko').checked  = !!tool.ko;
+  document.getElementById('ef-hot').checked = !!tool.hot;
+  document.getElementById('ef-rec').checked = !!tool.rec;
+
+  // Populate category select
+  const sel = document.getElementById('ef-cat');
+  sel.innerHTML = STATE.cats.map(c=>
+    `<option value="${escHtml(c.id)}" ${c.id===tool.cat?'selected':''}>${c.emoji} ${escHtml(c.name)}</option>`
+  ).join('');
+
+  // Set price radio
+  const priceVal = tool.price || 'freemium';
+  const priceRadio = document.querySelector(`input[name="efprice"][value="${priceVal}"]`);
+  if(priceRadio) priceRadio.checked = true;
+
+  openModal('editSite');
+}
+
+function submitEditSite(){
+  if(!editingToolId) return;
+  const tool = STATE.tools.find(t=>t.id===editingToolId);
+  if(!tool) return;
+
+  const name = document.getElementById('ef-name').value.trim();
+  const url  = document.getElementById('ef-url').value.trim();
+
+  if(!name){ alert('도구 이름을 입력해주세요.'); return; }
+  if(!url || (!url.startsWith('http://') && !url.startsWith('https://'))){
+    alert('올바른 URL을 입력해주세요. (https://로 시작해야 합니다)'); return;
+  }
+
+  tool.fav   = document.getElementById('ef-fav').value.trim() || '🔧';
+  tool.name  = name;
+  tool.url   = url;
+  tool.desc  = document.getElementById('ef-desc').value.trim();
+  tool.cat   = document.getElementById('ef-cat').value;
+  tool.price = document.querySelector('input[name="efprice"]:checked')?.value || 'freemium';
+  tool.ko    = document.getElementById('ef-ko').checked;
+  tool.hot   = document.getElementById('ef-hot').checked;
+  tool.rec   = document.getElementById('ef-rec').checked;
+
+  saveState(STATE.cats, STATE.tools);
+  closeModal('editSite');
+  editingToolId = null;
+  renderSections();
+  renderFilterBar();
+  showToast(`✅ "${tool.name}" 수정이 완료됐습니다!`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EDIT CATEGORY
+// ═══════════════════════════════════════════════════════════════
+let editingCatId = null;
+
+function openEditCat(catId){
+  const cat = STATE.cats.find(c=>c.id===catId);
+  if(!cat) return;
+  editingCatId = catId;
+
+  document.getElementById('ec-emoji').value = cat.emoji || '📌';
+  document.getElementById('ec-emoji-display').textContent = cat.emoji || '📌';
+  document.getElementById('ec-name').value  = cat.name  || '';
+  document.getElementById('ec-sub').value   = cat.sub   || '';
+
+  // Set color radio (match or default to first)
+  const colorVal = cat.color || 'rgba(124,92,252,.15)';
+  const colorRadio = document.querySelector(`input[name="eccolor"][value="${colorVal}"]`);
+  if(colorRadio) colorRadio.checked = true;
+  else { const first = document.querySelector('input[name="eccolor"]'); if(first) first.checked=true; }
+
+  openModal('editCat');
+}
+
+function submitEditCat(){
+  if(!editingCatId) return;
+  const cat = STATE.cats.find(c=>c.id===editingCatId);
+  if(!cat) return;
+
+  const name = document.getElementById('ec-name').value.trim();
+  if(!name){ alert('카테고리 이름을 입력해주세요.'); return; }
+
+  cat.emoji = document.getElementById('ec-emoji').value.trim() || '📌';
+  cat.name  = name;
+  cat.sub   = document.getElementById('ec-sub').value.trim();
+  cat.color = document.querySelector('input[name="eccolor"]:checked')?.value || 'rgba(124,92,252,.15)';
+
+  saveState(STATE.cats, STATE.tools);
+  closeModal('editCat');
+  editingCatId = null;
+  render();
+  showToast(`✅ "${cat.name}" 카테고리 수정이 완료됐습니다!`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DELETE CATEGORY
+// ═══════════════════════════════════════════════════════════════
+let pendingDeleteCatId = null;
+
+function confirmDeleteCat(catId){
+  const cat = STATE.cats.find(c=>c.id===catId);
+  if(!cat) return;
+  const toolCount = STATE.tools.filter(t=>t.cat===catId).length;
+  pendingDeleteCatId = catId;
+  document.getElementById('confirmCatMsg').innerHTML =
+    `<strong>"${escHtml(cat.name)}"</strong> 카테고리를 삭제하시겠어요?` +
+    (toolCount>0 ? `<br><small style="font-size:12px;color:var(--a3)">⚠️ 이 카테고리의 도구 <strong>${toolCount}개</strong>도 함께 삭제됩니다.</small>` : '<br><small style="font-size:12px;color:var(--dim)">이 작업은 되돌릴 수 없습니다.</small>');
+  document.getElementById('confirmCatOk').onclick = ()=>{
+    STATE.tools = STATE.tools.filter(t=>t.cat!==pendingDeleteCatId);
+    STATE.cats  = STATE.cats.filter(c=>c.id!==pendingDeleteCatId);
+    saveState(STATE.cats, STATE.tools);
+    closeModal('confirmCat');
+    if(currentFilter===pendingDeleteCatId) currentFilter='all';
+    render();
+    showToast('🗑️ 카테고리가 삭제되었습니다');
+  };
+  openModal('confirmCat');
+}
+
+// ─ Star click handler (no full re-render, just toggle) ─
+function handleStarClick(btn, toolId){
+  toggleFav(toolId);
+  const starred = isFav(toolId);
+  btn.textContent = starred ? '★ 즐겨찾기' : '☆ 즐겨찾기';
+  btn.className = 'ctrl-btn ctrl-fav' + (starred ? ' starred' : '');
+  btn.title = starred ? '즐겨찾기 해제' : '즐겨찾기 추가';
+  showToast(starred ? '⭐ 즐겨찾기에 추가했습니다' : '☆ 즐겨찾기에서 제거했습니다');
+  renderFilterBar(); // 카운트만 갱신
+}
+
+// ─ Clear actions ─
+function clearRecent(){
+  saveRecent([]);
+  render();
+  showToast('🗑️ 방문 기록을 지웠습니다');
+}
+function clearFavs(){
+  saveFavs([]);
+  render();
+  showToast('🗑️ 즐겨찾기를 모두 해제했습니다');
+}
+
+// ─ Format visit time ─
+function formatVisitTime(ts){
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  const h = Math.floor(diff/3600000);
+  const d = Math.floor(diff/86400000);
+  if(m < 1) return '방금 전';
+  if(m < 60) return `${m}분 전`;
+  if(h < 24) return `${h}시간 전`;
+  if(d < 7) return `${d}일 전`;
+  return new Date(ts).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EMOJI PICKER ENGINE
+// ═══════════════════════════════════════════════════════════════
+const EMOJI_DATA = {
+  '🤖 AI·기술': ['🤖','🧠','💡','⚡','🔮','🛸','🌐','💻','🖥️','📱','⌨️','🖱️','🖨️','📡','🔌','💾','💿','📀','🔋','🔧','🔩','⚙️','🛠️','🔑','🗝️','🔐','🔒','🔓','🧩','🔭','🔬','🧪','🧫','🧬','⚗️','🔦','💡','🕯️','🪔'],
+  '📝 문서·글': ['📝','✏️','🖊️','🖋️','📖','📚','📄','📃','📋','📑','🗒️','🗓️','📰','🗞️','📓','📔','📒','📕','📗','📘','📙','🗃️','🗄️','📁','📂','🗂️','📌','📍','📎','🖇️','✂️','🗑️','📬','📭','📮','🖃','📧'],
+  '🎨 디자인·이미지': ['🎨','🖌️','🖼️','🎭','🎪','✨','🌈','🎆','🎇','🌟','⭐','💫','🔆','🌅','🌄','🌠','🎑','🏞️','🗺️','🧭','🎯','🎲','🃏','🎴','🀄','🎰','🎮','🕹️','👾','🤺','🎗️','🏷️','🔖'],
+  '📊 데이터·분석': ['📊','📈','📉','📐','📏','🗂️','💹','💰','💵','💴','💶','💷','🏦','💳','🪙','💎','🏆','🥇','🥈','🥉','🎖️','🏅','🎗️','🔢','🔣','#️⃣','*️⃣','0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣'],
+  '🎵 음악·미디어': ['🎵','🎶','🎼','🎤','🎧','🎷','🎸','🎹','🎺','🎻','🥁','🪘','🎙️','📻','📺','🎬','🎥','📽️','🎞️','📹','📷','📸','🔊','🔉','🔈','🔇','📢','📣','🔔','🔕','🎊','🎉','🎈','🎁'],
+  '💼 비즈니스': ['💼','🤝','📊','💡','🏢','🏗️','🏭','🏛️','🏦','🏨','🏬','🏪','🏩','🏫','🏥','⚖️','🔏','📜','📋','🗒️','🗓️','📆','📅','🗑️','📤','📥','📦','📫','📪','📬','📭','📮','🏷️','🔖','💌','📩'],
+  '🌍 언어·소통': ['🌍','🌎','🌏','🌐','🗺️','🌏','💬','💭','🗨️','🗯️','📢','📣','🔔','🌏','🇰🇷','🇺🇸','🇯🇵','🇨🇳','🇩🇪','🇫🇷','🇪🇸','🇮🇹','🇵🇹','🇷🇺','🇦🇺','🤗','👋','🙌','👏','🤲','🙏','👐','🫶'],
+  '🌱 기타': ['🌱','🌿','🍀','🌸','🌺','🌻','🌹','🌷','🌼','🌳','🌲','🌴','🎋','🎍','🍃','🍂','🍁','🍄','🌾','🌵','🌊','🌈','⛅','🌤️','🌦️','⛈️','🌩️','❄️','🌪️','🌫️','🔥','💧','🌊','⭐','🌟','🌙','☀️','🌞']
+};
+
+let activePickerField = null;
+let activePickerTab = null;
+
+function buildEmojiPicker(fieldId) {
+  const panel = document.getElementById(fieldId + '-panel');
+  if (!panel || panel._built) return;
+  panel._built = true;
+
+  const tabKeys = Object.keys(EMOJI_DATA);
+  activePickerTab = tabKeys[0];
+
+  panel.innerHTML = `
+    <div class="ep-search">
+      <span>🔍</span>
+      <input type="text" placeholder="이모지 검색..." id="${fieldId}-search" oninput="filterEmojiPicker('${fieldId}', this.value)">
+    </div>
+    <div class="ep-tabs" id="${fieldId}-tabs">
+      ${tabKeys.map((k,i)=>`<button class="ep-tab${i===0?' active':''}" title="${k}" onclick="switchEmojiTab('${fieldId}','${k}',this)">${k.split(' ')[0]}</button>`).join('')}
+    </div>
+    <div class="ep-grid" id="${fieldId}-grid"></div>
+    <div class="ep-custom-row">
+      <span class="ep-custom-label">직접 입력:</span>
+      <input class="ep-custom-input" type="text" maxlength="4" id="${fieldId}-custom"
+        oninput="setEmojiDirect('${fieldId}', this.value)"
+        placeholder="✍️">
+    </div>`;
+
+  renderEmojiGrid(fieldId, EMOJI_DATA[tabKeys[0]]);
+}
+
+function renderEmojiGrid(fieldId, emojis) {
+  const grid = document.getElementById(fieldId + '-grid');
+  if (!grid) return;
+  const cur = document.getElementById(fieldId).value;
+  grid.innerHTML = emojis.map(e =>
+    `<button type="button" title="${e}" class="${e===cur?'selected':''}" onclick="selectEmoji('${fieldId}','${e}')">${e}</button>`
+  ).join('');
+}
+
+function switchEmojiTab(fieldId, tabKey, btn) {
+  activePickerTab = tabKey;
+  const tabs = document.getElementById(fieldId + '-tabs');
+  tabs.querySelectorAll('.ep-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(fieldId + '-search').value = '';
+  renderEmojiGrid(fieldId, EMOJI_DATA[tabKey]);
+}
+
+function filterEmojiPicker(fieldId, q) {
+  if (!q.trim()) {
+    renderEmojiGrid(fieldId, EMOJI_DATA[activePickerTab] || Object.values(EMOJI_DATA)[0]);
+    return;
+  }
+  const all = Object.values(EMOJI_DATA).flat();
+  renderEmojiGrid(fieldId, all.filter(e => e.includes(q)));
+}
+
+function selectEmoji(fieldId, emoji) {
+  document.getElementById(fieldId).value = emoji;
+  const display = document.getElementById(fieldId + '-display');
+  if (display) display.textContent = emoji;
+  // update custom input
+  const ci = document.getElementById(fieldId + '-custom');
+  if (ci) ci.value = emoji;
+  // re-highlight selected
+  const grid = document.getElementById(fieldId + '-grid');
+  if (grid) grid.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('selected', b.textContent === emoji);
+  });
+}
+
+function setEmojiDirect(fieldId, val) {
+  if (!val.trim()) return;
+  const e = [...val.trim()][0];
+  document.getElementById(fieldId).value = e;
+  const display = document.getElementById(fieldId + '-display');
+  if (display) display.textContent = e;
+}
+
+function toggleEmojiPicker(fieldId) {
+  buildEmojiPicker(fieldId);
+  const panel = document.getElementById(fieldId + '-panel');
+  const btn   = document.getElementById(fieldId + '-btn');
+
+  // close others first
+  if (activePickerField && activePickerField !== fieldId) {
+    closeEmojiPicker(activePickerField);
+  }
+
+  const isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    closeEmojiPicker(fieldId);
+  } else {
+    panel.classList.add('open');
+    btn.classList.add('open');
+    activePickerField = fieldId;
+  }
+}
+
+function closeEmojiPicker(fieldId) {
+  const panel = document.getElementById(fieldId + '-panel');
+  const btn   = document.getElementById(fieldId + '-btn');
+  if (panel) panel.classList.remove('open');
+  if (btn)   btn.classList.remove('open');
+  if (activePickerField === fieldId) activePickerField = null;
+}
+
+// 편집 모달 열릴 때 display span도 동기화
+function syncEmojiDisplay(fieldId) {
+  const val = document.getElementById(fieldId).value;
+  const display = document.getElementById(fieldId + '-display');
+  if (display && val) display.textContent = val;
+}
+
+// 기존 openEditSite/openEditCat 이후 sync 호출 — 기존 코드 패치
+const _origOpenEditSite = window.openEditSite;
+document.addEventListener('DOMContentLoaded', () => {
+  // close picker when clicking outside
+  document.addEventListener('click', e => {
+    if (activePickerField && !e.target.closest('.emoji-wrap')) {
+      closeEmojiPicker(activePickerField);
+    }
+  });
+});
+
+// reset 시 display도 초기화
+function resetEmojiField(fieldId, defaultEmoji) {
+  document.getElementById(fieldId).value = defaultEmoji;
+  const display = document.getElementById(fieldId + '-display');
+  if (display) display.textContent = defaultEmoji;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+render();
+</script>
+</body>
+</html>
