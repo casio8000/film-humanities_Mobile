@@ -248,6 +248,70 @@ footer{text-align:center;color:var(--dim);font-size:14px;padding:24px;border-top
 kbd{background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-family:monospace;}
 @media(max-width:600px){.cg{grid-template-columns:1fr;}.stats{gap:18px;}h1{font-size:1.8rem;}.form-row-2{grid-template-columns:1fr;}}
 
+/* ══════════════════════════════════════════════
+   MOBILE UX FIXES — 터치/스크롤 전면 개선
+   ══════════════════════════════════════════════ */
+@media(max-width:768px){
+  /* ── 1. 필터 바: 가로 스크롤 (핵심 수정) ── */
+  .filter-bar{
+    flex-wrap:nowrap !important;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:10px 14px;
+    gap:6px;
+  }
+  .filter-bar::-webkit-scrollbar{display:none;}
+  /* 구분선·레이블 숨김 (가로 스크롤 시 불필요) */
+  .fb-divider{display:none !important;}
+  .fb-row-label{display:none !important;}
+
+  /* ── 2. 필터 버튼 크기 조정 ── */
+  .fb{
+    padding:9px 13px;
+    font-size:13px;
+    border-radius:10px;
+  }
+  .fb .fb-emoji{font-size:16px;}
+  .fb .fb-cnt{font-size:10px;min-width:19px;height:18px;}
+
+  /* ── 3. 카드 편집 버튼: 터치에서도 항상 표시 ── */
+  .card-ctrl .ctrl-btn:not(.ctrl-fav){
+    opacity:1 !important;
+  }
+  .ctrl-btn{
+    padding:5px 9px;
+    font-size:11px;
+  }
+
+  /* ── 4. 카테고리 헤더 컨트롤: 터치에서도 항상 표시 ── */
+  .cat-ctrl-btn{
+    opacity:1 !important;
+    pointer-events:auto !important;
+  }
+
+  /* ── 5. 헤더 패딩 최적화 ── */
+  header{padding:32px 16px 18px;}
+  .subtitle{font-size:14px;}
+  .action-bar{gap:8px;}
+  .btn-add-site,.btn-add-cat{padding:10px 16px;font-size:14px;}
+
+  /* ── 6. main 패딩 ── */
+  main{padding:18px 12px 80px;}
+
+  /* ── 7. 카테고리 헤더 ── */
+  .cat-hd{flex-wrap:wrap;gap:8px;}
+  .ccnt{margin-left:0;}
+
+  /* ── 8. 모달 전체 화면으로 ── */
+  .modal{padding:22px 18px;border-radius:16px;}
+  .overlay{padding:12px;}
+
+  /* ── 9. 범례 스크롤 ── */
+  .legend{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;}
+  .legend::-webkit-scrollbar{display:none;}
+}
+
 /* ── FAVORITE STAR BUTTON (in card-ctrl) ── */
 .ctrl-fav{
   background:rgba(255,209,102,.1);
@@ -959,7 +1023,7 @@ function renderFilterBar(){
   allBtn.className = 'fb fb-all'+(currentFilter==='all'?' active':'');
   allBtn.innerHTML = `<span class="fb-emoji">🌐</span><span class="fb-name">전체 보기</span><span class="fb-cnt">${totalCnt}</span>`;
   allBtn.title = '모든 카테고리 보기';
-  allBtn.onclick = ()=>{ currentFilter='all'; clearSearch(); render(); };
+  allBtn.onclick = ()=>{ currentFilter='all'; clearSearch(); render(); window.scrollTo({top:0,behavior:'smooth'}); };
   fb.appendChild(allBtn);
 
   // ── 구분선
@@ -974,7 +1038,7 @@ function renderFilterBar(){
   recentBtn.className = 'fb fb-recent'+(currentFilter==='recent'?' active':'');
   recentBtn.title = '최근 방문한 사이트';
   recentBtn.innerHTML = `<span class="fb-emoji">🕐</span><span class="fb-name">최근 방문</span><span class="fb-cnt">${Math.min(recentTools.length,20)}</span>`;
-  recentBtn.onclick = ()=>{ currentFilter='recent'; clearSearch(); render(); };
+  recentBtn.onclick = ()=>{ currentFilter='recent'; clearSearch(); render(); window.scrollTo({top:0,behavior:'smooth'}); };
   fb.appendChild(recentBtn);
 
   // ── ⭐ 즐겨찾기 버튼
@@ -984,7 +1048,7 @@ function renderFilterBar(){
   favBtn.className = 'fb fb-fav'+(currentFilter==='favorites'?' active':'');
   favBtn.title = '즐겨찾기 저장 목록';
   favBtn.innerHTML = `<span class="fb-emoji">⭐</span><span class="fb-name">즐겨찾기</span><span class="fb-cnt">${favTools.length}</span>`;
-  favBtn.onclick = ()=>{ currentFilter='favorites'; clearSearch(); render(); };
+  favBtn.onclick = ()=>{ currentFilter='favorites'; clearSearch(); render(); window.scrollTo({top:0,behavior:'smooth'}); };
   fb.appendChild(favBtn);
 
   // ── 구분선2
@@ -1006,8 +1070,18 @@ function renderFilterBar(){
       renderFilterBar();
       document.getElementById('searchInput').value='';
       updateSearchUI('');
+      // 모바일: 카테고리 변경 시 필터 바 바로 아래로 스크롤
+      const filterBar = document.getElementById('filterBar');
+      const offset = filterBar ? filterBar.getBoundingClientRect().bottom + window.scrollY : 0;
+      window.scrollTo({top: Math.max(0, offset - filterBar.offsetHeight), behavior:'smooth'});
     };
     fb.appendChild(b);
+  });
+
+  // 활성 버튼이 필터 바 가시 영역 안에 오도록 스크롤 (모바일 가로 스크롤)
+  requestAnimationFrame(()=>{
+    const active = fb.querySelector('.fb.active');
+    if(active) active.scrollIntoView({inline:'nearest', block:'nearest', behavior:'smooth'});
   });
 }
 
