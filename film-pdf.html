@@ -5,26 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>도시의 이방인</title>
     
-    <link rel="apple-touch-icon" href="https://casio8000.github.io/film-humanities_Mobile/images/Stranger_in_the_City.png?v=2">
+    <link rel="apple-touch-icon" href="https://casio8000.github.io/film-humanities_Mobile/images/Stranger_in_the_City.png?v=3">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="도시의 이방인">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <script>
-        // 아이폰이 아이콘 정보를 읽을 시간을 충분히 주기 위해 1.5초(1500) 대기
-        window.onload = function() {
-            setTimeout(function() {
-                window.location.href = "https://casio8000.github.io/film-humanities_Mobile/Stranger_in_the_City_ft.Nova.pdf"; 
-            }, 1500); 
-        };
-    </script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+            font-family: -apple-system, sans-serif;
+        }
+        .icon-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 26px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+        .btn-open {
+            padding: 12px 30px;
+            background-color: #007aff;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .info-text {
+            color: #888;
+            font-size: 13px;
+            margin-top: 15px;
+            text-align: center;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body>
-    <div style="margin-top: 150px; text-align: center; font-family: -apple-system, sans-serif;">
-        <img src="https://casio8000.github.io/film-humanities_Mobile/images/Stranger_in_the_City.png" width="100" style="border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-        <p style="color: #333; font-weight: 500; margin-top: 20px;">도시의 이방인</p>
-        <p style="color: #888; font-size: 14px;">콘텐츠를 불러오는 중입니다...</p>
-    </div>
+
+    <img src="https://casio8000.github.io/film-humanities_Mobile/images/Stranger_in_the_City.png" class="icon-img">
+    
+    <h2 style="margin: 0 0 10px 0; color: #333;">도시의 이방인</h2>
+
+    <a href="https://casio8000.github.io/film-humanities_Mobile/Stranger_in_the_City_ft.Nova.pdf" class="btn-open">
+        PDF 파일 열기
+    </a>
+
+    <p class="info-text">
+        하단의 공유 버튼을 눌러<br>
+        <b>'홈 화면에 추가'</b>를 먼저 해주세요.
+    </p>
+
 </body>
 </html>
