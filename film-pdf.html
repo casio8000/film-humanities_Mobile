@@ -2,21 +2,27 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>詩集/도시의 이방인</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>詩集 도시의 이방인</title>
     
     <link rel="apple-touch-icon" href="images/Stranger_in_the_City.png">
     
-    <meta name="apple-mobile-web-app-title" content="도시의 이방인">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="도시의 이방인">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script>
-        // 3. 실제 PDF 파일명으로 수정 (예: film.pdf)
-        window.location.href = "Stranger_in_the_City_ft.Nova.pdf"; 
+        // 페이지가 완전히 로드된 후 PDF로 이동 (아이콘 인식 시간을 벌기 위함)
+        window.onload = function() {
+            setTimeout(function() {
+                window.location.href = "Stranger_in_the_City_ft.Nova.pdf"; 
+            }, 100); 
+        };
     </script>
 </head>
 <body>
-    <p>PDF를 불러오는 중입니다...</p>
+    <div style="margin-top: 50px; text-align: center; color: #666;">
+        <p>PDF 문서를 불러오고 있습니다...</p>
+    </div>
 </body>
 </html>
