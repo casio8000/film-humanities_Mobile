@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>痕迹 흔적 — 스물여섯 해의 감정 기록</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@200;300;400;500&display=block" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#07070f;--bg2:#0d0d1a;--bg3:#12121f;
+  --text:#e4ddd4;--text-dim:#9a9088;--text-faint:#3a3832;
+  --gold:#b8976a;--gold-dim:#7a6044;--gold-glow:rgba(184,151,106,.1);
+  --divider:rgba(255,255,255,.07);
+  --c1:#7a9ab8;--c2:#c87a5a;--c3:#7aaa7a;--c4:#b8976a;--c5:#8ab89a;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  overflow-x:hidden;max-width:100%;
+  background:var(--bg);color:var(--text);
+  font-family:'Noto Serif KR',serif;line-height:2;word-break:keep-all;
+  -webkit-text-size-adjust:100%;
+}
+body.no-scroll{overflow:hidden;}
+
+/* grain */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* ── VIEW SYSTEM ── */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── GLOBAL NAV ── */
+#gnav{
+  position:fixed;top:0;left:0;right:0;z-index:600;
+  padding:0 20px;
+  display:none;
+  align-items:center;gap:10px;
+  background:rgba(10,10,22,.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  height:auto;min-height:64px;
+  flex-wrap:nowrap;
+}
+#gnav.show{display:flex;}
+
+/* archive and entry top offset */
+#archive{padding-top:72px;}
+#entry{padding-top:72px;min-height:100vh;}
+.eprog{top:72px;}
+
+.gnav-logo{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:1.05rem;color:#fff;cursor:pointer;white-space:nowrap;flex-shrink:0;
+}
+.gnav-logo .gc{color:var(--gold);font-style:normal;font-size:.9rem;letter-spacing:2px;}
+
+/* two-row chip container */
+.gnav-rows{
+  display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;
+  padding:8px 0;
+}
+.gnav-row{
+  display:flex;align-items:center;gap:3px;flex-wrap:nowrap;
+  overflow-x:auto;scrollbar-width:none;
+}
+.gnav-row::-webkit-scrollbar{display:none;}
+.gnav-sep{
+  color:rgba(255,255,255,.15);font-size:.9rem;margin:0 4px;flex-shrink:0;
+}
+
+/* ── BASE CHIP ── */
+.gchip{
+  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:1.2px;
+  padding:4px 11px;border-radius:14px;border:1px solid rgba(255,255,255,.12);
+  color:rgba(200,195,190,.6);cursor:pointer;transition:all .2s;white-space:nowrap;
+  text-transform:uppercase;background:rgba(255,255,255,.02);
+}
+.gchip:hover{color:rgba(230,225,218,.9);border-color:rgba(255,255,255,.26);background:rgba(255,255,255,.05);}
+
+/* Chapter chips (row 1) */
+.gchip-ch.on{border-color:var(--gold-dim);color:var(--gold);background:rgba(184,151,106,.08);}
+.gchip-ch.on[data-f="1"]{color:var(--c1);border-color:var(--c1);background:rgba(122,154,184,.1);}
+.gchip-ch.on[data-f="2"]{color:var(--c2);border-color:var(--c2);background:rgba(200,122,90,.1);}
+.gchip-ch.on[data-f="3"]{color:var(--c3);border-color:var(--c3);background:rgba(122,170,122,.1);}
+.gchip-ch.on[data-f="4"]{color:var(--c4);border-color:var(--c4);background:rgba(184,151,106,.1);}
+.gchip-ch.on[data-f="5"]{color:var(--c5);border-color:var(--c5);background:rgba(138,184,154,.1);}
+
+/* Tag chips (row 2) */
+.gchip-tag{font-size:.62rem;padding:3px 10px;border-radius:12px;}
+.gchip-tag.on{color:#d4c8be;border-color:rgba(212,200,190,.5);background:rgba(212,200,190,.07);}
+.gchip-tag.on[data-f="고독"]{color:#a8b8d0;border-color:#a8b8d0;background:rgba(168,184,208,.1);}
+.gchip-tag.on[data-f="가족"]{color:#d0a8a8;border-color:#d0a8a8;background:rgba(208,168,168,.1);}
+.gchip-tag.on[data-f="시간"]{color:#c8c0a0;border-color:#c8c0a0;background:rgba(200,192,160,.1);}
+.gchip-tag.on[data-f="성찰"]{color:#a8c8a8;border-color:#a8c8a8;background:rgba(168,200,168,.1);}
+.gchip-tag.on[data-f="도시"]{color:#c0b0d8;border-color:#c0b0d8;background:rgba(192,176,216,.1);}
+
+/* 서가 chip — teal/jade */
+.gchip-soga{
+  font-size:.62rem;padding:3px 11px;border-radius:12px;
+  color:rgba(120,200,185,.65);border-color:rgba(120,200,185,.25);
+}
+.gchip-soga:hover{color:rgba(120,200,185,.95);border-color:rgba(120,200,185,.5);background:rgba(120,200,185,.07);}
+.gchip-soga.on{color:#78c8b9;border-color:#78c8b9;background:rgba(120,200,185,.1);}
+
+/* 각서 chip — warm amber */
+.gchip-gak{
+  font-size:.62rem;padding:3px 11px;border-radius:12px;
+  color:rgba(210,175,100,.65);border-color:rgba(210,175,100,.25);
+}
+.gchip-gak:hover{color:rgba(210,175,100,.95);border-color:rgba(210,175,100,.5);background:rgba(210,175,100,.07);}
+.gchip-gak.on{color:#d2af64;border-color:#d2af64;background:rgba(210,175,100,.1);}
+
+/* ── SEARCH ── */
+#srchwrap{
+  position:relative;flex-shrink:0;
+}
+#srch{
+  background:rgba(255,255,255,.05);border:1px solid var(--divider);
+  border-radius:16px;padding:5px 12px 5px 30px;
+  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:.5px;
+  color:var(--text-dim);outline:none;width:140px;transition:all .3s;
+}
+#srch::placeholder{color:var(--text-faint);}
+#srch:focus{width:180px;border-color:rgba(184,151,106,.35);color:var(--text);}
+.srch-icon{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  color:var(--text-faint);font-size:.65rem;pointer-events:none;
+}
+#srch-drop{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;
+  width:280px;max-height:340px;overflow-y:auto;scrollbar-width:thin;
+  background:rgba(10,10,20,.97);border:1px solid var(--divider);
+  border-radius:12px;box-shadow:0 12px 48px rgba(0,0,0,.8);z-index:700;
+}
+#srch-drop.open{display:block;}
+.sitem{
+  padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--divider);
+  transition:background .18s;
+}
+.sitem:last-child{border-bottom:none;}
+.sitem:hover{background:rgba(255,255,255,.04);}
+.sitem-title{
+  font-family:'Noto Serif KR',serif;font-size:.88rem;color:#fff;
+  margin-bottom:3px;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
+}
+.sitem-title mark{background:rgba(184,151,106,.3);color:var(--gold);border-radius:2px;}
+.sitem-meta{
+  font-family:'Montserrat',sans-serif;font-size:.56rem;letter-spacing:1.5px;
+  color:var(--text-faint);text-transform:uppercase;
+}
+.sitem-snippet{
+  font-family:'Noto Serif KR',serif;font-size:.75rem;
+  color:var(--text-faint);line-height:1.7;
+  margin:4px 0;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.sitem-snippet mark{background:rgba(184,151,106,.2);color:var(--gold-dim);border-radius:2px;}
+.snone{padding:16px;font-family:'Montserrat',sans-serif;font-size:.65rem;
+  color:var(--text-faint);letter-spacing:1px;text-align:center;}
+
+/* ── FONT SIZE TOGGLE ── */
+#fztog{display:none;}
+.fzbtn{
+  font-family:'Montserrat',sans-serif;font-size:.62rem;
+  padding:4px 9px;cursor:pointer;color:var(--text-faint);
+  border:none;background:none;transition:all .22s;
+}
+.fzbtn:hover{color:var(--text-dim);}
+.fzbtn.on{background:var(--gold-glow);color:var(--gold);}
+
+/* ── SHARE CARD MODAL ── */
+#share-overlay{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;
+}
+#share-overlay.open{display:flex;}
+#share-box{
+  background:var(--bg2);border:1px solid var(--divider);
+  border-radius:16px;padding:28px;max-width:400px;width:90%;
+  box-shadow:0 20px 80px rgba(0,0,0,.8);
+}
+#share-box h3{
+  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:3px;
+  color:var(--text-faint);text-transform:uppercase;margin-bottom:16px;
+}
+#share-canvas{
+  width:100%;border-radius:8px;display:block;
+  margin-bottom:16px;
+}
+.share-btns{display:flex;gap:10px;}
+.sbtn{
+  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:2px;
+  padding:9px 18px;border-radius:20px;cursor:pointer;
+  transition:all .25s;text-transform:uppercase;flex:1;text-align:center;
+  border:1px solid;
+}
+.sbtn-dl{color:var(--gold);border-color:var(--gold-dim);background:none;}
+.sbtn-dl:hover{background:var(--gold-glow);}
+.sbtn-cl{color:var(--text-dim);border-color:var(--divider);background:none;}
+.sbtn-cl:hover{color:var(--text);border-color:rgba(255,255,255,.2);}
+
+/* ── BOOKMARK ── */
+#bm-banner{
+  display:none;
+  margin:0 40px 0;padding:14px 20px;
+  background:rgba(184,151,106,.06);border:1px solid rgba(184,151,106,.18);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;
+}
+#bm-banner.hidden{display:none!important;}
+.bm-txt{
+  font-family:'Noto Serif KR',serif;font-size:.85rem;color:var(--text-dim);
+}
+.bm-txt em{color:var(--gold);font-style:normal;}
+.bm-btns{display:flex;gap:8px;}
+.bmbtn{
+  font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:1.5px;
+  padding:5px 14px;border-radius:14px;border:1px solid;cursor:pointer;
+  transition:all .22s;text-transform:uppercase;background:none;
+}
+.bmbtn-yes{color:var(--gold);border-color:var(--gold-dim);}
+.bmbtn-yes:hover{background:var(--gold-glow);}
+.bmbtn-no{color:var(--text-faint);border-color:var(--divider);}
+.bmbtn-no:hover{color:var(--text-dim);border-color:rgba(255,255,255,.15);}
+
+/* share btn in entry meta */
+.share-trigger{
+  font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:1.5px;
+  padding:4px 12px;border-radius:12px;border:1px solid var(--divider);
+  color:var(--text-faint);cursor:pointer;transition:all .22s;background:none;
+  text-transform:uppercase;
+}
+.share-trigger:hover{color:var(--gold);border-color:rgba(184,151,106,.3);}
+
+/* ── BTT ── */
+#btt{
+  position:fixed;bottom:80px;right:24px;z-index:900;
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(10,10,20,.92);border:1px solid var(--divider);
+  backdrop-filter:blur(14px);
+  color:var(--text-dim);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;transition:all .3s;
+  opacity:0;pointer-events:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.6);
+}
+#btt.vis{opacity:1;pointer-events:auto;}
+#btt:hover{color:var(--gold);border-color:rgba(184,151,106,.4);}
+
+/* ── BACK BUTTON ── */
+#back-btn{
+  position:fixed;bottom:24px;right:24px;z-index:900;
+  display:none;
+  align-items:center;gap:6px;
+  padding:9px 18px;border-radius:22px;
+  background:rgba(10,10,20,.92);border:1px solid var(--divider);
+  backdrop-filter:blur(14px);
+  color:var(--text-dim);cursor:pointer;
+  font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:1.5px;
+  text-transform:uppercase;transition:all .3s;
+  box-shadow:0 4px 20px rgba(0,0,0,.6);
+}
+#back-btn.vis{display:flex;}
+#back-btn:hover{color:var(--gold);border-color:rgba(184,151,106,.4);}
+#mtog{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 16px;border-radius:22px;
+  background:rgba(10,10,20,.9);border:1px solid var(--divider);
+  backdrop-filter:blur(18px);
+  color:var(--gold-dim);cursor:pointer;
+  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:2px;
+  text-transform:uppercase;transition:all .3s;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);user-select:none;
+}
+#mtog:hover{color:var(--gold);}
+#mtog.on{color:var(--gold);border-color:rgba(184,151,106,.4);}
+.mpw{display:flex;gap:2px;align-items:center;height:10px;}
+.mpw i{width:2px;border-radius:1px;background:currentColor;display:block;}
+#mtog.on .mpw i{animation:wv 1.1s ease-in-out infinite;}
+.mpw i:nth-child(1){height:3px;}.mpw i:nth-child(2){height:9px;animation-delay:.15s!important;}
+.mpw i:nth-child(3){height:5px;animation-delay:.3s!important;}
+.mpw i:nth-child(4){height:9px;animation-delay:.08s!important;}
+.mpw i:nth-child(5){height:3px;animation-delay:.22s!important;}
+@keyframes wv{0%,100%{transform:scaleY(.35);}50%{transform:scaleY(1);}}
+
+/* ── MUSIC ── */
+#mwrap{position:fixed;bottom:24px;left:24px;z-index:900;}
+#mpanel{
+  display:none;margin-bottom:8px;
+  background:rgba(7,7,15,.97);border:1px solid var(--divider);
+  border-radius:14px;overflow:hidden;
+  box-shadow:0 8px 48px rgba(0,0,0,.8);width:290px;
+}
+#mpanel.open{display:block;}
+#mphead{
+  padding:10px 14px;border-bottom:1px solid var(--divider);
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:2px;
+  color:var(--text-dim);text-transform:uppercase;
+}
+#mpclose{cursor:pointer;opacity:.4;font-size:.75rem;}
+#mframe{width:100%;height:220px;border:none;display:block;background:var(--bg2);}
+#mfallback{
+  display:none;
+  padding:16px;
+  font-family:'Montserrat',sans-serif;font-size:.62rem;
+  color:var(--text-dim);line-height:1.8;letter-spacing:.5px;
+}
+#mfallback a{color:var(--gold);text-decoration:none;}
+
+/* ────── LANDING ────── */
+#landing{
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse 65% 60% at 12% 22%,rgba(122,154,184,.07) 0%,transparent 65%),
+    radial-gradient(ellipse 50% 65% at 88% 78%,rgba(184,151,106,.06) 0%,transparent 65%),
+    var(--bg);
+}
+.ld{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;
+  min-height:100vh;padding:60px 24px;
+}
+/* hero title */
+.ld-chi{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(5.5rem,16vw,11rem);
+  font-weight:400;
+  color:rgba(184,151,106,.9);
+  line-height:.95;letter-spacing:4px;
+  text-shadow:0 0 100px rgba(184,151,106,.2);
+  opacity:0;animation:fu .9s ease .1s forwards;
+}
+.ld-kor{
+  font-family:'Noto Serif KR',serif;font-weight:300;
+  font-size:clamp(1rem,2.5vw,1.4rem);
+  color:var(--text-dim);letter-spacing:10px;margin-top:10px;
+  opacity:0;animation:fu .9s ease .3s forwards;
+}
+.ld-vline{
+  width:1px;height:48px;margin:36px auto;
+  background:linear-gradient(to bottom,transparent,var(--gold-dim),transparent);
+  opacity:0;animation:fu .9s ease .42s forwards;
+}
+/* prologue */
+.ld-prologue{
+  max-width:520px;margin:0 auto 48px;
+  opacity:0;animation:fu .9s ease .52s forwards;
+}
+.ld-prologue p{
+  font-size:1rem;color:var(--text-dim);line-height:2.4;
+  font-family:'Noto Serif KR',serif;font-weight:300;
+}
+.ld-prologue p+p{margin-top:1.6em;}
+.ld-prologue em{font-style:italic;color:rgba(184,151,106,.88);}
+.ld-prologue strong{font-weight:400;color:var(--text);}
+
+.ld-eye{
+  font-family:'Montserrat',sans-serif;font-size:.68rem;
+  letter-spacing:4px;color:var(--text-faint);text-transform:uppercase;
+  margin-bottom:32px;
+  opacity:0;animation:fu .9s ease .62s forwards;
+}
+/* chapter pills */
+.ld-chs{
+  display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+  margin-bottom:44px;
+  opacity:0;animation:fu .9s ease .72s forwards;
+}
+.ch-pill{
+  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:1.5px;
+  padding:5px 16px;border-radius:18px;
+  border:1px solid rgba(255,255,255,.09);color:var(--text-dim);
+  display:flex;align-items:center;gap:8px;
+}
+.ch-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.ld-btn{
+  font-family:'Montserrat',sans-serif;font-size:.72rem;letter-spacing:2px;
+  padding:15px 40px;border-radius:32px;border:1px solid var(--gold-dim);
+  color:var(--gold);background:transparent;cursor:pointer;
+  transition:all .3s;text-transform:uppercase;
+  opacity:0;animation:fu .9s ease .82s forwards;
+}
+.ld-btn:hover{background:var(--gold-glow);border-color:var(--gold);}
+
+@keyframes fu{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+
+
+/* ────── ARCHIVE ────── */
+#archive{/* padding handled by gnav height rule above */}
+
+/* editorial header */
+.arch-hero{
+  padding:48px 40px 0;
+  border-bottom:1px solid var(--divider);
+}
+.arch-hero-title{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(1.8rem,4vw,2.8rem);color:#fff;margin-bottom:8px;
+}
+.arch-hero-sub{
+  font-family:'Montserrat',sans-serif;font-size:.68rem;
+  letter-spacing:3px;color:var(--text-faint);text-transform:uppercase;
+  margin-bottom:28px;
+}
+/* stats bar */
+.arch-stats{
+  display:flex;gap:32px;padding:20px 0 0;border-top:1px solid var(--divider);
+  flex-wrap:wrap;
+}
+.stat{
+  font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:2px;
+  color:var(--text-faint);text-transform:uppercase;
+}
+.stat span{
+  display:block;font-family:'Playfair Display',serif;font-style:italic;
+  font-size:1.6rem;color:var(--text-dim);letter-spacing:0;margin-bottom:2px;
+}
+
+/* chapter section */
+.ch-section{padding:0 40px 60px;}
+.ch-banner{
+  display:flex;align-items:center;gap:0;
+  padding:40px 0 28px;position:relative;
+}
+.ch-banner::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;
+  height:1px;background:var(--divider);
+}
+.ch-numeral{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:5rem;line-height:1;color:rgba(255,255,255,.06);
+  margin-right:24px;flex-shrink:0;
+}
+.ch-info{}
+.ch-label{
+  font-family:'Montserrat',sans-serif;font-size:.7rem;
+  letter-spacing:4px;text-transform:uppercase;margin-bottom:4px;
+}
+.ch-period{font-size:.82rem;color:var(--text-faint);}
+.ch-count{
+  margin-left:auto;font-family:'Playfair Display',serif;
+  font-style:italic;font-size:2.2rem;color:rgba(255,255,255,.12);
+}
+
+/* editorial card grid */
+.ch-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1px;
+  background:var(--divider);
+  border:1px solid var(--divider);
+  border-radius:8px;overflow:hidden;
+  margin-top:28px;
+}
+.ecard{
+  background:var(--bg2);padding:28px 24px;
+  cursor:pointer;transition:background .22s;
+  position:relative;overflow:hidden;
+  min-height:160px;display:flex;flex-direction:column;
+}
+.ecard:hover{background:var(--bg3);}
+.ecard::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:2px;background:var(--cc,var(--gold));
+  opacity:0;transition:opacity .22s;
+}
+.ecard:hover::before{opacity:.8;}
+.ecard-num{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:2rem;color:rgba(255,255,255,.05);
+  position:absolute;top:12px;right:16px;line-height:1;
+}
+.ecard-date{
+  font-family:'Montserrat',sans-serif;font-size:.58rem;
+  letter-spacing:2px;color:var(--text-faint);margin-bottom:10px;
+  text-transform:uppercase;
+}
+.ecard-title{
+  font-family:'Noto Serif KR',serif;font-weight:500;
+  font-size:1.02rem;color:#fff;line-height:1.5;margin-bottom:12px;flex:1;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.ecard-pre{
+  font-size:.8rem;color:var(--text-faint);line-height:1.8;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  margin-bottom:12px;
+}
+.ecard-tag{
+  font-family:'Montserrat',sans-serif;font-size:.56rem;letter-spacing:1.5px;
+  color:var(--cc,var(--gold));text-transform:uppercase;opacity:.6;
+}
+/* first card featured */
+.ch-grid .ecard:first-child{
+  grid-column:1/-1;
+  padding:36px 32px;min-height:auto;
+  background:var(--bg3);
+}
+.ch-grid .ecard:first-child .ecard-title{
+  font-size:1.3rem;font-weight:700;-webkit-line-clamp:3;
+}
+.ch-grid .ecard:first-child .ecard-pre{
+  -webkit-line-clamp:3;font-size:.85rem;color:var(--text-dim);
+}
+.ch-grid .ecard.hidden{display:none;}
+
+/* friend section */
+.friend-section{
+  padding:0 40px 80px;
+}
+.friend-banner{
+  display:flex;align-items:center;gap:20px;
+  padding:40px 0 28px;border-bottom:1px solid rgba(200,168,216,.1);
+}
+.friend-icon{
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid rgba(200,168,216,.3);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(200,168,216,.6);font-size:1rem;flex-shrink:0;
+}
+.friend-info{}
+.friend-label{
+  font-family:'Montserrat',sans-serif;font-size:.7rem;
+  letter-spacing:4px;text-transform:uppercase;
+  color:rgba(200,168,216,.7);margin-bottom:3px;
+}
+.friend-sub{font-size:.82rem;color:var(--text-faint);}
+.friend-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1px;background:rgba(200,168,216,.06);
+  border:1px solid rgba(200,168,216,.1);
+  border-radius:8px;overflow:hidden;margin-top:28px;
+}
+.fcard{
+  background:rgba(12,10,18,.8);padding:28px 24px;
+  cursor:pointer;transition:background .22s;
+  position:relative;overflow:hidden;min-height:160px;
+  display:flex;flex-direction:column;
+}
+.fcard:hover{background:rgba(16,13,24,.9);}
+.fcard::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:2px;background:rgba(200,168,216,.5);
+  opacity:0;transition:opacity .22s;
+}
+.fcard:hover::before{opacity:1;}
+.fcard-badge{
+  position:absolute;top:12px;right:12px;
+  font-family:'Montserrat',sans-serif;font-size:.52rem;letter-spacing:1.5px;
+  color:rgba(200,168,216,.4);text-transform:uppercase;
+}
+.fcard-date{
+  font-family:'Montserrat',sans-serif;font-size:.58rem;
+  letter-spacing:2px;color:rgba(200,168,216,.25);margin-bottom:10px;text-transform:uppercase;
+}
+.fcard-title{
+  font-family:'Noto Serif KR',serif;font-weight:400;
+  font-size:1rem;color:rgba(230,220,240,.85);line-height:1.5;
+  margin-bottom:12px;flex:1;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.fcard-pre{
+  font-size:.78rem;color:rgba(200,168,216,.35);line-height:1.8;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+/* ────── ENTRY ────── */
+#entry{/* padding handled by gnav height rule above */min-height:100vh;}
+
+.entry-bg{
+  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  transition:background 1.2s ease;
+}
+.entry-bg.c1{background:
+  radial-gradient(ellipse 80% 60% at 8% 15%,rgba(122,154,184,.09) 0%,transparent 60%),
+  radial-gradient(ellipse 60% 80% at 90% 85%,rgba(90,120,160,.06) 0%,transparent 60%),
+  #05070e;}
+.entry-bg.c2{background:
+  radial-gradient(ellipse 75% 55% at 12% 20%,rgba(200,122,90,.08) 0%,transparent 60%),
+  radial-gradient(ellipse 55% 75% at 88% 82%,rgba(160,90,60,.06) 0%,transparent 60%),
+  #0c0806;}
+.entry-bg.c3{background:
+  radial-gradient(ellipse 70% 60% at 10% 18%,rgba(122,170,122,.07) 0%,transparent 60%),
+  radial-gradient(ellipse 55% 70% at 88% 82%,rgba(90,140,90,.05) 0%,transparent 60%),
+  #060c06;}
+.entry-bg.c4{background:
+  radial-gradient(ellipse 72% 58% at 12% 20%,rgba(184,151,106,.07) 0%,transparent 60%),
+  radial-gradient(ellipse 52% 72% at 88% 82%,rgba(150,120,80,.05) 0%,transparent 60%),
+  #0a0804;}
+.entry-bg.c5{background:
+  radial-gradient(ellipse 70% 60% at 12% 20%,rgba(138,184,154,.07) 0%,transparent 60%),
+  radial-gradient(ellipse 55% 70% at 87% 80%,rgba(100,160,120,.05) 0%,transparent 60%),
+  #060e09;}
+.entry-bg.cf{background:
+  radial-gradient(ellipse 70% 55% at 10% 18%,rgba(200,168,216,.07) 0%,transparent 60%),
+  radial-gradient(ellipse 55% 70% at 88% 82%,rgba(160,120,200,.04) 0%,transparent 60%),
+  #080610;}
+
+/* reading progress */
+.eprog{
+  position:fixed;top:72px;left:0;height:2px;z-index:700;
+  background:var(--ecc,var(--gold));opacity:.6;
+  transition:width .08s linear;width:0%;
+  box-shadow:0 0 6px var(--ecc,var(--gold));
+}
+
+.ewrap{padding:48px 28px 120px;}
+.ecol{max-width:460px;margin:0 auto;}
+
+/* entry typography */
+.e-date{
+  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:3px;
+  color:rgba(184,175,160,.55);text-transform:uppercase;margin-bottom:28px;
+  opacity:0;animation:fu .7s ease .05s forwards;
+}
+.e-rule{
+  width:30px;height:1px;background:var(--ecc,var(--gold));
+  margin-bottom:22px;
+  opacity:0;animation:fu .7s ease .12s forwards;
+}
+.e-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.6rem,5vw,2.2rem);
+  font-weight:400;color:var(--ecc,var(--gold));line-height:1.35;
+  margin-bottom:42px;
+  opacity:0;animation:fu .7s ease .2s forwards;
+}
+.e-body{
+  font-size:1.12rem;color:rgba(228,221,212,.9);
+  font-family:'Noto Serif KR',Georgia,'Times New Roman',serif;
+  font-weight:400;
+  line-height:2.7;word-break:keep-all;
+  opacity:0;animation:fu .7s ease .3s forwards;
+}
+.e-stanza{display:block;margin-bottom:2.2em;}
+.e-stanza:last-child{margin-bottom:0;}
+.e-line{display:block;letter-spacing:.02em;}
+
+.e-coda{
+  margin-top:48px;padding-top:32px;
+  border-top:1px solid rgba(255,255,255,.07);
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:1.05rem;color:var(--ecc,var(--gold));line-height:2.1;
+  opacity:0;animation:fu .7s ease .55s forwards;
+}
+.e-friend{
+  margin-top:20px;font-family:'Montserrat',sans-serif;font-size:.56rem;
+  letter-spacing:1.5px;color:rgba(200,168,216,.3);text-align:right;
+}
+.e-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:44px;padding-top:28px;border-top:1px solid var(--divider);
+  flex-wrap:wrap;gap:12px;
+  opacity:0;animation:fu .7s ease .65s forwards;
+}
+.e-tag{
+  font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:1.5px;
+  padding:4px 12px;border-radius:12px;border:1px solid;
+  color:var(--ecc,var(--gold));border-color:var(--ecc,var(--gold));
+  opacity:.55;text-transform:uppercase;
+}
+.e-nav{display:flex;gap:20px;}
+.pnb{
+  font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:2px;
+  color:var(--text-dim);cursor:pointer;transition:color .22s;
+  border:none;background:none;text-transform:uppercase;padding:0;
+  display:flex;align-items:center;gap:5px;
+}
+.pnb:hover{color:var(--text);}
+.pnb:disabled{opacity:.15;cursor:default;}
+
+/* ── 읽은 카드 활성 표시 ── */
+.ecard.ecard-active{
+  background:var(--bg3)!important;
+  box-shadow:inset 3px 0 0 var(--cc,var(--gold));
+}
+.ecard.ecard-active .ecard-title{color:var(--cc,var(--gold));}
+.fcard.ecard-active{
+  background:rgba(20,16,28,.95)!important;
+  box-shadow:inset 3px 0 0 rgba(200,168,216,.6);
+}
+
+/* ── MEMO GRID ── */
+.memo-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:14px;margin-top:28px;
+}
+.memo-card{
+  background:rgba(12,10,6,.7);
+  border:1px solid rgba(210,175,100,.15);
+  border-top:2px solid rgba(210,175,100,.25);
+  border-radius:8px;padding:24px 22px 18px;position:relative;
+  transition:background .22s, border-color .22s;
+}
+.memo-card:hover{
+  background:rgba(18,15,8,.85);
+  border-color:rgba(210,175,100,.32);
+  border-top-color:rgba(210,175,100,.55);
+}
+.memo-num{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:1.9rem;color:rgba(210,175,100,.1);
+  position:absolute;top:10px;right:14px;line-height:1;
+}
+.memo-body{
+  font-family:'Noto Serif KR',serif;font-size:.92rem;
+  color:rgba(220,212,198,.82);line-height:2.2;margin-bottom:14px;
+}
+.memo-src{
+  font-family:'Montserrat',sans-serif;font-size:.56rem;
+  letter-spacing:1.5px;color:rgba(210,175,100,.5);
+  margin-bottom:10px;
+}
+.memo-tag{
+  font-family:'Montserrat',sans-serif;font-size:.54rem;
+  letter-spacing:1.5px;color:rgba(210,175,100,.35);
+  text-transform:uppercase;
+}
+
+/* ch-pill clickable */
+.ch-pill-link{
+  cursor:pointer;transition:all .25s;
+}
+.ch-pill-link:hover{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.18);
+  transform:translateY(-1px);
+}
+.ch-arr{
+  font-size:.55rem;margin-left:6px;opacity:0;
+  transition:opacity .22s;
+}
+.ch-pill-link:hover .ch-arr{opacity:1;}
+
+/* chapter preface */
+.ch-preface{
+  margin:0 0 28px;
+  padding:18px 22px;
+  font-family:'Noto Serif KR',serif;font-size:.88rem;
+  color:var(--text-dim);line-height:2.2;
+  border-radius:0 6px 6px 0;
+  background:rgba(255,255,255,.02);
+}
+
+/* ── IMPROVED NAV CHIP READABILITY ── */
+.gchip{
+  font-family:'Montserrat',sans-serif;font-size:.68rem;letter-spacing:1.2px;
+  padding:5px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.15);
+  color:rgba(200,195,190,.65);cursor:pointer;transition:all .22s;white-space:nowrap;
+  text-transform:uppercase;background:rgba(255,255,255,.03);
+}
+.gchip:hover{color:rgba(230,225,218,.9);border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06);}
+.gchip.on{border-color:var(--gold-dim);color:var(--gold);background:rgba(184,151,106,.08);}
+.gchip.on[data-f="1"]{color:var(--c1);border-color:var(--c1);background:rgba(122,154,184,.1);}
+.gchip.on[data-f="2"]{color:var(--c2);border-color:var(--c2);background:rgba(200,122,90,.1);}
+.gchip.on[data-f="3"]{color:var(--c3);border-color:var(--c3);background:rgba(122,170,122,.1);}
+.gchip.on[data-f="4"]{color:var(--c4);border-color:var(--c4);background:rgba(184,151,106,.1);}
+.gchip.on[data-f="friend"]{color:#c8a8d8;border-color:#c8a8d8;background:rgba(200,168,216,.1);}
+.gchip.on[data-f="5"]{color:var(--c5);border-color:var(--c5);background:rgba(138,184,154,.1);}
+
+/* ════════════════════════════════
+   MOBILE OPTIMIZED  ≤ 600px
+   ════════════════════════════════ */
+
+/* ── 모바일 전용 하단 네비 ── */
+#mob-botnav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:610;
+  background:rgba(8,8,18,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,.1);
+  padding:7px 10px;
+  padding-bottom:calc(7px + env(safe-area-inset-bottom,0px));
+}
+.mbn-row{
+  display:flex;align-items:center;gap:4px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.mbn-row::-webkit-scrollbar{display:none;}
+.mbn-sep{flex-shrink:0;width:1px;height:16px;background:rgba(255,255,255,.12);margin:0 4px;}
+#fztog-mob{
+  display:flex;align-items:center;gap:0;flex-shrink:0;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;overflow:hidden;
+}
+#fztog-mob .fzbtn{
+  font-size:.62rem;padding:6px 10px;min-height:36px;min-width:32px;
+  display:flex;align-items:center;justify-content:center;
+}
+.mbn-music{
+  flex-shrink:0;display:flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.12);
+  color:var(--gold-dim);background:rgba(255,255,255,.03);
+  font-family:'Montserrat',sans-serif;font-size:.58rem;letter-spacing:1.5px;
+  cursor:pointer;touch-action:manipulation;user-select:none;
+}
+.mbn-music.on{color:var(--gold);border-color:rgba(184,151,106,.4);}
+.mbn-mpw{display:flex;gap:1.5px;align-items:center;height:9px;}
+.mbn-mpw i{width:1.5px;border-radius:1px;background:currentColor;display:block;}
+.mbn-music.on .mbn-mpw i{animation:wv 1.1s ease-in-out infinite;}
+.mbn-mpw i:nth-child(1){height:3px;}
+.mbn-mpw i:nth-child(2){height:8px;animation-delay:.15s!important;}
+.mbn-mpw i:nth-child(3){height:5px;animation-delay:.3s!important;}
+.mbn-mpw i:nth-child(4){height:8px;animation-delay:.08s!important;}
+.mbn-mpw i:nth-child(5){height:3px;animation-delay:.22s!important;}
+
+/* ── 랜딩 검색바 ── */
+#ld-search-wrap{
+  display:none;
+  position:relative;width:100%;max-width:320px;margin:20px auto 0;
+}
+#ld-srch{
+  width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;padding:11px 16px 11px 36px;
+  font-family:'Montserrat',sans-serif;font-size:.72rem;letter-spacing:.5px;
+  color:var(--text-dim);outline:none;
+}
+#ld-srch::placeholder{color:var(--text-faint);}
+#ld-srch:focus{border-color:rgba(184,151,106,.35);color:var(--text);}
+.ld-srch-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:.72rem;}
+#ld-srch-drop{
+  display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;
+  background:rgba(10,10,20,.97);border:1px solid var(--divider);
+  border-radius:12px;max-height:240px;overflow-y:auto;z-index:800;
+  box-shadow:0 8px 32px rgba(0,0,0,.8);
+}
+#ld-srch-drop.open{display:block;}
+
+@media(max-width:600px){
+  /* ── 기본 터치 ── */
+  *{-webkit-tap-highlight-color:transparent;}
+  button,.gchip,.ch-pill-link,.ecard,.fcard,
+  .ld-btn,.lmp-play,.pnb,.share-trigger,
+  .bmbtn,.sbtn,.fzbtn,.gnav-logo,#mtog,#back-btn{
+    touch-action:manipulation;
+  }
+
+  /* ── 네비 상단 (챕터 + 폰트) ── */
+  #gnav{padding:0 8px;gap:4px;min-height:50px;}
+  #gnav .gnav-row-tag{display:none;}   /* 태그는 하단 바로 이동 */
+  #gnav .gnav-sep{display:none;}
+  #gnav #srchwrap{display:none;}        /* 검색은 랜딩으로 */
+  /* fztog 제거됨 */
+  .gnav-logo{font-size:.82rem;}
+  .gnav-logo .gc{font-size:.68rem;letter-spacing:1px;}
+  .gnav-rows{gap:0;padding:3px 0;}
+  .gchip{font-size:.56rem;padding:4px 8px;letter-spacing:.6px;border-radius:11px;min-height:28px;}
+  .gchip-tag,.gchip-soga,.gchip-gak{font-size:.54rem;padding:3px 7px;}
+
+  /* ── 콘텐츠 여백 (상단 50px + 하단 mob-botnav 48px + safe-area) ── */
+  #archive{padding-top:58px;}
+  #entry{padding-top:58px;}
+  .eprog{top:58px;}
+
+  /* ── 랜딩 ── */
+  #landing .ld{
+    padding:60px 20px calc(160px + env(safe-area-inset-bottom,0px));
+    min-height:100vh;
+    justify-content:flex-start;
+  }
+  .ld-chi{font-size:clamp(3.8rem,20vw,6rem);}
+  .ld-kor{letter-spacing:5px;margin-top:6px;}
+  .ld-vline{height:24px;margin:18px auto;}
+  .ld-prologue{margin-bottom:20px;}
+  .ld-prologue p{font-size:.9rem;line-height:2.2;}
+  .ld-prologue p+p{margin-top:.9em;}
+  .ld-eye{font-size:.54rem;letter-spacing:1.5px;margin-bottom:14px;}
+  .ld-chs{gap:6px;margin-bottom:16px;}
+  .ch-pill{font-size:.55rem;padding:5px 9px;gap:4px;}
+  .ld-btn{padding:14px 26px;font-size:.64rem;min-height:48px;}
+  #ld-search-wrap{display:block;}  /* 랜딩에서 검색 표시 */
+  #ld-music-promo{display:none!important;}
+  #mob-botnav{display:block;}      /* 하단 바 표시 */
+
+  /* ── 아카이브 ── */
+  .arch-hero,.ch-section,.friend-section{padding-left:14px;padding-right:14px;}
+  .arch-hero{padding-top:24px;}
+  .ch-numeral{font-size:2.8rem;}
+  .arch-hero-title{font-size:1.25rem;}
+  .arch-stats{gap:12px;}
+  .stat span{font-size:1.2rem;}
+  .ch-grid{grid-template-columns:1fr;border-radius:6px;}
+  .ch-grid .ecard:first-child{grid-column:1;padding:20px 16px;}
+  .ch-grid .ecard:first-child .ecard-title{font-size:1.05rem;}
+  .friend-grid,.memo-grid{grid-template-columns:1fr;}
+  .ecard,.fcard{min-height:auto;padding:18px 14px;}
+  .ecard-title,.fcard-title{font-size:.92rem;}
+  .ch-banner{padding:24px 0 16px;}
+  .ch-section{padding-bottom:36px;}
+  .friend-section{padding-bottom:20px;}
+
+  /* ── 글 읽기 ── */
+  .ewrap{padding:20px 20px calc(100px + env(safe-area-inset-bottom,0px));}
+  .ecol{max-width:100%;}
+  .e-body{font-size:.95rem!important;line-height:2.6;font-family:'Noto Serif KR',Georgia,'Times New Roman',serif!important;font-weight:400!important;}
+  .e-title{font-size:1.25rem;margin-bottom:28px;}
+  .e-date{margin-bottom:18px;font-size:.6rem;}
+  .e-rule{margin-bottom:16px;}
+  .e-stanza{margin-bottom:2em;}
+  .e-coda{margin-top:32px;padding-top:20px;font-size:.94rem;}
+  .e-meta{margin-top:24px;padding-top:18px;}
+  .e-nav{gap:10px;flex-wrap:wrap;}
+  .pnb{min-height:40px;align-items:center;padding:8px 2px;}
+  .share-trigger{min-height:40px;padding:6px 12px;}
+
+  /* ── 맨위로 버튼: 모바일 entry에서 숨김 ── */
+  #btt{display:none!important;}
+
+  /* ── 목록으로 버튼 위치 ── */
+  #back-btn{
+    bottom:calc(58px + env(safe-area-inset-bottom,0px));
+    right:14px;font-size:.55rem;padding:8px 12px;border-radius:16px;
+  }
+
+  /* ── 음악: 모바일 전체 숨김 ── */
+  #mwrap{display:none!important;}
+
+
+
+  /* ── 공유 모달 ── */
+  #share-box{padding:18px;width:calc(100% - 28px);}
+
+  /* ── 툴팁 터치 비활성 ── */
+  [data-tip]:hover::after{display:none;}
+  #bm-banner{margin:10px 14px;}
+  #srch-drop{max-height:240px;}
+}
+
+/* ── hover: 터치 기기에서만 비활성 ── */
+@media(hover:none){
+  .ecard:hover{transform:none!important;box-shadow:none!important;background:var(--bg2)!important;}
+  .fcard:hover{transform:none!important;background:rgba(12,10,18,.8)!important;}
+  .ch-pill-link:hover{transform:none!important;background:none!important;border-color:rgba(255,255,255,.09)!important;}
+  .ecard::before,.fcard::before{display:none;}
+}  .ch-pill-link:hover{transform:none!important;background:none!important;border-color:rgba(255,255,255,.09)!important;}
+  .ecard::before,.fcard::before{display:none;}
+}
+
+/* ── 접근성 개선 ── */
+:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:3px;
+  border-radius:4px;
+}
+button:focus-visible,
+.ecard:focus-visible,
+.fcard:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:2px;
+}
+
+/* ── 카드 시각 구분 강화 ── */
+.ecard{
+  border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .2s, transform .15s;
+}
+.ecard:hover{
+  transform:translateY(-1px);
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+/* 챕터별 첫 카드(featured) 구분 강화 */
+.ch-grid .ecard:first-child{
+  border-top:2px solid var(--cc,var(--gold));
+}
+
+/* ── 검색 결과 개선 ── */
+.sitem-meta{
+  font-family:'Montserrat',sans-serif;font-size:.58rem;letter-spacing:1.2px;
+  color:rgba(180,175,168,.5);text-transform:uppercase;margin-top:4px;
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.sitem-ch{
+  color:var(--gold);opacity:.7;
+}
+
+/* ── 읽기 진행바 개선 ── */
+.eprog{
+  height:2px;
+  box-shadow:0 0 6px var(--ecc,var(--gold));
+}
+
+/* ── 아카이브 섹션 구분 강화 ── */
+.ch-section{
+  border-top:1px solid rgba(255,255,255,.04);
+  margin-top:8px;
+}
+
+/* ── 툴팁 ── */
+[data-tip]{position:relative;}
+[data-tip]:hover::after{
+  content:attr(data-tip);
+  position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:rgba(10,10,20,.97);border:1px solid var(--divider);
+  color:var(--text-dim);font-family:'Montserrat',sans-serif;
+  font-size:.58rem;letter-spacing:.5px;
+  padding:5px 10px;border-radius:6px;white-space:nowrap;
+  pointer-events:none;z-index:800;
+  box-shadow:0 4px 16px rgba(0,0,0,.6);
+}
+
+/* ── 랜딩 음악 프로모 박스 ── */
+#ld-music-promo{
+  position:fixed;bottom:80px;left:24px;z-index:901;
+  width:260px;
+  background:rgba(7,7,15,.97);
+  border:1px solid rgba(184,151,106,.3);
+  border-radius:14px;overflow:hidden;
+  box-shadow:0 8px 40px rgba(0,0,0,.8),0 0 0 1px rgba(184,151,106,.08);
+  transform:translateY(0);opacity:1;
+  transition:transform .55s cubic-bezier(.4,0,.2,1),opacity .45s ease;
+  display:none;
+}
+#ld-music-promo.show{display:block;}
+#ld-music-promo.hide{
+  transform:translateY(130%);opacity:0;pointer-events:none;
+}
+.lmp-head{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px 8px;
+  border-bottom:1px solid rgba(184,151,106,.12);
+}
+.lmp-dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+  background:var(--gold);
+  animation:lmp-pulse 1.8s ease-in-out infinite;
+}
+@keyframes lmp-pulse{0%,100%{transform:scale(.8);opacity:.5;}50%{transform:scale(1.2);opacity:1;}}
+.lmp-label{
+  font-family:'Montserrat',sans-serif;font-size:.58rem;letter-spacing:2px;
+  color:rgba(184,151,106,.75);text-transform:uppercase;
+}
+.lmp-desc{
+  padding:10px 14px 8px;
+  font-family:'Noto Serif KR',serif;font-size:.78rem;
+  color:rgba(228,221,212,.6);line-height:1.8;
+}
+.lmp-play{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin:0 14px 14px;
+  padding:9px 0;border-radius:22px;
+  background:rgba(184,151,106,.12);border:1px solid rgba(184,151,106,.35);
+  color:var(--gold);
+  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:2px;
+  text-transform:uppercase;cursor:pointer;transition:all .25s;
+  user-select:none;
+}
+.lmp-play:hover{background:rgba(184,151,106,.22);border-color:var(--gold);}
+.lmp-play{min-height:44px;}  /* 터치 타겟 */
+
+/* ── 볼륨 슬라이더 ── */
+#mvol-wrap{
+  padding:10px 14px 12px;border-top:1px solid var(--divider);
+  display:flex;align-items:center;gap:8px;
+}
+.mvol-icon{font-size:.7rem;color:var(--gold-dim);flex-shrink:0;}
+#mvol{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:3px;border-radius:2px;outline:none;cursor:pointer;
+  background:linear-gradient(to right,var(--gold) 70%,rgba(255,255,255,.12) 70%);
+}
+#mvol::-webkit-slider-thumb{
+  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  background:var(--gold);cursor:pointer;
+  box-shadow:0 0 6px rgba(184,151,106,.5);
+}
+#mvol::-moz-range-thumb{
+  width:13px;height:13px;border-radius:50%;border:none;
+  background:var(--gold);cursor:pointer;
+}
+
+/* ── 스크롤바 커스텀 ── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(184,151,106,.2);border-radius:2px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(184,151,106,.4);}
+
+/* ── 북마크 배너 표시 수정 ── */
+#bm-banner{
+  display:none;
+  margin:16px 40px;padding:14px 20px;
+  background:rgba(184,151,106,.06);border:1px solid rgba(184,151,106,.18);
+  border-radius:8px;
+  align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;
+}
+#bm-banner.show{display:flex;}
+#bm-banner.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<!-- GLOBAL NAV -->
+<nav id="gnav">
+  <div class="gnav-logo" onclick="goLanding()">痕迹 <span class="gc">흔적</span></div>
+  <div class="gnav-rows">
+    <!-- Row 1: Chapters -->
+    <div class="gnav-row gnav-row-ch">
+      <button class="gchip gchip-ch on" data-f="all" onclick="filter(this,'all')">전체</button>
+      <button class="gchip gchip-ch" data-f="1" onclick="filter(this,'1')">Ⅰ 방황</button>
+      <button class="gchip gchip-ch" data-f="2" onclick="filter(this,'2')">Ⅱ 갈증</button>
+      <button class="gchip gchip-ch" data-f="3" onclick="filter(this,'3')">Ⅲ 성찰</button>
+      <button class="gchip gchip-ch" data-f="4" onclick="filter(this,'4')">Ⅳ 정착</button>
+      <button class="gchip gchip-ch" data-f="5" onclick="filter(this,'5')">Ⅴ 회복</button>
+    </div>
+    <!-- Row 2: Tags + Special -->
+    <div class="gnav-row gnav-row-tag">
+      <button class="gchip gchip-tag" data-f="고독" onclick="filter(this,'고독')">고독</button>
+      <button class="gchip gchip-tag" data-f="가족" onclick="filter(this,'가족')">가족</button>
+      <button class="gchip gchip-tag" data-f="시간" onclick="filter(this,'시간')">시간</button>
+      <button class="gchip gchip-tag" data-f="성찰" onclick="filter(this,'성찰')">성찰</button>
+      <button class="gchip gchip-tag" data-f="도시" onclick="filter(this,'도시')">도시</button>
+      <span class="gnav-sep">│</span>
+      <button class="gchip gchip-soga" data-f="friend" onclick="filter(this,'friend')" data-tip="원문 보존 · 서정 산문">서가 書架</button>
+      <button class="gchip gchip-gak" data-f="memo" onclick="filter(this,'memo')" data-tip="순간의 단상 · 삶의 언어">각서 覺書</button>
+    </div>
+  </div>
+  <!-- search -->
+  <div id="srchwrap">
+    <span class="srch-icon">🔍</span>
+    <input id="srch" type="text" placeholder="검색" autocomplete="off"
+      oninput="doSearch(this.value)"
+      onfocus="if(this.value)document.getElementById('srch-drop').classList.add('open')"
+    />
+    <div id="srch-drop"></div>
+  </div>
+</nav>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav id="mob-botnav">
+  <div class="mbn-row">
+    <button class="gchip gchip-tag" data-f="고독" onclick="filter(this,'고독')">고독</button>
+    <button class="gchip gchip-tag" data-f="가족" onclick="filter(this,'가족')">가족</button>
+    <button class="gchip gchip-tag" data-f="시간" onclick="filter(this,'시간')">시간</button>
+    <button class="gchip gchip-tag" data-f="성찰" onclick="filter(this,'성찰')">성찰</button>
+    <button class="gchip gchip-tag" data-f="도시" onclick="filter(this,'도시')">도시</button>
+    <button class="gchip gchip-soga" data-f="friend" onclick="filter(this,'friend')">서가</button>
+    <button class="gchip gchip-gak" data-f="memo" onclick="filter(this,'memo')">각서</button>
+
+  </div>
+</nav>
+
+<!-- BTT -->
+<button id="btt" onclick="scrollTop()">↑</button>
+
+<!-- BACK BUTTON -->
+<button id="back-btn" onclick="goBack()">← 목록으로</button>
+
+<!-- LANDING MUSIC PROMO BOX -->
+<div id="ld-music-promo">
+  <div class="lmp-head">
+    <div class="lmp-dot"></div>
+    <span class="lmp-label">배경음악 · 지혜의 쉼터</span>
+  </div>
+  <div class="lmp-desc">글을 읽는 동안 음악이 함께합니다.<br/>재생 버튼을 눌러 시작하세요.</div>
+  <div style="font-family:'Noto Serif KR',serif;font-size:.78rem;font-weight:300;color:rgba(184,151,106,.65);padding:2px 14px 8px;text-align:center;">* 수록 음악은 AI로 생성된 창작 음원입니다</div>
+  <div class="lmp-play" onclick="startLandingMusic()">▶ &nbsp;배경음악 재생</div>
+</div>
+
+<!-- MUSIC -->
+<div id="mwrap">
+  <div id="mpanel">
+    <div id="mphead">
+      <span>배경음악 · 지혜의 쉼터</span>
+      <span id="mpclose" onclick="toggleMP()">✕</span>
+    </div>
+    <iframe id="mframe" 
+      width="100%" height="180" scrolling="no" frameborder="no" 
+      allow="autoplay" 
+      src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%3Aplaylists%3A2216711789&color=%23b8976a&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true">
+    </iframe>
+    <div id="mfallback">
+      SoundCloud 플레이리스트: <a href="https://soundcloud.com/liberal-joe-765677086/sets/my-riffusion-archive" target="_blank">링크 열기</a>
+    </div>
+    <div id="mvol-wrap">
+      <span class="mvol-icon">♪</span>
+      <input id="mvol" type="range" min="0" max="100" value="70"
+        oninput="setVolume(this.value)" onchange="setVolume(this.value)"/>
+    </div>
+  </div>
+  <div id="mtog" onclick="toggleMP()">
+    <div class="mpw"><i></i><i></i><i></i><i></i><i></i></div>
+    <span id="mlbl">음악</span>
+  </div>
+</div>
+
+<!-- SHARE CARD MODAL -->
+<div id="share-overlay" onclick="if(event.target===this)closeShare()">
+  <div id="share-box">
+    <h3>인용구 카드 저장</h3>
+    <canvas id="share-canvas"></canvas>
+    <div class="share-btns">
+      <button class="sbtn sbtn-dl" onclick="downloadCard()">이미지 저장</button>
+      <button class="sbtn sbtn-cl" onclick="closeShare()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANDING → -->
+
+<div id="landing" class="view active">
+  <div class="ld">
+    <div class="ld-chi">痕迹</div>
+    <div class="ld-kor">흔 적</div>
+    <div class="ld-vline"></div>
+    <div class="ld-prologue">
+      <p>
+        헤겔은 말했다 — 미네르바의 부엉이는<br/>
+        오직 황혼이 깃들 때에야 날갯짓을 시작한다고.<br/>
+        지혜는 사건이 지나간 뒤에야<br/>
+        비로소 그 전모를 드러낸다는 뜻이다.
+      </p>
+      <p>
+        이제야 돌아볼 수 있었다.<br/>
+        부유해져서도 아니고, 코너에 몰려서도 아니다.<br/>
+        다만 <em>연륜이라는 갑옷</em>을 두른 덕분이다 —<br/>
+        상처가 딱지가 되고, 딱지가 살갗이 되어<br/>
+        비로소 그 자리를 바라볼 수 있게 된 것처럼.
+      </p>
+      <p>
+        도망치고 싶었던 아픈 날들이 여기 있다.<br/>
+        기억은 지나간 것을 재현하지 않는다 —<br/>
+        <em>현재 안에서 과거를 다시 살아낸다.</em><br/>
+        그것이 이 기록이 지금도 살아있는 이유다.
+      </p>
+      <p>
+        2000년에서 2026년까지,<br/>
+        스물여섯 해에 걸쳐 쓰인 128편의 흔적.
+      </p>
+    </div>
+    <p class="ld-eye">지혜의 쉼터 · 감정 기록 아카이브 · 2000—2026</p>
+    <div class="ld-chs">
+      <div class="ch-pill ch-pill-link" onclick="goChapter('1')"><span class="ch-dot" style="background:var(--c1)"></span><span style="color:var(--c1)">Ⅰ</span>&nbsp;방황 · 2000–05<span class="ch-arr" style="color:var(--c1)">→</span></div>
+      <div class="ch-pill ch-pill-link" onclick="goChapter('2')"><span class="ch-dot" style="background:var(--c2)"></span><span style="color:var(--c2)">Ⅱ</span>&nbsp;갈증 · 2006–10<span class="ch-arr" style="color:var(--c2)">→</span></div>
+      <div class="ch-pill ch-pill-link" onclick="goChapter('3')"><span class="ch-dot" style="background:var(--c3)"></span><span style="color:var(--c3)">Ⅲ</span>&nbsp;성찰 · 2011–14<span class="ch-arr" style="color:var(--c3)">→</span></div>
+      <div class="ch-pill ch-pill-link" onclick="goChapter('4')"><span class="ch-dot" style="background:var(--c4)"></span><span style="color:var(--c4)">Ⅳ</span>&nbsp;정착 · 2015–16<span class="ch-arr" style="color:var(--c4)">→</span></div>
+      <div class="ch-pill ch-pill-link" onclick="goChapter('5')"><span class="ch-dot" style="background:var(--c5)"></span><span style="color:var(--c5)">Ⅴ</span>&nbsp;회복 · 2017–26<span class="ch-arr" style="color:var(--c5)">→</span></div>
+    </div>
+    <!-- 모바일 전용 검색 -->
+    <div id="ld-search-wrap">
+      <span class="ld-srch-icon">🔍</span>
+      <input id="ld-srch" type="text" placeholder="제목 또는 내용 검색" autocomplete="off"
+        oninput="ldSearch(this.value)"
+        onfocus="if(this.value)document.getElementById('ld-srch-drop').classList.add('open')"
+      />
+      <div id="ld-srch-drop"></div>
+    </div>
+    <button class="ld-btn" onclick="showArchive()">128편 모두 읽기</button>
+    <div id="ld-resume" style="display:none;margin-top:14px;">
+      <button id="ld-resume-btn"
+        style="font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:2px;
+          padding:11px 28px;border-radius:28px;border:1px solid rgba(255,255,255,.12);
+          color:var(--text-faint);background:none;cursor:pointer;text-transform:uppercase;
+          transition:all .3s;"
+        onmouseover="this.style.color='var(--text-dim)';this.style.borderColor='rgba(255,255,255,.2)'"
+        onmouseout="this.style.color='var(--text-faint)';this.style.borderColor='rgba(255,255,255,.12)'"
+        onclick="resumeReading()">계속 읽기 →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ ARCHIVE ══ -->
+<div id="archive" class="view"></div>
+
+<!-- ══ ENTRY ══ -->
+<div id="entry" class="view">
+  <div class="entry-bg" id="ebg"></div>
+  <div class="eprog" id="eprog"></div>
+  <div class="ewrap">
+    <div class="ecol" id="ecol"></div>
+  </div>
+</div>
+
+<!-- DATA + LOGIC -->
+<script>
+
+const DATA=[
+{id:100,seq:0,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 05월",year:2000,tag:"시간",title:"세월이란...",lines:[["세월이란...", "그저 찾아오고야 마는", "당위와도 같은 것인지???", "벌써 2개월이란 시간이", "저만치 흘러 버렸습니다."], ["자신의 의식조차도 외면했었던", "몇 번인가의 망설임을 뒤로하고", "퇴직을 막상 하고 보니,", "갑작스레 주체할 수 없는", "지나친 여유로움이", "시공을 잃어 버린듯한 느낌으로", "가끔은 당혹스럽게 까지 하지만", "익숙치 못한... 뭔가는", "새로운 환경에 적응하기 위한", "시기라 위안을 해봅니다."], ["날씨 탓인지", "오늘은 왠지 마음이 차분해집니다.", "기다림의 짧은 시간이", "어떤 큰 의미를 가질 수는 없겠지만,", "스스로 만들어 논", "규정된 원 속의 일상에서의 느낌이 아닌", "새로운 환경에 대한", "어떤 알 수 없는 약간의 설레임을 느끼면서", "거역할 수 없는 인간임을 느끼게 되었다면...", "좀 느끼한건가?"]],coda:"세월이란 기다리지 않아도 오는 것이지만 — 준비한 사람에게는 다르게 온다.",isFriend:false,isOriginal:false},
+{id:99,seq:1,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 11월",year:2000,tag:"고독",title:"가을이 남긴 쓸쓸함..",lines:[["하루를 내동댕이 치듯..", "아무런 생각도 없이..", "어느 한적한 강원도 국도변을", "그저 마음 가는대로 실어", "온종일 헤메고 다녔습니다."], ["멀리 달려온 것만 같은 시간들은", "아주 가까이에 주저 앉아", "무엇 하나 제자리에 놓여진 것도 없이", "온 마음을.. 조각조각 분산시켜 버립니다."], ["가볍다 못해 허공에 떠도는 의식들은", "온 가슴을 마음대로 흐트러 놓고", "견딜 수 없는 공허에 시달리다", "못내..", "또 그렇게 감당하지 못하고는", "담배 한 모금에..", "씁쓸한 표정 지으며 애써 외면합니다."], ["적막한 아스팔트 속에서", "차갑게 고갈되어 버린 마음은", "어색한 육손이가 되어 있었고", "수많은 시간들 속에 찰나의 순간처럼", "짧게 스쳐가는 작은 느낌들은", "세월이라는 시간과 공간 속에 갇혀", "또 다른 일상을 갈망해 보지만.."], ["하루하루 편한 것들과 친숙해져 버린", "콘크리트 더미의 길들여짐 속으로 돌아와", "무뎌진 감각들과 부딪히며", "또 하루를 그렇게", "살아가야 하려나 봅니다."], ["계절은 그렇게..", "잠시 스쳐가듯 내게 와서", "외로움을 감당해야 할", "기약 없는 시간들만 남아", "이렇게 눈 쌓인 겨울의 한복판에 서있도록", "아직도 이 가을 끝자락 언저리에 메달려", "알 수 없는 쓸쓸함을 토해내고 있습니다."]],coda:"가을이 남긴 쓸쓸함은 — 봄이 와도 완전히 사라지지 않는다.",isFriend:false,isOriginal:false},
+{id:98,seq:2,ch:1,chName:"방황",cc:"var(--c1)",date:"2001년 04월",year:2001,tag:"시간",title:"마흔 즈음에..",lines:[["마흔이라는 결코 짧지 않은 일생을 살면서", "주변에서의 작은 인연들을 마치", "나를 위한 고리로 엮으며", "그 알 수도 없는 연관의 줄이란 것을", "소중히 여기며 살았습니다."], ["어쩌면 내심에는", "살면서 언젠가는 벌어질 수 있는", "또 다른.. 알수 없는 미래에 대한", "투자를 위하여 그랬는지도 모릅니다."], ["그 때문인지..", "그 수많은 연관의 줄들을", "마치 내인생의 목표라도 되듯이,", "본능적으로 자신의 온몸에 성급하게", "휘감아가고 있었는지도 모릅니다."], ["그런데....", "그 정리되지 못한 연관의 줄들이", "어느 순간부턴가 매듭이 생기기 시작했고,", "그 매듭들은 또 다른 매듭으로 실타래처럼 엉켜,", "온전신을 휘감는 올가미가 되어..", "자신의 의지와는 상관없이 살아 숨쉬는", "꼭둑각시가 되어버린 자신의 모습을 발견하곤", "'과연 어떻게 사는 것이 올바른 것인가?' 라는", "다소 유년스럽고 유치한반문을 하게 되지만", "그 답은 불혹의 이 나이가 되도록", "아직 그 진리를 깨닫지 못한", "결코 평범하지 않은 진리라는 것을", "깨닫게 합니다."], ["삶의 진리란?", "아주 단순한 일상에 있다지만,", "그 단순한 진리조차도", "아직 깨닫지 못하고 사는 삶은  어쩌면", "반복이라는 일상 속에", "시각의 편협을 강요 받으며", "살고 있는지도 모르는 일입니다."], ["가끔은 일상 속의 작은 변화에서", "그 편협으로부터 벗어나기 위한", "접근을 시도하지만", "길들여지지 못한 현실과", "새로운 환경에 대한 불안함은", "이내 타협이라는 허울좋은 명분과 악수하며", "또 다른 강요된 현실로 길들여 집니다."]],coda:"마흔이란 — 인생의 매듭들을 비로소 볼 수 있는 나이다.",isFriend:false,isOriginal:false},
+{id:97,seq:3,ch:2,chName:"갈증",cc:"var(--c2)",date:"2010년 02월",year:2010,tag:"성찰",title:"채우지 못한 관음..",lines:[["영화는 내가 살지 못한 삶을 대신 살아준다."], ["스크린 속 타인의 격정과 사랑과 상실 앞에서", "나는 안전하게 감동받을 수 있다.", "그것이 조금 비겁하다는 것을 안다."], ["채울 수 없는 감정들이", "어둠 속 빛의 언어로 조금씩 채워질 때 —", "그것으로 충분한 날이 있다."], ["스크린이 꺼지고 나면", "나는 다시 나의 삶으로 돌아온다.", "조금은 덜 허기진 채로."]],coda:"관음(觀音) — 보는 것만으로도 위로가 되는 것들이 있다.",isFriend:false,isOriginal:false},
+{id:96,seq:4,ch:2,chName:"갈증",cc:"var(--c2)",date:"2010년 02월",year:2010,tag:"고독",title:"욕망과 만족..",lines:[["가난이", "인간에게 가해지는 무서운 채찍인 것처럼,", "권태 또한", "우리의 삶에 가해지는 또 하나의 형벌이다."], ["모든 인간생활은 오직", "욕망과 만족 사이를 서성이고 있을 뿐이다.", "본질적으로 욕망은 고통이며,", "욕망을 충족시키면 곧 싫증이 난다."], ["목표라는 것은", "일시적인 것에 지나지 않는다.", "원하던 것을 손에 넣게 되면", "이미 자극은 없어져 버리고,", "새로운 형태의 욕망이 다시 고개를 쳐든다.", "이때 새로운 욕망이 일어나지 않으면", "쓸쓸한 공허감, 권태가 생기며", "이것을 물리치는 것은", "곤궁과 싸우는 것 못지않게 어려운 일이다."], ["욕망과 만족 사이의 시간이", "아주 짧지도 않고,", "혹은 너무 길지도 않은 상태에서", "계속 반복될 경우에는 고통이 적어진다.", "그리고 욕망과 만족의 양이 적절하면", "가장 행복한 생애가 이어진다."], ["- 쇼팬하우어의 욕망과 만족중에서-"]],coda:"욕망과 만족 사이 — 그 거리를 아는 사람이 지혜로운 사람이다.",isFriend:false,isOriginal:false},
+{id:95,seq:5,ch:2,chName:"갈증",cc:"var(--c2)",date:"2010년 03월",year:2010,tag:"가족",title:"前 한미은행장의 '아들에게 보내는 편지'",lines:[["이 편지는", "전 한미은행장이 자신의 아들에게 보내는 편지로", "알려져있다.", "편지의 내용을 보면 사업과 인간관계,", "결혼와 자녀에 대한 지침까지 빼곡이 충고해 주고 있다.", "인생의 경륜을 통해 자녀들에게 주는", "부모의 걱정 아닌 걱정의 충고인 것이다.", "재미난 부분은 똥은 아침에 누라는 충고인데", "이건 정말 좋은 습관인 것 같다.", "하여튼 내용이 모두 알차고", "자녀들이 꼭 마음에 간직해야할 내용들이다."], ["약속 시간에 늦는 사람하고는 동업하지 말거라.", "시간 약속을 지키지 않는 사람은", "모든 약속을 지키지 않는다."], ["어려서부터 오빠라고 부르는 여자 아이들을", "많이 만들어 놓거라.", "그 중에 하나 둘은 안 그랬다면 말도", "붙이기 어려울 만큼 예쁜 아가씨로 자랄 것이다."], ["목욕할 때에는 다리 사이와 겨드랑이를", "깨끗이 씻거라.", "치질과 냄새로 고생하는 일이 없을 것이다."], ["식당에 가서 맛있는 식사를 하거든", "주방장에게 간단한 메모로 칭찬을 전해라.", "주방장은 자기 직업을 행복해할 것이고", "너는 항상 좋은 음식을 먹게 될 것이다."], ["좋은 글을 만나거든 반드시 추천을 하거라.", "너도 행복하고 세상도 행복해진다."], ["여자아이들에게 짓궂게 하지 말거라.", "신사는 어린 여자나 나이든 여자나 다 좋아한단다."], ["양치질을 거르면 안된다.", "하지만 빡빡 닦지 말거라.", "평생 즐거움의 반은 먹는 것에 있단다."], ["노래하고 춤추는 것을 부끄러워하지 말거라.", "친구가 너를 어려워하지 않을 것이며", "아내가 즐거워할 것이다."], ["하나님을 찾아 보거라.", "만약 시간의 역사(호킨스), 노자(김용옥 해설),", "요한복음(요한)을 이해한다면", "서른 살을 넘어서면 스스로 서게 될 것이다."], ["어려운 말을 사용하는 사람과", "너무 예의바른 사람을", "집에 초대하지 말거라.", "굳이 일부러 피곤함을 만들 필요는 없단다."], ["똥은 아침에 일어나자마자 누거라.", "일주일만 억지로 해보면", "평생 배 속이 편하고 밖에 나가", "창피당하는 일이 없다."], ["가까운 친구라도 남의 말을 전하는 사람에게는", "절대로 속을 보이지 마라.", "그 사람이 바로 내 흉을 보고 다닌 사람이다."], ["나이 들어가는 것도 청춘만큼이나 재미있단다.", "그러니 겁먹지 말거라.", "사실 청춘은 청춘 그 자체 빼고는", "다 별거 아니란다."], ["밥을 먹고 난 후에는 빈 그릇을", "설거지통에 넣어주거라.", "엄마는 기분이 좋아지고", "여자친구 엄마는 널 사위로 볼 것이며", "네 아내는 행복해할 것이다."], ["양말은 반드시 펴서 세탁기에 넣어라.", "소파 밑에서 도너츠가 된 양말을 흔드는", "사나운 아내를 만나지 않게 될 것이다."], ["네가 지금 하는 결정이 당장 행복한 것인지", "앞으로도 행복할 것인지를 생각하라.", "법과 도덕을 지키는 것은 막상 해보면", "그게 더 편하단다."], ["돈을 너무 가까이 하지 말거라.", "돈에 눈이 멀어진다.", "돈을 너무 멀리 하지 말거라.", "너의 처자식이 다른 이에게 천대받는다.", "돈이 모자라면 필요한 것과 원하는 것을", "구별해서 사용해라."], ["너는 항상 내 아내를 사랑해라.", "그러면 네 아내가 내 아내에게 사랑받을 것이다."], ["심각한 병에 걸린 것 같으면 최소한", "세 명의 의사 진단을 받아라.", "생명에 관한 문제에 게으르거나", "돈을 절약할 생각은 말아라."], ["5년 이상 쓸 물건이라면", "너의 경제능력 안에서 가장 좋은 것을 사거라.", "결과적으로 그것이 절약하는 것이다."], ["베개와 침대와 이불은 가장 좋은 것을 사거라.", "숙면은 숙변과 더불어 건강에 가장 중요한 문제다."], ["너의 자녀들에게 아버지와 친구가 되거라.", "둘 중에 하나를 선택해야 될 것 같으면", "아버지를 택해라.", "친구는 너 말고도 많겠지만", "아버지는 너 하나이기 때문이다."], ["오줌을 눌 때에는 바짝 다가서거라.", "남자가 흘리지 말아야 될 것이", "눈물만 있는 것은 아니다."], ["연락이 거의 없던 이가 찾아와 친한 척하면", "돈을 빌리기 위한 것이다.", "분명하게 '노'라고 말해라.", "돈도 잃고 마음도 상한다."], ["친구가 돈이 필요하다면", "되돌려 받지 않아도 될 한도 내에서", "모든 것을 다 해줘라.", "그러나 먼저 네 형제나 가족들에게도", "그렇게 해줬나 생각하거라."], ["네 자녀를 키우면서 효도를 기대하지 말아라.", "나도 너를 키우며, 너 웃으며 자란 모습으로", "벌써 다 받았다"]],coda:null,isFriend:false,isOriginal:false},
+{id:94,seq:6,ch:2,chName:"갈증",cc:"var(--c2)",date:"2010년 11월",year:2010,tag:"고독",title:"낯설음..",lines:[["서로 다른 시간과 공간 안에서", "하루하루의 엮어감 속에 살다", "아주 우연한 만남을 통해 서로를 알기 시작했고,", "가끔은 자장면만 먹고 살수 없다는", "다소 우스개적인 논리로", "반복과 단순에 지친 일상에서", "내가 아닌 또 다른 사람과의 만남을 통해", "시간의 흐름뒤에 잊혀져가는", "마음 한 조각 한 조각의 작은 느낌들을", "언젠가 회상이라는 저편에", "소담한 추억이라도 그리워할 수 있기에,", "가끔은 친구처럼.. 또 가끔은 애인처럼..", "느끼고 싶다는 생각을 하기도 하고...."], ["그리고 어느 순간..", "서로 조금은 공유된 시간과 공간 안에서", "하루하루의 엮어감 속에 살다", "갑작스런 부담을 통해 낯설음이 생기게 되고", "그래도 자장면만 못하다는", "결코 평범하지 않은 진리를 느껴", "부담과 귀찮음에 지친 만남에서", "서로가 아닌 나 혼자만의 여유를 통해", "시간의 흐름 속에 남겨져 있는", "마음 한 조각 한 조각의 지난 느낌들을", "언젠가 회상이라는 저편에", "조그만 추억이라도 애증으로 얼룩질 수 있기에,", "가끔은 원수처럼.. 또 가끔은 이방인처럼..", "지워버리고 싶다는 생각이 들 때도 있겠지.."], ["시작이 있음은", "또 끝도 공존함을 느낄 수 있는 연륜이 있음에", "우연한 시작이 그랬듯이 언젠가...", "부담이란 이유로 낯설음이 생기게 된다면,", "부담없는 마음으로 서로에게 고하여", "낯설음을 정리하도록 하세....."]],coda:"낯설음은 — 새로운 것의 다른 이름이다.",isFriend:false,isOriginal:false},
+{id:93,seq:7,ch:2,chName:"갈증",cc:"var(--c2)",date:"2010년 11월",year:2010,tag:"가족",title:"오만과 편견..",lines:[["40년이란 세월 동안", "자기 보호본능에 시달려", "사랑과 영원이란 것조차 부정하며", "보잘 것 없는 나를 지키느라", "무의미한 세월만 보내", "빛바랜 훈장같은 나이만 배부르게 먹었습니다."], ["지난날의 타인들에 대한", "오만과 편견들은 이제 벗어 버리고 싶습니다.", "나이만큼이나 배부른 풍요로움으로", "타인을 사랑하는 법을 배워야 겠습니다.", "보잘 것 없는 자신을 버리고,", "주변으로 부터 내 자신을 찾을 수 있는", "평범이라는 결코 쉽지 않은 진리를", "일깨우려 합니다."], ["삶이란게??!!..", "뭔가는 이해할 수 있을 것만 같은 자만과..", "이해할 수 없을 것 같은 무지함의..", "상반된 감정을 느끼면서", "자신도 체 추스리지도 못한 현실을 혹이라도..", "누군가에게 나누어", "내몸 가볍게 하고자는 것이 아닌가?..", "한동안 생각하며 망설여지게 합니다."], ["술을 한잔 하고 있습니다.", "이 시간이면 영락없이 단지내 청소차가", "약간의 굉음을 쏟아내며", "이른 새벽을 열어갑니다.", "온 전신을 감싸고 도는 알콜기운이", "그리 싫지만 않은 것이", "다소 수다스러워지고 싶은 밤입니다.", "하고 싶은 말들이 많아", "과묵해져 버린 습성탓일까?..", "이젠.....있는 그대로를 아끼며", "살아갈까 합니다..."]],coda:"오만과 편견을 버리는 것은 — 나이가 들어서야 비로소 가능한 용기다.",isFriend:false,isOriginal:false},
+{id:92,seq:8,ch:2,chName:"갈증",cc:"var(--c2)",date:"2012년 03월",year:2012,tag:"성찰",title:"성적 환타지!",lines:[["성적 환타지!", "남자라는 동물에겐 누구나 한 가지씩은", "품고 있는 패티시적 욕망이 있다.", "누구에겐 제복에 대한 패티시즘이 있고,", "또 어느 누군가에겐 스타킹에 대한 패티시즘과,", "특정 신체부위에 유독 집착하는", "패티시즘을 가지고 있는 이도 있다."], ["이러한 욕망들을", "단지 내가 가지고 있는 생각과 다르다는 이유로", "수많은 사람들의 성적 환타지가", "단순히 변태로만 치부되어 진다면", "너무도 가식적인 일상이 아닐까?"], ["또한", "각 개인마다의 그런 성적 환타지를", "현실에서 실현하려 하는 행위는 잘못된 것일까?", "무의미 하고 건조한 일상에서", "뭔가의 자신만의 원초적 욕망을 통해", "만족치 못한 현실에 충실하려는", "반대급부적 행위라고 볼 수는 없는걸까?"], ["사람의 감정이란게 경우에 따라서는", "서스럼 없이 자신의 생을 내 던지기도 하고", "또 경우에 따라서는 이해할 수 없을 정도의", "고뇌속에서도 꿋꿋하게 살아가기도 한다.", "그 고난속에서도", "꿋꿋함을 지탱할 수 있는 힘의 원천이 어디에서 오는 것일까?", "많은 주변으로 부터의 동기부여가 있었겠지만,", "결국은 자신 스스로가 그렇게 변해야 한다는", "마음가짐이 시발점이리라.."], ["결론적으로", "그 동기가 다소는 대중적이지 못하더라도", "자신을 변화시킬 수 있는 힘..", "그것을 취하는 데 있다고 생각된다."], ["난 그저 나만의 취향 때문일지 모르겠지만", "그런 자신만의 성적 환타지를 통해", "상대에 대한 애정을 더욱 곤고히하고", "더 나아가서는 만족할 수 없는 현실에 대한", "내 삶의 단편들에게서 위로 하고픈 마음이라면", "과연 나는 변태인걸까?"]],coda:"욕망을 숨기는 것이 — 욕망 자체보다 더 큰 문제다.",isFriend:false,isOriginal:false},
+{id:91,seq:9,ch:2,chName:"갈증",cc:"var(--c2)",date:"2012년 05월",year:2012,tag:"가족",title:"아내의 불평",lines:[["연일 이어지는 적자로", "심란하기만한 상황에", "아내는 자기 무시하고 배려를 안한다고 불평이다", "이틀이나 식음를 마다하고", "한 공간 안에서 얼굴 마주치길 외면하고", "각방쓰고 말 안하고 마치 없는 사람보다", "더 불편한 관계로 사흘이 흘렀다"], ["뭐라 변명도 싫고", "속모르는 철부지처럼", "자기 자신외에는 배려를 하지 못하는", "사회성 결핍증세가 심하다.", "자신이 무엇을 잘못한건지", "무엇이 중요한 우선순위인지", "모든것에 자신을 먼저한다", "말대로 헤어져야 하는게 옳은건지"], ["꼭같은 일상은", "어느순간 어긋난 감정의 대립에서", "반복되는 예상으로 치닫아 올 순간을 생각하면 두렵다", "장사는 장사대로 가정은 가정대로", "파탄의 위기에서 애써 외면하기에", "너무도 많은 물질적 정신적 손실을", "어찌 감당할지", "답답하기만 하다."]],coda:"가장 가까운 사람의 불평이 — 가장 멀리 닿는다.",isFriend:false,isOriginal:false},
+{id:90,seq:10,ch:2,chName:"갈증",cc:"var(--c2)",date:"2012년 05월",year:2012,tag:"시간",title:"나이가 든다는 건..",lines:[["나이가 든다는 건", "고정관념을 버리는 것에 대한", "결과물인듯 싶다.", "젊었을 땐 거부하고 심지어", "혐오스럽게 생각하던 것들 조차", "자연스럽게 받아 들이고", "서스럼 없이 행동함은 자신만의", "고정관념이란 것이 편협된", "사고에서 만들어 놓은 자기만의", "울타리를 쳐놓곤 맹목적인 방어가", "자신을 지켜가는 수단이라", "착각하며 살다", "뒤늦게 모순이란걸", "깨닫게 되지만 그 역시 한 순간에", "버려질 수 없는 것이기에 또 그렇게", "애착없는 미련을 부리게 되나보다.."]],coda:"고정관념을 버리는 것이 나이 드는 것의 의미라면 — 그것은 성장이다.",isFriend:false,isOriginal:false},
+{id:89,seq:11,ch:2,chName:"갈증",cc:"var(--c2)",date:"2012년 06월",year:2012,tag:"시간",title:"어떤 선택을 해야할까?",lines:[["어떤 선택을 해야할까?"], ["﻿너무나도 수시로 부딛히는 갈등들은", "언제부턴가 애증으로 변해버린지", "오래되었다.", "한순간 알콜을 들이키고 나면", "자신도 기억할 수 없는 심한", "욕설들이 서스럼없이 내 뱉어지고", "반복되는 무의미한 침묵의 시간들에", "서로에게 힘겨운 상처들이 내 뒹군다", "어렵사리 꾸려나가는 생계가 그렇고", "알수도 없고", "기약도 없는 기다림의 시간들은", "왜이리도 멀기만 하고 더딘지...﻿", "서로를 이해하려는 배려는", "먼발치서 낯설은 외면으로 대신하고", "엇갈린 조각난 파편의 시간들을", "꿰어 보건만 그 역시 어려운 일이", "되어 버렸다."], ["잘못된 선택일까?", "어긋난 만남일까?", "그렇다면 서로를 위해서라도", "다른길을 찾아야 하는 것이 아닐까?", "섣부른 판단으로 또다른 오류를 범하지", "않기 위해서라도 생각, 또 생각한들", "이 순간 제대로 된 판단을 내릴 수 있을까?"], ["두려움이 앞선다", "서로에게 맞는다는 것과", "맞지 않는다는 것의 차이는 무엇일까?", "삶이란게 그리 대단하지도", "또 그리 간단하지만도 않은", "단순 복잡한 것이라 ..", "그 무엇하나 쉽사리 되어 지는 것도 없고", "또 그 무엇하나 안되는 것도 없는게라서", "사람들이 그리도 버거워 하며", "살아가는지도 모른다 ."], ["어떤 선택을 해야할까?", "늦었다고 생각할 때가 가장 빠른길이라 했던가?", "누구나 자신만이 꿈꾸고", "자신만이 느끼는 세상이 존재하고", "그 생각들 또한", "자기 뜻대로만 이루어 지는 것도 아니겠지만", "적어도 얼룩진 상처만이 존재하는 삶은", "누구도 원하지는 않을게다 ."], ["변화가 절실한 시기다", "엉킨 실타래처럼 먹먹한 순간들에", "정작 필요함은 변화다 .", "내 인생에 엉켜버린 시간들을", "다시금 엮어 볼만 한 순간들이 과연", "얼마나 존재할지 모르겠지만", "암튼 변화란게 절실한 시기임을", "이미 간파하고도 얄팍한 저울질 때문에", "선듯 결론을 못 내리는 건 아닐까?", "그 얄팍한 생각때문에 서로에게", "더 많은 상처들을 만들어 가고", "있지는 않은지...", "답답할 뿐이다"]],coda:"어떤 선택을 해야 할지 모를 때는 — 아직 그 선택의 무게를 느끼고 있다는 것이다.",isFriend:false,isOriginal:false},
+{id:88,seq:12,ch:2,chName:"갈증",cc:"var(--c2)",date:"2012년 06월",year:2012,tag:"성찰",title:"가게를 마치고..",lines:[["가게를 마치고 올라오는", "계단의 발걸음이", "천근의 업겁을 짊어진 것처럼 무겁다", "술에취해 가슴아픔에 취해", "감내해야하는 켜켜히 쌓인", "풀지못할 버거움에", "힘겨워 하는 일상이 또 그리도 얄궂다"]],coda:"천근의 무게를 짊어진 발걸음도 — 집으로 향한다.",isFriend:false,isOriginal:false},
+{id:87,seq:13,ch:2,chName:"갈증",cc:"var(--c2)",date:"2012년 11월",year:2012,tag:"가족",title:"아들에게의 편지..",lines:[["한참이나 잊고 살았던 대화창구..", "그래.. 편지라는 도구가 있었구나?", "잘지내고 있지? 라는 상투적인 말보단", "참으로 짜증나고 뭔가에 얽메어 있는 시공들에", "아쉽기만한 날들이 많을거라 생각한다."], ["네 나이에 아빠는", "아마도 너보다 훨씬 더 힘겨워 했던 기억이다.", "그 덕에 심한 방황과 홍역도 심하게 치루었고..", "부모에 대한.. 세상에 대한 반항과 적개심은", "기성세대들이 보는 관점에선", "다소 올바르지 못한 생활들을 남들보단", "꽤나 열심히 실천한 듯 하구나.ㅋㅋ"], ["그런 생활들이 다 잘못되었다고", "감히 결론 지을순 없겠지만", "젊은 시절에 대한 추억보단", "후회가 많은걸 보면", "옳지 않음은 분명한 듯 싶다."], ["아빠가 하는 일이 왜그런지", "허술하게 한 것만은 아닌데도", "연속된 실패로 우리 가족을 여러모로", "불편하게 만들었구나..", "아무리 비운이었었다고 변명해 보아도", "이제와 생각해 보면", "현실에 대한 용기가 없었던 것 같은 생각이 든다.", "무엇하나 버릴 수 없어", "움켜 쥐려 욕심아닌 과욕을 부리다", "훨씬 더 많은 것들 잃어야만 했던", "세상의 진리를 깨닫지 못하고 산", "덕이라 생각한다."], ["이상 중략.. 각설하고.."], ["흔히들 말하는", "'그래도 공부할 때가 젤 좋은 때'라는", "이해할 수 없는 말이긴 해도"], ["네 또래가 원하던 학교생활이란", "구속에서 벗어나 정작 성인이 되어 살다보면", "모든 일들이 가끔은 자기 의지하곤 상관없이", "잘못되는 일들이 많아지게 마련이다."], ["그럴때 마다 하는 후회들이 바로", "좀더 학업에 충실했더라면", "지금 보단 훨씬 나을텐데 라는", "푸념을 하게 된다는 것이다."], ["사람은 항상 후회를 반복하며 산다.", "후회가 없으면 또 역시 발전도 없고 .."], ["이제 인생이라는 것을", "감히 조금은 이해할수 있음애 느끼는 것은", "살아온 날들에 후회도 물론 있겠지만", "가장 크게 아쉬운 점이라면 바로", "무엇에서도", "열심히 하지 못했던 것에 대한 미련이", "가장 많이 남는 것 같다.", "어느 하나의 열정에 미치도록 빠져 보기도 하고..", "실패를 두려워 해 미처 도전해 보지도 못했던", "많은 일들이 항상 가슴 언저리에 남아", "후회를 하고 있다는 사실이다."], ["암튼 인생은 결코 길지도", "또 결코 달콤한 것만도 아니기에", "후회없는 삶을 살기위해선", "이 순간 아무것도 하지 않는 자신을 책망하며", "무언가 열중하며 살았으면 좋겠구나.."]],coda:"아빠가 아들에게 쓰는 편지는 — 쓰지 못한 말들로 가득하다.",isFriend:false,isOriginal:false},
+{id:86,seq:14,ch:4,chName:"정착",cc:"var(--c4)",date:"2012년 11월",year:2012,tag:"가족",title:"결혼생활에 대한 두서없는 생각들..",lines:[["시간은 사람들의 마음을 퇴색시키게 하고", "길들여짐이라는 편안함 뒤로", "식상이라는 무관심과 무의식 또한 존재함이", "또 다른 갈망을 하게 하는 것인지도 모르겠지만", "사실 결혼생활이란게 어쩌면", "그저 누구나 거쳐가는", "일련의 과정이라 생각하며 별다른 의문없이", "그저 세월의 흐름에 맡기며", "지내온 시간들이 아니었을까", "되새겨 보기도 한다."], ["수십년간 시간과 공간을 달리한 사람들이", "어느순간", "시간과 공간을 공유하며 살아간다는 것이", "그저 순리대로 살아갈 수 있는", "모습만은 아닐듯 하다."], ["부딪히며 부데끼고 마음 졸이며 가슴 아파하고", "서로에게 진심아닌 상처로 얼룩지게 하기도 하며", "모든 것이 생각과 뜻한데로", "움직이지지 않는 것이 느껴질땐", "가끔은 이별이란 서스럼 없는 생각도 하게 됨은", "결국 어쩔수 없는 인간임을  느끼게도 한다."], ["살 부비며 살아오면서", "어느 순간 되돌아 느꼈을 때", "이미 내 마음과는 너무도 멀리 달려온", "시간들에 아파하며", "상대에 대한 긍휼한 마음이 느껴질때", "문득 사랑이란 단어를 연상하게 된다.", "그것이 부부의 참 모습이 아닐런지.."], ["우리 부부는 그렇게", "수많은 시간들을 부딪히며 마치 검투사처럼", "무엇인가를 쟁취하려는 허무한 줄달음의 행위에", "유난히도 많은 시간들을 허비한 듯 하다.", "참으로 한심한 노릇이 아닐런지...."], ["불혹이 되면서", "삶의 가치가 조금씩 변하게 되어", "뒤늦게 철이 들었다고나 할까..", "수많은 경쟁의 시간들 속에서", "조금이라도 뒤 쳐지는 것에 대한", "아량없는 마음이", "자신 스스로를 옭아메는", "동아줄이란걸 깨달았다면..", "그 안에서 파생된 부부간의 갈등들은", "자연스런 부산물을 만들어 낸", "자신의 유년스러움에 대한", "어리석음을 뒤늦게 깨닫곤", "부부관계회복이라는 명제앞에", "진심어린 시간들을 함께하며", "눈높이를 맞추는 연습을 한다."], ["지금은 그 어느 순간보다 행복하다", "감히 말할수 있을까?", "십여년간의 탄탄한 직장생활을 접고", "험난한 고난의 길을 겪으며 느낀 아이러니다.", "세상은 참으로 공평치 못한", "공평함이 존재한다 생각한다."], ["내가 너무 두서없는 말들을 토설하고 있나보다.."]],coda:"결혼생활이란 — 같은 시간과 공간을 견디는 법을 배우는 과정이다.",isFriend:false,isOriginal:false},
+{id:85,seq:15,ch:4,chName:"정착",cc:"var(--c4)",date:"2012년 11월",year:2012,tag:"성찰",title:"하루에..",lines:[["어떤 날은 이유 없이 무너진다."], ["아침부터 가슴 위에 무언가 얹혀 있고", "그것이 무엇인지 알 수 없다는 사실이", "더 무겁다."], ["불안은 원인을 요구하지 않는다.", "그저 찾아와서 온 전신을 휘감고", "하루를 통째로 앗아간다."], ["그런 날이 있다는 것을", "인정하는 것이", "그나마 할 수 있는 전부다."]],coda:"설명할 수 없는 무기력이 찾아오는 날 — 그것도 살아있기에 가능한 감각이다.",isFriend:false,isOriginal:false},
+{id:84,seq:16,ch:4,chName:"정착",cc:"var(--c4)",date:"2012년 11월",year:2012,tag:"가족",title:"부모나 자식이나 똑같다.",lines:[["부모나 자식이나 똑같다.", "당신집 담보로 빌린 이자가 입금 안되었다고", "은행업무도 하지않는 일요일에", "전화를 걸어 조바심을 내는 부모나,"], ["부모의 나이가 팔순이 넘어", "자주는 아니더라도", "가끔은 안부라도 물어야 하는 것이", "자식된 도리일 터,", "제 자식녀석 외박이나 나와", "서울 근교에 머무를 곳이 없어 아쉬울 때나", "넌지시 전화를 건네", "숙식이나 해결하려는 자식이나", "어쩌면 그리도 똑 같을까?"], ["그 부모의 그 자식이라 했던가!", "과연 부모 자식간 서로에겐", "어떤 감정으로 살아 가고 있는 것일까?"], ["잘사는 것도 아니면서", "또 그렇게 어렵게 사는 것도 아니면서", "무엇을 위해 그리 자신의 소유물에", "미련을 버리지 못한 걸까?", "어쩌면 어중간한 위치에 자신이 존재하기에", "그 불안감이 소유욕으로 더해져", "더 심한 것인지도 모르겠다.", "차라리 가진 것이 없다면", "소유욕에 대한 애착이 없을지도 모른다."], ["소유욕이란 것이 없는 자에게 보다는", "적당히 가진자에게 나타나는", "일종의 불안감 때문은 아닐까?", "암튼 부모 자식간에 얄팍한 심리전으로", "서로를 이해하려는 노력보단", "자신의 처지만을 강요하는 서로가 얄밉다."]],coda:"그 부모의 그 자식 — 닮고 싶지 않아도 닮는 것들이 있다.",isFriend:false,isOriginal:false},
+{id:83,seq:17,ch:4,chName:"정착",cc:"var(--c4)",date:"2012년 11월",year:2012,tag:"가족",title:"Connect!",lines:[["Connect!", "연결고리가 없다.", "내 인생의 결코 짧지않은 여정속에서", "천진난만한 웃음을 지었던 때가", "언제였을까?"], ["자식의 위치에서도 부모의 위치에서도", "배우자의 위치에서도 그 무엇하나", "또렷하게 정돈된 것이 없다.", "언제 어디서부터 그 연결고리를", "잃어버리고 살았던걸까?"], ["하찮은 말초신경에 이성이 지배당하고", "매순간 찰나에 의해 변질되어지는", "어긋난 일련의 일들이", "본심과는 어긋나게 서스럼없이", "벌어지게 되고 뒤늦은 후회의 아쉬움은", "더 큰 허무함만이 남겨질 뿐이다."], ["어찌해야 할까?", "어떻게 해야하지?", "이젠 이런 되물음 조차도", "구차스런 일이되어버렸다.", "정말 다시 시작하고 싶다."], ["그 언젠가부터,, 그 어디에서부터,,", "내 이 어긋난 인생의 연결고리를", "다시 엮고싶은 간절한 마음이", "더 가슴 아프게 한다......"]],coda:"끊어진 연결고리는 — 다시 이을 수 있다. 다만 시간이 필요할 뿐이다.",isFriend:false,isOriginal:false},
+{id:82,seq:18,ch:4,chName:"정착",cc:"var(--c4)",date:"2012년 12월",year:2012,tag:"시간",title:"어떤 기억으로 남아 있을까?",lines:[["어떤 기억으로 남아 있을까?"], ["어느 순간", "내가 세상에서 존재하지 않을 때", "과연 나를 아는 사람들의", "기억에서 무엇으로 남아있을까?"], ["무엇하나 열정없는 이 지긋한 삶에서", "도망치듯 표정없는 기계처럼 살아감은", "모든이에게서 나에 대한", "그 기억들을 앗아가고 있는 것은 아닐까?", "그저 변화없는 무탈함이", "또 그저 별 기억없는", "삶으로 이어짐은 아닐까?"]],coda:"어떤 기억으로 남을지는 — 살아있는 동안 결정된다.",isFriend:false,isOriginal:false},
+{id:81,seq:19,ch:4,chName:"정착",cc:"var(--c4)",date:"2013년 01월",year:2013,tag:"성찰",title:"이젠 그랬으면 좋겠네!",lines:[["이젠 그랬으면 좋겠네!", "단지 말 표현이 없어도", "오랜 친구들의 그러함처럼", "내 마음 읽어줄 그런 배려이면 좋겠네."], ["이젠 그랬으면 좋겠네!", "그리 오래되진 않았어도", "다정한 연인들의 밀어처럼", "내 마음 헤아려줄 용서이면 좋겠네.."], ["이젠 그랬으면 좋겠네!", "그저 익숙하지 못한 모습이라도", "먼 발치서 묵묵히 바라보는", "미련한 망부석이라면 좋겠네..."]],coda:"이젠 그랬으면 좋겠다는 말은 — 아직 포기하지 않았다는 말이다.",isFriend:false,isOriginal:false},
+{id:80,seq:20,ch:2,chName:"갈증",cc:"var(--c2)",date:"2013년 01월",year:2013,tag:"가족",title:"내가 그랬으면 어땠을까?",lines:[["내가 그랬으면 어땠을까?", "앙탈 부리는 애교덩어리 딸아이가", "하나 있었으면 어땠을까?"], ["남편말에 묵묵히 그저 따라주는", "해바라기 같은 아내가 있었으면", "어땠을까?"], ["가끔은 그저 가끔은", "현실과 동떨어진 것에 대한", "동경으로 살아감은 어떨까....,,??"]],coda:"그랬으면 어땠을까 — 그 질문은 답을 원하는 것이 아니다. 위로를 원하는 것이다.",isFriend:false,isOriginal:false},
+{id:79,seq:21,ch:2,chName:"갈증",cc:"var(--c2)",date:"2013년 01월",year:2013,tag:"성찰",title:"상실..",lines:[["무기력한 일상의 연속이다.", "덕지덕지 묻어나는", "일상의 적막감에서 상실을 본다.", "가진 것도 없는데..", "잃을 것도 별로 없는데..", "무엇이 두려워 상실감을 느끼는 걸까?", "버릴 것도..", "잃을 것도 없음은", "무언가 채울 수 있음이 존재할진대..", "왜 상실감이 드는걸까??"]],coda:"상실은 채울 수 없다. 다만 함께 살아가는 법을 배울 뿐이다.",isFriend:false,isOriginal:false},
+{id:78,seq:22,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 02월",year:2013,tag:"가족",title:"평창을 정리하고..",lines:[["4년여의 여정끝에 평창을 정리하고", "이도저도 어쩔수 없는", "무력감만 두 어깨에 짊어지고", "수지로 돌아왔습니다.", "결혼생활 18년여의 여정이", "마침내 원점으로 돌아온 것입니다."], ["결혼 초", "직장인으로서의 몇년간의 삶을 제외하곤", "삶은 그저 내게", "고달픈 일상과의 푸념이었을 뿐,", "세상과.. 사람과..", "부모형제를 등뒤로", "아쉬움에 미련만 남긴채", "한푼의 경제력없는 상실감만 남기고", "육체적, 정신적 후유증에 시달리는", "트라우마를 안고", "또 다른 시작을 하기위한", "몸부림을 준비합니다."], ["이제...", "희망과 도전의 활기로 출발했던", "그 긴 여정의 뒤안길을", "절망과 미련의 두려움을 간직한채", "알수도 없는 좁은문을 향해 가려", "준비를 해야 할진대,", "왜이리도 세상을 향한,", "사람을 향한 미움이 발목을 붙잡는지..."], ["사소한 것에 마음을 다치고,", "조그만 것에 울분을 토하는", "그저 심약한 존재가 되어 있음애,", "자신을 채찍해야할지,", "위로를 해야 할지 갈팡질창 하는 마음은..", "어느것 하나 명쾌한게 없는 것이", "또 그리 가슴 쓰리게 합니다."], ["세상사는게", "그저 별게 아니다 하면서도", "막상 세상과 호흡하려다 보면", "무엇이 그리 부족하고 무력하기만 한지..", "아직도 내게 치워내지 못한", "비워낼 수 있는", "그 무엇인가 남아있는 것일까요?"], ["가슴 저켠에", "비워낼 수 없는 작은 울분이라도..", "타인으로 향한 작은 미움의 불씨라도..", "아직은 비워낼 것이 존재한다면", "내겐 아직 세상을 받아들일", "준비가 부족한 것이겠지요.."], ["미움은 또 다른 미움으로", "내게 다가 온다는 것을", "너무도 잘 알면서도", "그 미움의 감정도", "제대로 다스리지 못하는 나는", "어쩌면.....", "지독스런 꿈을 꾸고 있는지도 모릅니다..", "아니 꿈이었으면 하는 바램입니다.."]],coda:"정리한다는 것은 — 끝이 아니라 다음의 시작이다.",isFriend:false,isOriginal:false},
+{id:77,seq:23,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 04월",year:2013,tag:"성찰",title:"내 의지와는 상관없이 벌어지는 것들..",lines:[["내 의지와는 상관없이 벌어지는 것들."], ["삶의 대부분은 사실", "내가 선택하지 않은 것들로 이루어진다.", "선택했다고 생각했던 것들조차", "어느새 다른 방향으로 흘러간다."], ["그렇다면 내 의지란 무엇인가.", "아무 대비 없이 맞닥뜨리는 현실 앞에서", "인간은 얼마나 작은 존재인가."], ["그러나 그 작음을 인정하는 순간부터", "비로소 진짜 선택이 시작된다."]],coda:"통제할 수 없는 것들에 대한 인정 — 그것이 성숙의 시작이다.",isFriend:false,isOriginal:false},
+{id:76,seq:24,ch:1,chName:"방황",cc:"var(--c1)",date:"2013년 05월",year:2013,tag:"고독",title:"사랑하는 법과 용서하는 법",lines:[["우리는 같이가는길을 늘 혼자간다고 생각합니다.", "바람부는날", "저 미루나무 언덕에 혼자있다 하여도", "가슴속에는 누군가가 함께있기 마련입니다."], ["우리는 힘이들때 혼자서만 힘들다고 생각합니다.", "하지만 그곁에는 또다른 누군가가", "같이 힘들어하며 살아가고 있습니다.", "나는 비오는날 창가에서 그사람을 생각합니다.", "나로인해 그사람이 창가에서", "나를 그리워 하고있다면", "그것만으로도 나는 행복한것입니다 ."], ["우리는 태어나면서부터 누구입니까?", "사람입니다. 영원히 가질 수도", "영원히 버릴 수도 없는", "여름날에 비와도같은 것입니다."], ["우리는 사랑해야 합니다.", "그사람이 좋을때보다", "그사람이 싫을때 사랑해야 합니다.", "그리고 용서해야합니다.", "그사람을 사랑하는것보다", "용서하는것을 먼저 배워야합니다."], ["우리는 새것보다 헌것을 사랑해야 합니다.", "우리가 가끔 옛날을 그리워 할 때에는", "우리가 늙어가고 있다고 느끼기 때문입니다."], ["사람들은 늙어가면서 새것이 돼 더아름답습니다.", "그리고 그것을 느낄때", "당신은 아름다움을 볼수있는 마음이", "진정생기는 것입니다."], ["우리는 사랑해야합니다", "그리고 용서해야합니다", "그래야 우리가 이세상에 없어도", "먼훗날", "우리를 그리워해 줄수 있는", "사람이 있기 때문입니다.", "오늘밤은 창밖에 비가내릴것같습니다", "그누구의 가슴속에도......"]],coda:"사랑하는 법과 용서하는 법은 — 결국 같은 것이다.",isFriend:false,isOriginal:false},
+{id:75,seq:25,ch:1,chName:"방황",cc:"var(--c1)",date:"2013년 07월",year:2013,tag:"가족",title:"119",lines:[["119."], ["위기는 예고 없이 찾아온다.", "그 번호를 누르는 손은 떨린다.", "그리고 그 순간", "세상의 모든 것이 정지한다."], ["그 번호가 필요 없었던 날들이", "얼마나 소중한 것인지를", "사람들은 잊고 산다."], ["오늘도 그 번호를 누르지 않아도 되는 하루였다.", "그것만으로 충분하다."]],coda:"평범한 하루는 기적이다. 위기 없이 지나간 오늘이 증거다.",isFriend:false,isOriginal:false},
+{id:74,seq:26,ch:1,chName:"방황",cc:"var(--c1)",date:"2013년 07월",year:2013,tag:"가족",title:"원룸으로 이사온지..",lines:[["원룸으로 온지 한달 반이 지났다.", "와이프의 이해못할 행동에 기분이 상한 후로", "주체할 수 없는 감정의 기복이 생긴이후부터", "잠을 이룰수 없다.", "자꾸만 빠져드는 소용돌이 처럼", "우울함에 온갖 지난날들에 회의감이 팽배해지고", "미래없는 나날속에 지나온 과거속 미련에", "어쩔줄 몰라한다."], ["아들녀석까지 방학해 좁은 공간에", "무더위와 함께 지내자니", "더구나 별로 좋지 않은 내 정신상태까지", "겹치다 보니 어찌할 바를 모르겠다."], ["잠은 오지않고 좁은 원룸에 가전제품 열기 탓에", "TV마저 켤수없어 오늘 이렇게 또", "차안에 홀로 앉아 술을 벗삼아", "정리되지 않은 번민들과 씨름을 하다", "고개를 들고 하늘을 보니 오늘도 그렇게", "먼발치서 아침의 동이터온다."]],coda:"새 공간에서의 첫 날은 — 언제나 낯설고 고요하다.",isFriend:false,isOriginal:false},
+{id:73,seq:27,ch:1,chName:"방황",cc:"var(--c1)",date:"2013년 07월",year:2013,tag:"성찰",title:"세상은 계속움직이는데..",lines:[["세상은 계속움직이는데.. 난 정지되었다.", "마음은 작은것들에 상처로 위안에 굶주리고", "낯설지 않은 안면이라도 마주 대할 수 없음에", "가슴은 터질것 같아 안달아닌 안달하는", "처량함이 묻어난다."], ["가난은 그저 동화속에 나오는", "나 하고는 동떨어진 것으로 여기며 살아왔다.", "어느날 갑자기 궁핍", "우리가 생각하"]],coda:"세상이 계속 움직이는 동안 — 나는 잠시 멈춰 있어도 된다.",isFriend:false,isOriginal:false},
+{id:72,seq:28,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 08월",year:2013,tag:"고독",title:"배려가 필요한건데..",lines:[["생활이 여러모로 갑갑해지다보니", "칼날선 언행으로 서로 무언의 상처를", "서스럼없이 행한다.", "그저 잠시 답답한 현실이라도", "마음의 여유를 가지고 싶었던 내 마음은", "말 그대로 나 혼자만의 자위였을 뿐이다."], ["사람의 감정이란게", "자기 맘대로 되는것이 아니기에", "마치 '머치의 법칙' 과", "'셀리의 법칙'처럼", "흐름의 분위기란게 있는겐데,,,"], ["답답한 현실에 마음마저 각박해져", "자신에게 조차도 배려가 인색해지는게다."]],coda:"배려는 주는 것이 아니라 이해하는 것이다.",isFriend:false,isOriginal:false},
+{id:71,seq:29,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 08월",year:2013,tag:"고독",title:"술을 취하는 이유",lines:[["술을 취하는 이유"], ["살아있다는 강한 긍정을  위해 마신다."], ["몸뚱아리가 아닌", "머리가 깨어 있음을 위해 마신다."], ["나도 아니고", "남도 아닌 상태가 되어 자신으로부터", "객관적이기 위해 마신다."], ["그냥 잊고싶어 마신다...", "살아있다는 것이 죄인듯해 마신다...", "나라는 의식이 존재되는 것이 싫어 마신다...", "머리없는 몸뚱아리가 되고싶어 마신다...", "이것도 저것도 아닌 그냥 마신다...", "그저 마음이 흔들릴 때마다 마신다...", "구름위를 달리고 싶을 때 마신다...", "내가 못하는 것을 하기위해 마신다...", "......", "......", ",,,???!!!!"], ["살아있고", "머리가 깨어 있음에도", "결국은", "소스라치게 허전하고", "외로운건  왜일까?"]],coda:"취하는 이유가 있다는 것은 — 아직 무언가를 느끼고 있다는 것이다.",isFriend:false,isOriginal:false},
+{id:70,seq:30,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 08월",year:2013,tag:"고독",title:"사랑..그놈..",lines:[["늘 혼자 사랑하고 혼자 이별하고", "늘 혼자 추억하고 혼자 무너지고", "사랑이란 놈 그 놈 앞에서", "언제나 난 늘 빈털털일뿐", "늘 혼자 외면하고 혼자 후회하고", "늘 휘청거리면서 아닌 척을 하고", "사랑이란 놈 그 놈 앞에서", "언제나 난 늘 웃음거릴뿐", "사랑해 널 사랑해", "불러도 대답 없는 멜로디", "가슴이 멍들고 맘에 눈은 멀어도", "다시 또 발길은 그 자리로", "사랑해 또 사랑해", "제 멋대로 왔다가", "자기 맘대로 떠나간다", "왔을때 처럼 아무말도 없이 떠나간다", "늘 기억땜에 살고 추억에 울어도", "늘 너를 잊었다고 거짓말을 해도", "숨을 삼키듯 맘을 삼키고", "그저 웃으며 손을 흔든다", "사랑해 널 사랑해", "목이 메여 불러도", "너는 듣지 못할 그 한마디", "고개 떨구며 사랑 앞에 난 또 서있다", "사랑해 널 사랑해", "제 멋대로 왔다가", "자기 마음대로 떠나가고", "왔을때 처럼 아무말도 없이 떠나가도", "모른척 해도 날 잊는대도", "사랑은 다시 또 온다", "그래 아직 내 가슴은 믿는다", "사랑 사랑은 다시 또 온다.."]],coda:"사랑은 왔다가 간다. 그 자리에 남는 것이 진짜다.",isFriend:false,isOriginal:false},
+{id:69,seq:31,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 08월",year:2013,tag:"성찰",title:"삶속의 아픔은",lines:[["삶속의 아픔은", "치유의 대상이지", "극복의 대상이 아닙니다.", "부정하면 할수록", "잊으려면 잊을수록", "더 생각나고 더 올라옵니다.", "부정하거나 저항하지 말고", "있는 그대로를 허락하세요.", "허락하면 아픔과 같이 있어도 괜찮아져요."], ["혜민스님"]],coda:"삶 속의 아픔은 — 삶의 일부이지 전부가 아니다.",isFriend:false,isOriginal:false},
+{id:68,seq:32,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 08월",year:2013,tag:"가족",title:"열대야...",lines:[["우연찮게도", "아들녀석이 개학으로 학교로 떠나면서", "그 지리했던 열대야가 끝났다.", "몇평 안되는 좁은 원룸에서 두달간의", "세명의 동거는 절대로 낭만적이지는 않았다."], ["가전제품의 열기가 그리 대단할줄이야..", "TV를 켜면 냉장고와 함께 뿜어내는 열기가", "좁은방안 공기가 높이마다 그층이 달라", "마치 사우나에 가면 그 특유의 냄새와", "꼭 같은 느낌이다."]],coda:"열대야의 밤은 — 몸만 뜨거운 것이 아니다.",isFriend:false,isOriginal:false},
+{id:67,seq:33,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 08월",year:2013,tag:"성찰",title:"얼마나 숱한 날들을 하얗게 지새우고도",lines:[["얼마나 숱한 날들을 하얗게 지새우고도", "이 우울과 상실은", "내 곁을 떠나지 않는 것인지."], ["인내는 미덕이라 했다.", "그러나 끝없이 반복되는 고통 앞에서", "인내는 때로 고집이 된다."], ["그래도 또 아침이 오고", "또 하루를 시작하는 것은", "아직 포기하지 않았다는 뜻이다."]],coda:"우울이 오래된 친구처럼 되어버린 날도 — 아침은 온다.",isFriend:false,isOriginal:false},
+{id:66,seq:34,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 08월",year:2013,tag:"가족",title:"내가 좀 많이 아프다..",lines:[["내가 좀 많이 아프다..", "나도 내 자신을 어떻게 콘트롤을 할 수가 없다."], ["자꾸만 지나온 날들에 미련과 한숨만 날뿐..", "변화된 환경에 미숙한 적응과", "돌이킬 수 없는 지난날의 어긋난 순간 순간들..", "모두가 되돌릴 수 없는 부질없는 일들에", "온 정신을 빼앗기고  어찌할 바를 몰라", "안절부절하는 내 모습이", "내 자신도 가증스럽고 싫지만,", "언제 부턴가 철저하게 고립되어진 내 모습은", "이미 너무 많은 시간들을 뒤로하고", "세상을 향한 미움만이 나를 힘들게 하고있다."], ["어느 때 부턴가 무의미해 져버린 내 모든 관계는", "부모도, 자식도, 배우자 조차도 그저", "나란 존재를 부정하고 질타하는", "무섭고 두려운 존재로", "마치 불필요한 벌레처럼 치부되어 버린지", "내겐 이미 오래전 일이다."], ["내가 좀 많이 아프다..", "항상 아팠던 그런 갈등의 아픔이 아니라", "마음이.. 가슴이 무척 아프다.", "누가 알아주지 못하는 아픔을 아파하느라", "더 아픈것 같다.", "지금은 단지 아무 이유없이 그저 따뜻한 위로와", "배려가 절실할 뿐인데,", "넌 항상 그랬어 라고 치부하고 무시하는 아픔이", "더 더욱 아프다."], ["삶과 죽음의 경계에서", "용기없는 나약함으로", "아직 세상에 존재되고 있음을 한탄하며", "가끔 가끔 울컥하는 마음이", "그저 편안하게 세상을 내려놓고만 싶은 생각이", "왜 그리도 서글픈겐지.."], ["지금은 그 아무것도 할 수 없는 상태다.", "눈을 떠 깨어 있으면 현실이 괴롭고", "그나마 위안이라곤", "알콜힘에 의지해 깨어있는 시간 뿐", "잠도 제대로 이룰 수가 없다."]],coda:"아프다는 것은 — 아직 느끼고 있다는 것이다.",isFriend:false,isOriginal:false},
+{id:65,seq:35,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 08월",year:2013,tag:"가족",title:"살면서 수많은 상처들..",lines:[["사람들은 살면서 수많은 상처들을", "무의식적으로 범하며 산다.", "정작 중요한 사실은", "상처를 주는 본인은 모른다는 것이다.", "자기 자신의 기준으로 생각하며 판단하기 때문에", "상대방이 어떤 어려움과 고통이 있는지..", "또 어떤 심리상태인지는 별 안중에 없다.", "그게 일반적인건지도 모른다.", "그렇다면 상처를 주는 사람보다", "상처로 받아들이는 사람이 문제일게다."], ["상대방은 아무 의미없이 던진 말 또는 행동에", "누군가는 그 행위로 상처를 받는다는 것이다.", "내가 알고있는 사람이든", "잘 알지 못하는 사람이든", "말과 행동은 항상 상대의 입장에서", "또 한번 생각해 보면 어떨까?!!"]],coda:"상처는 흔적을 남긴다. 그 흔적이 내가 살았다는 증거다.",isFriend:false,isOriginal:false},
+{id:64,seq:36,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 09월",year:2013,tag:"시간",title:"나이가 들수록 참을줄 알아야 한다..",lines:[["나이가 들수록", "살아온 날들에 대한 미련과 후회가 많다보니", "가슴속 참아낸 하고픈 말들이 늘어난다.", "선의라고 포장하여 평소 자신이", "부족하고 후회했던 일들에 대한 미련을", "변명하기 위한 수단으로", "자신보다 어린 사람에게 선량한 훈계를", "한답시고 설레발을 한다.", "전형적인 꼰대의 모습이다.", "무기력한 수많은 주체할 수 없는 양기들을", "누군가 만만한 사람에게 토설하려 함이", "꼰대의 표상이다."]],coda:"나이가 드는 것은 — 참는 법을 배우는 것이 아니라 놓아주는 법을 배우는 것이다.",isFriend:false,isOriginal:false},
+{id:63,seq:37,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 09월",year:2013,tag:"가족",title:"Disconnect",lines:[["현대인의 삶이란", "따로 또 같이 사는 삶이다.", "녹록치 않은 현실에", "부모는 경제력을 최선으로 살고", "더욱이 요즘엔 기껐해야", "자식 한둘이고 보니", "자식은 자식대로 어디 정신적 의지없이"]],coda:"연결되지 않는 것들이 — 사실은 가장 깊이 연결되어 있다.",isFriend:false,isOriginal:false},
+{id:62,seq:38,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 10월",year:2013,tag:"성찰",title:"새벽이 되면...",lines:[["새벽이 되면", "온몸에서 부스러기처럼 흩어지는", "서툰 감정의 조각들이 있다."], ["낮에는 단단하게 억눌러두었던 것들이", "어둠이 깊어지면서", "하나씩 풀려나온다."], ["새벽은 거짓말을 허용하지 않는 시간이다.", "그 시간에 찾아오는 감정들이", "진짜 나다."]],coda:"새벽의 감정은 낮의 이성이 닿지 못하는 곳에서 온다.",isFriend:false,isOriginal:false},
+{id:61,seq:39,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 11월",year:2013,tag:"고독",title:"나의 빈정..",lines:[["아내가 교회에서 감 1박스를 가져왔다.", "신도중 누군가가 교인들에게 나눠주기 위해", "기증을 했다 한다.", "과수농가를 하는 집인지..", "참으로 대단한 마음이다.", "아내는 두식구 먹는 양이 많아", "주변 이웃들에게 나눠주겠다고 하는 것을", "왜 그랬는지 나는 손사래를 쳤다."], ["아내는 그냥 봉지 봉지에 담아", "그냥 문고리에 걸어 주겠노라고 말했지만,", "누군가 건네준다는 것을 알리기도 싫었고", "또 익명으로 건네줄 경우", "요즘 세상에 쉽게 수용하여", "감사하게는 아니더라도 쉽게 받아", "먹을 것이라 생각지도 않아서였다.", "갑작스런 나에 손사래에", "아내는 납득할 수 가 없었다는 듯이", "대립을 하였고 거기에 나는 조금은", "과민한 반응을 보이고 집을 나와 김포로 왔다."], ["아내는 어이가 없다는 듯", "오늘 가지 말라고 하였지만", "내 마음은 왠지..", "모든 말에 수긍보다는 자신의 뜻대로만 행동하는", "평소 배려없는 아내의 태도에", "불만이 내재 되었던 마음이", "화로 이어져 빈정이 상하게 된 듯 하다."], ["편치않은 시선을 받으며 집을 나서자", "갑자기 쌀쌀해진 날씨에 바람까지 거세", "온몸을 잔뜩이나 움츠리게 한다.", "버스 정류장으로 향하는 대로에는", "매서운 바람에 낙엽 뒹구는 소리가", "왜 그리도 쓸쓸하던지..."]],coda:"나의 빈정은 — 세상에 대한 마지막 저항이다.",isFriend:false,isOriginal:false},
+{id:60,seq:40,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 11월",year:2013,tag:"도시",title:"어김없는 후회..",lines:[["감정기복이란게", "어떻게 표현을 해야할지 모르겠다.", "어제는 돼지머릿고기에 막걸리로 시작해서", "소주를 마시고보니", "닫았던 마음의 빗장을 내려 놓고", "너스레를 떨고는", "또 이렇게 후회아닌 후회를 한다."], ["내심에 그렇듯 거침없는 생각들은", "거리낌없는 말들로", "내재된 갈등과 갈증들을", "다음날이면 영낙없는 후회를 알면서도", "또 그렇게 토설을 한다."]],coda:"후회는 어김없이 온다. 그래서 삶이 진지해진다.",isFriend:false,isOriginal:false},
+{id:59,seq:41,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 12월",year:2013,tag:"성찰",title:"왜 그리도 힘들게 살아가고 있는지...",lines:[["왜 그리도 힘들게 살아가고 있는지..", "무얼 위해서인지도", "누굴 위해서인지도 모른다.", "그저 열심히 살라고 강요받으며 산다.", "열심히 살다 고갤 들어보니", "뭔가 알수없는 후회와 미련이 생긴다.", "이 기분 이 감정은 무얼까?"], ["그렇다고 남들처럼 열심히 살지도 못했다.", "그래선지 한참 달려온 시간에 대한", "보상은 가난이라는 불편이다.", "가난이 불편한건 의심의 여지가 없겠지만", "힘들게 살아가고 있음이", "가난으로 투영되는 것만은 아니다.", "그럼에도 왜 그리도 힘들게 살아가고", "있는지 의문이 생김은 또 무엇일까??"], ["권위는 잃고 책임만 남은 수컷", "있는 듯 없는 듯, 오늘도 떠돈다."]],coda:"힘들게 사는 이유를 묻기보다 — 그럼에도 사는 이유를 찾는 것이 먼저다.",isFriend:false,isOriginal:false},
+{id:58,seq:42,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 12월",year:2013,tag:"시간",title:"2013년을 보내며...",lines:[["그리도 궁핍스럽던 한해가 저물어 간다.", "평창을 정리하고 1월에 올라와", "어느덧 한 해가 지나갔다.", "왜 그리도 서글픈 한해였던지...", "긴 터널의 끝이 존재한다지만..", "아직도 먼 여정이 남은겐지..", "아님 그 긴 터널의 끝이 존재함을", "느낄 수 있는겐지..", "작은일 하나에", "경제적인걸 먼저 생각해야 한다는 것..", "이 나이 되어서야 몸소 느낌이", "참 뭔가는 잘못 살았다는 걸 느낀다.", "세월은", "그저 찾아오고야 마는 당위와도 같다지만", "하루하루 가장으로서 힘겨운 삶이란", "뭐라 말할 수 없는 당혹스러움은", "또 왜그리도", "무기력하게 하는지.."]],coda:"한 해를 보내며 하는 후회는 — 다음 해를 살게 하는 힘이다.",isFriend:false,isOriginal:false},
+{id:57,seq:43,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 03월",year:2014,tag:"고독",title:"사요나라 이츠카..",lines:[["영화 '사요나라 이츠카' 를 3번째로 보았다.", "\"우리들은 죽기 직전..", "누군가에게 사랑받았던 추억을 기억하는지", "누군가를 사랑했던 추억을 기억하는지.\"..라는", "로맨스 영화에 어울리는 기억남을 대사보단", "\"현명한 남자는 길을 잃지 않아..\"라는", "주인공 토우코의 사장의 대사가 머리속에서", "떠나질 않는다.", "내가 걸어야 할 길은 어딜까???...."], ["Prologue", "인간은 늘 이별을 준비하며 살아가야 하는 거야", "고독은 절대로 배신하지 않는", "친구라고 생각하는게 좋아", "사랑 앞에서 몸을 떨기 전에, 우산을 사야 해", "아무리 뜨거운 사랑 앞이라도", "행복을 믿어선 안 돼", "죽을 만큼 사랑해도 절대로", "너무 사랑한다고 해서는 안 되는 거야", "사랑이란 계절과도 같은 것", "그냥 찾아와서 인생을 지겹지 않게", "치장할 뿐인 것", "사랑이라고 부르는 순간,", "스르르 녹아버리는 얼음 조각", "영원한 행복이 없듯,", "영원한 불행도 없는 거야", "언젠가 이별이 찾아오고,", "또 언젠가 만남이 찾아 오느니…", "인간은 죽을 때,", "사랑 받은 기억을 떠올리는 사람과", "사랑한 기억을 떠올리는 사람이 있는 거야", "난 사랑한 기억을 떠올리고 싶어", "SAYONARA ITSUKA", "안녕 언젠가", "- 츠지 히토나리, <사요나라 이츠카> 中"]],coda:"사요나라는 끝이 아니다. 언젠가 다시 만날 것을 알기에 헤어지는 말이다.",isFriend:false,isOriginal:false},
+{id:56,seq:44,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 03월",year:2014,tag:"성찰",title:"투박하고 세련되지 못한 감정..",lines:[["온종일 뭔가에 쫒기듯", "먹먹한 조바심은 무얼까?", "한 동안 누렸던 호사스런 감정들을", "빼앗기지 않으려는 노력들은", "시시각각 변하는..", "현실에 무딘 감정들을 애써 외면하려", "오후 내내 음악을 들어봐도", "몇 편의 영화를 보아도", "그 알 수 없는 먹먹한 조바심을", "외면하기 위한 노력들을 비웃기라도 하듯", "어김없이 내 감정들은", "무기력하게 허물어 진다."], ["의지하곤 상관없이 찾아오는", "투박하고 세련되지 못한", "조각난 감정의 작은 파편들에", "무기력해지면 난 그저", "아무것에서도 자연스럽지 못해진다."], ["평창에서 올라온지 14개월이 지났건만 나는..", "지금 무얼하고 있는건가?!!", "그 먹먹한 조바심은 결국", "한심한 자화상 탓이었을까?", "이 순간..", "하얀 형광 불빛이 왜이리 차갑기만 한 건지", "따뜻한 백열전등 이었으면 좋겠다.."]],coda:"투박한 감정이 세련된 표현보다 — 더 오래 남는다.",isFriend:false,isOriginal:false},
+{id:55,seq:45,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 04월",year:2014,tag:"성찰",title:"知識보단 智慧를..",lines:[["지식과 지혜!", "'쌓아서 채우는 것이 지식이라면", "비우고 덜어냄으로써", "생기는 것이 지혜'라 했다.", "지식이 자신을 위한 교만이라면", "지혜는 나눔과 비움속에", "상대를 먼저 생각함의 배려다."], ["내 젊은 날 나는", "나의 교만을 쌓느라 적지않은 시간을", "할애하며 손해보지 않고 사는 삶이", "똑똑하게 사는 줄 알았다.", "상대방의 작은 실수도 그냥 넘어가는 법 없이", "따지고 지적질하여 잘못된 것들을", "바로잡아 가는 삶이", "나를 위한 삶에서도 사회에서의 삶에서도", "뭔가 올바른 행동이라 여기며 살아왔던 모습들은", "수많은 다른 사람들에겐 참으로 재수없고", "싸가지 없는 모습들로 살았던게다."], ["지식이란 시간과 노력으로 얻을 수 있지만", "지혜는 결코 시간과 노력으로", "얻어지는 것이 아니다.", "내려 놓고 비워냄으로써 작은 것들로부터", "깨달음으로 덜어내는 것이다."], ["뭔가를 버려야만", "또 다른 뭔가가 채워짐은", "세상의 참으로 단순한 법리이거늘", "그 단순한 이치에서조차", "깨닫지 못하고 사는", "우리네 욕망스러움을 비워내고", "깨달음으로 채워지는", "지혜를 얻을 수 있게 하소서..."]],coda:"지식은 배우는 것이고 지혜는 살면서 얻는 것이다.",isFriend:false,isOriginal:false},
+{id:54,seq:46,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 04월",year:2014,tag:"성찰",title:"Twosome Place..",lines:[["지인의 자제가 대학에서 연주회가 있어", "생각지도 못한 문화적 호사를 누렸다.", "드뷔시, 바하, 리스트...", "유명한 음악가들의 피아노곡이었지만", "분명 아는 곡은 없었다.", "곡의 중간부분조차도 알수없는", "피아노 선율이었지만", "그 느낌만은 알거 같다.", "바하의 곡이 뭔가 무거우면서도", "저음에서 전해지는 웅장함이", "다른 음악가들 보다 내겐 더 살갑다."], ["지인과 함께 동반할까 말까", "몇번인가를 망설였던 갈등이", "진정 기우였음을..", "갖게한 좋은 시간이었다."], ["시간과 기회가 허락된다면", "자주 접했으면 조으렸만이라 되뇌이며", "투썸 플레이스에서 향이좋은", "커피한잔을 마신다..!!!"]],coda:"커피 한 잔의 시간이 — 때로는 모든 것이다.",isFriend:false,isOriginal:false},
+{id:53,seq:47,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 04월",year:2014,tag:"성찰",title:"세상의 두께를 감안하고 살자..",lines:[["세상의 두께를 감안하고 살자.", "세상은 원리원칙과 정해진 룰대로", "되는 일이 별로 없다.", "정해진 룰과 원리원칙대로 살다보면", "본의 아니게 우리네 일상이", "어긋나는 경우가 종종 벌어진다."], ["설사 자신은 흐트러지지 않는", "깨끗하고 고결한 삶을 살아간다해도", "그렇게 살아가지 못하는 어리석음에", "한탄하며 탄식하지는 말자.", "나도 언젠간 또 어느 땐가 누군가에게", "어쩔 수 없이 미개한 순간이 있었을 수도", "있었을테니.."], ["그렇다고,,", "'내가 그럴 수도 있으니", "너를 책망하지는 말자'라는", "평등이라는 저울의 잣대를 들이대지도 말자.", "유달리 정의감이 넘쳐", "과도한 정의를 실천할 때", "때로는 그 정의감이", "정의롭지 못한 난동으로도", "비춰질 수 있음은", "너무 과하지도 부족하지도 않음이", "세상을 살아가는", "중용이라는 지혜로움이 아닐런지..", "한번 되뇌여볼 필요가 있을 듯 싶다."]],coda:"세상의 두께를 아는 사람만이 — 가볍게 살 수 있다.",isFriend:false,isOriginal:false},
+{id:52,seq:48,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 04월",year:2014,tag:"성찰",title:"때론 어색한 침묵도..",lines:[["때론 어색한 침묵이 우리곁에 머물러도", "어색해 하거나 두려워 하지 말자.", "섣부른 조바심은 서투른 행동으로 나타나고", "다듬어지지 않은 투박한 감정들로", "타인에게 자신의 감정을 강요하게 되고", "결국 강요된 감정들이 자신과 어긋나게 되면", "못내 상처로 남아 결국 어설픈 어색함으로", "또 다른 자의식이 생기기 마련이다.", "이 어찌 바보스런 행동이 아닐런지.."], ["하지만 모든걸 알면서도..", "어쩔 수 없는 미약한 인간의 모습은", "또 그렇게 무엇인가에 의지할 수 밖에 없음이다.", "뭔가는 완벽을 추구하지만", "항상 그 뒤에 도사린 허무에의 그 무언가는", "자만이라는 위선의 탈을 쓰며 살아가고 있지만,", "모든 것이 시간이 다하면", "약빨은 떨어지게 되는 법...", "그렇게 자신만의 삶에 대한 절규는", "내가 살아있는 동안", "하염없이 반복되어 지고 있다."], ["그러기에 산다는 것은 갈증이다.", "그 갈증을 얼마나 지혜롭게 이겨나기 위한", "무언가를 갈구한다는 것..", "실수와 죄의식의 반복된 삶처럼", "생명수를 찾는 반복된 갈증으로", "살아가고 있는 것이", "우리네 삶인게다.."], ["그것은 결국 이도 저도 할수 없는", "보잘것 없는 자신을 발견할 때 신을 찾게된다.", "'신이시여! 심약한 저에게", "위안과 평온을 주소서'라고....???!!!"]],coda:"어색한 침묵도 — 말보다 많은 것을 전한다.",isFriend:false,isOriginal:false},
+{id:51,seq:49,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 04월",year:2014,tag:"성찰",title:"만약 신이 존재한다면..",lines:[["만약 신이 존재한다면", "그 신은 어디에서 누굴위해", "무얼하며 존재하시고 계시는 건가요..", "조물주시라면 언제든 내 주위에", "있어야함이 옳지 않을런지요.", "세상이 온통 모순투성이라면", "그대는 내게 어떤 변명으로", "대신하실런지요."], ["이 불공평한 세상은 살만한", "진정한 가치 따위란게", "존재할런지요.", "과연 어떻게 살아야만", "이 죽일눔의 갈증이 해소될 수", "있을런지요.."], ["하염없이 서글픈 번민과 갈등은", "또 무엇 때문일런지요.", "무슨놈의 삶이", "허무함의 끝없음으로 살아가야 하는걸까요.", "왜 사는지도 모르고 살아감은", "또 무슨 죄가 많아", "그리도 아파하며 살아가야 하는겐지요?"], ["온통 모순투성인 삶은", "뭔가는 다시한번 되뇌여볼", "아픔이 필요할 듯 싶네요."], ["내 몸 가볍자고 자꾸만", "누군가에게 기대고 의지하려구 하는", "심약함이 또 그리도 싫어 지내요.", "암튼 뭔가는 다시금", "정리가 필요한 시기인 듯 싶네요..!!"]],coda:"신이 존재한다면 — 이 질문 자체가 그 증거다.",isFriend:false,isOriginal:false},
+{id:50,seq:50,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 04월",year:2014,tag:"성찰",title:"사람을 미워하는 감정이..",lines:[["사람을 미워하는 감정이", "자신스스로에게 이리 고통스러울줄은", "예전엔 몰랐습니다.", "미우면 그저 안보면 그만이지라는 생각으로", "터부시 해왔던 이내 어리석은 생각은", "어쩔 수 없이 봐야만 하는", "내 처한 암울적 극단적 상황은", "미처 인지 못했던 어리섞음이겠지요.", "아니 이미 인지하고 있었기에", "더 많은 갈증이 있었는지도 모르겠네요.."], ["나와 맞지 않는다고..", "내 생각과 너무 틀리다고..", "그 사람을 이리도 싸잡아", "내 모든 불안한 작금의 현실을", "덤테기라도 씌우듯 몰아치는 감정이", "이리도 구차스럽고 두렵기만 한 행태가", "이렇게 자신을 괴롭히게 됨에 대한", "아이러니와의 싸움을 합니다."], ["언젠간 한번쯤", "깊게 생각해 봐야 할 문제라 여겼지만", "순간적 상황에 의한 찰나라 여겼기에", "그리 중요시 생각지 않았던 모양입니다.", "하루를 그저 미래에 대한 불안을 떨치려", "자기기분에만 너무도 충실하게 지냈던", "최근의 호사스런 감정들에 대한 결과가", "어쩌면 너무도 당연한건지도 모르겠지요."], ["모든걸 내려 놓았다는 어김없는 자만이", "결국 자만 그 이하였음을 느끼게 되는 마음이", "또 그리도 울화를 치밀게 합니다."], ["사람의 감정이란게", "그리 쉽게 순간에 의해 변질되어지게 됨이", "과연 인간적이었던 걸까요?", "자만스런 인간들을 통해", "결코 자만스런 인간을 거부하기를 다짐했건만", "결국 자신 역시 어쩔 수 없는", "자만스러운 인간임을 느끼게 됩니다."], ["내일은 아침일찍", "어느 조용한 산사라도 찾아가", "이내 정리되지 않은 생각들을 한번", "되새겨 봐야할 것 같습니다..??!!"]],coda:"미워하는 감정도 — 살아있기에 가능한 것이다.",isFriend:false,isOriginal:false},
+{id:49,seq:51,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 05월",year:2014,tag:"성찰",title:"예고된 사건..",lines:[["드디어..", "예고되었던 일이 마침내 터지고 말았다.", "지금 이 순간. 무엇을 참지 못해", "이런 일을 저질렀나 싶지만,", "그 순간 난 이미 넘을 수 없는 선을 넘고 말았다.", "왜 그랬을까?", "정말 참을 수 없었던 일이었을까?", "이 모든 물음표조차 뭐라", "정확히 표현할 수가 없다.", "이건 아니다 싶어 저지른 정의로움 이었을까?", "그것이 정작 정의로움 이었다면", "이런 씁쓸한 벌레 씹은 느낌은 아니었을텐데..", "그 찰나의 감정은", "촌철살인이라도 저지르고 싶은 마음이", "제지하던 주변인에 대한", "아량마저도 철저히 무시한 행동으로 나타났다."], ["정작 정의 스러움도 그 명분과 실리가 없다면", "난동으로 밖에 비춰지지 않는 것을...", "무엇을 위해서..", "누구를 위해서..", "그 어떤 명분을 위해서 그랬을까??"], ["지금 난 그런 촌철살인한 언행을 후회 하는걸까?", "아님 내 비굴함에 가슴 쓰려하고 있는걸까????"]],coda:"예고된 사건은 — 준비가 되어있어도 충격이다.",isFriend:false,isOriginal:false},
+{id:48,seq:52,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 05월",year:2014,tag:"가족",title:"부모와 학부모..",lines:[["부모는 멀리 보라하고,", "학부모는 앞만 보라 합니다."], ["부모는 함께 가라하고", "학부모는 앞서 가라 합니다."], ["부모는 꿈을 꾸라하고,", "학부모는 꿈꿀 시간을 주지 않습니다."], ["당신은 부모입니까? 학부모입니까?"], ["부모의 모습으로 돌아가는 길..", "참된 교육의 시작입니다.."]],coda:"부모와 학부모의 차이 — 사랑의 방향이 다르다.",isFriend:false,isOriginal:false},
+{id:47,seq:53,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 05월",year:2014,tag:"고독",title:"하나라는 외로움?..",lines:[["'하나는 외로워 둘이랍니다~...'", "지금은 헤묶고 케케한", "먼지 쌓인 다락 귀퉁이에서나 어울릴 듯한", "기억에도 가물한 소시쩍 어디에선가 많이 보았던", "유치스런 글귀이긴 하지만,", "사람은 원래 고독스러울 수 밖에 없는 존재라서", "혼자서는 완전할 수 없는 결정체이기에", "항상 무엇인가에서 둘이기를 갈망하며 살아간다."], ["하지만", "서로 이해되지 않은 둘이란", "하나마저 못한", "불완전한 결정체가 되어지기도 한다.", "그럼에도 왜? 인간은 하나가 아닌", "둘이기를 갈망하며 살아가고 들 있는걸까?", "홀로라는 하나는 완전함이", "하물며 완전하지 못한 불완전한 상태로는", "살아갈 수는 없는 것일까?"], ["외롭로 완전하지 못해서 만난 둘이라는", "우리네 그 두 사람들..", "알뜰히 사랑하기란 참 힘든 것 같다."]],coda:"하나라는 외로움은 — 둘이 되어도 완전히 사라지지 않는다.",isFriend:false,isOriginal:false},
+{id:46,seq:54,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 05월",year:2014,tag:"가족",title:"- 최인호의 ‘인연’ 中에서 -",lines:[["우리가 진정 만나고 싶어하는", "그 인연은 어디에 있는 것일까?", "바로 그건 우리가 지금 시간의 강을 건너며", "우리 어깨에 지고가는 사람들의 무게가 아닐까.", "우리는 늘 누군가를 기다리고,", "누군가 자신의 인생에 결정적인 전환이 되어줄", "사람이 나타나기를 기다리고 있다.", "그러나 우리는 이미 우리 인생의 인연들을", "숱하게 만나 왔는지도 모른다.", "다만 우리가 그 사람이 우리 생에", "정말 중요한 인연이란 걸 모르고 지나쳐왔을 뿐.", "생에 크고 작은 인연이란 따로 없다.", "우리가 얼마나 크고 작게 느끼는가에", "모든 인연은 그 무게와 질감,", "부피와 색채가 변할 것이다.", "운명이 그러하듯 인연 또한", "우리들의 마음먹기에 달린 것이 아닐까?"], ["감사의 마음은 고통을 이기는 최선의 것"], ["생각은 행동을 낳고 행동은 습관을 낳고", "습관은 성격을 낳으며 성격은 운명을 낳습니다.", "우리가 운명을 바꾸기 위해서는 무엇보다 먼저", "우리의 생각을 바꾸지 않으면 안 될 것입니다."], ["우리는 모두 그 누군가의 붓이 되어", "세상에 그 어떤 그림을 그리며 살아가고 있는 건 아닐까.", "인연이란 내가 그 사람에게로 다가가", "그 무언가가 되어주는 일이다.", "막시밀리안 꼴레 신부는 성모마리아를 만나", "그 분의 붓이 되어 수많은 생명들을 살려냈으며,", "히틀러는 그 어떤 전쟁의 광기를 만나", "수많은 생명을 죽이는 무기가 되었다.", "우리는 지금 누군가의 붓인가, 아니면 무기인가?", "우리는 지금 타인의 삶에", "아름다운 색채를 그려주고 있는가,", "아니면 타인의 삶을 파괴하고 있는가?"], ["새삼 적막함을 느끼는 나이가 되었다는 사실이 슬프지만", "때로는 이 적막을 받아들이는 자신을 겸허하게", "바라보는데 시간을 쓰고 있다는 사실 또한 소중히 여긴다.", "적막은 이제 우리가 세월 속에 받아들여야 할 인연인 것 같다."], ["우리가 아는 것은 불완전하지만", "완전한 것이 오면 불완전한 것이 사라집니다.", "우리가 지금은 거울에 비추어 보듯이 희미하게 보지만", "그때에 가서는 얼굴을 맞대고 볼 것입니다.", "지금은 내가 불완전하게 알 뿐이지만", "그때 가서는 하나님께서 나를 아시듯이", "나는 완전하게 알 것입니다."], ["겸손이란 자연처럼 있는 그대로의 자기 모습을", "숨김없이 보여주는 일이다.", "우리는 너무나 일찍 자신을 먼저 탓하기 전에", "남을 탓하는 버릇을 들였다.", "자신을 솔직하게 보여주기 전에", "타인의 눈앞에서 자신을 가꾸는 법을 먼저 배웠다."], ["겸손은 겸손이 없는 세상을 위해 존재하는 단어다.", "우리 모두 낮은 자리로 돌아가", "사랑이라는 작은 몸짓 하나를 배울 수 있다면", "세상엔 겸손이란 단어 또한 궂이 필요하지 않을 것이다.", "우리가 있는 그대로 우리 자신을 보여주는 일이", "당신을 있는 그대로 사랑하는 유일한 길이 될 터이다."], ["남을 해치는 말은 입 밖에도 내치지 마십시오.", "오히려 기회 있는 대로", "남에게 이로운 말을 하여 도움을 주고,", "듣는 사람에게 기쁨을 주도록 하십시오.", "(....) 모든 욕설과 격정과 분노와 고함소리와", "욕설 따위는 온갖 악의와 더불어 내버리십시오.", "여러분들은 서로 너그럽고 따뜻하게 대해주며", "하나님께서 그리스도를 통해서", "여러분을 용서하신 것처럼 서로 용서하십시오."], ["내 마음의 고통이 ‘욕심’에 있음을 알았다.", "욕심이 갈등을 낳고 번뇌를 낳으며", "욕심이 고통을 낳는다는 사실을 깨달았다.", "욕심은 집착을 낳으며, 집착은 무도(無道)를 낳고", "무도는 파멸을 낳음을 깨달았다."], ["매일매일 청소하지 않으면", "온갖 먼지와 쓰레기가 쌓이는 더러운 방처럼,", "처음에는 깨끗이 비워내었던 내 마음의 방은", "또다시 더러움과 쓰레기로 가득차기 시작했다.", "내 마음의 방이 온갖 더러운 쓰레기로 가득", "차 있으니 이 쓰레기를 치우는 일은 쉽지가 않을 것이다.", "그러나 조금씩 조금씩 퍼내고 덜어내고", "내다 버리면 언젠가는 깨끗한 방이될 것이다.", "이제 나는 마음을 은유하는 법을 다시 배우고 있는 것이다."], ["- 2014년 5월 8일 오후에 -"]],coda:null,isFriend:false,isOriginal:false},
+{id:45,seq:55,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 05월",year:2014,tag:"가족",title:"네 운명을 바꾸었구나!",lines:[["내가 네 운명을 바꾸었구나!", "네 인생의 가장 중요한 갈림길에서", "꿈꾸던 네 미래를", "부모의 형편이라는 이유 하나만으로..", "네 운명을 바꾸게 되었구나!", "네가 좀더 일찍 세상과 만났더라면", "네 꿈을 접지 않아도 되었을 것을.."], ["내가 네 운명을 바꾸었구나!", "그저 나와의 결혼생활이 신혼초 몇년을 제외하곤", "수차례의 사업실패와", "강단없는 나약한 심성으로 무엇하나 제대로", "이뤄낸 것 없이", "그저 어깨에 짓눌린 고단한 삶이", "또 그렇게 네 운명을 바꾸었구나!"], ["그럼에도 사그러들지 않는 자존심은", "무엇에나 쓸려고 그러는지..", "항상 미안하고 무거운 가슴은", "짜증스런 말투와", "세상과 호흡하지 못하는 책임없는 행동 뿐.."], ["내가 너의 운명을 바꾸었구나!", "어긋난 인연이", "이런 운명을 만들기도 하는구나.", "왜? 내겐", "해피엔딩의 인연은 없을까?", "부딪히고 부데끼는 내 어깨는", "어디에도 없는걸까?.."]],coda:"운명을 바꾼 선택은 — 그 순간에는 보이지 않는다.",isFriend:false,isOriginal:false},
+{id:44,seq:56,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 06월",year:2014,tag:"성찰",title:"길들여 진다는 건..",lines:[["사람이 뭔가에 길들여 진다는 것은", "무서운 일이다.", "사람이든 환경이든 시간이든..", "정작 그 순간에 길들여진 그 무엇과", "함께 하지 못하면", "말할 수 없는 곤경에 빠지게 되어", "심한 허탈감을 느끼게 되곤 한다."], ["단순하고도 반복되어지는 일상은", "습관으로 몸에 베어 자신도 모르는 사이", "아무런 거부감없이 어느샌가 길들여 진", "자신을 발견하게 되고는", "소스라치게 놀랄 때가 종종 있다."], ["사람은 누구나 변화를 두려워 하기도", "갈망하기도 하며 친숙하지 못한", "그 무엇인가를 갈구하며", "쉽사리 친숙해지길 갈망하지만,", "정작 원하던 친숙함을 느끼게 되면", "또 다른 변화에 대한 친숙함을 갈구하며", "이전의 친숙함을 뒤로하게 되는 일이", "우리네 일상이다."], ["만남과 이별의 반복속에서", "살아가는 모습처럼", "무언가에 길들여 지고 있다는 건..", "또 다른 무엇을 향한 갈망의", "부산물일지도 모른다."]],coda:"길들여진다는 것은 — 포기가 아니라 이해의 다른 이름이다.",isFriend:false,isOriginal:false},
+{id:43,seq:57,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 06월",year:2014,tag:"가족",title:"왜 나만 아프고 힘든걸까?",lines:[["언젠가 우연하게 TV를 보다 KBS에서 방영하는", "'강연 100도씨'라는 프로그램을 보았다.", "일요일 저녁 8시에서 아마도 9시까지 방영하는", "일반인들의 삶의 애환을 통해", "꿋꿋하게 살아가는 사람들의 작은 몸짓이지만", "뭔가 여운이 있는 참 좋은 프로그램이라는", "생각을 했다."], ["세상에 온통 울분과 분노로 가득한", "작금의 현실에서 무엇인가는", "한 회당 3명의 강연자들을 통해", "작지만 열심히 살아가는 모습을 반영해", "작은 위로라도 주고자하는 제작진의 배려가", "무척 돋보이는 프로라 또 역시 생각했다."], ["PC를 켜 뉴스를 보자면", "온통 선정적 이슈로 그것도", "내용과도 전혀 상관없는 낚시질을", "일삼코 있는 현실이 마치", "모든 팩트에 흑백 논리로만 강요하며", "채우지 못한..치유될 수 없는 감정들을", "분노와 울분의 극단적 성향으로 몰아가며", "인내심 없는 사고의 단편속에", "방치되어 살아가고 있는 씁쓸한 삶을", "위로라도 하듯 적대적 마녀사냥을 통해", "스스로를 자위하며", "위선의 탈을 쓰고 살아간다."], ["아내와의 불편한 관계 탓에", "한 동안 외면하고 싶었던 현실이 미안해", "별 다른 생각없이 전화를 했지만", "이내 아내는 그동안", "자신이 참아왔던 불편한 진실에 대한", "보상이라도 하듯", "울분아닌 불평섞인 토로를 한다.", "요즘 정말 죽을만큼 힘이 든다고...", "어떻게 이해하고 받아 들여야 할까?"], ["날선 칼날같은 감정으로 내달을까 싶어", "지금은 대화란걸 하지 말아야 겠다는 생각에", "멈칫하며 전화를 끊었지만", "이내 감정은 지진파의 바늘처럼 요동친다."], ["세상은 그렇게 녹록치 않게들 살아가건만", "아낸 왜  나만 아프고", "힘들다고만 생각하며 살고있을까?", "그런 느낌과 감정을 내게 전달함은", "단지 배우자에게의 푸념이라 생각하지만", "지금 난,", "내 자신조차도 헤아릴 수 없는", "절름발이의 인생을 살아가고 있는걸..."]],coda:"왜 나만 아프냐고 묻는 것은 — 아직 살고 싶다는 뜻이다.",isFriend:false,isOriginal:false},
+{id:42,seq:58,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 06월",year:2014,tag:"가족",title:"영화 '역린(逆鱗)'의 중용(中庸) 23장",lines:[["며칠전 '역린(逆鱗)'이란 영화를 보았다.", "사도세자의 아들 정조", "시해사건을 소재로 한 영화였다.", "역린의 뜻은 왕의 노여움이다.", "즉 정조의 노여움이다.", "정조가 왕위에 오르고 역모가 끊이지 않았던", "역사적 사건을 배경으로 전개된다."], ["영화의 재미를 떠나 영화속 대사가", "마음에 와 닿는다.", "\"작은 일도 무시하지 않고 최선을 다해야 한다.", "작은 일에도 최선을 다하면 정성스럽게 된다.", "정성스럽게 되면 겉에 배어 나오고", "겉에 배어 나오면 겉으로 드러나고", "겉으로 드러나면 이내 밝아지고", "밝아지면 남을 감동시키고", "남을 감동시키면 이내 변하게 되고", "변하면 생육된다. 그러니", "오직 세상에서 지극히 정성을 다하는 사람만이", "나와 세상을 변하게 할 수 있는 것이다.”"], ["과연 난 살면서 얼마나", "세상을 정성스럽게 살았던가?", "너무도 쉽사리 포기하고", "또 너무도 쉽게 인간관계를", "여러 이유로 포장하며 외면하고", "스스로를 너무도 쉽게", "나락으로 떨어낸건 아닐까?"], ["무엇하나 제대로 이루어 낸 것 없이", "무거운 운명의 무게를", "자신의 박복한 운에 위로하며", "세상을 등지고 살고있는건 아닐까?"], ["누군가를 변화시킨다는건..", "각고의 노력과 인내가 없으면 불가능한 것임을..", "세상은 Take & Give 가 아니라", "Give & Take 임을", "애써 외면하고 살고 있는건 아닐까?"]],coda:null,isFriend:false,isOriginal:false},
+{id:41,seq:59,ch:3,chName:"성찰",cc:"var(--c3)",date:"2014년 06월",year:2014,tag:"가족",title:"비겁한 상실감",lines:[["모든 이 에게서의 불필요한 존재가 되었다.", "선배든 친구든 사회를 통한 지인들이건", "형제. 또 부모에게서 조차", "껄끄럽고 귀찮고", "남들에게 창피스런 존재일 뿐인가보다.", "어쩌다 이런 존재가 되어 버렸을까?"], ["가난은 인간에게 가해지는 무서운 채찍이라", "쇼팬하우어가 말한 것처럼", "가난에서 가중되는 무기력한 상실감이", "또 그렇다."], ["상실감은 무기력을 낳고", "무기력은 비겁함을 생기게 하고", "비겁함은 주변으로의 분노를 만들며", "분노는 누군가의 증오를 만들고", "증오는 또다른 분노를 만들고", "적의로 가득찬 우울감에 빠져든다."], ["산다는 것이 이리 구차스럽고 비겁한 걸까?"]],coda:"상실감은 비겁하지 않다. 잃었다는 것을 인정하는 용기다.",isFriend:false,isOriginal:false},
+{id:40,seq:60,ch:2,chName:"갈증",cc:"var(--c2)",date:"2014년 06월",year:2014,tag:"성찰",title:"부정, 분노, 타협, 우울 그리고 수용",lines:[["엘리자베스 퀴블러 로스라는 정신과 의사는", "죽음을 맞이하는 임종 과정을", "부정, 분노, 타협, 우울, 수용이라는 5단계의", "과정을 거친다고 하였다. 이러한 단계는", "꼭 순차적으로 일어나는 것도 아니며", "중간에 단계가 생략되기도 하고", "혹은 동시 다발적으로 나타기도 하며", "수용의 마지막 단계까지 가지 못하고 정체된 채", "죽음을 맞이하기도 한다고 하였다."], ["모월간지에 실린 이 기사를 보면서 나는", "꼭 죽음을 맞이하는", "임종의 단계의 사람만이 아닌", "살아있어도 세상에 뒤로 내 앉혀진 사람들 또한", "꼭 같은 심정임을 이해할 수 있었다."], ["평창에서 어쩔수 없이 가게를 접고난 후", "난 심한 상처에 대한 분노와 우울사이의", "반복적 단계에서", "온 전신을 빼았긴 채 울분을 토하고 있었다.", "수 차례의 사업실패..사람에 대한 배신..", "지독스레도 비껴간 운..", "냉정하리만큼 싸늘한 촌철살인 같은 언행..", "자괴감과 우울증으로 심한 상실감에 빠져", "죽어 버릴까 하는 생각까지 했었다.", "울분과 분노로 가득했던 시간들에", "버거워하던 때에 김포로 왔다.", "한동안 일과 사람들에 부딛히며 대화를 하고", "농담을 건네며 차츰 울분과 분노를 뒤로하고", "섣부른 타협과 수용의 길을 가는듯 했다."], ["하지만 어느순간", "사람에 대한.. 결코 편하지 않았던 환경들을", "접하면서 때아닌 분노와 울분이 시시때때로", "자신을 괴롭히는 시간들에 노출되면서", "고립과 단절의 결핍한 사회성을 인지하게 되었고", "또 내 울분과 분노의 주체의 시발점이 되었던", "대상과 함께 공존하며 그 사람에게 또 다른", "미움의 감정이 싹트면서.."]],coda:"부정, 분노, 타협, 우울, 수용 — 인간의 모든 감정은 결국 수용으로 향한다.",isFriend:false,isOriginal:false},
+{id:39,seq:61,ch:2,chName:"갈증",cc:"var(--c2)",date:"2014년 07월",year:2014,tag:"성찰",title:"21세기에도 수컷은 수컷이어야한다??!!...",lines:[["21세기에도 수컷은 수컷이어야 하는가."], ["DNA는 시대의 속도를 따라가지 못한다.", "문명이 아무리 전진해도", "인간의 원초적 본능은", "여전히 그 자리에서 웅크리고 있다."], ["이것이 결함인가 아니면 본성인가.", "본성이라 부르면 면죄부가 되고", "결함이라 부르면 교정의 대상이 된다."], ["그러나 어느 쪽이든", "그 안에서 살아야 하는 것이 인간이다.", "수컷이라는 이름의 딜레마 앞에서."]],coda:"본성과 윤리 사이에서 — 인간은 언제나 그 경계를 걷는다.",isFriend:false,isOriginal:false},
+{id:38,seq:62,ch:2,chName:"갈증",cc:"var(--c2)",date:"2014년 07월",year:2014,tag:"성찰",title:"사는게뭔지..",lines:[["사는게뭔지..", "살고있는 것이 무엇인지..", "정작 답을 갈망하지만,", "우리는 무엇때문에 살아가고 있는지 잘 모른다.", "삶은 그렇게 우리에게 녹록하게만", "다가오는 것이 아니기 때문일까?"], ["지금도 어떻게 사는 것이 과연 옳은겐지에 대한", "의문과 모순을 가슴에 담은ㅊ"]],coda:"사는 게 뭔지 — 물을 때마다 답이 달라진다. 그것이 삶이다.",isFriend:false,isOriginal:false},
+{id:37,seq:63,ch:2,chName:"갈증",cc:"var(--c2)",date:"2014년 08월",year:2014,tag:"가족",title:"당신의 마음에 나는 반도 못딸아갑니다.",lines:[["당신의 마음에 나는 반도 못따라갑니다.", "정작 난 당신의 뜻이 무엇인지도 잘 모릅니다.", "하지만 세상살이를 하며", "무엇이 갈망이고 무엇이 아픔인지는", "알 것만 같습니다."], ["하지만 알지못할 그 세상살이가", "또 그리 힘들게 하기도 합니다.", "사는게 무엇인지요.", "그저 세상살이 흔한 남들처럼", "살아간다 하지만", "그 흔한 세상살이조차 힘에겨워", "살아가는 사람은 무엇으로", "위안을 삼고 살아가야 하는걸까요?"]],coda:"마음의 반도 따라가지 못한다면 — 그 절반의 진심으로 충분하다.",isFriend:false,isOriginal:false},
+{id:36,seq:64,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 08월",year:2014,tag:"성찰",title:"시작도 하기전에..",lines:[["시작도 하기전에 끝을 먼저 예견함은", "너무 조금한 마음인가요?"], ["사람이 살아가는 비슷한 감정들이", "이제는 끝을 미리 예견하는 연륜을 가지게 됨이", "사람으로서 이미 퇴색해져 버린 탓일까요?"], ["알콜기운이 전신에 퍼지면 어김없이", "수많은 생각들이 머리를 괴롭힙니다.", "무엇하나 시작해서 성공은 아닐지라도", "작은 성취라도 느낄 수 있었던 일들이", "전혀 생각이 나지 않음은", "섣부른 자만이 또 그렇게 섣부르게", "단정 지어버리고는", "되돌릴수 없는 때아닌 후회를 합니다."], ["왜? 그랬을까요?"]],coda:"시작하기 전의 두려움이 — 가장 큰 장애물이다.",isFriend:false,isOriginal:false},
+{id:35,seq:65,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 09월",year:2014,tag:"시간",title:"내 인생의 네비게이션은 어느 길일까?",lines:[["적어도 사춘기를 겪기전 어렸을적 나는..", "자신감에 충만해 있었다.", "잘나서 그런게 아니라 못나서 자신감만 넘치며", "살고 있었던게다."], ["사춘기에 접어든 중학시절 어느순간부터", "난 세상에서 하염없이 초라한 사람의", "그 나락의 끝을 이해하기 시작했다."], ["겸손과 다양성에 대한 진리를", "그 당시엔 느꼈었던", "그 무엇인가가 있었는지도 모른다."], ["그 시간 이후로 많은 변화들이 생겼다.", "자만하지 않고 세상에 작은 것들을 이해하고", "전부라고는 차마 말 못하지만", "겸손이라는 미덕을 깨우쳤고", "보잘것 없는 것들에 대한 당위성에", "이해를 갈망하며", "나의 무지함을 위로하고 살았다."], ["첫 직장생활을 하면서 난", "나의 젊은 날의 무지함의 결실인", "스팩의 필요성을 체감했고", "그 젊은 날 찰나의 쾌락의 순간들에", "체감할 수 없는 긴 시간의 후유증에 시달려", "한동안은 정말 누구보다도", "열정과 열망을 갈구하며", "열심히 살아온 날들이 있었다."], ["그 열정과 열망의 시간들이", "순간의 착오된 선택으로", "간 나락의 세월을 경험해야 했고", "그 잘못된 선택으로 지금 이 순간을", "맞이하고 있기도 하다."], ["누구도 아닌 자신이 선택한 길..", "너무 다른 길로 치달은 끝이 없는 길..", "내 인생의 네비게이션은 어느 길일까?", "왼쪽으로 가야하나", "오른쪽으로 가야 할까?", "아님 유턴을 해야할까?..."]],coda:"인생의 네비게이션은 없다. 걸어가면서 만들어가는 것이다.",isFriend:false,isOriginal:false},
+{id:34,seq:66,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 09월",year:2014,tag:"성찰",title:"세상의 진리..",lines:[["세상에 진정한 진리란 존재하는 것일까?", "그 무엇하나 섣불리 믿고 깨달을 수가 없다.", "기쁨은 기쁨이고 슬픔은 슬픔이어야 하거늘..", "사람들은 기쁠때나 슬플때나 눈물을 흘린다.", "간혹 기쁨과 슬픔의 눈물은 차이가 있다지만", "어디.. 어떤.. 차이가 있을까? 다만 눈물뒤에", "느끼는 카타르시스적 차이만 존재할 뿐.."], ["세상의 진리란게 존재함을 깨우치 못함에", "답답한겐지 있지도 않은 것을 쫒다", "지쳐 답답한겐지.. 모르겠다...??!!"]],coda:"세상의 진리는 단순하다. 다만 받아들이기 어려울 뿐이다.",isFriend:false,isOriginal:false},
+{id:33,seq:67,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 09월",year:2014,tag:"성찰",title:"술이 말하는 후유증..",lines:[["며칠전.. 아니.. 매일이긴 하지만", "또 역시 가슴 답답했던 오늘,", "별다른 끼니를 거른채", "이른 저녁부터 술을 들이키며", "한심하고 서글픈 내 처지를 위안삼아", "소맥을 들이키며 이어폰에 흐르는", "음악에 감정을 공유하고 있다."], ["아니나 다를까", "어느정도 취기가 온 전신을 휘감아 올때면", "나는 한 동안의 침묵에서", "술기운에 대한 취기를 토해내듯", "억눌린 감정에 대한 말들에 대한 토설을", "거침없이 뿜어낸다.", "이미 그 대상은 아무런 안중에도 없다."], ["그러고는 다음날 또 어김없는 후회를 한다.", "미치지 않고서야 어찌 그런 토설을", "어김없이 할 수 있단 말일까?", "어김없는 후회는 또 그렇게 침잠으로 이어지고", "어김없이 안달난 우울에 빠진다."]],coda:"술이 말하는 것은 — 낮에 말하지 못한 것들이다.",isFriend:false,isOriginal:false},
+{id:32,seq:68,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 11월",year:2014,tag:"시간",title:"아직도 가난이 서툴다..",lines:[["어느덧 몇평짜리 원룸생활도", "1년여의 세월이 지났다.", "세월과 시간은 그렇게 어김없이 흐르고 만다.", "그동안 난 무엇을 위한 시간이었을까?", "수많은 시간과 세월을 분노와 타협과 우울과의", "불규칙한 반복의 시간이었을 뿐..!", "결국 지나온 세월에 무엇하나", "당당히 이룬것이 없다.", "쫒기듯 불편한 감정들을", "위로하기에 급급했던 시간들 뒤로", "점점 늘어가는 마이너스 통장 잔액은 턱밑에서", "위협을 하고있다.", "뭔가 벌이를 해야 할텐데..."], ["수많은 경제적 아쉬움에", "어느정도 적응할만 하건만", "아직도 내겐 가난에 너무 서툴기만 하다..."]],coda:"가난이 서툰 것은 — 아직 포기하지 않았다는 뜻이다.",isFriend:false,isOriginal:false},
+{id:31,seq:69,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 11월",year:2014,tag:"시간",title:"온달이 아닌 평강공주가 되고싶다...",lines:[["100세 시대라는데..", "남자나이 50대가 넘고보니", "제대로된 구직이 힘들다.", "좀더 정확하자면 내세울 스팩이 없는 듯 하다.", "열정은 온데간데 없고 불필요한 감정들만 충만해", "수컷으로서의 본능을 점점상실하고있다."], ["욕심이 과한건지 노력이 부족한건지", "남자보단 여자가 오히려", "재취업의 길이 그래도 좀 나은듯 싶다.", "그럴바에야 바보스런 어설픈 온달이 되기보다", "평강공주가 되는게 더 나을까 싶다."]],coda:"지혜로운 자가 강한 자를 이끈다. 역사는 항상 그랬다.",isFriend:false,isOriginal:false},
+{id:30,seq:70,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 11월",year:2014,tag:"가족",title:"P/C와 싸우다...",lines:[["엊그제 갑자기 먹통이 되어버린", "pc를 고친답시고 동네 아는 부동산에", "부모님 계신 수지에 동네 공용도서관에", "컴수리점에 생전 처음 가보은 피씨방에", "정신없이 왔다갔다 부산를 떨었지만 결국", "하루종일 부질없는 시간을 보내곤 허탈스레", "술한잔으로 시름을 달래고 아이폰에", "담긴 음악을 들으며 누워 오랜만에 뭔가를", "끌적이고 있다."], ["간단하게 해결할 수 있는 문제였지만", "무엇하나 정상적으로 되는 것이", "없다보니 이리 부산을 떨어도 육신만 고단한", "시간이었을 뿐이다."], ["동네 부동산은 어느샌가 텅빈체", "단단히 잠긴 문고리 뒤로 알지못할", "인형들만 어두운 사무실 안으로", "내동댕이쳐 있었고", "수지는 워낙 오래된 컴이라", "멀티기능을 전혀할 수 없을정도로", "조급한 내심정을 위안해줄 수 없었으며", "주변 공용도서관은 주차장이 만차라는 이유로", "문전박대를 당했고 인터넷으로 검색한", "주변 컴수리점은 찾아가보니 아파트단지였으며", "기껏 머리써서 도착한 피씨방은 cd-rom자체가", "없어 간단히 부팅씨디 복사만으로 해결될", "일을 한시간이나 써핑을 통해", "기껏 받아온 파일은 비웃기라도 하듯", "먹통...!!!???₩&\")(/", "정말 돌아버리는줄.........."]],coda:"기계와 싸우는 밤은 결국 자신과 싸우는 밤이다.",isFriend:false,isOriginal:false},
+{id:29,seq:71,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 11월",year:2014,tag:"고독",title:"같이 있어도 외로움은 늘 곁에있다..",lines:[["같이 있어도 외로움은 늘 곁에 있다..", "혼자라는게 너무 외로워", "같이 있으면 조금은 덜 외롭겠다는", "생각을 했었다."], ["외로움에 지쳐 힘에 버거울 때", "쑥스럽지만 손을 뻗으면", "온기가 아니라도 같이 호흡할 수 있을거라", "생각을 했었다."], ["하지만 같이라는게", "어느 순간 본인의 감정보단", "상대방의 감정에 신경이 더 곤두설 때가", "종종 생기다 보면", "혼자가 더 편할 수도 있겠다 라는", "생각 또한 했었다."], ["그럼에도", "혼자 있는게..", "또 같이 있는게..", "그 어느 것이 더 좋은 것인지는", "정말 알 수가 없다."], ["혼자이면서도 같이고", "같이 있으면서도 혼자인..", "그런 하나이자 둘이며", "둘이며 혼자일 수 있는", "수다와 침묵과 또 침묵과 수다가", "공존할 수 있다면 얼마나 좋을까?"], ["혼자 있어도 외롭고", "같이 있어도 늘 곁에 외로움이 있는건", "왜일까?!!...,,."]],coda:"같이 있어도 외로운 것이 — 혼자인 것보다 더 외롭다.",isFriend:false,isOriginal:false},
+{id:28,seq:72,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 11월",year:2014,tag:"고독",title:"치맥보단 소맥이..",lines:[["치맥보단 소맥이 훨씬 친근하다.", "치맥은 화려하지만", "소맥은 수수하다.", "치맥은 여럿이 어울려 어우러지지만", "소맥은 혼자라도 전혀 낯설지 않다.", "치맥은 치킨이란 안주가 필요하지만", "소맥은 그저 살아가는 모습들이 안주거리다."], ["치맥은 여럿일수록 좋지만", "소맥은 혼자일수록 좋다.", "결코 화려하지는 않지만", "술이라는 본연 그대로의 모습에 충실하다.", "그래서", "치맥보단 소맥이 더 좋다...."]],coda:"치맥이든 소맥이든 — 결국 같은 밤이다.",isFriend:false,isOriginal:false},
+{id:27,seq:73,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 11월",year:2014,tag:"고독",title:"관심밖에 사라져가는 슬픔...",lines:[["관심밖에 사라져가는 슬픔은 외롭다.", "아무리 아니라고 발버둥을 쳐 본들듯", "이미 너무 많이 달려온 시간들은..", "이미 너무 많은 외로움에 친숙해져 있다."], ["가난에 익숙치못한 세월만큼", "관심밖에 사라져가는 슬픔 또한", "이해하지 못했다.", "외로움은 어디에서 오는 외로움이며", "슬픔은 또 무엇으로부터의 슬픔인걸까?", "끝없는 의문의 갈증들을 되새기기엔", "이미 너무 가난에 노출되어", "감각마저 궁색한 변명을 한다."]],coda:"관심 밖으로 사라지는 슬픔은 두 번 슬프다.",isFriend:false,isOriginal:false},
+{id:26,seq:74,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 11월",year:2014,tag:"시간",title:"실낱같은 감정..",lines:[["세월에 무딘 감정들을 찰나의 순간이라도", "느낄수 있는 순간은", "잠시 알콜이라는 힘에 의존하고 있을 뿐이다.", "실낱같이 위태로운 감정들은", "영혼과 저울질하며", "점점 빠져드는..", "늪에 빠진 허우적 거림이 힘에 겹다."]],coda:"실낱 같은 감정도 끊어지면 — 그 자리에 큰 구멍이 생긴다.",isFriend:false,isOriginal:false},
+{id:25,seq:75,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 11월",year:2014,tag:"고독",title:"남이 아닌 나의 아내(안의)에게..",lines:[["난 정말 왜 이렇게 변해 버렸을까?", "가슴 켜켜히 짓눌린 어느 가난한 아버지의", "힘없는 몸부림처럼", "한없이 초라하고", "세상의 모든 슬픔을", "그 짓눌린 어깨위에 짊어진 사람처럼", "모든일에 어찌할 바를 몰라하며", "하루하루를 자신과 외면하며 살아가고 있다."], ["세상은 덧없이 답답하기만 하고", "할 수 있는거라곤", "마음하곤 다르게 날선 언행일 뿐", "그 무엇하나 지 맘대로 되는게 없다.", "우라질놈의 외로움과 분노는", "어는순간부터 내 의지와는 상관없이", "나 혼자만이 외치는 세상의 중심이 되어 버렸다."], ["배우자로서의 본능을 잃어버리고", "부모로서의 기본 기능조차 할 수도 없고", "그저 못난 자신만을 한탄하고 분노하며", "뭔가 핑겟거리를 일삼으며 자신을 위로하고", "있는 몹쓸처지야 말로", "참으로 어리석고 한심한 노릇일 뿐이다."], ["어렸을적 무섭고 두려운 아버지의 존재가", "다만 그저 시키는 것 만이라도 해 낼수만 있다면", "뭔가 마음의 위안과 평온함을 느낄 수 있듯이", "누군가 내게 그 이상의 두려운 존재가 되어", "감당할 수 없는 이내 산만한 마음이라도", "채찍질 해줄 수있는 두려운 존재라도 있길", "바라기엔 이미 너무 많은 세월이 지나 버렸다."], ["살려다오!", "이성이 아닌", "저 밑바닥에 있는 감성의 측은지심이라도", "이 나약한 네 배우자의 작은 지푸라기라도", "되어줄순 없겠니?"], ["누굴위해 무엇을 위해", "살아가야 하는지도 모르는 무지한 나약함을", "다만 잠시 그 가벼운 어깨라도 내어줄 수 있다면", "조금은 위로라도 될텐데..."]],coda:"가장 가까운 사람에게 가장 말하기 어려운 것들이 있다.",isFriend:false,isOriginal:false},
+{id:24,seq:76,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 12월",year:2014,tag:"성찰",title:"정답은 모르지만 해답을 아는 사람..",lines:[["'정답은 모르지만 해답을 아는 사람들이 있다.'", "'미생,이라는 드라마 15회에 나오는 말이다.", "그래! 우린 살면서 해답을 얻으려기 보다", "정답을 얻으려 안달을 하며 살아간다."], ["살다보면 해답은 평범한 우리네 삶의 곳곳에", "덕지덕지 묻어져 있지만 정작 중요한 사실에 대해", "외면하며 일상에 손짓하는 해답들을 뒤로하고", "정답만을 쫒으려 살고 있는지도 모른다."], ["왜 많은 사람들이 눈에 보이는 해답보단", "눈에 보이지 않는 정답에 애태우며", "가슴아파하며 살아가고 있는걸까?", "분명 삶에는 정답이 그 어디에도 없거늘", "작은 해답들이 모여 정답이 되는 것이거늘.."], ["그것은 아마도 불안함 때문일 것이다.", "현재에 대한 불안함도,", "또 미래에 대한 불안함도", "차마 견뎌낼 수 없어..", "감내하기 두려워", "지금 지내고 있는 불확실한 것에 대한", "위안이 절실하기 때문일게다."], ["지금보다 더 나아지려는 욕망을 버려야", "마음으로 부터 자유스러워 질 수 있게되고", "욕심을 비워내야 비로소", "진정한 정답아닌 해답을 구할 수 있으리라...."]],coda:"해답을 아는 사람과 정답을 아는 사람 — 전자가 더 지혜롭다.",isFriend:false,isOriginal:false},
+{id:23,seq:77,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 12월",year:2014,tag:"고독",title:"최백호 - 길 위에서",lines:[["어제 무심코 TV에서 주말연속극이 끝나면서", "흐르는 음악 하나가 가슴을 먹먹하게 한다.", "세상의 모든 미련의 아쉬움을 뒤로한체", "독백하듯 내 뱉어지는 회한의 인생이", "가슴속을 파고들어 잠시 멍한뒤로", "음악을 찾아 다운받아 지금 이렇게", "몇번이고를 반복하며 듣고있다.", "가사에서 말하듯 내 인생의 긴 꿈을 되새기며..."], ["\"긴 꿈이었을까", "저 아득한 세월이", "거친 바람 속을 참 오래도 걸었네", "긴 꿈이었다면 덧없게도 잊힐까", "대답 없는 길을 나 외롭게 걸어왔네", "푸른 잎들 돋고", "새들 노래를 하던", "뜰에 오색향기 어여쁜 시간은 지나고", "고마웠어요", "스쳐간 그 인연들", "아름다웠던 추억에 웃으며 인사를 해야지", "아직 나에게 시간이 남았다면", "이 밤 외로운 술잔을 가득히 채우리", "푸른 하늘 위로 웃음 날아오르고", "꽃잎보다 붉던 내 젊은 시간은 지나고", "기억할게요 다정한 그 얼굴들", "나를 떠나는 시간과 조용히 악수를 해야지", "떠나가야 할 시간이 되었다면", "이 밤 마지막 술잔에 입술을 맞추리", "긴 꿈이었을까", "어디만큼 왔는지", "문을 열고 서니 찬 바람만 스쳐가네", "바람만 스쳐 가네\""]],coda:"길 위에서 만난 노래는 집에 돌아와서도 남는다.",isFriend:false,isOriginal:false},
+{id:22,seq:78,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 12월",year:2014,tag:"고독",title:"용기내어 손을 내밀면...",lines:[["별일도 아닌 일에 나름 용기를 내어", "신경정신과를 찾았지만", "끝내 진료를 받지 못했다.", "나만 용기내어 손을 내밀면", "누군가 잡아줄거란 기대는 또 한번의", "실망스런 오류를 저지르고 말았다."], ["많이 들 아파하며 들 살아가고 있구나!"], ["낯설고 무거운 발걸음으로 병원문을 여는순간", "입구에 대기중인 사람들의 일제히 쏠리는 시선..", "'젠 뭣땜에 왔을까?'", "'너도 역시 혼자선 어쩔 수 없었던게니?'", "차마 고개를 들어 그들의 눈을", "처다볼 수가 없었다."], ["예약없인 1-2시간 대기를 해야하고", "예약도 며칠뒤나 가능하단다.", "마치 자랑질이라도 하듯", "예약없인 곤란하다며 지금 예약하겠냐는", "무슨 애프터서비스센터 상담원 마냥", "나이 어린 접수직원의 눈망울이 순수해보인다.", "세상 아무 고민도 없는 것처럼..."], ["갑자기 갈길을 잃어버린 듯한", "이 먹먹함은 무얼까?", "용기내어 손을 내밀면..", "누군가 손잡아 줄거라 생각했는데..", "잠시라도 온기를 느끼고 싶었을 뿐인데..", "집으로 돌아오는 길은 왜이리 짧은걸까?!!"]],coda:"먼저 손을 내미는 용기가 세상을 바꾼다.",isFriend:false,isOriginal:false},
+{id:21,seq:79,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 12월",year:2014,tag:"가족",title:"새벽 4시가 넘었는데...",lines:[["새벽 4시가 넘었는데...", "잠을 자야할 것 같은데..", "정신은 살금살금 살아있어", "시간하곤 상관없이 깨어있다."], ["참다 못해 또 술기운에 의지하게 되고", "그 찰나를 기회삼아 이제 잠자리에 들게다.", "꼭 같은 일상이 두렵다.", "가뜩이나 의지력 없는데..", "멘탈마저 흐트러져 어찌할 바를 모르겠다."], ["뒤늦은 잠자리에", "또 늦은 아침 어쩌면 오전이 다하도록", "이부자리에 있을테고", "이젠 뭐라 표현조차 하지않는", "아내의 눈치를 살피며", "피곤한 하루가 또 그렇게 시작되리라."], ["내일은 예약하자.", "섣불리 정신없이 도망치다시피", "빠져나온 정신과 상담이라도 받아", "수면제라도 처방받아", "제 시간에 잠이라도 잤으면 좋겠다."], ["이번주를 끝으로", "아들녀석 방학일텐데", "엊그제 술마시고 이해못할 너스레를 떨었던", "그 어색함은 또 어쩔까?", "한 동안 내가 나가 있는게 옳을까 싶다."], ["내일은 김포에 연락해봐야 겠다.", "어렵지만 올겨울 신세좀 지자고..."]],coda:"새벽 4시는 거짓말을 할 수 없는 시간이다.",isFriend:false,isOriginal:false},
+{id:20,seq:80,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 12월",year:2014,tag:"가족",title:"겨울비..",lines:[["겨울을 재촉하는 비가 내린다.", "눈이 온다했는데..", "그것도 꽤 많은 양의 눈이 내린다 했는데", "궁색하게도 비가 내린다."], ["오늘은 그저 눈이라도 와줬으면 조으련만", "점점 메말라 가는 감정은", "설사 눈이었어도", "그저 별다른 느낌은 없었으리라", "낯선 시간들..", "낯선 공간들..", "그 낯섬이 왠지 싫지만 않다."], ["아들녀석 방학하고", "좁은 공간에서의 공존이 얼마동안", "평온할 수 있을까?", "아내하고의 대화가 끊긴진", "꽤나 많은 시간이 흘렀다.", "아마 서로가 대화없음이 편할것이란걸", "서로 느끼고 있다."], ["어느 순간부터", "말없음이 말을 토설하는 것보다", "더 많은 말들을 서로 하고 있음을", "인지하고 있다."], ["결혼생활 거의 20년 내공이", "묵언수행의 깨달음을 얻은 것인지도 모른다.", "말은 토설한다고 말만은 아닐 것이다.", "말 없음이 어느땐가는", "서로에게 너무도 하고픈 말을", "하는 것일지도 모른다.."], ["때 아닌 겨울비가 내리는 것처럼...."]],coda:"겨울비는 말이 없다. 그래서 더 많은 것을 말한다.",isFriend:false,isOriginal:false},
+{id:19,seq:81,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 12월",year:2014,tag:"가족",title:"부부가 섹스할 때 처럼",lines:[["부부가 섹스할 때 처럼", "자존심없이 대화를 할 수 있었으면", "얼마나 좋을까?", "대체 그 자존심은 누굴위한걸까?", "순간의 자신이 손해보고 초라해진다고", "설사 느끼더라도", "부부생활에 손해되는 것만은 아닐텐데..", "왜 그리 서로가 날선 고집을 세울까?"]],coda:"욕망은 부끄러운 것이 아니다. 고백할 수 없게 만든 세상이 문제다.",isFriend:false,isOriginal:false},
+{id:18,seq:82,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 12월",year:2014,tag:"시간",title:"수많은 세월의 흐름을",lines:[["수많은 세월의 흐름을", "짧은 순간 다 이해할 수는 없겠지만", "가끔 모든 생각들이 뒤엉켜서", "아무것도 생각하지 못할 때...", "그 모든 연관의 끈들이", "허구였음을 느낄때..", "난 종종 기나긴 잠수를 탄다."], ["오랜만에 그것도", "못다 풀지못한 많은 애기들을", "가슴에 묻고 살아온 시간들이 많아", "어디서부터 그 실마리를 풀어야할지 모를땐", "더욱 더 그렇다.", "그저 이젠 세월의 덧없음에", "미련이 많을 뿐이다."], ["갑작스런 대상이 나타난다고 해도", "난 그저 과거의 추억과", "아련했던 미숙한 내 언행이 부끄러울 뿐", "현실을 부정하고자도", "안타까워 하고자도 아니다.", "다만 후회하고 있을 뿐이다.", "그렇다고 달라질건 없지만.."], ["난 내인생을 살아가기에도", "너무 힘에 버거워", "누구네 인생에 더부살이로 달콤한", "이야깃거리로 남아 있기도 싫다."], ["행복해야돼!", "그랬으면 좋겠어! 라는 상투적인 말은", "필요가 없으리라. 아니까..", "어떤 성향의 사람인줄 아니까..", "그래서 그냥 세월의 덧없음은 그저", "하찮은 도구로 여기고", "현실과 연이 없는 인연으로만", "대화했음이 더 인간적이지는 않을까?"], ["분명 그러리라 그랬을거리라 여긴다.", "하지만 보지못한 세월이", "느낄수 없는 시간이", "또 그렇게 우리네 지나온 세월에", "동정을 하지만...", "우린 결국 어쩔수 없었던 시간들에", "애태우고 가슴졸이며 살아가고 있다."]],coda:"세월은 기다리지 않는다. 기억만이 가끔 돌아온다.",isFriend:false,isOriginal:false},
+{id:17,seq:83,ch:5,chName:"회복",cc:"var(--c5)",date:"2014년 12월",year:2014,tag:"시간",title:"지금 내 처지에 과연 어떻게 하는 것이 옳은 일일까?",lines:[["어제 정신과 상담을 했다.", "언젠가부터 한 번쯤 내 정신상태를", "상담받고픈 마음이었지만", "차마 정신과라는 뉘앙스에 선듯", "방문하기가 걸끄러웠던건 자격지심이었을까?"], ["나보다 조금은 더 많은 세월을 보낸 듯한", "중년의사의 몇가지 설문에", "괜시리 상투적인 듯한 느낌을 받으며", "별다른 성의없는 질문과 답변들이 오고가고", "중증 알콜중독과", "중증 우울증군에 속할 수 있단다.", "자살충동을 느껴보고", "실행해본 적이 있냐고 묻는다."], ["참으로 자존감 떨구는 질문이다.", "그건 마치 네 자신이 심약해서", "스스로 아무것도 할 수 없는", "나를 질책하는 질문만 같았다.", "좀더 평안한 상태에서", "대화란 것을 나눌거란 기대는", "그저 영화속에나 존재하는 것인가보다."], ["우선 며칠분의 수면보조제와", "항우울제를 처방받았다.", "약기운 때문일까?", "두세시 사이였을게다.", "YTN 2시뉴스 끝이라는 말만 기억날 뿐", "아침 11시가 넘어서야 잠을깼다.", "중간에 잠도 깨지 않고,,", "다만 기억할수 없는", "몇편의 꿈이란 것만 기억날 뿐..", "하루종일 뭔가 멍한느낌.. 약기운인지..", "아님 며칠간의 피로가 풀린 탓인지.."], ["현실을 직시하는게 옳은일인지", "자신만을 생각해야 하는 것인질 물었다.", "전혀 공존할 수 없는", "지금의 내처지에 합당한 질문이었지만", "내심 의사는 내 맘을 꿰뚤어 보듯", "현실에..", "타인에게 비춰지는 모습들에 과하지 않는", "자신만의 시간들을 누리라 한다.", "그게 우선이라고..."], ["지금 내 처지에", "과연 어떻게 하는 것이 옳은 일일까?"]],coda:"옳은 일이 무엇인지 모르는 것이 아니다. 알면서도 못하는 것이 삶이다.",isFriend:false,isOriginal:false},
+{id:16,seq:84,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 01월",year:2015,tag:"시간",title:"약에 취해 있는 것 같다..",lines:[["약에 취해 있는 것 같다.", "아니 잠에 취한듯 매일 늦잠을 잔다.", "하지만", "악몽도 아니고 길몽도 아닌", "무언가의 꿈에 취해 정신이 혼미하다."], ["평상시엔 꿈이라곤", "일년에 몇차례 인지조차", "기억에도 가물한데", "약처방 이후론 거의 매일 꿈을 꾸는것 같다.", "무슨 꿈인지도 모르는걸.."]],coda:"감각이 무뎌지는 것을 약 탓으로 돌릴 수 있다면 — 얼마나 간편한 세상인가.",isFriend:false,isOriginal:false},
+{id:15,seq:85,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 01월",year:2015,tag:"가족",title:"부모는 아니지만..",lines:[["이틀 연속 형과 관련된 꿈을 꾸었다.", "첫날엔 서로 죽일듯이 다투는 꿈으로", "아마도 난 식칼같은 무기를 손에 쥐고", "죽여버리겠다고 울부짖던 모습으로", "잠에서 깨었고,"], ["어젠 아내를 달래 사과하려는 제스쳐에", "평소와는 다른 모습으로", "아내는 그저 말없는 부정도 긍정도 아닌", "적당한 수긍의 태도의 모습을 지켜보면서", "이내 분노를 느끼며 아내에게 심한", "배반감을 느꼈던 그런 내용의 꿈이었다."], ["꽤나 생생한 느낌이라 아직도", "울분이 가라앉질 않는 것만 같다.", "난 무엇때문에 형이란 존재에게", "화가 나있는걸까? 생각해본다."], ["아직도 귓전에 멤도는 그 한마디", "\"내가 니 부모냐?\""], ["부모는 아니지만 형제이거늘", "꼭 그런 말로 상처를 줘야 했을까?"]],coda:"부모가 아니어도 사랑할 수 있다. 그 사랑이 때로는 더 순수하다.",isFriend:false,isOriginal:false},
+{id:14,seq:86,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 01월",year:2015,tag:"고독",title:"혼자만 겉도는 느낌은 왜일까?",lines:[["김포에 온후로 혼자있는 시간이 줄어선지", "별다른 우울감이 없는 듯하더니", "별일도 아닌 사소한 것에라도", "기분이 상하게 되고나면", "걷잡을 수 없이 감정조절 기능이 저하되곤", "갑작스레 혼자만 공중에 붕떠있는 듯한", "겉도는 느낌을 받게 된다."], ["어느 한순간 사소한 것에 조차", "저항력이란게 상실되어 버린걸까?", "스스로를 마음 저 한구석에", "크리스찬이라 여기면서도", "내놓고 떠들고 공정하지 못한 것들에조차", "종교인임을 강조하는 주변인들의 모습에", "혐오를 느낄 때가 종종 발생한다."], ["부평으로 4일간의 일거리를 마지막으로", "일도 끊겼다.", "다음 일거리는 조만간이라도 있는겐지", "없는겐지 제대로 얘기도 해주지 않는다."]],coda:"혼자만 겉도는 것이 아니다. 모두가 그렇게 산다. 다만 표현하지 않을 뿐이다.",isFriend:false,isOriginal:false},
+{id:13,seq:87,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 01월",year:2015,tag:"고독",title:"어느쪽을 쫒아야 하는 걸까?",lines:[["그저 아무 생각없이 하루하루를 보낸다.", "선배도 만나고 친구들도 만나면서", "혼자있는 시간들을 외면하는 일에 애쓰고 있다.", "그런 시간들이 우울한 감정들은", "다소 멀게 느껴질 수는 있게 하지만", "뭔가는 알 수 없는 또 다른 초조함에", "내심 불안스런 날들의 연속이다."], ["이제 다음달 5일이면", "마이너스 통장도 한계가 되어", "아무런 경제적인 것이 없게 된다.", "아니 월세방값조차 지불할 수 없다.", "경제적 현실을 어떻게 해결해야 할까?", "지금 우울증이나 피하자고", "내 생각할 때만은 아님에도", "맘대로 뜻대로 되지 않는 현실에 답답할 뿐이다."], ["왜? 난 항시 극단적일까?", "하나가 좋으면 반드시 상응하는 또 다른", "아픔이 존재한다.", "그 아픔을 치유하기 위해선", "또 다른 아픔을 감내해야 하는 일들이 공존함은", "머피든 샐리든", "어느 법칙의 적용없이 동전의 양면처럼", "어느 한쪽을 쫒을 수 없게", "좋고 싫음이 동시에 공존한다."], ["그러면 또 난 어느쪽을 쫒아야 하는 걸까?"]],coda:"어느 쪽인지 모를 때는, 아직 때가 아닌 것이다.",isFriend:false,isOriginal:false},
+{id:12,seq:88,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 01월",year:2015,tag:"성찰",title:"꾸베가 얻은 ‘행복해지는 열여섯가지 팁’",lines:[["꾸베가 얻은 ‘행복해지는 열여섯가지 팁’"], ["1) 다른 사람과 비교하면 행복한 기분을 망친다", "2) 사람들은 돈이나 지위를 갖는게", "행복이라 생각한다.", "3) 사람들은 행복이 미래에 있다고 생각한다", "4) 두 여자를 동시에 사랑할 자유가 행복일지도", "모른다고 생각한다", "5) 때로는 진실을 모르는게 행복일 수도 있다.", "6) 불행을 피하는게 행복의 길은 아니다.", "7) 행복은 일종의 부수적 효과다", "8) 행복은 소명에 응답하는 것이다", "9) 행복은 있는 그대로 사랑받는 것이다", "10) 고구마 스튜!", "11) 두려움은 행복을 가로막는다", "12) 행복이란 온전히 살아있음을 느끼는 것이다", "13) 행복은 좋을 일을 기뻐할 줄 아는 것이다", "14) 사랑은 귀 기울여주는 것이다", "15) 향수에 젖는 것은 촌스러운 것이다", "16) 우리는 행복할 의무가 있다."], ["행복의 추구보다는", "뭘 추구할 때 오는 행복에", "더 관심을 가져야 한다."]],coda:"행복의 조건을 나열할수록 행복은 멀어진다.",isFriend:false,isOriginal:false},
+{id:11,seq:89,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 02월",year:2015,tag:"고독",title:"절망과 행복..차이",lines:[["LH공사에서 우편물이 왔다.", "2년전 임대아파트 대기자 신청으로", "77번째 순위였는데", "예상치도 못한 순간에", "어느덧 내 순위가 되어", "며칠전 이미 전화통보를 받은 후였다.", "경제적 여건으로 내 순위가 좀더 늦길 바랬는데..", "이미 마이너스 통장엔 한도가 꽉차", "카드값도.. 집월세도 낼수없는 코너에 몰려", "이러지도 저러지도 못할", "절망스런 상황에 어찌할바를 몰라 했었는데..", "뭔가는 알수없는 정확한 타이밍에", "부모가 도움을 준다는 사실에 절망에서 희망으로", "그 기분조차 변화되는 무기력한 자신을", "뭐라 변명이라도 해야할 지..."], ["아내는 도면을 보고 이내 좋아라", "한층 들뜬 기분으로 즐거워 하는", "참으로 소박한 해맑음에 쓸쓸해진다.", "그 작고 초라한 행복을 난 왜그리 어렵사리 헤메였던걸까?", "내가 생각한 행복이란게 과연", "감당할 수 있었던 방황이었던걸까?", "아님 전혀 상관없는 방향을", "허우적거리며 헤메였던 허구였던걸까?", "행복이란?", "나름 소박하지만", "지금의 환경보단 좀더 낳은 환경으로", "탈바꿈 하는 것이다.", "비록 남에게는 하찮은 것일지라도..."], ["비록 네가 될 수 없음은", "또 그렇게 내가 될 수 없음에", "난 또 그렇게", "절망과 행복사이에 서서", "알수없는 그 차이가 무엇인가?", "줄달음을 하고있다."]],coda:"절망과 행복은 다른 것이 아니다. 같은 감정의 두 이름일 뿐이다.",isFriend:false,isOriginal:false},
+{id:10,seq:90,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 06월",year:2015,tag:"고독",title:"공감이란걸 하고싶다..",lines:[["혼자가 아닌 여럿이 무언가 공유될 수 있는", "그 어떤 것들에 수다스러운 나 자신이기고 싶다.", "같이 느끼고 싶은 느낌.. 즉 공감이란건 무얼까?"], ["수많은 세월이 흐름뒤에", "아무리 애쓰려해도", "무언가 동떨어진 느낌..."], ["나누고 싶어도 나눌수 없는 감정들은", "서서히 찢어진 칼날같은 감정들이 우리네 삶을 짓밞는다.", "살자살자 하면서도 어떻게 살아가야 하는지 모르는", "모순된 시간들을 보내면서", "'따로 또 같이'라는 뉘앙스가 그리운 시간이다."]],coda:"공감은 말이 아니라 침묵으로 완성된다.",isFriend:false,isOriginal:false},
+{id:9,seq:91,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 06월",year:2015,tag:"도시",title:"절망과 희망사이..",lines:[["와이프와 관계가 소원해진지 오래되었다.", "정서적으로 맞지않는 관계가 이리도 힘이 들었던걸까?", "내 자신이 일반적인 융화하고는 거리가 어느정도 있다 생각했거늘..", "이리도 참담할 줄이야.."], ["미움의 골이 깊어갈 수록", "알수없는 무언의 행동들은 현실을 외면한 채", "그 끝을 알수없이 내 달음치고 있다."], ["우리들에겐 아픔이 서로 이해될 수 없었던겔까?", "그 어느 하나 것에도 공유란걸 나눌수 없는 고통이었던겔까?", "그저 난 알수없는 허공으로의 절규밖에 될 수 없었 던겔까?"]],coda:"절망과 희망 사이 — 그 거리는 생각보다 훨씬 짧다.",isFriend:false,isOriginal:false},
+{id:8,seq:92,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 12월",year:2015,tag:"가족",title:"'지혜' 와 '깨달음'",lines:[["살면서 도움이 안되는 것들이 있다.", "바로 '지혜'와 '깨달음'이다.", "지혜란 건 꼭 필요할 때가 지난 후에 얻는다.", "지금 당장은 도움이 안되고", "다음번에 도움이 될 뿐이다.", "경험에서 얻는 지혜는 그렇다.", "부인이 계속 야근하라고 보챈다면", "그럴만한 이유가 있듯이 말이다.", "(야근 안하고 일찍 들어오니 아내가 외간남자와 바람을 피운다. ㅋㅋ)"], ["'깨달음'은 또 어떤가?", "그것은 마치 백미러와 같아서", "이미 지나친 이후에야 비로소 보이게 된다.", "이를테면 '나 술 그렇게 많이 안 마셨는데?'", "'나 안취했어' 같은 생각들.", "지혜와 깨달음은 오늘의 나에겐 도움이 안되고", "내일의 나에게 도움이 될 뿐이다."], ["문제는, 내일은 아직 오지 않았다는 것.", "당장 이 지옥 같은 오늘을 버텨야 한다.", "그러니 이야기가 시작된", "처음으로 돌아가 보자", "뒤늦은 깨달음을 통해서 지혜를 얻을 수 있을테니까", "- 영화 포커나이트 중에서 -"]],coda:"지혜는 지식보다 늦게 온다. 그래서 더 값지다.",isFriend:false,isOriginal:false},
+{id:7,seq:93,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 12월",year:2015,tag:"성찰",title:"지난 일에 연연해선 안되는 법!",lines:[["\"지난 일에 연연해선 안되는 법!", "과거의 마음도 잡지 못하며", "현재의 마음도 잡지 못하며", "미래의 마음도 잡지 못하거늘", "미래는 이미 현재가 되고", "현재는 이미 과거가 되니", "그냥 마음이 가는대로 하시게..\""], ["영화 검우강호 중에서"]],coda:"지난 일에 연연하는 것은 어리석음이 아니다. 그것은 아직 살아있다는 증거다.",isFriend:false,isOriginal:false},
+{id:6,seq:94,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 12월",year:2015,tag:"고독",title:"아들녀석 군입대의 현실..",lines:[["2015.11.19(목) 하나있는 아들녀석이", "제 생일 이틀을 못채우고 의경으로 군입대를 했다.", "정작 국방의 의무로 군입대를 한다는 사실보다", "우리 부부의 무언가 끊을수 없는 고리역할을 했던", "자식녀석의 부재로 과연 어떤흐름으로", "부부의 연을 다 할까라는 의구심이 더 먼저 드는 것은", "부모이기전에 철저한 개인으로서의", "불안한 기분 그 자체였을지도 모른다."], ["헤어짐의 두려움도", "혼자될 수도 있다는 미련도 있어서가 아님에", "아무것도 할 수 없는 현실에", "원하든, 원하지 않던간에", "세월의 흔적처럼 내 몸에 붙어있던", "그 무언가를 털어내어야 하는", "부담감이 생기고 있는지도 모른다.", "어쩌면 혼자로 지내는 것이", "지금보단 훨 나을것 같다는 생각을 자주 하곤 하지만", "막상 생각이 현실로 다가오다보면", "알수없던 멈춧거림에 당황하곤 한다."], ["그러면서도 6개월여 이상이 되도록", "한 지붕 아래서 서로 얼굴을 외면하며 살아가고 있다.", "가끔 술이 취하면 뭐라도 대화란걸 하고픈 욕망도 일지만", "결국 부질없는 짓임을 깨닫고는 애써 또 외면하며", "남이기를 마치 숙명처럼 받아들이고 있다.", "절제된 언행들...", "언제까지 침묵속에 진실을 외면할 수 있을까?"], ["이젠.. 뭔가 결단을 내려야 할진대..", "그 무엇하나 쉽사리 결론지어", "입밖으로 내 뱉을 수가 없음이", "또 그렇게 날 붙잡는다.", "같이 있음이 불편하고 그저 얄밉단 생각앞 앞서고,", "고지식함에 답답해 하고,", "유연하지 못한 사고의 경직함에 지쳐있지만,", "알수없는 뭔가의 머뭇거림이 마음에 걸린다."]],coda:"군대라는 시간은 아들의 것이지만, 그 빈자리의 무게는 온전히 남겨진 자의 것이다.",isFriend:false,isOriginal:false},
+{id:5,seq:95,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 12월",year:2015,tag:"고독",title:"어쩔수 없는 꼰대의 X-MAS...",lines:[["이젠.. 그 어떤 시간의 흔적조차 느낄수 없는", "무감각이 날 지배한다.", "젊은 날.,", "크리스마스 이브라면", "마치 유년시절 소풍전날의 기분이상의 업된 감정들로", "오늘은 뭔가 좋은 일이 생길것만 같았던..", "덧없더라도 그저 들뜬 감정에 충실하며", "기대감에 부풀었던 기억이 새롭다."], ["고등학교 2학년 때 이후로 X-Mas 이브날에 단 한번도", "혼자 궁상을 떠는 일이 없었던 시절을 되새기며,", "이젠 아무런 의미 없는", "어제와 다를것 없이 똑같은 하루가 얄궂다."], ["시간이 더해지면 세월이 되고", "세월이 더해지면....", "그저 후회스러운 날들이 존재할 뿐이다..", "시간의 무감각이라면", "그나마의 아량이란게 느껴지지만", "세월의 무감각을 느끼게 되고보니", "어쩔수 없는 꼰대가 되어가고 있구나.."], ["의미없는 꼰대의 하루..", "누군가에게는 설레는 하루가 되겠지...", "그렇게 또 꼰대를 향해 줄달음친다."]],coda:"설레지 않게 된 날이 언제부터였는지 — 기억조차 나지 않는다는 것이 더 쓸쓸하다.",isFriend:false,isOriginal:false},
+{id:4,seq:96,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 12월",year:2015,tag:"시간",title:"잿빛 색깔의 겨울이 싫다..",lines:[["사계절중 겨울이 난 젤 싫다.", "부실한 몸뚱아리에 체지방도 적어", "추위를 타는 탓도 있지만,", "그것보다 더 싫은건 뿌연잿빛 색깔 때문이다.", "그런 바깥 풍경을 바라보자면", "왠지 내 머리속까지 잿빛으로 하얗게 되는 것 같아", "온종일 무언가에 이끌리듯"]],coda:"잿빛 겨울은 언제나 그 색으로 거기 있었다. 그리고 사람도 그 속에서 어떻게든 봄을 기다렸다.",isFriend:false,isOriginal:false},
+{id:3,seq:97,ch:4,chName:"정착",cc:"var(--c4)",date:"2015년 12월",year:2015,tag:"가족",title:"내 아버지처럼 될까 두렵다..",lines:[["자식 위한답시고", "매일 꼭같은 레파토리로 마음 후벼파고", "자식들 외식권유에", "단 한 번도 혼쾌히 응하지도 않으며", "점점 건강염려등 환자가 되어", "당신 스스로 소설을 쓰며 병원투어를 한다."], ["노화에 순응하지 못하고", "흔한 3대 거짓말처럼 얼마 안 남았다하며", "온갖 병치레에 신경을 세우고 주변인들을 힘들게 한다.", "삶에 대한 애착일까?", "죽음에 대한 두려움일까?"], ["그리 재미있고 즐거운 삶을 산것도 아님을", "또 그렇게 살고 있지도 못하거늘", "과연 어떤 느낌으로 하루하루를 살아가고 있을까?", "나이가 들어 노인이 되면", "일반적으론 대쪽같던 성격도 유해진다지만", "남에게 절대 피해주고 살지 않겠다며", "정작 본인 스스로에만 위안하며", "주변인들에게 상당한 피해를 주고 있는", "사실을 알지 못한다. 알려고도 하질 않는다."], ["점점 여려지는 마음은 당신에게 대한 연민일 뿐", "그저 주변인들에게는 미움과 고집불통으로 사는", "내 아버지의 삶이 내 모습이 될까봐 두렵다..."]],coda:"사람은 결국, 가장 닮지 않으려 했던 것을 가장 깊이 닮아간다.",isFriend:false,isOriginal:false},
+{id:2,seq:98,ch:4,chName:"정착",cc:"var(--c4)",date:"2016년 01월",year:2016,tag:"고독",title:"잊었던 술잔을 찾아 기울이다...",lines:[["'톡투유' 라는 TV 프로그램에서 김제동이 그런다.", "내가 술을 마시는 이유.."], ["비오는 날에는 세상이 다 젖는데", "나 혼자 안 젖을 수 없어 술잔을 들이키고", "눈오는 날은", "비가 저렇게 얼었는데", "내가 녹여줘야 될 것 같아 취하고,"], ["꽃도 피었는데 내가 안필수 없어 한잔 기울이고..", "바람부는 날엔", "바람이 부는데 내가 좀 흩날려 줘야 해서..", "흔들릴 때 마다 한 잔하는 것이", "다 자연에 대한 도리기에 마신다고.."], ["정말 웃픈말이다!.", "이렇게 술은 자신의 기분에 따라 흐르고", "때론 순리에 따라 흐르기에", "그저 편안하게 느낌에 따라 마시는 것이", "가장 행복한 것이 아닐까??"]],coda:"인간이 자연 앞에서 가장 솔직해지는 방식 — 이유를 만들며 마시는 것이다.",isFriend:false,isOriginal:false},
+{id:1,seq:99,ch:4,chName:"정착",cc:"var(--c4)",date:"2016년 01월",year:2016,tag:"고독",title:"인생의 조력자..",lines:[["살면서..", "정작 내 자신을 좀더 내려 놓자면", "주위에 누군가 도와주는 조력자가 있다.", "그 조력자의 역할이란", "아주 작고 보잘 것 없는 일 일지도 모르지만", "그 단순하고 보잘 것 없는", "조력자의 도움으로 인해", "자신의 인생의 전환점이 될 수 있는", "엄청난 일이 되기도 한다.", "세상은 혼자가 아니다.", "누군가와의 공존과 상생을 통해서", "내가 세상과 소통하는 것이다.", "또 그 누군가를 통해서 나의 가치 또한", "느낄 수 있는 것이다."]],coda:"세상은 혼자가 아니다. 누군가와의 공존 속에서 나의 가치를 느끼는 것이다.",isFriend:false,isOriginal:false},
+{id:0,seq:100,ch:4,chName:"정착",cc:"var(--c4)",date:"2016년 01월",year:2016,tag:"가족",title:"자식에게 세상을 살면서 깨우치는 중요한 역할을 하는 몫은",lines:[["자식에게", "세상을 살면서 깨우치는", "중요한 역할을 하는 몫은", "부모 둘 중 그 누군가의 크나 큰 몫이다.", "과연 우리네 부모들은", "서로들에겐 끌림에 반해 결혼하고", "사랑의 결실로 자식들을 낳고는 정작.", "한 인간의 본질에 대해", "얼마나 충성스레 고민하여", "생각해 본 적이 있던가??", "삶은 그저 내가 선택한 것이 아니라", "누군가에게서 선택 되어 진 삶이라면.."]],coda:"선택받은 삶을 산다는 것 — 그 무게를 아는 부모가 얼마나 될까.",isFriend:false,isOriginal:false},
+{id:101,seq:101,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"성찰",title:"그랬으면 좋겠네",lines:[["만나서 아무 말 없이", "손만 꼭 잡았으면 좋겠네", "네가 누구냐고 내가 누구라고", "애써 답하지 않아도", "느낌으로 알았으면 좋겠네"], ["하얀 이 들어 내어", "배꽃 같은 웃음 한번 웃고", "마주앉아 차 한잔을 기울이면", "이미 살아온 날들은", "대변될 수 있었으면 좋겠네", "조금 어색하면 어떠리", "얼마쯤 퇴색했어도 좋으리", "질그릇 같았던 우리네 삶,", "유년기에 잃어버린 구슬처럼", "잃어버린 것이 많지 않은가", "비어있지 않은가", "긴 터널 속을 빠져 나와", "눈부신 햇살처럼 만나진", "참으로 반가운 그대", "어디 있었나", "이제, 송엽주를 부어가며", "그리움을 키워 갔으면 좋겠네", "백도의 열량으로 부둥켜 안아도", "서러웁기만 했던 세상."]],coda:null,isFriend:true,isOriginal:true},
+{id:102,seq:102,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"도시",title:"벗이여..",lines:[["때때로 긴 한숨을 몰아쉬지 않고는", "견뎌내기 힘든", "순간들이 우리에게도 있었지."], ["삶은 두려운 실상으로 여린", "너와 나의 목을 짓누르며 다가서고", "세상은 어둠으로 단장된 긴 터널되어", "늘 우리 앞을 가로 막았었다."], ["거대한 도시 이 끝에서 저 끝까지", "터덜거리며 찾아 헤메이던 것이", "대체 무엇이었더냐.."], ["이제 희망이라 하는 그 깊은 의미를", "너에게 주려 하였건만", "갑작스러운 너의 부제는", "나로 하여금 격렬한 상실감에", "몸부림치게 한다."], ["조금만 방황하여라 벗이여!", "결코 잡아낼 수 없는 혼란 속에", "휴식없이 방황하는 너는", "또 하나의 아픔의 별이 되려 하는구나"], ["느낌만으로도 충분했던 너를", "이대로 다시 볼 수 없음이", "더욱 나의 영혼을 목마르게만 하고.."]],coda:null,isFriend:true,isOriginal:true},
+{id:103,seq:103,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"성찰",title:"한 사람만을 알고 싶습니다",lines:[["한 사람만을 알고 싶습니다", "내 작은 가슴속에 나 아닌 그 누구도 모르게", "고이 간직할 사람은 오직 그대 한 사람이길 바랍니다.", "아니, 바라지 않아도 이미 들어선", "그대가 있기에 다른 누구도", "들어올 틈이 없어 졌음을 나는 압니다."], ["먼 미래를 약속할 수는 없겠지만", "마음속으로 다져지며 박혀지는건", "약속없던 미래가 오늘 현실 속에", "우리를 있게 해 줌을 나는 믿고 있습니다"], ["그대가 바람이어도 좋겠습니다.", "잠시 내게로 왔다가 흔적없이 사라져가는", "얄미운 바람이어도 좋겠습니다.", "그런 바람은 잡을 수도 만질 수도 없는 것,", "그대가 좋아해 달라해서 좋아한 것도 아니며", "그대가 믿어 달라해서 믿는 것도 아닙니다", "오직,내 마음이 그러한 것입니다"], ["물이 되겠습니다", "늘 소리없이 침묵으로 흐르는 강물.", "흐르다 걸림돌이 있으면", "자연스럽게 비켜갈 줄 알고", "거만히 거꾸로 올라가지 않으며", "높은 곳에서 낮은 곳으로 흐르는", "자연의 섭리처럼", "그렇게 그대에게로 흘러 흘러 가겠습니다.."]],coda:null,isFriend:true,isOriginal:true},
+{id:104,seq:104,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"시간",title:"기다림",lines:[["밤은 예감에 넘친", "신성한 두려움으로", "작인들의 가슴가슴에 보다 나은", "영혼을 일깨우며 다가선다.", "운명을 바꿔놓을 연모를 꾸미는", "처연한 꽃 한 송이", "기다림에 지쳐있는 긴 겨울", "어두운 터널 밑으로", "다 버릴 수 있어야만 만나지는", "봄을 기다린다.", "성긴 가시 사이사이", "매서운 바람 물리치고", "언 땅 위로 튀어올라", "그 푸릇한 설레임으로", "옳고 그름을 구별하여", "인간사 괴로움을 한 순간 잊게 해줄", "봄은 오고 있는 거겠지..", "멈춰 서 있는 삶 뒤로", "아로새겨질 부푼 꿈을 안고", "살아서 파닥일 수 있는", "영혼과 만나지고 싶은 간절함 있어", "육중한 얼음장 덮어 쓴 세월", "쉼없이 흘러오듯", "어엿한 봄은 오고야 말테지.."]],coda:null,isFriend:true,isOriginal:true},
+{id:105,seq:105,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"시간",title:"에필로그",lines:[["그때도 습관처럼", "가슴이 허기졌던게 분명해..", "거리엔 낙엽이 비되어", "쏟아져 내리고 있었지", "날리던 낙엽의 허무가", "가슴을 휩쓸어 비틀대던 내게로", "그대는 노오란 실선의", "모습으로 다가왔었다.", "나와 닮은꼴의 그대가", "같은 세월을", "같은 감성으로 살고 있다는 것이", "얼마나 신비로웠는지", "얼마나 내 가슴을 뛰게 했었는지", "나는 나의 억메임의 실체인", "현실을 잊고 싶었었어.", "약속도 없었던 어느 날", "그렇게 그대는", "비속의 바람따라 날리는", "낙엽처럼 성큼성큼 내게로 다가와", "주체할 수 없어 타오르던", "내속의 불들을 잠재워 주었던거야"], ["투명한 갈색의 눈망울이", "수 만가지 사연으로 빛나서", "끝없이 목마르던", "나의 메마른 가슴속을 쓰려내려", "나의 의미를 새겨주었고", "꺼내보지 못해 서러웠던", "내 시린 세월의 잔해까지", "말끔히 씻어 주었었지.", "잠시, 아주 잠시였지만", "내 허기진 가슴이", "그대의 어깨에 기대어", "마음껏 통곡할 수 있었다", "그래...그래도 영원한 것은 없어", "되돌려진 가슴이 그 허망함에 비틀거리거든..", "가끔은 그렇게 무감각하게", "현실을 버려버리고 싶었던", "열망이 있었는지도 모르지..", "눈 한번 제대로 맞추지 못한 채", "이별을 했었지만", "이제는 내 사는 하늘아래", "그대 있음을 감사할 수 있을 것 같다.", "오늘은, 내 허망한 사랑을 기억하기 위해", "한잔의 쓴 거피를 마셔야겠어..", "목줄기를 뜨겁게 타고 내리는", "그리움이 되거든", "오랫동안 잊혀지지 않을", "나의 역사의 한 페이지에 꼭꼭 숨겨 놓을께."]],coda:null,isFriend:true,isOriginal:true},
+{id:106,seq:106,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"고독",title:"…",lines:[["어김없이 이어지는", "계절의 변화를", "무딘 감정으로는", "이제는 채 따라잡지 못합니다.", "이유없이 찾아드는", "삶에 대한 회의들을 되돌아보면", "미처 다 성장하지 못한", "정신의 미숙함을 들 수 있을 것 같습니다.", "그 미숙함은", "수시로 우울함을 만들고", "그 우울함은 육신을 고달프게 합니다.", "참으로 한심할 노릇이 아닐련지요."], ["그 마음 내색할 수 없어", "그냥 침묵함으로", "외로움을 잊을 수 있길 바라지만", "그래도 밀고 들어서는 오만가지 상념들과", "운명처럼 받아들여야만 하는", "삶에 대한 숱한 갈증과", "살아있음으로 느낄 수밖에 없는", "실낫 같은 존재의식", "그로 인해 부질없이 생겨나는", "세속의 크고 작은 욕망들까지", "두눈 따악 감고 외면하기엔", "내자신 너무나 작은 그릇임을 느낍니다.", "하지만 또 계절이 바뀌면", "산다는 것이 시들시들 해지고", "왜 사느냐..고 묻는 바보같은 의문들이", "똑같은 두께로 생겨납니다만", "끝내 그 해답을 얻지 못하여", "삶에 대한 회의만을", "가슴에 채곡 채곡 채우고 있습니다.."], ["조금만이라도", "비워둔 마음이 있었다면", "그래서 많은 것을", "가슴으로 느낄 수 있었다면", "세찬 비바람에", "온몸이 흔들리는 아픔을 겪는다 해도", "그것마저 차라리", "행복이라 말할 수 있었을 텐데요..", "많은 날 허기진 가슴을 채우기 위해", "급급하여 황량한 거리를 배회하는", "어리석음을 반복하고 있지만", "산다는 것이", "무엇인가로 가슴 가득 채워가는 것이 아니라", "부질없는 욕심을 하나 두울 버리며", "마음을 비워가는 것 이라는 것을", "그때는 미쳐 알지 못했었던 탓일겝니다.."], ["한번쯤 앞뒤 재지 않고..", "부질없는 것들 다 버리고", "이 깊어진 계절 속으로 깊숙이 들어가", "어느 산자락 이름없는 들꽃이 되어", "아무도 찾아주는 이 없는", "외로운 흔들림만으로도", "세상의 잔잔한 어여쁨을", "일깨우는 향기가 될 수 있다면", "얼마나 행복하겠는지요.", "하지만 끝내 그런 용기는 내지 못할 겝니다.", "지금은 누군가에게", "이렇게 가슴속에 이야기들을", "궁시렁거려 볼 수 있다는 것만으로", "만족할 것도 같습니다.."]],coda:null,isFriend:true,isOriginal:true},
+{id:107,seq:107,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"고독",title:"긴 여행을 끝내고.. ( 왕십리에서 )",lines:[["옛 시절 사람들은 이곳에서 추억한다.", "아흔 아홉칸 정두단을 집 삼아 살던", "백발의 아낙은 아직도 그때를 잊지 못하여", "하릴없는 날은 언제나 이곳을 기웃거리고.."], ["희망이란 놈이 머리 속에서만 아른거리고", "뱃가죽 등짝에 붙어 배고프던 시절", "가진 것 없는 자들이 쓸쓸한 바람맞으며 정 나누던 곳", "가끔 배 두두리며 먹고 살만한 이들은", "지금도 왕십리를 그리워한다."], ["칼바람 부는 골목골목 피 터지는 쉰 목소리들", "지치고 힘든 삶이라도 지나고 추억하면 그리움될까?", "왕십리는 예전의 그 자리에 그대로 있는데", "빛나던 왕십리에 살던 옛 님들은 어디로 갔는가.."], ["옛추억의 유물처럼 떠나간 세월들을 붙잡고", "진한 막걸리 한 사발 묵은 발걸음으로 마시며", "아직 그 시절을 그리워하는 사람들이 많은 것을 보면", "왕십리는 그래도 행복하다."]],coda:null,isFriend:true,isOriginal:true},
+{id:108,seq:108,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"고독",title:"익명의 벗에게..",lines:[["당신과 내가 누구며 어디 사는지", "나보다 나이가 많은지 적은지는 모를수록 좋다.", "지금은 살을 에는 찬바람이 옷깃을 여미게 하고", "첫 추위가 기승을 부리고 있는 11월..", "낯선 도시 허름한 뒷골목에선", "가진 것 없는 어떤 님들의 한숨이 새어 나와", "무심한 벽에 기대오는 소리가 들리는 밤이다."], ["그렇게 외롭고 가난하며", "고단하기까지 한 사람도 사는데", "단지 외롭다고 너무 떠들어댔던 나는", "외로움을 젖은 외투처럼 어깨에 걸치고 다녔다.", "외롭게 바라본 횡단보도", "외로운 버스정류소,", "외로운 약국의 약사,", "외로운 빵들,", "외로운 마네킹들,", "외로운 계단들", "외로운 줄 장미들.", "횟집 수족관의 외로운 물고기들,", "수레 위에 수북한 외로운 사과들..뿐"], ["세상에 내 어깨에 걸린", "젖은 외투를 걸어둘 위안은 어디에도 보이지 않았다.", "그제야 나는 깨 닳았다.", "다들 외로운 채로 사는 거구나.", "내가 너무 수선을 떨었구나.", "모두가 이마에 무소의 뿔들을 달고", "꿋꿋하게 팔리기를 기다리거나", "죽기를 기다리거나", "생으로 이어지는 버스를 기다리고 서있었던 거다.", "진짜 외로운 모습이란", "침묵하고 어디론가 자취를 감춘 것이었지.", "거리를 걷고 때되면 밥 먹고,", "음악 듣고, 차 마시고,", "활자가 눈에 들어오는 외로움은", "외로움 축에 끼지 못하는 거란 것을 나는 알았다."], ["저기 한 외판원 여자가 종일 걸어 부은 다리로", "놀이방에서 나온 아이를 안고 가더라.", "어둠에 묻혀 가는 저녁거리를", "그녀는 맨손의 나보다", "더욱 가볍게 걸어가더라", "외로움은 나태한 감정이 불러내는", "하품 같은 게 아닐까.", "여자들이 보석을 목에 걸 듯이", "허영심 많은 영혼이", "이마에 두르고 싶은 사치품이 아닐까.", "눈물방울로 짠 울적한 보석처럼.", "버리기도 간직하기도 구차해진", "옛사랑의 유물같이 외로움은", "내 영혼의 빈방에 늘 걸려있다.."]],coda:null,isFriend:true,isOriginal:true},
+{id:109,seq:109,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"도시",title:"거리에서",lines:[["해가 기울 무렵", "세상의 모든 주부들이 그들의 집에서", "그날의 마지막 끼니를 준비하기 위해", "부엌에 갖혀 있을 그 시간에 나는", "낯선 도시 낯선 거리에서 서성이고 있었다."], ["화려한 네온불빛 사이로", "물결을 이루며 바쁘게 흘러가는", "풍경 속에서 나는 갈 곳을 잃어버린", "미아처럼 막막해졌다."], ["거리 구석구석에선 누군가", "마대에 담아와서 쏟아놓은 것처럼", "발랄한 차림의 젊음들이", "끊임없이 쏟아져 나왔다."], ["그들의 살아있는 욕망과 활기에서는", "썩어가는 냄새가 풍겨져 왔지만", "그 밤시간을 보내는데 두 가지 방법이", "있다는 걸 나는 깨닫는다."], ["집에서 거리를 내다보며 보내는 일과", "거리에서 집을 향해가며 보내는 방법", "죽어 있는 것의 평화스러움과", "썩어가는 것의 생명력의 묘한 공존.."], ["나는 살아있고 싶었던 것이다."]],coda:null,isFriend:true,isOriginal:true},
+{id:110,seq:110,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"고독",title:"밤의 길목에서",lines:[["도시는 일제히 술렁거리며 눈을 떠서", "저마다 생존의 톱니들을 영악스럽게 갈아대며", "외치고, 헐떡거리고, 쫓고, 쫓기고", "속고. 속이며 발버둥 치다가", "어느새 시린 어깨위로 내려앉은", "어둠에게 자리를 내어주고 만다."], ["그렇게 어둠이 낙진처럼 내려 덮이고", "밤의 덧문이 소리없이 빗장을 풀면", "하나 두울 창문마다 젖어드는 쓸쓸한 불빛들", "집으로 돌아가는 무거운 발걸음에", "드문드문 채이는 아물지 않은 상처가", "스몰스몰 통증을 일으킨다."], ["눈꺼풀이 내려앉는 고통쯤이야", "잊은지 얼마던가.", "수없이 많은 날 거머리처럼 파고들던", "정체를 알 수 없었던 두려운 예감들은", "시리고 궁핍한 삶위로", "새벽이면 찾아오는 어깨 통증처럼", "익숙한 곳에서 지난 추억처럼 걸어나와", "내 진부한 삶을 비웃는다."], ["하지만 난 이제 이도시의 시궁창에다", "내 사랑의 잔해와 증오를 내다 버렸다.", "밤이면 노곤한 몸을 이리저리 굴리며", "한 권의 책보다는 한편의 드라마를.", "한 악장의 모짤트보다 한 소절의 유행가 가사를", "흥얼거리며 살아가면서도 행복을 느낄 수 있기를 바란다."]],coda:null,isFriend:true,isOriginal:true},
+{id:111,seq:111,ch:1,chName:"방황",cc:"var(--c1)",date:"2000년 03월",year:2000,tag:"고독",title:"도시의 이방인",lines:[["창밖 거대한 도시위로 스로모션을 취한", "어둠이 소리없이 내리고", "거짓말처럼 껌벅이는 가로등 넘어론", "평화로운 세계가 펼쳐졌다.", "무료하고 답답한 궤도위를 습관처럼 맴돌다", "거대한 강물을 이룬 하얀 침묵으로 덮힌", "도시의 끝에서 나는 한참을 갈 곳 몰라 서성였다.", "숨가뿌게 움직이던 시지푸스를 닮은 사람들", "매일매일 반복되는 도시의 일상 속에서", "얼마나 많은 기쁨을 얻었던 것일까.", "한때는 나도 부푼 꿈을 안고 이 거대한 도시를", "가슴가득 안은적도 있었지..", "덕지덕지 묻어있는", "삶의 찌거기들을 뱉아내며", "기쁘거나 즐겁거나 슬프거나 괴롭거나", "거짓 웃음이라도 흘릴 수 있을 때는 행복 했었다.", "그 순수한 영원과 단순한 욕망은", "어디로 가버린 것일까", "취해도 취해도 해소할 수 없는", "지독한 갈증의 실체는 무엇인가.", "이제는 익숙해질 만도 하련만", "어설픈 이방인처럼", "잠들어가는 어두운 거리 귀퉁이에 서서", "나는 또 권태로운 현실과의 타협을", "거부하고 있었다."]],coda:null,isFriend:true,isOriginal:true},
+{id:200,seq:112,ch:5,chName:"회복",cc:"var(--c5)",date:"2018년 01월",year:2018,tag:"성찰",title:"배가 고픈 돼지",lines:[["아내에겐", "나는 배부른 돼지다.", "별 어려움 없이 호사를 누리며", "현실감 없이 방랑만을 일삼는."], ["또 동시에 아내에게", "나는 배고픈 소크라테스다.", "현실에 무너지는 허무와 씨름하며", "잘못 살아온 지난 날에 연연하며", "신세 한탄에 사로잡힌."], ["그러나 현실의 나는", "배부른 돼지도", "배고픈 소크라테스도 아니다.", "그저 — 배가 고픈 돼지일 뿐이다."], ["존재의 가장 솔직한 고백은", "어쩌면 이렇게 단순하다.", "먹어야 할 것을 먹지 못한 채", "먹은 척 사는 삶."]],coda:"자신이 무엇에 굶주려 있는지 아는 것 — 그것이 철학의 시작이다.",isFriend:false,isOriginal:false},
+{id:201,seq:113,ch:5,chName:"회복",cc:"var(--c5)",date:"2018년 01월",year:2018,tag:"시간",title:"열심히 살면",lines:[["열심히 살면 행복할 거라는 명제는", "더 이상 유효하지 않다."], ["그 명제가 처음 틀리기 시작한 날이", "언제였는지 기억나지 않는다.", "어느 아침, 무거운 어깨에", "삶의 무게가 내려앉았을 때", "그저 그 무게에 익숙해지고 있었을 뿐이었다."], ["방향이 아니라 속도를 숭배했던 시절.", "누군가 이런 말도 있다 —", "속도보다 중요한 것은 방향이라고.", "열심히 달렸는데 목적지가 없었다면", "그 열심은 무엇의 증거인가."], ["지친 일상은", "오늘도 조금씩 지쳐가는 시간들 속에서", "그래도 걷고 있다.", "그것만으로 충분한지", "아직 모르겠다."]],coda:"열심히 사는 것과 올바르게 사는 것은 분명한 차이가 있다. 그 차이를 아는 날이 진짜 시작이다.",isFriend:false,isOriginal:false},
+{id:202,seq:114,ch:5,chName:"회복",cc:"var(--c5)",date:"2018년 01월",year:2018,tag:"고독",title:"거실의 시계초침 소리",lines:[["거실의 시계 초침 소리가", "이리도 컸던가."], ["아니면", "알코올이 감각 세포를 예민하게 만든 탓일까.", "정리되지 않은 머릿속과는 달리", "어김없는 시간만이 공간을 지배하고 있다."], ["취한 밤에는", "모든 소리가 날카로워진다.", "시계 소리도, 냉장고 소리도, 침묵 소리도."], ["특히 침묵이 가장 크게 울린다.", "그것은 혼자라는 신호다."]],coda:"술이 만드는 예민함은 — 낮에 외면했던 감각들이 한꺼번에 깨어나는 것이다.",isFriend:false,isOriginal:false},
+{id:203,seq:115,ch:5,chName:"회복",cc:"var(--c5)",date:"2018년 01월",year:2018,tag:"가족",title:"소확행의 거짓말",lines:[["작지만 확실한 행복 — 소확행(小確幸)."], ["그 말의 참뜻을 알면서도", "나는 그 소소한 행복들을 거역하는 일상 속에", "스스로를 가두고 있다.", "마치 행복해질 자격이 없는 것처럼."], ["화난 감정에 나 몰라라 외면하는 아내와", "그런 아내가 싫어 침묵으로 외면하는 나", "그 곁에서 불편함을 참아가는 아들 —", "한 지붕 아래서 세 사람이 불편한 동거를 한다."], ["가족의 연이란 게 이다지도 구차스럽던가.", "행복은 깊이가 아니라 넓이라 했지만", "지금 이 집 안에서", "행복이 숨 쉴 넓이가 얼마나 되는가."]],coda:"가장 가까운 곳에서 행복을 놓치는 것 — 그것이 인간의 가장 오래된 비극이다.",isFriend:false,isOriginal:false},
+{id:204,seq:116,ch:5,chName:"회복",cc:"var(--c5)",date:"2018년 02월",year:2018,tag:"고독",title:"시간은 더디고 세월은 빠르다",lines:[["어떻게 하면 시간을 잘 보낼 수 있을까 —", "그 생각 하나에 골똘하며 살았다."], ["시간을 죽이는 일에 날을 세우며", "의미 없는 반복에 지칠 때면", "한 주가 다하고 한 달이 간다.", "그렇게 한 해가 지나고", "오십 중반에 한 살을 더 얹는다."], ["병 속에 갇힌 굴레처럼", "어떻게 벗어날 수 있을까."], ["아 — 정말", "시간은 지겹도록 더디고", "세월은 덧없이 빠르다.", "그 역설이 우리가 살아가는 방식이다."]],coda:"시간이 아까운 것은 — 그것이 돌아오지 않기 때문이 아니라, 제대로 살지 못했다는 자각 때문이다.",isFriend:false,isOriginal:false},
+{id:205,seq:117,ch:5,chName:"회복",cc:"var(--c5)",date:"2019년 05월",year:2019,tag:"가족",title:"말없는 중늙은이의 삶",lines:[["내 부모가 싫었다.", "그러나 거꾸로 생각해보면 —", "그것이 최선이었다.", "무지한 부모의 최선이", "자식에게 상처가 된다는 것을", "그들은 알지 못했을 것이다."], ["자식이기 이전에", "한 인간으로서 미안해서라도", "웃을 수도, 즐거워할 수도 없는 날이 있다.", "그 무게가 아내와 아들에게도", "말없는 중늙은이로 전해진다."], ["세대는 이렇게 흐른다.", "받은 상처를 품은 채 어른이 되고", "그 어른이 또 다른 상처를 남긴다.", "끊어내야 할 사슬이 있다면", "그것을 아는 것이 첫 번째다."]],coda:"부모를 이해한다는 것은 — 그들을 용서하는 것이 아니라, 그 서투름의 무게를 함께 지는 것이다.",isFriend:false,isOriginal:false},
+{id:206,seq:118,ch:5,chName:"회복",cc:"var(--c5)",date:"2019년 03월",year:2019,tag:"가족",title:"아내의 생일에",lines:[["생일인데."], ["즐겁지 못한 생일이라 미안하다.", "그래도 — 생일 축하해."], ["집에 들어서는 순간", "선의가 힘없이 허물어지고", "혼자라는 외로움의 동굴 속으로", "다시 빠지고 만다."], ["서로 나름의 이유가 있음에도", "그 이유마저도 공유하길 거부하고", "자신만의 일상에 우선하며", "서로 기대란 걸 포기하며 살아간다."], ["쌓아온 외면의 두께를", "한순간 허물기엔 버겁다는 걸", "우리 둘 다 잘 알기 때문이다.", "그럼에도 — 오늘은 생일이다."]],coda:"사랑이 식은 것이 아니라, 말하는 법을 잃어버린 것이다. 그리고 그 말을 다시 찾는 것이 두 번째 사랑이다.",isFriend:false,isOriginal:false},
+{id:207,seq:119,ch:5,chName:"회복",cc:"var(--c5)",date:"2020년 05월",year:2020,tag:"가족",title:"119",lines:[["119에 와이프가 실려갔다.", "난 그때까지 아들과 문자를 주고 받았다."], ["귀엔 이어폰을 끼고", "술한잔에 시름을 달래며 내 서글픈영혼과", "짠한 마음의 동요를 이해라도 해 달래듯", "알딸한 술기운에 뭔가 가슴속에", "울분을 토하며 음악을 듣고 있었다."], ["아니 와이프의 울부짖음을 외면하고", "있었는지도 모른다."], ["나도 힘들고 와이프의 답답함에", "진저리치고 있었는데..", "느닷없는 와이프의 돌발적 고통에", "체 놀랄 겨를없이 정말 얼떨결에 구급차에", "동승해 멀거니 침대 머리맡에 앉아", "링거를 바라보고 앉아았다."], ["1시간반이 언제 지나갈까?", "밀려오는 술기운은 응급실의 위급함은", "저 멀리한체 그저 밀려오는 잠기운이 날 또 그리", "무기력한 사람으로 내닺는다."], ["생전 듣도보도 못한 전해질 문제인가 싶다한다.", "난 아무것도 할 수가 할 수도 없다.", "그저 바라볼 뿐,,"], ["아픈것도 아니고 슬픈것도 아니다.", "다만 이 순간 어쩔수 없는 나약하고 힘없는", "자신이 왜그리 서글픈겐지..."], ["미안하다..", "사랑한다...", "네가 처한 형편 내 대신해줄 수 있는게라면", "나..그리 하리라..", "시간은 왜 그리도 더디게만 가는지..."]],coda:"미안하다.. 사랑한다... — 응급실 링거 옆에서.",isFriend:false,isOriginal:true},
+{id:208,seq:120,ch:5,chName:"회복",cc:"var(--c5)",date:"2020년 07월",year:2020,tag:"성찰",title:"정작 소외된 자들",lines:[["가족 중에 아픔과 상처를 가진 사람이 있으면", "그 사람에게 관심이 집중된다.", "당연한 일이다."], ["그러나 그 집중의 그늘 속에서", "또 다른 소외된 아픔이 조용히 자란다.", "표출할 수 없기에 더 외롭고", "보이지 않기에 더 무겁다."], ["눈에 보이는 상처에는 관대하고", "보이지 않는 상처에는 냉소적인 우리.", "그 냉소가 또 다른 상처의 씨앗이 된다."], ["어떤 영화가 말했다 —", "'힘겨운 싸움을 하고 있는 모두에게 친절하라.'", "옳음보다 친절함을 선택하는 것 —", "그것이 가장 어려운 덕이다."]],coda:"모든 사람은 각자의 전쟁을 치르고 있다. 보이지 않는 전장이 때로 더 깊다.",isFriend:false,isOriginal:false},
+{id:209,seq:121,ch:5,chName:"회복",cc:"var(--c5)",date:"2020년 07월",year:2020,tag:"성찰",title:"기다림은 만남을 목적으로 해야 한다",lines:[["젊은 날", "서정윤 시인의 '홀로서기'를 처음 읽고 전율했다.", "'기다림은 만남을 목적으로 하지 않아도 좋다'고 했지만 —"], ["기다림의 시간이 만남의 시간을 넘어 지나고 나면", "자기 성찰의 시간으로 변하고", "이내 기다림에 대한 기대와 설렘을 넘어", "미련과 후회로 남겨진 과거의 불안이 된다."], ["어떤 행위는 그 목적을 다하는 순간에 완전해진다.", "파생된 부차적 목적이 되어서는 안 된다.", "고로 기다림은", "기다리는 주체와의 만남을 반드시 목적으로 해야 한다."], ["기다림 끝에 얻어지는 것들은", "짙은 향기가 베어있다.", "그 향기는 목적 없는 기다림에선 오지 않는다."]],coda:"기다림이 아름다운 것은 그것이 끝나기 때문이다. 끝나지 않는 기다림은 — 집착이다.",isFriend:false,isOriginal:false},
+{id:210,seq:122,ch:5,chName:"회복",cc:"var(--c5)",date:"2022년 05월",year:2022,tag:"가족",title:"결혼기념일에",lines:[["몇 해인지 셈해보아야 인지할 정도로", "오래 살긴 했네."], ["소설로도 회자될 파란만장한 시간들이", "서로의 가슴 저편에", "많은 멍에들을 남겼지만 —"], ["이제 또 다른 소설의 시작이 되었으면 하네.", "물론 해피한 쪽으로."], ["부부의 연을 포기하지 않고", "지내온 시간들에 감사하며", "새마을운동의 캐치플레이처럼 —", "잘 살아보세, 우리."]],coda:"사랑이 끝난 뒤에도 함께 있다는 것은 — 그것이 진짜 사랑의 모습일 수도 있다.",isFriend:false,isOriginal:false},
+{id:211,seq:123,ch:5,chName:"회복",cc:"var(--c5)",date:"2023년 01월",year:2023,tag:"성찰",title:"두 번째다",lines:[["두 번째다.", "모임을 다녀온 후 며칠 동안", "심한 자괴감에 빠져", "좀처럼 마음이 안정되지 않았다."], ["평소 내 의지와는 상관없이 왜 그랬을까.", "많은 생각 끝에 깨달았다 —", "현실에 온전치 못한 자신을 뒤로하고", "자신감에 충만했던 예전 시간들에 집착하다 보니", "착각에서 혼돈으로", "타인의 선의를 망가뜨리고 있었음을."], ["솔직하자면 지금은", "자존감이 많이 상실된 시기다.", "의지력 또한 비례해서", "실수를 반복하게 되는 듯하다."], ["좀 더 내 자신에 대해", "다시 한번 되돌아봐야 할 자중의 시기라 생각한다.", "다음에 다시 보게 된다면", "좀 더 나아진 내 모습이길 바라며."]],coda:"자괴감은 나쁜 것이 아니다. 그것은 아직 자신에게 기대를 포기하지 않았다는 신호다.",isFriend:false,isOriginal:false},
+{id:212,seq:124,ch:5,chName:"회복",cc:"var(--c5)",date:"2025년 04월",year:2025,tag:"성찰",title:"Second Chance",lines:[["난 내 인생을 잘못 살았다.", "이미 되돌리기엔 너무 많은 시간을 허비했다."], ["그러나 — 세상에 늦은 것은 없다 했다.", "이제부터라도 나만의 시간을 갖고 싶다."], ["내 인생을 새로 찾고자 하면서", "누군가의 인생을 망가뜨리며 내 것을 찾는다.", "미안하게도", "내 것이 우선이다.", "그렇게 내가 먼저여야 한다.", "난 살아야만 한다."], ["누군가에게 기억되기 위해서가 아니라", "내가 기억해야 할 것들이 너무 많아", "내가 먼저 살아야 한다."]],coda:"자신을 먼저 살리는 것 — 그것이 이기심이 아니라 책임의 시작일 때가 있다.",isFriend:false,isOriginal:false},
+{id:213,seq:125,ch:5,chName:"회복",cc:"var(--c5)",date:"2025년 04월",year:2025,tag:"성찰",title:"비틀린 앵글",lines:[["일상을 틀어 보면", "낯선 아름다움이 흐르기 시작한다."], ["눈높이가 아닌 곳에서 세계를 담아내는 순간", "보통의 시선이 놓친 자리에 카메라를 들이대면", "익숙함은 갑자기 낯설어지고", "평범함은 특별해진다."], ["생각도 그렇지 않을까.", "고정된 틀에서 벗어나", "살짝 비틀어진 각도로 세상을 바라보는 용기.", "익숙한 사고의 경로를 벗어나", "색다른 사유의 풍경으로."], ["비틀린 앵글에서 비로소 보이는", "새로운 진실의 조각들.", "그 신선한 발견 속에서", "삶은 다시 한 번 빛난다."]],coda:"관점을 바꾸는 것은 세상을 바꾸는 것이다. 같은 사물이 다른 각도에서 전혀 다른 진실을 말한다.",isFriend:false,isOriginal:false},
+{id:214,seq:126,ch:5,chName:"회복",cc:"var(--c5)",date:"2025년 08월",year:2025,tag:"성찰",title:"선택이 만든 나, 내가 만든 선택",lines:[["선택은 언제나", "무엇을 고를 것인가의 문제가 아니다.", "동시에 — 무엇을 포기할 것인가의 문제이기도 하다."], ["선택은 가능성의 문을 열지만", "동시에 다른 문들을 닫는다.", "그래서 선택은 설레면서도 두렵고", "가볍게 보이지만 결코 가볍지 않다."], ["그러니 기억하자 —", "선택이 우리를 만든다.", "그러나 동시에", "우리는 스스로의 선택을 만들 수 있다."], ["그 자각이 바로", "더 나은 내일을 여는 첫 걸음이다."]],coda:"어떤 길을 선택했느냐보다 — 그 길을 어떻게 걸어가느냐가 인생의 진짜 내용이다.",isFriend:false,isOriginal:false},
+{id:215,seq:127,ch:5,chName:"회복",cc:"var(--c5)",date:"2026년 04월",year:2026,tag:"시간",title:"남자와 여자의 갱년기",lines:[["여자의 갱년기는 몸으로 표출되고", "남자의 갱년기는 머리로 표출된다."], ["여자는 그동안 참아왔던 울분이 터지는 것이고", "남자의 것은 그동안 느끼지 못했던 사실에 대한", "후회와 한탄으로 터져 나온다.", "그렇게 세 번째의 성징(性徵)을 보인다."], ["여자는 체념하지 못해 분출하고", "남자는 이제서야 체념할 때임을 인지하게 됨에", "한탄을 한다."], ["과연 남자와 여자는", "사랑의 감정 없이는 공존할 수 없는 것인가.", "아니 — 사랑의 감정이 무기력해질 수밖에 없어지는 것인가."], ["그 역시 타이밍이다.", "서로의 고통이 엇박자로 터지는 시간 —", "거기서 살아남는 것이 오래된 사랑이다."]],coda:"함께 늙는다는 것은 — 서로의 갱년기를 견디는 것이다. 그것이 동행의 실제 모습이다.",isFriend:false,isOriginal:false}
+];
+
+const MEMOS=[
+{num:1,content:"말은 믿을 수 없지만\n몸이 느낀 건 믿을 수 있다.",src:null,tag:"성찰"},
+{num:2,content:"견디는 게 산 사람의 몫이야.",src:null,tag:"고독"},
+{num:3,content:"여행은\n일상 속에서 여백을 찾는 일이다.",src:null,tag:"성찰"},
+{num:4,content:"사람의 눈은\n그저 열어놓은 창문과도 같다.\n마음으로 바라볼 수 있을 때\n아름다움을 느낄 수 있다.",src:null,tag:"성찰"},
+{num:5,content:"진실은 밝혀지는 게 아니라\n밝혀진 게 진실이다.",src:null,tag:"성찰"},
+{num:6,content:"의심은 해소시키면 확신이 된다.",src:null,tag:"성찰"},
+{num:7,content:"영혼에 상처를 입으면 관상이 바뀐다.",src:null,tag:"성찰"},
+{num:8,content:"부부가 싸움만 하면 되지\n심판까지 하려다 보니 끝이 없다.",src:null,tag:"가족"},
+{num:9,content:"말 한 마리는 2톤의 무게를 끌 수 있지만\n말 두 마리는 10톤 이상을 끈다.",src:null,tag:"성찰"},
+{num:10,content:"신은 모든 곳에 있을 수 없었기에\n어머니를 만들었다.",src:null,tag:"가족"},
+{num:11,content:"돈은 불행을 줄일 수 있지만\n행복을 늘릴 수는 없다.",src:null,tag:"성찰"},
+{num:12,content:"집이란\n어릴 때는 떠나고 싶고\n나이 먹으면 돌아가고 싶은 곳이다.",src:null,tag:"가족"},
+{num:13,content:"가난이 무서운 건\n마음까지 가난해지기 때문이다.",src:null,tag:"성찰"},
+{num:14,content:"중년은 갑자기 어두운 극장에 들어선 느낌.\n잠깐 멈춰서 눈을 감고 몇 초를 참고\n눈을 뜨면\n내가 갈 앞길만큼은 보이게 된다.",src:null,tag:"시간"},
+{num:15,content:"시간을 견디니\n세월은 길을 내어 줍니다.",src:null,tag:"시간"},
+{num:16,content:"생각이란 때론 늪과 같아\n생각할수록 허우적댄다.",src:null,tag:"고독"},
+{num:17,content:"어쩌면 새로운 시작일 수도 있는 끝.\n알 수도 없는 끝을 달려가고 있는 시간들...",src:null,tag:"시간"},
+{num:18,content:"기다림 끝에 얻어지는 것들은\n짙은 향기가 베어있다.",src:null,tag:"시간"},
+{num:19,content:"And or End\nEnd가 아닌 And가 되길 꿈꾸며...",src:null,tag:"성찰"},
+{num:20,content:"신뢰는 사기그릇 같아서\n한번 깨지면\n이어 붙여도 제 구실을 못한다.",src:null,tag:"성찰"},
+{num:21,content:"사람은 변하지 않는다고들 한다.\n그러나 상처는 사람을 바꾼다.\n다만 좋은 쪽으로 바꾸는 상처는\n시간이 훨씬 오래 걸릴 뿐이다.",src:null,tag:"성찰"},
+{num:22,content:"말하지 않아도 알기를 바라는 마음이\n가장 많은 오해를 만든다.",src:null,tag:"성찰"},
+{num:23,content:"홀로 있는 시간은 낭비가 아니다.\n그것은 자신과 마주하는\n가장 정직한 대화다.",src:null,tag:"고독"},
+{num:24,content:"후회는 과거를 향해 있고\n불안은 미래를 향해 있다.\n지금 이 순간,\n우리는 왜 이렇게도 현재를 살기 힘든가.",src:null,tag:"시간"},
+{num:25,content:"나이가 든다는 것은\n더 많이 알게 되는 것이 아니라\n모른다는 것을 더 많이 알게 되는 것이다.",src:null,tag:"시간"},
+{num:26,content:"가장 오래 기억되는 사람은\n가장 화려했던 사람이 아니라\n가장 따뜻했던 사람이다.",src:null,tag:"성찰"},
+{num:27,content:"외로움은 혼자이기 때문에 오는 것이 아니다.\n이해받지 못한다고 느낄 때 온다.",src:null,tag:"고독"},
+{num:28,content:"사랑이 식는 것보다 무서운 것은\n말하는 법을 잊어버리는 것이다.",src:null,tag:"가족"},
+{num:29,content:"과거를 바꿀 수 없다면\n그것을 해석하는 방식이라도 바꾸어야 한다.\n같은 기억이 다른 이야기가 될 수 있다.",src:null,tag:"성찰"},
+{num:30,content:"어떤 날은 아무 이유 없이 무너진다.\n그것도 살아있기에 가능한 감각이다.\n무너지지 않는 사람은\n이미 돌처럼 굳어버린 것일 테니.",src:null,tag:"고독"},
+{num:31,content:"가족이란\n선택하지 않고 시작하지만\n선택함으로써 지속되는 관계다.",src:null,tag:"가족"},
+{num:32,content:"한 해를 보내며 하는 후회는\n다음 해를 살게 하는 힘이다.\n후회가 없다면\n아무것도 느끼지 못한 해였을 것이다.",src:null,tag:"시간"}
+];
+
+
+/* ══ STATE ══ */
+let curView='landing', curSeq=0, mpOpen=false, mpLoaded=false, savedScrollY=0;
+const PLAYLIST_EMBED='https://www.producer.ai/embed/playlist/3d879bdf-04c7-4b6b-b529-b60d5ba4ed6f';
+let archBuilt=false;
+
+/* ══ SCROLL ══ */
+function scrollTop(){
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+window.addEventListener('scroll',()=>{
+  const scrolled = window.scrollY>400;
+  document.getElementById('btt').classList.toggle('vis', scrolled && curView==='entry');
+  if(curView==='entry'){
+    const tot=document.body.scrollHeight-window.innerHeight;
+    const pct=tot>0?window.scrollY/tot*100:0;
+    document.getElementById('eprog').style.width=pct+'%';
+  }
+},{passive:true});
+
+/* ══ VIEWS ══ */
+let prevView='landing';
+function showView(name,restoreScroll){
+  prevView = curView;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  const gnav=document.getElementById('gnav');
+  gnav.classList.toggle('show', name!=='landing');
+  curView=name;
+  const backBtn=document.getElementById('back-btn');
+  backBtn.classList.toggle('vis', name==='entry');
+  if(name!=='entry') document.getElementById('btt').classList.remove('vis');
+  // mob-botnav: archive/entry에서 표시, landing에서 숨김
+  const mbn=document.getElementById('mob-botnav');
+  if(mbn) mbn.style.display=(name==='landing')?'none':'';
+  // 스크롤
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(restoreScroll!=null) window.scrollTo(0, restoreScroll);
+    else window.scrollTo(0,0);
+  }));
+}
+
+function goLanding(){showView('landing');}
+
+function goBack(){
+  if(curView==='entry'){
+    if(!archBuilt){buildArchive();archBuilt=true;}
+    // 이전 스크롤 위치로 복원
+    showView('archive', savedScrollY);
+    // 마지막 읽은 카드 활성 표시
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      document.querySelectorAll('.ecard.ecard-active,.fcard.ecard-active')
+        .forEach(el=>el.classList.remove('ecard-active'));
+      const activeCard=document.querySelector(`.ecard[data-seq="${curSeq}"],.fcard[data-seq="${curSeq}"]`);
+      if(activeCard){
+        activeCard.classList.add('ecard-active');
+        // 카드가 뷰포트 안에 없으면 스크롤
+        const rect=activeCard.getBoundingClientRect();
+        const inView=rect.top>=60&&rect.bottom<=(window.innerHeight-60);
+        if(!inView) activeCard.scrollIntoView({behavior:'smooth',block:'center'});
+      }
+    }));
+  } else {
+    goLanding();
+  }
+}
+
+function goChapter(ch){
+  if(!archBuilt){buildArchive();archBuilt=true;}
+  showView('archive');
+  // activate filter chip
+  document.querySelectorAll('.gchip').forEach(c=>c.classList.remove('on'));
+  const chip=document.querySelector(`.gchip[data-f="${ch}"]`);
+  if(chip) chip.classList.add('on');
+  curFilter=ch;
+  // show only the selected chapter section
+  document.querySelectorAll('[data-chsec]').forEach(s=>{
+    s.style.display=s.dataset.chsec===ch?'':'none';
+  });
+  document.querySelectorAll('.ecard').forEach(c=>{
+    c.classList.toggle('hidden',c.dataset.ch!==ch);
+  });
+  const fs=document.getElementById('friend-section');if(fs)fs.style.display='none';
+  const ms=document.getElementById('memo-section');if(ms)ms.style.display='none';
+  // scroll to chapter section after paint
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const sec=document.querySelector(`[data-chsec="${ch}"]`);
+    if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'});
+  }));
+}
+
+/* ══ ARCHIVE ══ */
+const CH_META={
+  1:{ro:'Ⅰ',label:'방황 — 도시를 걷던 시절',period:'2000 · 2001 · 2002 · 2003 · 2004 · 2005 · 2006 · 2013',color:'var(--c1)'},
+  2:{ro:'Ⅱ',label:'갈증 — 무언가를 찾던 시절',period:'2010 · 2011 · 2012 · 2013 · 2014',color:'var(--c2)'},
+  3:{ro:'Ⅲ',label:'성찰 — 내려놓기 시작한 시절',period:'2013 · 2014',color:'var(--c3)'},
+  4:{ro:'Ⅳ',label:'정착 — 있는 그대로 보이는 시절',period:'2012 · 2013 · 2014 · 2015 · 2016',color:'var(--c4)'},
+  5:{ro:'Ⅴ',label:'회복 — 다시 서는 시절',period:'2014 · 2015 · 2016 · 2017 · 2018 · 2019 · 2020 · 2022 · 2023 · 2025 · 2026',color:'var(--c5)'},
+};
+
+function showArchive(){
+  if(!archBuilt){buildArchive();archBuilt=true;}
+  showView('archive');
+  resetFilter();
+}
+
+function buildArchive(){
+  const el=document.getElementById('archive');
+  const main=DATA.filter(d=>!d.isFriend);
+  const friends=DATA.filter(d=>d.isFriend);
+  const total=DATA.length;
+  
+  let html=`
+  <div class="arch-hero">
+    <div class="arch-hero-title">스물여섯 해의 감정 기록</div>
+    <div class="arch-hero-sub">2000 — 2026 · 지혜의 쉼터</div>
+    <div class="arch-stats">
+      <div class="stat"><span>${main.length}</span>본문 수록</div>
+      <div class="stat"><span>${friends.length}</span>서가 수록</div>
+      <div class="stat"><span>5</span>개 챕터</div>
+      <div class="stat"><span>26</span>년 기록</div>
+    </div>
+  </div>`;
+
+  // Chapters I→II→III→IV→V
+  const CH_PREFACE={
+    1:`도시는 언제나 처음 보는 사람처럼 낯설었다. 스무 살의 발걸음은 방향을 알지 못했고, 그 모름이 오히려 발을 가볍게 했다. 이 시절의 기록들은 길을 잃는 것이 어떤 것인지, 그리고 그 길 잃음이 얼마나 필요한 것이었는지를 담고 있다. 방황은 목적 없음이 아니었다 — 다만 아직 목적을 찾는 중이었을 뿐이다.`,
+    2:`무언가를 원하는데 그것이 무엇인지 알 수 없는 시간들이 있다. 갈증은 물이 없어서가 아니라, 무엇을 마셔야 할지 몰라서 온다. 이 시절의 글들은 그 알 수 없는 결핍감과의 씨름이다. 사람도, 일도, 관계도 — 모두 그 갈증을 채우려는 시도였고, 채워지지 않는다는 사실을 받아들이는 것이 이 시간의 끝이었다.`,
+    3:`내려놓는다는 것이 포기가 아님을 알게 된 시절. 옳고 그름을 따지는 것보다 이해하는 것이 더 어렵다는 사실을 몸으로 배웠다. 성찰은 책상 위에서 오지 않는다 — 부딪히고 무너지고 다시 일어서는 반복 속에서, 어느 새벽 문득 찾아온다. 이 기록들은 그 새벽의 목소리들이다.`,
+    4:`어느 순간 더 이상 도망치지 않게 되었다. 정착이란 좋은 곳에 자리 잡는 것이 아니라, 지금 있는 자리를 받아들이는 것임을 알게 되었다. 현실은 여전히 팍팍했고, 가족과의 거리는 여전히 좁혀지지 않았지만 — 있는 그대로를 바라보는 눈이 생겼다. 그것이 이 시절이 남긴 가장 조용한 변화였다.`,
+    5:`다시 선다는 것은 넘어지지 않겠다는 다짐이 아니다. 넘어지더라도 다시 일어나겠다는 방향 감각이다. 회복은 완치가 아니라 — 아픔과 함께 살아가는 법을 배우는 과정이다. 이 시절의 글들은 그 과정에서 쓰인 것들이다. 덜 완벽하지만 더 솔직하고, 덜 격렬하지만 더 단단해진 언어들로.`,
+  };
+  [1,2,3,4,5].forEach(chNum=>{
+    const m=CH_META[chNum];
+    const entries=main.filter(d=>d.ch===chNum);
+    if(!entries.length)return;
+    html+=`<div class="ch-section" data-chsec="${chNum}" style="display:none">
+      <div class="ch-banner">
+        <div class="ch-numeral" style="color:${m.color}">${m.ro}</div>
+        <div class="ch-info">
+          <div class="ch-label" style="color:${m.color}">${m.label}</div>
+          <div class="ch-period">${m.period}</div>
+        </div>
+        <div class="ch-count">${entries.length}</div>
+      </div>
+      <div class="ch-preface" style="border-left:2px solid ${m.color};opacity:.55">${CH_PREFACE[chNum]}</div>
+      <div class="ch-grid" id="grid-${chNum}">`;
+    entries.forEach(d=>{
+      const pre=d.lines.flat().join(' ').substring(0,68);
+      html+=`<div class="ecard" style="--cc:${d.cc}"
+          data-ch="${d.ch}" data-tag="${d.tag}" data-seq="${d.seq}"
+          onclick="openEntry(${d.seq})">
+          <div class="ecard-num">${String(d.id+1).padStart(3,'0')}</div>
+          <div class="ecard-date">${d.date}</div>
+          <div class="ecard-title">${d.title}</div>
+          <div class="ecard-pre">${pre}…</div>
+          <div class="ecard-tag">${d.tag}</div>
+        </div>`;
+    });
+    html+=`</div></div>`;
+  });
+
+  // Friend section
+  html+=`<div class="friend-section" id="friend-section" style="display:none">
+    <div class="friend-banner">
+      <div class="friend-icon">✦</div>
+      <div class="friend-info">
+        <div class="friend-label">서가 (書架) — 특별 수록</div>
+        <div class="friend-sub">도시의 기억 · 2000년 봄의 산문들 · 원문 보존</div>
+      </div>
+    </div>
+    <div class="friend-grid" id="friend-grid">`;
+  friends.forEach(d=>{
+    const pre=d.lines.flat().join(' ').substring(0,60);
+    html+=`<div class="fcard" data-seq="${d.seq}" onclick="openEntry(${d.seq})">
+        <div class="fcard-badge">원문</div>
+        <div class="fcard-date">${d.date}</div>
+        <div class="fcard-title">${d.title}</div>
+        <div class="fcard-pre">${pre}…</div>
+      </div>`;
+  });
+  html+=`</div></div>`;
+
+
+  // Memo section (覺書) — 전체보기 맨 아래 노출
+  html+=`<div class="memo-section ch-section" id="memo-section">
+    <div class="ch-banner" style="border-bottom-color:rgba(210,175,100,.2)">
+      <div class="ch-numeral" style="color:rgba(210,175,100,.15);font-size:4.5rem;">覺</div>
+      <div class="ch-info">
+        <div class="ch-label" style="color:#d2af64;letter-spacing:3px;">각서 覺書 — 순간의 메모들</div>
+        <div class="ch-period" style="color:rgba(210,175,100,.45);">관찰 · 단상 · 삶의 언어들 · ${(window.MEMOS||MEMOS).length}편</div>
+      </div>
+      <div class="ch-count" style="color:rgba(210,175,100,.18)">${(window.MEMOS||MEMOS).length}</div>
+    </div>
+    <div class="ch-preface" style="border-left:2px solid #d2af64;opacity:.5">
+      어느 날 문득 스쳐 지나간 말들. 책 속에서, 거리에서, 새벽의 혼잣말에서 건져 올린 조각들. 완결되지 않아서 오히려 오래 남는 문장들이다.
+    </div>
+    <div class="memo-grid" id="memo-grid">${buildMemoGrid()}</div>
+  </div>`;
+
+  el.innerHTML=html;
+  showAllSections();
+}
+
+function buildMemoGrid(){
+  return (window.MEMOS||MEMOS).map(m=>{
+    const srcHtml = m.src ? `<div class="memo-src">— ${m.src}</div>` : '';
+    return `<div class="memo-card" data-mtag="${m.tag}">
+      <div class="memo-num">${String(m.num).padStart(2,'0')}</div>
+      <div class="memo-body">${m.content.replace(/\n/g,'<br>')}</div>
+      ${srcHtml}
+      <div class="memo-tag">${m.tag}</div>
+    </div>`;
+  }).join('');
+}
+
+function showAllSections(){
+  document.querySelectorAll('[data-chsec]').forEach(s=>s.style.display='');
+  const fs=document.getElementById('friend-section');
+  if(fs) fs.style.display='';
+  const ms=document.getElementById('memo-section');
+  if(ms) ms.style.display=''; // 전체보기에서도 각서 노출 (맨 아래)
+  document.querySelectorAll('.ecard,.fcard').forEach(c=>c.classList.remove('hidden'));
+}
+
+let curFilter='all';
+function resetFilter(){
+  document.querySelectorAll('.gchip').forEach(c=>c.classList.remove('on'));
+  document.querySelector('.gchip[data-f="all"]').classList.add('on');
+  curFilter='all';
+  showAllSections();
+}
+
+function filter(el,f){
+  curFilter=f;
+  // 상단 gnav + 하단 mob-botnav 모든 chip 동기화
+  document.querySelectorAll('.gchip').forEach(c=>c.classList.remove('on'));
+  // 같은 data-f 값을 가진 모든 칩에 on 표시
+  document.querySelectorAll(`.gchip[data-f="${f}"]`).forEach(c=>c.classList.add('on'));
+  
+  if(curView!=='archive'){showArchive();return;}
+  
+  if(f==='all'){showAllSections();return;}
+  if(f==='memo'){
+    document.querySelectorAll('[data-chsec]').forEach(s=>s.style.display='none');
+    const fs2=document.getElementById('friend-section');if(fs2) fs2.style.display='none';
+    const ms=document.getElementById('memo-section');if(ms) ms.style.display='';
+    return;
+  }
+  if(f==='friend'){
+    document.querySelectorAll('[data-chsec]').forEach(s=>s.style.display='none');
+    const ms2=document.getElementById('memo-section');if(ms2) ms2.style.display='none';
+    const fs=document.getElementById('friend-section');
+    if(fs) fs.style.display='';
+    return;
+  }
+  const fs3=document.getElementById('friend-section');if(fs3) fs3.style.display='none';
+  const ms3=document.getElementById('memo-section');if(ms3) ms3.style.display='none';
+  
+  // chapter filter (1-5)
+  if(['1','2','3','4','5'].includes(f)){
+    document.querySelectorAll('[data-chsec]').forEach(s=>{
+      s.style.display=s.dataset.chsec===f?'':'none';
+    });
+    document.querySelectorAll('.ecard').forEach(c=>{
+      c.classList.toggle('hidden',c.dataset.ch!==f);
+    });
+    return;
+  }
+  // tag filter
+  document.querySelectorAll('[data-chsec]').forEach(s=>s.style.display='');
+  document.querySelectorAll('.ecard').forEach(c=>{
+    c.classList.toggle('hidden',c.dataset.tag!==f);
+  });
+  // hide empty chapter sections
+  document.querySelectorAll('[data-chsec]').forEach(s=>{
+    const has=[...s.querySelectorAll('.ecard')].some(c=>!c.classList.contains('hidden'));
+    s.style.display=has?'':'none';
+  });
+}
+
+/* ══ ENTRY ══ */
+const CHCOLORS={1:'var(--c1)',2:'var(--c2)',3:'var(--c3)',4:'var(--c4)',5:'var(--c5)',
+  friend:'rgba(200,168,216,.85)'};
+const BGCLS={1:'c1',2:'c2',3:'c3',4:'c4',5:'c5',friend:'cf'};
+
+function openEntry(seq){
+  savedScrollY=window.scrollY;  // 현재 위치 기억
+  curSeq=seq;
+  renderEntry(seq);
+  saveBookmark(seq);
+  showView('entry');
+}
+
+function renderEntry(seq){
+  const d=DATA[seq];
+  const chKey=d.isFriend?'friend':d.ch;
+  const ecc=CHCOLORS[chKey];
+  
+  document.getElementById('ebg').className='entry-bg '+BGCLS[chKey];
+  document.getElementById('entry').style.setProperty('--ecc',ecc);
+  
+  const bodyHtml=d.lines.map(st=>
+    `<span class="e-stanza">${st.map(l=>`<span class="e-line">${l}</span>`).join('')}</span>`
+  ).join('');
+  
+  let html=`
+    <div class="e-date">${d.date}</div>
+    <div class="e-rule"></div>
+    <h2 class="e-title">${d.title}</h2>
+    <div class="e-body" style="font-family:'Noto Serif KR',Georgia,'Times New Roman',serif;font-weight:400;">${bodyHtml}</div>`;
+  if(d.coda) html+=`<div class="e-coda">${d.coda}</div>`;
+  if(d.isFriend) html+=`<div class="e-friend">— 원문 보존 · 원작자의 글</div>`;
+  
+  html+=`<div class="e-meta">
+    <span class="e-tag">${d.tag}</span>
+    <div class="e-nav">
+      <button class="pnb" onclick="navEntry(${seq-1})"${seq===0?' disabled':''}>← 이전</button>
+      ${d.coda?`<button class="share-trigger" onclick="openShare(${seq})">공유</button>`:''}
+      <button class="pnb" onclick="navEntry(${seq+1})"${seq===DATA.length-1?' disabled':''}>다음 →</button>
+    </div>
+  </div>`;
+  
+  const col=document.getElementById('ecol');
+  col.innerHTML=html;
+  col.querySelectorAll('.e-date,.e-rule,.e-title,.e-body,.e-coda,.e-meta')
+    .forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation='';});
+}
+
+function navEntry(seq){
+  curSeq=seq;
+  renderEntry(seq);
+  saveBookmark(seq);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,0)));
+}
+let scWidget=null;let scReady=false;
+function toggleMP(){
+  const panel=document.getElementById('mpanel');
+  const tog=document.getElementById('mtog');
+  const lbl=document.getElementById('mlbl');
+  mpOpen=!mpOpen;
+  panel.classList.toggle('open',mpOpen);
+  if(tog){tog.classList.toggle('on',mpOpen);if(lbl)lbl.textContent=mpOpen?'재생 중':'음악';}
+  // mob-botnav 음악 버튼 동기화
+  const mbnTog=document.getElementById('mbn-mtog');
+  const mbnLbl=document.getElementById('mbn-mlbl');
+  if(mbnTog){mbnTog.classList.toggle('on',mpOpen);if(mbnLbl)mbnLbl.textContent=mpOpen?'재생 중':'음악';}
+  // 첫 오픈 시에만 iframe 로드 (autoplay 조작 없음 - 모바일 정책상 불가)
+  // 사용자가 iframe 안의 ▶ 버튼을 직접 탭하여 재생
+  if(mpOpen&&!mpLoaded){
+    mpLoaded=true;
+    // 데스크탑 전용: Widget API로 랜덤 트랙 시작
+    try{
+      if(typeof SC!=='undefined'){
+        const frame=document.getElementById('mframe');
+        scWidget=SC.Widget(frame);
+        scWidget.bind(SC.Widget.Events.READY,function(){
+          scReady=true;
+          scWidget.getSounds(function(sounds){
+            if(sounds&&sounds.length>1){
+              const idx=Math.floor(Math.random()*sounds.length);
+              scWidget.skip(idx);
+            }
+          });
+        });
+      }
+    }catch(e){}
+  }
+}
+function showMusicFallback(){
+  document.getElementById('mframe').style.display='none';
+  document.getElementById('mfallback').style.display='block';
+}
+
+/* ══ LANDING MUSIC PROMO ══ */
+function hideLandingPromo(){
+  const box=document.getElementById('ld-music-promo');
+  if(!box)return;
+  box.classList.add('hide');
+  setTimeout(()=>{box.style.display='none';},600);
+}
+function startLandingMusic(){
+  hideLandingPromo();
+  // 패널 열기
+  if(!mpOpen) toggleMP();
+}
+// 랜딩 진입 시 1초 후 프로모 박스 표시
+(function(){
+  const box=document.getElementById('ld-music-promo');
+  if(box) setTimeout(()=>box.classList.add('show'),1000);
+  // 아카이브/글 진입 시 숨김
+  const _sa=window.showArchive;
+  window.showArchive=function(){if(_sa)_sa.apply(this,arguments);hideLandingPromo();};
+  const _oe=window.openEntry;
+  window.openEntry=function(){if(_oe)_oe.apply(this,arguments);hideLandingPromo();};
+})();
+
+/* ══ VOLUME ══ */
+function setVolume(v){
+  v=parseInt(v);
+  // 슬라이더 그라데이션 업데이트
+  const slider=document.getElementById('mvol');
+  if(slider) slider.style.background=`linear-gradient(to right,var(--gold) ${v}%,rgba(255,255,255,.12) ${v}%)`;
+  // Widget API 볼륨 설정
+  if(scWidget&&scReady){try{scWidget.setVolume(v);}catch(e){}}
+}
+
+
+/* ══ LANDING SEARCH (모바일) ══ */
+let ldSrchTimer=null;
+function ldSearch(q){
+  clearTimeout(ldSrchTimer);
+  ldSrchTimer=setTimeout(()=>{
+    const drop=document.getElementById('ld-srch-drop');
+    q=q.trim();
+    if(!q){drop.classList.remove('open');drop.innerHTML='';return;}
+    const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+    const hits=DATA.filter(d=>d.title.match(re)||d.lines.flat().join(' ').match(re)).slice(0,8);
+    if(!hits.length){
+      drop.innerHTML='<div class="snone">검색 결과 없음</div>';
+      drop.classList.add('open');return;
+    }
+    const CM={'방황':'var(--c1)','갈증':'var(--c2)','성찰':'var(--c3)','정착':'var(--c4)','회복':'var(--c5)'};
+    drop.innerHTML=hits.map(d=>{
+      const ht=d.title.replace(re,m=>`<mark>${m}</mark>`);
+      return `<div class="sitem" onclick="openEntry(${d.seq});document.getElementById('ld-srch').value='';document.getElementById('ld-srch-drop').classList.remove('open')">
+        <div class="sitem-title">${ht}</div>
+        <div class="sitem-meta">
+          <span>${d.date}</span>
+          <span class="sitem-ch" style="color:${d.isFriend?'rgba(200,168,216,.7)':(CM[d.chName]||'var(--gold)')}">${d.isFriend?'서가':d.chName}</span>
+        </div>
+      </div>`;
+    }).join('');
+    drop.classList.add('open');
+  },160);
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#ld-search-wrap'))
+    document.getElementById('ld-srch-drop').classList.remove('open');
+},{capture:true,passive:true});
+
+let srchTimer=null;
+function doSearch(q){
+  clearTimeout(srchTimer);
+  srchTimer=setTimeout(()=>_doSearch(q),160);
+}
+function _doSearch(q){
+  const drop=document.getElementById('srch-drop');
+  q=q.trim();
+  if(!q){drop.classList.remove('open');drop.innerHTML='';return;}
+  const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+  const hits=DATA.filter(d=>
+    d.title.match(re)||d.lines.flat().join(' ').match(re)
+  ).slice(0,10);
+  if(!hits.length){
+    drop.innerHTML='<div class="snone">검색 결과 없음</div>';
+    drop.classList.add('open');return;
+  }
+  const CH_COLORS_MAP={'방황':'var(--c1)','갈증':'var(--c2)','성찰':'var(--c3)','정착':'var(--c4)','회복':'var(--c5)'};
+  drop.innerHTML=hits.map(d=>{
+    const ht=d.title.replace(re,m=>`<mark>${m}</mark>`);
+    // find a matching line for snippet
+    const bodyText=d.lines.flat().join(' ');
+    const bm=bodyText.match(re);
+    let snippet='';
+    if(bm){
+      const idx=bodyText.search(re);
+      const start=Math.max(0,idx-20);
+      const raw=bodyText.substring(start,idx+60);
+      snippet=raw.replace(re,m=>`<mark>${m}</mark>`);
+      if(start>0) snippet='…'+snippet;
+      snippet+='…';
+    }
+    const chColor=d.isFriend?'rgba(200,168,216,.7)':(CH_COLORS_MAP[d.chName]||'var(--gold)');
+    return `<div class="sitem" role="option" tabindex="0"
+      onclick="openEntry(${d.seq});clearSearch()"
+      onkeydown="if(event.key==='Enter'){openEntry(${d.seq});clearSearch();}">
+      <div class="sitem-title">${ht}</div>
+      ${snippet?`<div class="sitem-snippet">${snippet}</div>`:''}
+      <div class="sitem-meta">
+        <span>${d.date}</span>
+        <span class="sitem-ch" style="color:${chColor}">${d.isFriend?'서가':d.chName}</span>
+        <span>${d.tag}</span>
+      </div>
+    </div>`;
+  }).join('');
+  drop.classList.add('open');
+}
+function clearSearch(){
+  document.getElementById('srch').value='';
+  document.getElementById('srch-drop').classList.remove('open');
+  document.getElementById('srch-drop').innerHTML='';
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#srchwrap'))
+    document.getElementById('srch-drop').classList.remove('open');
+});
+
+/* ══ FONT SIZE ══ */
+/* fzIdx removed */
+/* fztog 제거됨 — setFz 미사용 */
+/* fz init 제거 */
+
+/* ══ BOOKMARK / CONTINUE READING ══ */
+function saveBookmark(seq){
+  localStorage.setItem('hj_bm',seq);
+}
+function resumeReading(){
+  const seq=parseInt(localStorage.getItem('hj_bm'));
+  if(!isNaN(seq)&&seq>=0&&seq<DATA.length) openEntry(seq);
+}
+(()=>{
+  const bm=parseInt(localStorage.getItem('hj_bm'));
+  if(!isNaN(bm)&&bm>=0&&bm<DATA.length){
+    const d=DATA[bm];
+    const btn=document.getElementById('ld-resume-btn');
+    if(btn) btn.textContent=`"${d.title.slice(0,18)}…" 계속 읽기 →`;
+    document.getElementById('ld-resume').style.display='block';
+  }
+})();
+
+/* ══ SHARE CARD ══ */
+let shareSeq=-1;
+function openShare(seq){
+  shareSeq=seq;
+  const d=DATA[seq];
+  const overlay=document.getElementById('share-overlay');
+  overlay.classList.add('open');
+  drawCard(d);
+}
+function closeShare(){
+  document.getElementById('share-overlay').classList.remove('open');
+}
+function drawCard(d){
+  const canvas=document.getElementById('share-canvas');
+  const W=640,H=400;
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  // background
+  ctx.fillStyle='#08080f';
+  ctx.fillRect(0,0,W,H);
+
+  // gradient glow
+  const grd=ctx.createRadialGradient(W*.15,H*.2,10,W*.15,H*.2,W*.6);
+  grd.addColorStop(0,'rgba(184,151,106,.07)');
+  grd.addColorStop(1,'transparent');
+  ctx.fillStyle=grd;
+  ctx.fillRect(0,0,W,H);
+
+  // border
+  ctx.strokeStyle='rgba(255,255,255,.07)';
+  ctx.lineWidth=1;
+  ctx.strokeRect(1,1,W-2,H-2);
+
+  // top rule
+  ctx.fillStyle='rgba(184,151,106,.5)';
+  ctx.fillRect(40,36,28,1);
+
+  // date + chapter
+  ctx.font='300 11px Montserrat,sans-serif';
+  ctx.fillStyle='rgba(184,151,106,.45)';
+  ctx.letterSpacing='2px';
+  ctx.fillText((d.date+' · '+d.chName).toUpperCase(),40,58);
+
+  // title
+  ctx.font='italic 400 22px "Playfair Display",serif';
+  ctx.fillStyle='rgba(184,151,106,.95)';
+  ctx.letterSpacing='0px';
+  wrapText(ctx,d.title,40,98,W-80,32);
+
+  // coda
+  const coda=d.coda||'';
+  ctx.font='300 15px "Noto Serif KR",serif';
+  ctx.fillStyle='rgba(228,221,212,.8)';
+  ctx.letterSpacing='0px';
+  wrapText(ctx,coda,40,170,W-80,26);
+
+  // bottom logo
+  ctx.font='italic 400 14px "Playfair Display",serif';
+  ctx.fillStyle='rgba(184,151,106,.35)';
+  ctx.fillText('痕迹 흔적 — 지혜의 쉼터',40,H-30);
+
+  // canvas is display:block, set display style
+  canvas.style.width='100%';
+}
+function wrapText(ctx,text,x,y,maxW,lineH){
+  if(!text)return;
+  const words=text.split(' ');
+  let line='';
+  for(let i=0;i<words.length;i++){
+    const test=line+(line?' ':'')+words[i];
+    const w=ctx.measureText(test).width;
+    if(w>maxW&&line){ctx.fillText(line,x,y);line=words[i];y+=lineH;}
+    else line=test;
+  }
+  if(line)ctx.fillText(line,x,y);
+}
+function downloadCard(){
+  const canvas=document.getElementById('share-canvas');
+  const d=DATA[shareSeq];
+  const a=document.createElement('a');
+  a.download=`흔적_${d.title.slice(0,12).replace(/\s/g,'_')}.png`;
+  a.href=canvas.toDataURL('image/png');
+  a.click();
+}
+</script>
+
+<script src="https://w.soundcloud.com/player/api.js"></script>
+</body>
+</html>
