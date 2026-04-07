@@ -1,0 +1,3461 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d0c10">
+<title>詩의 서재(書齋) — PoetryShelf</title>
+<link rel="icon" type="image/png" href="https://casio8000.github.io/film-humanities_Mobile/images/Poetry-icon.png">
+<link rel="apple-touch-icon" href="https://casio8000.github.io/film-humanities_Mobile/images/Poetry-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+:root{
+  --ink:    #0d0c10;
+  --ink2:   #1a1820;
+  --ink3:   #252330;
+
+  --paper:  #f7f4ed;
+  --paper2: #ede9df;
+  --paper3: #e2ddd2;
+
+  --gold:   #b8936a;
+  --gold2:  #d4aa82;
+  --gold3:  #f0cc9a;
+  --gold-dim: rgba(184,147,106,0.15);
+  --gold-glow: rgba(184,147,106,0.06);
+
+  --dust:   #7a7570;
+  --dust2:  #a09890;
+  --dust3:  #c8c2b8;
+
+  --rose:   rgba(180,120,100,0.18);
+  --sage:   rgba(100,130,110,0.16);
+  --slate:  rgba(100,110,140,0.18);
+  --dusk:   rgba(130,100,150,0.16);
+
+  --radius: 10px;
+  --serif: "Noto Serif KR", "IM Fell English", serif;
+  --sans:  "Noto Sans KR", sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--paper);font-family:var(--sans);overflow-x:hidden}
+
+/* ═══════════════════════════════════════
+   INTRO — 첫 화면
+═══════════════════════════════════════ */
+#intro{
+  position:fixed;inset:0;z-index:900;
+  background:var(--ink);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+
+/* 배경 — 낡은 종이 느낌 */
+.intro-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 20%, rgba(184,147,106,0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 70% at 85% 75%, rgba(184,147,106,0.05) 0%, transparent 65%),
+    radial-gradient(ellipse 30% 30% at 50% 50%, rgba(184,147,106,0.03) 0%, transparent 70%);
+}
+/* 상단 금선 */
+.intro-topline{
+  height:1px;flex-shrink:0;
+  background:linear-gradient(90deg,transparent,var(--gold) 25%,var(--gold2) 50%,var(--gold) 75%,transparent);
+  opacity:.4;
+}
+
+/* 인트로 본문 스크롤 가능 */
+.intro-body{
+  flex:1;overflow-y:auto;
+  display:flex;flex-direction:column;
+  align-items:center;
+  padding:clamp(32px,6vh,64px) clamp(24px,8vw,120px) 40px;
+  gap:clamp(18px,3vh,32px);
+  position:relative;z-index:1;
+}
+.intro-body::-webkit-scrollbar{width:3px;}
+.intro-body::-webkit-scrollbar-thumb{background:rgba(184,147,106,.25);}
+
+/* 시리즈 레이블 */
+.intro-eyebrow{
+  display:flex;align-items:center;gap:16px;
+  font-size:clamp(8px,0.8vw,10px);
+  letter-spacing:.3em;color:var(--dust);text-transform:uppercase;
+  font-family:var(--sans);font-weight:300;
+}
+.intro-eyebrow::before,.intro-eyebrow::after{
+  content:"";width:clamp(20px,4vw,60px);height:1px;
+  background:linear-gradient(90deg,transparent,var(--dust));
+}
+.intro-eyebrow::after{background:linear-gradient(90deg,var(--dust),transparent);}
+
+/* 메인 타이틀 */
+.intro-title{
+  font-family:var(--serif);
+  font-size:clamp(40px,7vw,96px);
+  font-weight:300;
+  line-height:1.08;
+  letter-spacing:-0.01em;
+  text-align:center;
+}
+.intro-title-ko{
+  display:block;color:var(--paper);
+}
+.intro-title-en{
+  display:block;
+  font-family:"IM Fell English",serif;
+  font-style:italic;
+  font-size:clamp(18px,2.8vw,38px);
+  color:var(--gold);
+  letter-spacing:.04em;
+  margin-top:4px;
+}
+
+/* 황금 구분선 */
+.intro-divider{
+  display:flex;align-items:center;gap:12px;
+  width:clamp(100px,18%,220px);
+}
+.intro-divider::before,.intro-divider::after{
+  content:"";flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(184,147,106,.5));
+}
+.intro-divider::after{background:linear-gradient(90deg,rgba(184,147,106,.5),transparent);}
+.intro-divider-gem{
+  width:5px;height:5px;
+  background:var(--gold);
+  transform:rotate(45deg);
+  flex-shrink:0;opacity:.8;
+}
+
+/* 서시 — 철학적 인문체 */
+.intro-verse{
+  font-family:var(--serif);
+  font-size:clamp(13px,1.3vw,16px);
+  font-weight:300;
+  line-height:2.3;
+  color:var(--dust2);
+  text-align:center;
+  max-width:600px;
+  word-break:keep-all;
+  white-space:pre-line;
+}
+.intro-verse strong{
+  color:var(--gold2);
+  font-weight:400;
+}
+.intro-verse em{
+  color:var(--paper);
+  font-style:normal;
+}
+
+/* 작은 인용 시 */
+.intro-poem-quote{
+  font-family:var(--serif);
+  font-size:clamp(12px,1.1vw,14px);
+  font-style:italic;
+  font-weight:300;
+  color:var(--dust);
+  text-align:center;
+  line-height:2.0;
+  border-left:2px solid rgba(184,147,106,.3);
+  padding:10px 20px;
+  max-width:440px;
+}
+.intro-poem-attr{
+  font-size:clamp(9px,.85vw,11px);
+  color:var(--dust);
+  text-align:right;
+  margin-top:6px;
+  letter-spacing:.05em;
+}
+
+/* 통계 */
+.intro-stats{
+  display:flex;gap:clamp(24px,5vw,60px);
+}
+.intro-stat-n{
+  font-family:"IM Fell English",serif;
+  font-style:italic;
+  font-size:clamp(26px,3.5vw,42px);
+  font-weight:400;color:var(--gold);
+  line-height:1;text-align:center;
+  letter-spacing:.02em;
+}
+.intro-stat-l{
+  font-size:clamp(8px,.75vw,10px);color:var(--dust);
+  margin-top:7px;letter-spacing:.15em;text-transform:uppercase;
+  text-align:center;font-family:var(--sans);font-weight:300;
+}
+
+/* 입장 버튼 */
+.intro-btn{
+  background:transparent;
+  border:1px solid rgba(184,147,106,.5);
+  color:var(--gold2);
+  border-radius:3px;
+  padding:clamp(11px,1.5vh,15px) clamp(36px,5vw,58px);
+  font-family:var(--serif);
+  font-size:clamp(12px,1.1vw,14px);
+  font-weight:300;
+  cursor:pointer;
+  letter-spacing:.2em;
+  transition:all .3s;
+  position:relative;overflow:hidden;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1;
+  vertical-align:middle;
+}
+.intro-btn::before{
+  content:"";position:absolute;inset:0;
+  background:var(--gold-dim);
+  opacity:0;transition:opacity .3s;
+}
+.intro-btn:hover{color:var(--gold3);border-color:var(--gold);}
+.intro-btn:hover::before{opacity:1;}
+
+/* 하단 크레딧 */
+.intro-footer{
+  flex-shrink:0;padding:clamp(8px,1.5vh,14px) 0;
+  text-align:center;
+  border-top:1px solid rgba(255,255,255,.05);
+  font-size:clamp(9px,.75vw,10px);
+  color:var(--dust);letter-spacing:.08em;
+  position:relative;z-index:1;
+}
+.intro-footer strong{color:var(--gold);}
+
+/* ═══════════════════════════════════════
+   MAIN APP
+═══════════════════════════════════════ */
+#app{display:none;}
+
+/* ── HEADER */
+.hdr{
+  position:sticky;top:0;z-index:200;
+  background:rgba(13,12,16,.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(184,147,106,.12);
+}
+.hdr-inner{
+  max-width:1600px;margin:0 auto;
+  display:flex;align-items:center;gap:10px;
+  height:52px;padding:0 20px;
+}
+.logo{
+  font-family:var(--serif);
+  font-size:16px;color:var(--gold);cursor:pointer;
+  letter-spacing:.04em;white-space:nowrap;flex-shrink:0;
+  font-weight:300;
+}
+.logo sub{font-family:var(--sans);font-size:9px;color:var(--dust);margin-left:4px;vertical-align:middle;}
+.hdr-right{display:flex;gap:6px;margin-left:auto;}
+.hdr-btn{
+  height:30px;padding:0 11px;border-radius:5px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:11px;font-weight:400;
+  display:flex;align-items:center;gap:4px;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+  font-family:var(--sans);
+}
+.hdr-btn:hover,.hdr-btn.active{
+  background:var(--gold-dim);color:var(--gold2);
+  border-color:rgba(184,147,106,.3);
+}
+
+/* ── FILTER BAR */
+.filter-bar{
+  border-bottom:1px solid rgba(255,255,255,.05);
+  background:rgba(13,12,16,.92);
+}
+.filter-inner{
+  max-width:1600px;margin:0 auto;
+  padding:8px 20px;
+  display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
+}
+.filter-inner::-webkit-scrollbar{display:none;}
+.filter-btn{
+  padding:4px 13px;border-radius:20px;white-space:nowrap;
+  font-size:11px;font-weight:400;cursor:pointer;
+  transition:all .15s;font-family:var(--sans);flex-shrink:0;
+  border:1px solid transparent;
+}
+.filter-btn.all-btn{
+  background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:var(--dust2);
+}
+.filter-btn.all-btn.active{
+  background:var(--gold-dim);border-color:rgba(184,147,106,.4);color:var(--gold2);
+}
+
+/* ── 검색바 */
+.search-bar{
+  background:rgba(13,12,16,.88);
+  border-bottom:1px solid rgba(255,255,255,.05);
+  padding:8px 20px;
+}
+.search-bar-inner{max-width:1600px;margin:0 auto;}
+.search-wrap{position:relative;}
+.search-wrap::before{
+  content:"🔍";
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  font-size:12px;pointer-events:none;opacity:.4;
+}
+.search-input{
+  width:100%;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;color:var(--paper);
+  font-family:var(--sans);font-size:16px;
+  padding:8px 14px 8px 38px;outline:none;
+  transition:border-color .2s;
+}
+.search-input:focus{border-color:rgba(184,147,106,.4);}
+.search-input::placeholder{color:var(--dust);font-size:14px;}
+
+/* ── STATS BAR */
+.stats-bar{
+  max-width:1600px;margin:0 auto;
+  padding:9px 20px;
+  display:flex;align-items:center;gap:14px;
+}
+.stat-item{font-size:11px;color:var(--dust);}
+.stat-item strong{color:var(--gold);font-size:13px;margin-right:2px;}
+.stat-sep{color:rgba(255,255,255,.1);}
+
+/* ═══════════════════════════════════════
+   POEM GRID
+═══════════════════════════════════════ */
+.grid-wrap{max-width:1600px;margin:0 auto;padding:0 20px 100px;}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+@media(max-width:1200px){.grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:820px) {.grid{grid-template-columns:repeat(2,1fr);gap:12px;}}
+@media(max-width:480px) {.grid{grid-template-columns:repeat(2,1fr);gap:9px;}}
+
+/* 시 카드 */
+.pcard{
+  position:relative;
+  background:var(--ink2);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--radius);
+  cursor:pointer;padding:16px 15px 13px;
+  transition:border-color .2s,transform .15s,box-shadow .2s;
+  animation:fadeUp .35s ease both;
+  display:flex;flex-direction:column;gap:8px;
+  min-height:180px;
+}
+@media(max-width:660px){.pcard{min-height:160px;padding:13px 12px 11px;}}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.pcard:hover{
+  border-color:rgba(184,147,106,.22);
+  transform:translateY(-2px);
+  box-shadow:0 10px 32px rgba(0,0,0,.5);
+}
+.pcard.fav{border-color:rgba(184,147,106,.35);}
+
+/* 카드 상단 */
+.pcard-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-shrink:0;
+}
+.pcard-cat{
+  font-size:9px;padding:2px 8px;border-radius:20px;
+  font-weight:500;letter-spacing:.03em;line-height:1.5;
+  font-family:var(--sans);
+}
+.pcard-sample{
+  font-size:8px;padding:1px 6px;border-radius:10px;
+  background:rgba(184,147,106,.12);color:var(--gold);
+  border:1px solid rgba(184,147,106,.2);
+  letter-spacing:.05em;flex-shrink:0;font-family:var(--sans);
+}
+.fav-star{
+  background:none;border:none;cursor:pointer;
+  font-size:14px;line-height:1;padding:0;
+  color:rgba(255,255,255,.15);transition:color .2s,transform .15s;flex-shrink:0;
+}
+.fav-star:hover{color:var(--gold);transform:scale(1.15);}
+.fav-star.on{color:var(--gold);}
+
+/* 제목 */
+.pcard-title{
+  font-family:var(--serif);
+  font-size:clamp(14px,1.2vw,17px);
+  font-weight:400;color:var(--paper);
+  line-height:1.4;flex-shrink:0;
+}
+/* 시인 */
+.pcard-poet{
+  font-size:11px;color:var(--dust2);
+  font-family:var(--sans);font-weight:300;
+  flex-shrink:0;
+}
+/* 본문 미리보기 */
+.pcard-preview{
+  font-family:var(--serif);
+  font-size:clamp(10px,.9vw,12px);
+  line-height:1.9;
+  color:var(--dust2);
+  flex:1;overflow:hidden;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  font-weight:300;
+  font-style:italic;
+}
+/* 카드 하단 */
+.pcard-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;margin-top:2px;
+}
+.pcard-year{font-size:9px;color:var(--dust);letter-spacing:.08em;}
+.pcard-actions{display:flex;gap:4px;}
+.pcard-btn{
+  width:22px;height:22px;border-radius:4px;
+  background:transparent;border:1px solid rgba(255,255,255,.07);
+  color:var(--dust);font-size:10px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .15s;
+}
+.pcard-btn:hover{color:var(--dust2);border-color:rgba(255,255,255,.15);}
+
+.empty{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--dust);}
+.empty-icon{font-size:32px;margin-bottom:12px;}
+
+/* ═══════════════════════════════════════
+   POEM DETAIL MODAL
+═══════════════════════════════════════ */
+.modal-bg{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.modal-bg.show{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--ink2);
+  border:1px solid rgba(184,147,106,.2);
+  border-radius:16px;
+  padding:36px 32px 28px;
+  width:100%;max-width:560px;max-height:88vh;overflow-y:auto;
+  position:relative;
+  transform:scale(.97) translateY(8px);transition:transform .25s;
+}
+.modal-bg.show .modal{transform:scale(1) translateY(0);}
+.modal::-webkit-scrollbar{width:3px;}
+.modal::-webkit-scrollbar-thumb{background:rgba(184,147,106,.2);}
+.modal-x{
+  position:absolute;top:14px;right:14px;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.modal-x:hover{color:var(--paper);}
+
+/* 모달 헤더 */
+.modal-header{margin-bottom:20px;}
+.modal-cat-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.modal-title{
+  font-family:var(--serif);
+  font-size:clamp(20px,2.5vw,26px);
+  font-weight:400;color:var(--paper);
+  line-height:1.3;margin-bottom:4px;
+}
+.modal-meta{
+  font-size:12px;color:var(--dust2);
+  display:flex;gap:10px;align-items:center;
+  font-family:var(--sans);font-weight:300;
+}
+.modal-meta span{color:var(--dust);}
+
+/* 시 본문 */
+.modal-poem{
+  font-family:var(--serif);
+  font-size:clamp(14px,1.4vw,16px);
+  line-height:2.4;
+  color:var(--paper2);
+  margin:0 0 20px;
+  white-space:pre-line;
+  font-weight:300;
+  border-left:2px solid rgba(184,147,106,.25);
+  padding-left:18px;
+}
+
+.modal-source{
+  font-size:11px;color:var(--dust);
+  margin-bottom:22px;font-style:italic;
+  font-family:var(--serif);
+}
+
+/* 이전/다음 */
+.modal-nav{display:flex;gap:8px;margin-bottom:10px;}
+.modal-nav-btn{
+  flex:1;padding:8px;border-radius:7px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:11px;cursor:pointer;
+  transition:all .15s;font-family:var(--sans);
+}
+.modal-nav-btn:hover{color:var(--gold);border-color:rgba(184,147,106,.3);}
+
+/* 액션 버튼 */
+.modal-actions{display:flex;gap:8px;}
+.modal-btn{
+  flex:1;padding:10px;border-radius:8px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:12px;font-weight:400;cursor:pointer;
+  transition:all .15s;font-family:var(--sans);
+}
+.modal-btn:hover{background:var(--gold-dim);color:var(--gold2);border-color:rgba(184,147,106,.3);}
+.modal-btn.primary{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:500;}
+.modal-btn.primary:hover{background:var(--gold2);}
+.modal-btn.danger{color:#cf6679;}
+.modal-btn.danger:hover{background:rgba(207,102,121,.1);border-color:rgba(207,102,121,.3);}
+
+/* ═══════════════════════════════════════
+   TODAY MODAL — 오늘의 시
+═══════════════════════════════════════ */
+.today-bg{
+  position:fixed;inset:0;z-index:450;
+  background:rgba(0,0,0,.82);
+  display:flex;align-items:center;justify-content:center;padding:24px 20px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.today-bg.show{opacity:1;pointer-events:all;}
+.today-modal{
+  background:var(--ink2);
+  border:1px solid rgba(184,147,106,.25);
+  border-radius:16px;
+  padding:34px 28px 24px;
+  width:100%;max-width:500px;max-height:88vh;overflow-y:auto;
+  position:relative;
+  transform:scale(.96) translateY(8px);transition:transform .25s;
+  text-align:center;
+}
+.today-bg.show .today-modal{transform:scale(1) translateY(0);}
+.today-modal::-webkit-scrollbar{width:3px;}
+.today-modal::-webkit-scrollbar-thumb{background:rgba(184,147,106,.2);}
+.today-modal-x{
+  position:absolute;top:13px;right:13px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.today-modal-x:hover{color:var(--paper);}
+.today-label{
+  font-size:9px;text-transform:uppercase;letter-spacing:.22em;
+  color:var(--gold);margin-bottom:16px;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.today-label::before,.today-label::after{content:"";width:20px;height:1px;background:rgba(184,147,106,.3);}
+.today-poem-title{
+  font-family:var(--serif);font-size:clamp(17px,2.5vw,21px);
+  font-weight:400;color:var(--paper);margin-bottom:4px;
+}
+.today-poet{font-size:12px;color:var(--dust2);margin-bottom:18px;font-family:var(--sans);}
+.today-poem-text{
+  font-family:var(--serif);
+  font-size:clamp(13px,1.3vw,15px);
+  line-height:2.3;color:var(--paper2);
+  text-align:left;white-space:pre-line;
+  border-left:2px solid rgba(184,147,106,.2);
+  padding-left:16px;margin-bottom:20px;
+  font-weight:300;font-style:italic;
+}
+.today-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.today-btn{
+  padding:8px 16px;border-radius:7px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:11px;font-weight:400;cursor:pointer;
+  transition:all .15s;font-family:var(--sans);
+}
+.today-btn:hover{background:var(--gold-dim);color:var(--gold2);border-color:rgba(184,147,106,.3);}
+.today-btn.next{color:var(--gold);border-color:rgba(184,147,106,.35);}
+@media(max-width:480px){
+  .today-modal{padding:28px 18px 20px;}
+  .today-poem-text{font-size:13px;}
+}
+
+/* ═══════════════════════════════════════
+   SETTINGS 패널
+═══════════════════════════════════════ */
+.settings-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.6);
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.settings-overlay.show{opacity:1;pointer-events:all;}
+.settings-panel{
+  position:fixed;top:0;right:0;bottom:0;z-index:501;
+  width:340px;max-width:92vw;
+  background:var(--ink2);
+  border-left:1px solid rgba(184,147,106,.12);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+}
+.settings-overlay.show .settings-panel{transform:translateX(0);}
+.settings-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px 12px;
+  border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;
+}
+.settings-title{font-family:var(--serif);font-size:14px;color:var(--gold2);font-weight:300;}
+.settings-x{
+  width:28px;height:28px;border-radius:6px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.settings-x:hover{color:var(--paper);}
+.settings-body{flex:1;overflow-y:auto;padding:18px;}
+.settings-body::-webkit-scrollbar{width:3px;}
+.settings-body::-webkit-scrollbar-thumb{background:rgba(184,147,106,.15);}
+.s-sec{margin-bottom:24px;}
+.s-sec-title{
+  font-size:9px;text-transform:uppercase;letter-spacing:.14em;
+  color:var(--dust);margin-bottom:10px;
+  padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.05);
+  font-family:var(--sans);
+}
+.s-input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:7px;color:var(--paper);
+  font-family:var(--sans);font-size:13px;
+  padding:8px 11px;outline:none;margin-bottom:7px;
+  transition:border-color .2s;
+}
+.s-input:focus{border-color:rgba(184,147,106,.4);}
+.s-input::placeholder{color:var(--dust);}
+textarea.s-input{resize:vertical;min-height:80px;line-height:1.8;font-family:var(--serif);font-size:13px;}
+.s-select{
+  width:100%;background:#1e1c28;border:1px solid rgba(184,147,106,.3);
+  border-radius:7px;color:var(--paper);
+  font-family:var(--sans);font-size:13px;
+  padding:8px 11px;outline:none;margin-bottom:7px;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+}
+.s-select option{background:#1e1c28;color:var(--paper);}
+.s-select:focus{border-color:rgba(184,147,106,.6);}
+.s-btn{
+  width:100%;padding:9px;border-radius:7px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:12px;font-weight:400;
+  cursor:pointer;margin-bottom:6px;transition:all .15s;
+  font-family:var(--sans);text-align:left;
+}
+.s-btn:hover{color:var(--paper);background:rgba(255,255,255,.07);}
+.s-btn.primary{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:500;text-align:center;}
+.s-btn.primary:hover{background:var(--gold2);}
+.s-btn.danger{color:#cf6679;}
+.s-btn.danger:hover{background:rgba(207,102,121,.1);border-color:rgba(207,102,121,.3);}
+.s-info{font-size:11px;color:var(--dust);line-height:1.9;
+  background:rgba(255,255,255,.03);border-radius:6px;padding:9px 11px;margin-bottom:7px;}
+.s-info strong{color:var(--dust2);}
+.s-backup-warn{
+  background:rgba(184,147,106,.1);border:1px solid rgba(184,147,106,.25);
+  border-radius:7px;padding:10px 12px;margin-bottom:10px;
+  font-size:11px;color:var(--gold2);line-height:1.7;
+}
+
+/* ═══════════════════════════════════════
+   HELP 모달 — 사용 설명서
+═══════════════════════════════════════ */
+.help-bg{
+  position:fixed;inset:0;z-index:460;
+  background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.help-bg.show{opacity:1;pointer-events:all;}
+.help-modal{
+  background:var(--ink2);
+  border:1px solid rgba(184,147,106,.2);
+  border-radius:16px;
+  padding:32px 28px 26px;
+  width:100%;max-width:560px;max-height:88vh;overflow-y:auto;
+  position:relative;
+  transform:scale(.97) translateY(8px);transition:transform .25s;
+}
+.help-bg.show .help-modal{transform:scale(1) translateY(0);}
+.help-modal::-webkit-scrollbar{width:3px;}
+.help-modal::-webkit-scrollbar-thumb{background:rgba(184,147,106,.2);}
+.help-x{
+  position:absolute;top:13px;right:13px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.help-x:hover{color:var(--paper);}
+.help-title{
+  font-family:var(--serif);font-size:20px;font-weight:400;
+  color:var(--paper);margin-bottom:6px;
+}
+.help-subtitle{font-size:11px;color:var(--dust);margin-bottom:24px;font-family:var(--sans);}
+.help-section{margin-bottom:22px;}
+.help-section-title{
+  font-family:var(--serif);font-size:14px;font-weight:400;
+  color:var(--gold2);margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.help-section-title::after{
+  content:"";flex:1;height:1px;background:rgba(184,147,106,.15);
+}
+.help-item{
+  display:flex;gap:12px;margin-bottom:10px;align-items:flex-start;
+}
+.help-icon{
+  width:28px;height:28px;border-radius:7px;flex-shrink:0;
+  background:rgba(184,147,106,.1);border:1px solid rgba(184,147,106,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+}
+.help-text{font-size:12px;color:var(--dust2);line-height:1.8;font-family:var(--sans);}
+.help-text strong{color:var(--paper);font-weight:500;}
+.help-note{
+  background:rgba(184,147,106,.08);border:1px solid rgba(184,147,106,.15);
+  border-radius:8px;padding:12px 14px;
+  font-size:11px;color:var(--gold2);line-height:1.9;font-family:var(--sans);
+}
+
+/* ═══════════════════════════════════════
+   RECEIVE POEM — 공유받은 詩 추가
+═══════════════════════════════════════ */
+.receive-bg{
+  position:fixed;inset:0;z-index:470;
+  background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.receive-bg.show{opacity:1;pointer-events:all;}
+.receive-modal{
+  background:var(--ink2);
+  border:1px solid rgba(184,147,106,.2);
+  border-radius:14px;
+  padding:28px 24px;
+  width:100%;max-width:480px;
+  position:relative;
+  transform:scale(.97) translateY(8px);transition:transform .25s;
+}
+.receive-bg.show .receive-modal{transform:scale(1) translateY(0);}
+.receive-x{
+  position:absolute;top:13px;right:13px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.receive-x:hover{color:var(--paper);}
+.receive-title{
+  font-family:var(--serif);font-size:17px;font-weight:400;
+  color:var(--paper);margin-bottom:6px;
+}
+.receive-sub{font-size:11px;color:var(--dust);margin-bottom:16px;font-family:var(--sans);line-height:1.7;}
+.receive-preview{
+  background:rgba(184,147,106,.07);border:1px solid rgba(184,147,106,.15);
+  border-radius:8px;padding:14px 16px;margin-bottom:16px;
+  font-family:var(--serif);font-size:13px;color:var(--paper2);
+  line-height:1.9;font-weight:300;font-style:italic;
+  max-height:160px;overflow-y:auto;white-space:pre-line;
+}
+.receive-actions{display:flex;gap:8px;}
+
+/* ── TOAST */
+.toast{
+  position:fixed;bottom:24px;left:50%;z-index:600;
+  transform:translateX(-50%) translateY(6px);
+  background:var(--ink3);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:8px 18px;
+  font-size:12px;color:var(--dust2);
+  opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;
+  font-family:var(--sans);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{border-color:rgba(100,180,120,.35);color:#6db87a;}
+.toast.warn{border-color:rgba(184,147,106,.4);color:var(--gold2);}
+
+/* 백업 알림 배너 */
+.backup-banner{
+  background:rgba(184,147,106,.08);
+  border-bottom:1px solid rgba(184,147,106,.2);
+  padding:8px 20px;
+  display:flex;align-items:center;gap:12px;
+  font-size:12px;color:var(--gold2);
+  font-family:var(--sans);
+}
+.backup-banner button{
+  margin-left:auto;padding:4px 12px;border-radius:5px;
+  background:rgba(184,147,106,.15);border:1px solid rgba(184,147,106,.3);
+  color:var(--gold);font-size:11px;cursor:pointer;
+  font-family:var(--sans);transition:all .15s;flex-shrink:0;
+}
+.backup-banner button:hover{background:rgba(184,147,106,.25);}
+.backup-banner-x{
+  background:none;border:none;color:var(--dust);cursor:pointer;
+  font-size:14px;padding:0 4px;flex-shrink:0;
+}
+
+/* ── 감정 태그 */
+.modal-emotion-row{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-bottom:14px;
+}
+.emotion-tag{
+  padding:4px 12px;border-radius:20px;font-size:11px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);
+  color:var(--dust2);transition:all .15s;font-family:var(--sans);
+  user-select:none;
+}
+.emotion-tag:hover{border-color:rgba(184,147,106,.35);color:var(--gold2);}
+.emotion-tag.active{background:rgba(184,147,106,.15);border-color:rgba(184,147,106,.4);color:var(--gold2);}
+
+/* ── 한 줄 메모 */
+.modal-memo-wrap{margin-bottom:16px;}
+.modal-memo-label{font-size:10px;color:var(--dust);letter-spacing:.1em;margin-bottom:5px;font-family:var(--sans);}
+.modal-memo-input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:7px;color:var(--paper2);
+  font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;
+  padding:8px 12px;outline:none;resize:none;
+  transition:border-color .2s;line-height:1.7;
+}
+.modal-memo-input:focus{border-color:rgba(184,147,106,.4);}
+.modal-memo-input::placeholder{color:var(--dust);font-style:italic;}
+
+/* ── 읽은 시 표시 */
+.pcard.read::after{
+  content:"✓";
+  position:absolute;bottom:10px;right:10px;
+  width:16px;height:16px;border-radius:50%;
+  background:rgba(100,180,120,.15);
+  border:1px solid rgba(100,180,120,.25);
+  color:#6db87a;font-size:9px;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+
+/* ── 감정 기반 탐색 필터 */
+.mood-bar{
+  border-bottom:1px solid rgba(255,255,255,.04);
+  background:rgba(13,12,16,.85);
+  padding:6px 20px;
+}
+.mood-bar-inner{
+  max-width:1600px;margin:0 auto;
+  display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none;
+}
+.mood-bar-inner::-webkit-scrollbar{display:none;}
+.mood-label{
+  font-size:10px;color:var(--dust);letter-spacing:.1em;
+  white-space:nowrap;flex-shrink:0;font-family:var(--sans);
+}
+.mood-btn{
+  padding:3px 12px;border-radius:20px;
+  font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;
+  border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);
+  color:var(--dust2);transition:all .15s;font-family:var(--sans);
+}
+.mood-btn:hover,.mood-btn.active{
+  background:rgba(184,147,106,.12);
+  border-color:rgba(184,147,106,.3);
+  color:var(--gold2);
+}
+
+@media(max-width:600px){
+  .hdr-inner{gap:8px;padding:0 14px;}
+  .logo{font-size:14px;}
+  .logo sub{display:none;}
+  .hdr-btn{padding:0 8px;font-size:11px;height:28px;gap:3px;}
+  .search-bar{padding:7px 14px;}
+}
+@media(max-width:390px){
+  .hdr-btn-text{display:none;}
+}
+
+/* ── 수정/삭제 모달 */
+.edit-bg{
+  position:fixed;inset:0;z-index:480;
+  background:rgba(0,0,0,.88);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.edit-bg.show{opacity:1;pointer-events:all;}
+.edit-modal{
+  background:var(--ink2);
+  border:1px solid rgba(184,147,106,.2);
+  border-radius:14px;
+  padding:28px 24px 22px;
+  width:100%;max-width:500px;max-height:90vh;overflow-y:auto;
+  position:relative;
+  transform:scale(.97) translateY(8px);transition:transform .25s;
+}
+.edit-bg.show .edit-modal{transform:scale(1) translateY(0);}
+.edit-modal::-webkit-scrollbar{width:3px;}
+.edit-modal::-webkit-scrollbar-thumb{background:rgba(184,147,106,.2);}
+.edit-x{
+  position:absolute;top:13px;right:13px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust2);font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.edit-x:hover{color:var(--paper);}
+.edit-title-bar{
+  font-family:var(--serif);font-size:16px;font-weight:400;
+  color:var(--paper);margin-bottom:16px;
+}
+.pcard-edit-btn,.pcard-del-btn{
+  width:22px;height:22px;border-radius:4px;
+  background:transparent;border:1px solid rgba(255,255,255,.07);
+  color:var(--dust);font-size:9px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .15s;flex-shrink:0;
+}
+.pcard-edit-btn:hover{color:var(--gold);border-color:rgba(184,147,106,.3);}
+.pcard-del-btn:hover{color:#cf6679;border-color:rgba(207,102,121,.35);}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════ INTRO ══════════ -->
+<div id="intro">
+  <div class="intro-bg"></div>
+  <div class="intro-topline"></div>
+
+  <div class="intro-body">
+    <div class="intro-eyebrow">나의 詩집 · Poetry Shelf</div>
+
+    <div class="intro-title">
+      <span class="intro-title-ko">詩의 서재(書齋)</span>
+      <span class="intro-title-en">A Shelf of Poems</span>
+    </div>
+
+    <div class="intro-divider"><div class="intro-divider-gem"></div></div>
+
+    <div class="intro-verse">
+어떤 문장은 읽히는 것이 아니라, <strong>스며든다.</strong>
+논리가 닿지 못하는 자리에서
+시는 조용히 먼저 도착해 있다.
+
+우리는 기쁠 때보다 무너질 때,
+더 절실하게 언어를 찾는다.
+그 언어가 시다.
+
+이 서재는 <em>당신이 살아온 계절만큼</em>의 시들을 담을 수 있다.
+슬픔을 아름답게 견디게 한 한 줄,
+예상치 못한 곳에서 등을 밀어준 한 행,
+그 낱낱의 시들이 여기에 모인다.
+
+위로를 말로 건네기 어려울 때,
+<strong>詩 한 편을 전하십시오.</strong>
+그것으로 충분한 날들이 있습니다.
+    </div>
+
+    <div class="intro-poem-quote">풀이 눕는다
+비를 몰아오는 동풍에 나부껴
+풀은 눕고
+드디어 울었다
+<div class="intro-poem-attr">— 김수영, 〈풀〉</div>
+    </div>
+
+    <div class="intro-stats">
+      <div>
+        <div class="intro-stat-n" id="intro-count">5</div>
+        <div class="intro-stat-l">수록 詩篇</div>
+      </div>
+      <div>
+        <div class="intro-stat-n">8</div>
+        <div class="intro-stat-l">주제 분류</div>
+      </div>
+      <div>
+        <div class="intro-stat-n" style="font-size:clamp(18px,2.2vw,28px);letter-spacing:.05em;">無限</div>
+        <div class="intro-stat-l">마음의 여백</div>
+      </div>
+    </div>
+
+    <button class="intro-btn" onclick="enterApp()">서재로 들어가다</button>
+  </div>
+
+  <div class="intro-footer">
+    Co-created by <strong>지혜의 쉼터</strong> with <strong>Claude</strong> &nbsp;·&nbsp; &copy; 2026
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div id="app">
+  <header class="hdr">
+    <div class="hdr-inner">
+      <div class="logo" onclick="showIntro()">詩의 서재 <sub>PoetryShelf</sub></div>
+      <div class="hdr-right">
+        <div class="hdr-btn" onclick="openToday()">✨ <span class="hdr-btn-text">오늘의 詩</span></div>
+        <div class="hdr-btn" id="btn-fav" onclick="toggleFavOnly()">⭐ <span class="hdr-btn-text">즐겨찾기</span></div>
+        <div class="hdr-btn" onclick="showRandom()">🎲 <span class="hdr-btn-text">랜덤</span></div>
+        <div class="hdr-btn" onclick="openHelp()">📖 <span class="hdr-btn-text">도움말</span></div>
+        <div class="hdr-btn" onclick="openSettings()">⚙️ <span class="hdr-btn-text">설정</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 백업 알림 배너 (필요시 표시) -->
+  <div class="backup-banner" id="backup-banner" style="display:none">
+    ⚠️ 마지막 백업으로부터 30일이 지났습니다. 소중한 시집을 백업해 두세요.
+    <button onclick="exportData()">지금 백업</button>
+    <button class="backup-banner-x" onclick="dismissBackup()">✕</button>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-inner" id="filter-wrap"></div>
+  </div>
+
+  <div class="search-bar">
+    <div class="search-bar-inner">
+      <div class="search-wrap">
+        <input class="search-input" placeholder="시 제목, 시인, 시구로 검색하세요" oninput="onSearch(this.value)">
+      </div>
+    </div>
+  </div>
+
+  <!-- 감정 기반 탐색 -->
+  <div class="mood-bar">
+    <div class="mood-bar-inner">
+      <div class="mood-label">지금 기분</div>
+      <div class="mood-btn" onclick="setMood(this,'위로')" data-mood="위로">🌧 위로가 필요해</div>
+      <div class="mood-btn" onclick="setMood(this,'사랑')" data-mood="사랑">🌸 사랑하고 싶어</div>
+      <div class="mood-btn" onclick="setMood(this,'고독')" data-mood="고독">🌙 혼자이고 싶어</div>
+      <div class="mood-btn" onclick="setMood(this,'자연')" data-mood="자연">🍃 자연이 그리워</div>
+      <div class="mood-btn" onclick="setMood(this,'의지')" data-mood="의지">🔥 힘을 내고 싶어</div>
+      <div class="mood-btn" onclick="setMood(this,'기억')" data-mood="기억">📷 추억에 잠기고파</div>
+      <div class="mood-btn" onclick="setMood(this,'')" data-mood="">✕ 해제</div>
+    </div>
+  </div>
+
+  <div class="stats-bar" id="stats-bar"></div>
+
+  <div class="grid-wrap">
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<!-- ══════════ POEM DETAIL MODAL ══════════ -->
+<div class="modal-bg" id="modal-bg" onclick="onModalBg(event)">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <div class="modal-header">
+      <div class="modal-cat-row">
+        <div id="modal-cat"></div>
+        <div id="modal-sample-badge"></div>
+      </div>
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-meta">
+        <span id="modal-poet"></span>
+        <span id="modal-year"></span>
+      </div>
+    </div>
+    <div class="modal-poem" id="modal-poem"></div>
+    <div class="modal-source" id="modal-source"></div>
+
+    <!-- 감정 태그 -->
+    <div class="modal-emotion-row" id="modal-emotions"></div>
+
+    <!-- 한 줄 메모 -->
+    <div class="modal-memo-wrap">
+      <div class="modal-memo-label">나의 한 줄 기록</div>
+      <textarea class="modal-memo-input" id="modal-memo" rows="2"
+        placeholder="이 詩가 나에게 남긴 것…" oninput="saveMemo(currentId,this.value)"></textarea>
+    </div>
+
+    <div class="modal-nav">
+      <button class="modal-nav-btn" onclick="modalNav(-1)">‹ 이전 시</button>
+      <button class="modal-nav-btn" onclick="modalNav(1)">다음 시 ›</button>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" id="modal-fav-btn" onclick="toggleFav(currentId)">☆ 즐겨찾기</button>
+      <button class="modal-btn" onclick="sharePoem(currentId)">📤 공유</button>
+      <button class="modal-btn primary" onclick="copyPoem(currentId)">📋 복사</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TODAY MODAL ══════════ -->
+<div class="today-bg" id="today-bg" onclick="onTodayBg(event)">
+  <div class="today-modal">
+    <button class="today-modal-x" onclick="closeToday()">✕</button>
+    <div class="today-label">오늘의 詩</div>
+    <div class="today-poem-title" id="today-title"></div>
+    <div class="today-poet" id="today-poet"></div>
+    <div class="today-poem-text" id="today-text"></div>
+    <div class="today-actions">
+      <button class="today-btn" onclick="copyToday()">📋 복사</button>
+      <button class="today-btn" onclick="shareToday()">📤 공유</button>
+      <button class="today-btn next" onclick="nextToday()">다음 시 ›</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ HELP MODAL ══════════ -->
+<div class="help-bg" id="help-bg" onclick="onHelpBg(event)">
+  <div class="help-modal">
+    <button class="help-x" onclick="closeHelp()">✕</button>
+    <div class="help-title">시의 서재 사용 안내</div>
+    <div class="help-subtitle">처음 오신 분들을 위한 간단한 안내입니다</div>
+
+    <div class="help-section">
+      <div class="help-section-title">감상 & 기록</div>
+      <div class="help-item">
+        <div class="help-icon">💬</div>
+        <div class="help-text"><strong>감정 태그</strong> — 詩를 읽고 나서 느낀 감정을 태그로 남길 수 있습니다. "위로됐어", "울컥했어" 등 여러 개 선택 가능합니다.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-icon">✏️</div>
+        <div class="help-text"><strong>한 줄 기록</strong> — 詩 아래 "나의 한 줄 기록"에 떠오르는 생각이나 느낌을 적어두세요. 카드에 ✏️ 아이콘으로 표시됩니다.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-icon">✓</div>
+        <div class="help-text"><strong>읽기 기록</strong> — 한 번 읽은 詩는 카드에 ✓ 표시가 생깁니다. 읽지 않은 시를 찾는 데 도움이 됩니다.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-icon">🌙</div>
+        <div class="help-text"><strong>지금 기분</strong> — 검색 아래 "지금 기분" 바에서 현재 감정을 고르면 그 기분에 어울리는 詩들만 보여줍니다.</div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">기본 기능</div>
+      <div class="help-item">
+        <div class="help-icon">📖</div>
+        <div class="help-text"><strong>詩 읽기</strong> — 카드를 클릭하면 시 전문을 감상할 수 있습니다. 이전·다음 버튼으로 연속 감상도 가능합니다.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-icon">⭐</div>
+        <div class="help-text"><strong>즐겨찾기</strong> — 마음에 드는 시에 별표를 눌러두면 즐겨찾기 버튼으로 모아볼 수 있습니다.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-icon">🔍</div>
+        <div class="help-text"><strong>검색</strong> — 시 제목, 시인 이름, 또는 시구의 일부를 입력하면 바로 찾아줍니다.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-icon">✨</div>
+        <div class="help-text"><strong>오늘의 詩</strong> — 매일 다른 詩 한 편을 만날 수 있습니다. 앱을 열 때 자동으로 보여드립니다.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-icon">🎲</div>
+        <div class="help-text"><strong>랜덤</strong> — 무작위로 詩 한 편을 열어드립니다. 어떤 시가 나올지 모르는 것이 묘미입니다.</div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">詩 추가 & 공유</div>
+      <div class="help-item">
+        <div class="help-icon">➕</div>
+        <div class="help-text"><strong>나만의 詩 추가</strong> — ⚙️ 설정에서 시 제목, 시인, 본문을 입력해 내 시집에 추가할 수 있습니다.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-icon">📤</div>
+        <div class="help-text"><strong>시 공유하기</strong> — 시를 열고 [공유] 버튼을 누르면 이 앱 형식 그대로 상대방이 바로 추가할 수 있는 링크·코드가 생성됩니다.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-icon">📥</div>
+        <div class="help-text"><strong>받은 詩 추가</strong> — ⚙️ 설정 → [받은 詩 추가]에 공유받은 코드를 붙여넣으면 중복 없이 내 시집에 바로 추가됩니다.</div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">데이터 관리</div>
+      <div class="help-item">
+        <div class="help-icon">💾</div>
+        <div class="help-text"><strong>백업</strong> — ⚙️ 설정 → [JSON 백업]을 눌러 내 시집 전체를 파일로 저장해 두세요. 앱이 업데이트되어도 개인 시집은 유지됩니다.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-icon">🔄</div>
+        <div class="help-text"><strong>복원 & 병합</strong> — 백업 파일을 불러오거나, 다른 기기의 시집을 가져올 때 중복되는 시는 자동으로 걸러집니다.</div>
+      </div>
+    </div>
+
+    <div class="help-note">
+      💡 샘플로 수록된 시(카드 우상단에 <b>sample</b> 표시)는 기준이 되는 시편입니다. 직접 추가한 시는 언제든 수정·삭제할 수 있습니다.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ RECEIVE POEM MODAL ══════════ -->
+<div class="receive-bg" id="receive-bg" onclick="onReceiveBg(event)">
+  <div class="receive-modal">
+    <button class="receive-x" onclick="closeReceive()">✕</button>
+    <div class="receive-title">받은 詩 추가</div>
+    <div class="receive-sub">공유받은 詩 코드를 아래에 붙여넣으세요.<br>중복 여부를 확인 후 내 시집에 추가됩니다.</div>
+    <textarea class="s-input" id="receive-input" placeholder='{"title":"시 제목","poet":"시인","text":"시 본문..."}' style="min-height:100px;margin-bottom:12px;width:100%"></textarea>
+    <div id="receive-preview" class="receive-preview" style="display:none"></div>
+    <div class="receive-actions">
+      <button class="modal-btn" onclick="closeReceive()">취소</button>
+      <button class="modal-btn primary" onclick="doReceive()">내 시집에 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SETTINGS ══════════ -->
+<div class="settings-overlay" id="settings-ov" onclick="onSettingsOv(event)">
+  <div class="settings-panel">
+    <div class="settings-hdr">
+      <div class="settings-title">설정 &amp; 관리</div>
+      <button class="settings-x" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-body">
+      <div class="s-sec">
+        <div class="s-sec-title">새 詩 추가</div>
+        <input class="s-input" id="new-title" placeholder="시 제목">
+        <input class="s-input" id="new-poet" placeholder="시인 이름">
+        <input class="s-input" id="new-year" placeholder="발표 연도 (선택)">
+        <textarea class="s-input" id="new-text" placeholder="시 본문을 입력하세요&#10;줄바꿈은 Enter로 구분됩니다" style="min-height:100px"></textarea>
+        <input class="s-input" id="new-source" placeholder="출처 (선택)">
+        <select class="s-select" id="new-cat"><option value="">카테고리 선택</option></select>
+        <button class="s-btn primary" onclick="addPoem()">➕ 추가하기</button>
+      </div>
+      <div class="s-sec">
+        <div class="s-sec-title">공유 & 수신</div>
+        <div class="s-info"><strong>詩 공유</strong>는 詩 상세 화면의 [공유] 버튼을 이용하세요.</div>
+        <button class="s-btn" onclick="openReceive()">📥 받은 詩 추가</button>
+      </div>
+      <div class="s-sec">
+        <div class="s-sec-title">백업 &amp; 복원</div>
+        <div class="s-info"><strong>내 詩집 데이터</strong>는 이 기기에 저장됩니다. 30일마다 백업을 권장합니다.</div>
+        <button class="s-btn" onclick="exportData()">📤 JSON 백업</button>
+        <button class="s-btn" onclick="document.getElementById('imp').click()">📥 JSON 불러오기 (병합)</button>
+        <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+      <div class="s-sec">
+        <div class="s-sec-title">데이터 관리</div>
+        <button class="s-btn danger" onclick="clearUserPoems()">🗑 내가 추가한 詩 초기화</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══════════ EDIT MODAL ══════════ -->
+<div class="edit-bg" id="edit-bg" onclick="onEditBg(event)">
+  <div class="edit-modal">
+    <button class="edit-x" onclick="closeEdit()">✕</button>
+    <div class="edit-title-bar">詩 수정</div>
+    <input class="s-input" id="edit-title" placeholder="詩 제목">
+    <input class="s-input" id="edit-poet" placeholder="시인 이름">
+    <input class="s-input" id="edit-year" placeholder="발표 연도 (선택)">
+    <textarea class="s-input" id="edit-text" placeholder="詩 본문" style="min-height:140px"></textarea>
+    <input class="s-input" id="edit-source" placeholder="출처 (선택)">
+    <select class="s-select" id="edit-cat"><option value="">카테고리 선택</option></select>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="modal-btn" onclick="closeEdit()">취소</button>
+      <button class="modal-btn primary" onclick="saveEdit()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   카테고리 팔레트
+═══════════════════════════════════════ */
+const CAT = {
+  '자연·계절': { bg:'rgba(80,140,100,0.16)', color:'#70c090', border:'rgba(80,140,100,0.32)' },
+  '사랑·이별': { bg:'rgba(190,90,100,0.16)', color:'#e08090', border:'rgba(190,90,100,0.32)' },
+  '고독·성찰': { bg:'rgba(120,100,180,0.16)',color:'#a090d8', border:'rgba(120,100,180,0.32)' },
+  '저항·의지': { bg:'rgba(190,140,60,0.16)', color:'#d4a060', border:'rgba(190,140,60,0.32)' },
+  '삶·죽음':   { bg:'rgba(100,120,150,0.16)',color:'#90a8c8', border:'rgba(100,120,150,0.32)' },
+  '고향·기억': { bg:'rgba(160,120,80,0.16)', color:'#c0a070', border:'rgba(160,120,80,0.32)' },
+  '언어·예술': { bg:'rgba(80,150,170,0.16)', color:'#70c0d0', border:'rgba(80,150,170,0.32)' },
+  '위로·희망': { bg:'rgba(180,140,80,0.16)', color:'#d4b860', border:'rgba(180,140,80,0.32)' },
+  '인간·관계': { bg:'rgba(80,160,140,0.16)', color:'#60c8b0', border:'rgba(80,160,140,0.32)' },
+  '기타':      { bg:'rgba(100,95,115,0.16)', color:'#9090a8', border:'rgba(100,95,115,0.28)' },
+};
+
+/* ═══════════════════════════════════════
+   샘플 시 5편 — BASE 데이터
+═══════════════════════════════════════ */
+const BASE = [
+  {
+    id: "s001",
+    title: "서시",
+    poet: "윤동주",
+    year: "1991",
+    category: "고독·성찰",
+    text: `죽는 날까지 하늘을 우러러
+한 점 부끄럼이 없기를,
+잎새에 이는 바람에도
+나는 괴로워했다.
+별을 노래하는 마음으로
+모든 죽어가는 것을 사랑해야지
+그리고 나한테 주어진 길을
+걸어가야겠다.
+
+오늘 밤에도 별이 바람에 스치운다.`,
+    source: "미래사(1991)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s002",
+    title: "진달래꽃",
+    poet: "김소월",
+    year: "2013",
+    category: "사랑·이별",
+    text: `나 보기가 역겨워
+가실 때에는
+말없이 고이 보내드리오리다.
+
+영변에 약산
+진달래꽃
+아름 따다 가실 길에 뿌리오리다.
+
+가시는 걸음 걸음
+놓인 그 꽃을
+사뿐히 즈려밟고 가시옵소서.
+
+나 보기가 역겨워
+가실 때에는
+죽어도 아니 눈물 흘리오리다.`,
+    source: "문학동네(2013)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s003",
+    title: "국화 옆에서",
+    poet: "서정주",
+    year: "1997",
+    category: "자연·계절",
+    text: `한 송이의 국화꽃을 피우기 위해
+봄부터 소쩍새는
+그렇게 울었나 보다.
+
+한 송이의 국화꽃을 피우기 위해
+천둥은 먹구름 속에서
+또 그렇게 울었나 보다.
+
+그립고 아쉬움에 가슴 조이던
+머언 먼 젊음의 뒤안길에서
+인제는 돌아와 거울 앞에 선
+내 누님같이 생긴 꽃이여.`,
+    source: "민음사(1997)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s004",
+    title: "향수",
+    poet: "정지용",
+    year: "2003",
+    category: "고향·기억",
+    text: `넓은 벌 동쪽 끝으로
+옛이야기 지줄대는 실개천이 휘돌아 나가고,
+얼룩백이 황소가
+해설피 금빛 게으른 울음을 우는 곳,
+그곳이 차마 꿈엔들 잊힐 리야.`,
+    source: "민음사(2003)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s005",
+    title: "꽃",
+    poet: "김춘수",
+    year: "2002",
+    category: "언어·예술",
+    text: `내가 그의 이름을 불러 주기 전에는
+그는 다만
+하나의 몸짓에 지나지 않았다.
+
+내가 그의 이름을 불러 주었을 때
+그는 나에게로 와서
+꽃이 되었다.`,
+    source: "문학과지성사(2002)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s006",
+    title: "나룻배와 행인",
+    poet: "한용운",
+    year: "2003",
+    category: "삶·죽음",
+    text: `나는 나룻배
+당신은 행인
+
+당신은 흙발로 나를 짓밟습니다.
+나는 당신을 안고 물을 건너갑니다.
+나는 당신을 안으면 깊으나 얕으나 급한 여울이나 건너갑니다.`,
+    source: "창비(2003)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s007",
+    title: "풀꽃",
+    poet: "나태주",
+    year: "2012",
+    category: "자연·계절",
+    text: `자세히 보아야 예쁘다
+오래 보아야 사랑스럽다
+너도 그렇다.`,
+    source: "푸른길(2012)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s008",
+    title: "너에게 묻는다",
+    poet: "안도현",
+    year: "1994",
+    category: "저항·의지",
+    text: `연탄재 함부로 발로 차지 마라
+너는
+누구에게 한 번이라도 뜨거운 사람이었느냐.`,
+    source: "세계사(1994)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s009",
+    title: "흔들리며 피는 꽃",
+    poet: "도종환",
+    year: "2007",
+    category: "삶·죽음",
+    text: `흔들리지 않고 피는 꽃이 어디 있으랴
+이 세상 그 어떤 아름다운 꽃들도
+다 흔들리면서 피었나니`,
+    source: "랜덤하우스(2007)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s010",
+    title: "사랑하라 한번도 상처받지 않은 것처럼",
+    poet: "알프레드 디 소자",
+    year: "2005",
+    category: "사랑·이별",
+    text: `춤추라, 아무도 바라보고 있지 않은 것처럼.
+사랑하라, 한 번도 상처받지 않은 것처럼.
+노래하라, 아무도 듣고 있지 않은 것처럼.
+일하라, 돈이 필요하지 않은 것처럼.
+살라, 오늘이 마지막 날인 것처럼.`,
+    source: "오래된미래(2005)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s011",
+    title: "바람의 사생활",
+    poet: "이병률",
+    year: "2006",
+    category: "사랑·이별",
+    text: `어떤 날은 누군가 보고 싶어
+문득 고개를 들면
+바람이 내 얼굴을 만지고 지나간다.
+바람에게도 사생활이 있어서
+어딘가로 급히 가야 할 곳이 있는 모양이다.`,
+    source: "문학과지성사(2006)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s012",
+    title: "무제(시선)",
+    poet: "하상욱",
+    year: "2012",
+    category: "기타",
+    text: `끝이
+어딜까
+
+- 소시지 중 - 
+
+(하상욱 단편 시집 '서울 시' 수록)`,
+    source: "중앙북스(2012)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s013",
+    title: "가난한 내가 나타샤를 사랑해서",
+    poet: "백석",
+    year: "1997",
+    category: "사랑·이별",
+    text: `가난한 내가
+아름다운 나타샤를 사랑해서
+오늘밤은 푹푹 눈이 나린다`,
+    source: "실천문학사(1997)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s014",
+    title: "슬픔이 기쁨에게",
+    poet: "정호승",
+    year: "1976",
+    category: "고독·성찰",
+    text: `나는 이제 너에게도 슬픔을 주겠다.
+사랑보다 소중한 슬픔을 주겠다.
+겨울밤 거리에서 귤 몇 개 놓고
+살아온 추위와 떨고 있는 할머니에게
+귤값을 깎으면서 기뻐하던 너에게.`,
+    source: "창비(1976)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s015",
+    title: "방문객",
+    poet: "정현종",
+    year: "2009",
+    category: "삶·죽음",
+    text: `사람이 온다는 건
+실은 어마어마한 일이다.
+그는
+그의 과거와
+현재와
+그리고
+그의 미래와 함께 오기 때문이다.`,
+    source: "문학판(2009)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s016",
+    title: "사무원",
+    poet: "김기택",
+    year: "1999",
+    category: "삶·죽음",
+    text: `좁은 바늘구멍으로 황소바람 들어오듯
+가느다란 출근길로 쏟아져 들어오는 사람들.
+그들은 모두 사무원이다.
+그들의 표정은 사무적이고 그들의 걸음은 사무적이다.`,
+    source: "창비(1999)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s017",
+    title: "입 속의 검은 잎",
+    poet: "기형도",
+    year: "1989",
+    category: "고독·성찰",
+    text: `택시 운전사는 묵묵히 어디론가 나를 데려다주었다.
+나는 창밖을 보았고 도시의 모든 가로등은
+일제히 불을 끄고 있었다.
+내 입 속에는 검은 잎이 자라나고 있었다.`,
+    source: "문학과지성사(1989)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s018",
+    title: "농무",
+    poet: "신경림",
+    year: "1973",
+    category: "저항·의지",
+    text: `징이 울린다 막이 내렸다
+오동나무에 전등이 매어달린 가설무대
+구경꾼이 바진 운동장 주저앉아 벽에 기대어
+우리는 분이 얼룩진 얼굴로
+학교 앞 소줏집에 모여 술을 마신다.`,
+    source: "창비(1973)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s019",
+    title: "가지 않은 길",
+    poet: "로버트 프로스트",
+    year: "2015",
+    category: "삶·죽음",
+    text: `노란 숲속에 두 갈래 길이 있었습니다.
+나는 두 길을 다 가지 못하는 것을 안타깝게 생각하며,
+오랫동안 서서 한쪽 길이 굽어 꺾여 내려간 데까지
+바라다볼 수 있는 데까지 멀리 바라다보았습니다.`,
+    source: "민음사(2015)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s020",
+    title: "인생 찬가",
+    poet: "헨리 워즈워스 롱펠로",
+    year: "2013",
+    category: "저항·의지",
+    text: `슬픈 가락으로 내게 말하지 말라
+인생은 한낱 헛된 꿈에 불과하다고!
+잠자는 영혼은 죽은 것이며
+만물의 외양은 실상과 다른 것이니.
+인생은 실제다! 인생은 진지하다!`,
+    source: "혜원출판사(2013)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s021",
+    title: "검은 고양이",
+    poet: "라이너 마리아 릴케",
+    year: "2012",
+    category: "고독·성찰",
+    text: `유령이라도 그녀의 시선에 부딪히면
+그 소리에 부서질 것만 같다.
+그러나 그 어둠 속에서 당신은
+갑자기 당신을 쳐다보는 두 개의 눈동자를 본다.`,
+    source: "민음사(2012)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s022",
+    title: "황무지",
+    poet: "T. S. 엘리어트",
+    year: "2014",
+    category: "고독·성찰",
+    text: `4월은 가장 잔인한 달
+죽은 땅에서 라일락을 키워내고
+추억과 욕망을 뒤섞고
+잠든 뿌리를 봄비로 깨운다.`,
+    source: "민음사(2014)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s023",
+    title: "기뻐하라(무지개)",
+    poet: "윌리엄 워즈워스",
+    year: "2002",
+    category: "자연·계절",
+    text: `저 하늘의 무지개를 보면
+내 마음 설레느니.
+나 어린 시절에도 그러했고
+어른이 된 지금도 그러하거늘
+나 늙어서도 그러하리라.`,
+    source: "문학세계사(2002)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s024",
+    title: "소네트 18번",
+    poet: "윌리엄 셰익스피어",
+    year: "2014",
+    category: "사랑·이별",
+    text: `그대를 여름날에 비할 수 있을까요?
+그대는 여름보다 더 아름답고 온화합니다.
+거친 바람이 오월의 고운 꽃봉오리를 흔들고
+여름의 빌려온 기간은 너무나 짧습니다.
+(중략)
+인간이 숨을 쉴 수 있고 볼 수 있는 눈이 있는 한
+이 시는 살아남아 그대에게 생명을 줄 것입니다.`,
+    source: "민음사(2014)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s025",
+    title: "가을날",
+    poet: "라이너 마리아 릴케",
+    year: "2012",
+    category: "자연·계절",
+    text: `주여, 때가 왔습니다. 여름은 참으로 위대했습니다.
+해시계 위에 당신의 그림자를 얹으시고
+벌판 위로 바람을 풀어놓아 주십시오.
+마지막 열매들이 영글도록 명해 주시고
+그들에게 이틀만 더 남국의 햇볕을 주시어
+그들을 완숙케 하시고, 독한 포도주 속에
+마지막 단맛이 스며들게 하소서.
+(중략)
+지금 집이 없는 사람은 이제 집을 짓지 않습니다.
+지금 혼자인 사람은 오래도록 혼자로 남아
+잠 안 오는 밤에 책을 읽고 긴 편지를 쓸 것입니다.`,
+    source: "민음사(2012)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s026",
+    title: "취하라",
+    poet: "샤를 보들레르",
+    year: "2009",
+    category: "언어·예술",
+    text: `항상 취해 있어야 한다. 모든 것이 거기에 있다.
+그것만이 유일한 문제다. 당신의 어깨를 짓누르고,
+지상을 향해 당신의 허리를 굽히게 하는
+시간의 가혹한 짐을 느끼지 않으려면,
+쉴 새 없이 취해야 한다.
+하지만 무엇에? 술에, 시에, 혹은 덕에, 무엇에든 당신 마음대로.
+그저 취하라.`,
+    source: "문학과지성사(2009)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s027",
+    title: "시(Poetry)",
+    poet: "파블로 네루다",
+    year: "2007",
+    category: "언어·예술",
+    text: `그러니까 그 나이였다... 시가
+나를 찾아왔다. 난 모른다. 어디서 왔는지
+겨울에서인지 강에서인지.
+어떻게 언제 왔는지 모른다.
+아니다, 목소리는 아니었다. 말도 아니었고
+침묵도 아니었다.
+하지만 어느 길거리에서 나를 부르더군.`,
+    source: "민음사(2007)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s028",
+    title: "희망은 날개 달린 것",
+    poet: "에밀리 디킨슨",
+    year: "2016",
+    category: "저항·의지",
+    text: `희망은 날개 달린 것
+영혼의 횃대 위에 앉아
+가사 없는 가락을 노래하며
+결코 멈추는 법이 없다.
+아무리 거센 폭풍우도
+많은 이들의 마음을 따뜻하게 해 준
+이 작은 새를 당황하게 하지는 못하리.`,
+    source: "민음사(2016)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s029",
+    title: "나그네의 밤 노래",
+    poet: "요한 볼프강 폰 괴테",
+    year: "2003",
+    category: "자연·계절",
+    text: `모든 산봉우리 위에
+안식이 있네.
+모든 나뭇잎 끝에
+숨결 하나 느낄 수 없네.
+숲속의 새들도 잠잠하니
+기다려라, 머지않아
+너 또한 쉬게 되리니.`,
+    source: "민음사(2003)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s030",
+    title: "이니스프리의 호수 섬",
+    poet: "W. B. 예이츠",
+    year: "2002",
+    category: "고향·기억",
+    text: `나 이제 일어나 가리, 이니스프리로 가리.
+거기 나뭇가지 엮어 진흙 바른 작은 오두막을 짓고
+아홉 이랑 콩밭과 꿀벌 통 하나 두어
+벌들이 잉잉대는 숲속에 나 혼자 살리라.
+그러면 거기서 평화가 조금씩 내리리니.`,
+    source: "민음사(2002)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s031",
+    title: "함께 있되 거리를 두라",
+    poet: "칼릴 지브란",
+    year: "2013",
+    category: "고독·성찰",
+    text: `함께 있되 거리를 두라.
+그리하여 하늘바람이 너희 사이에서 춤추게 하라.
+서로 사랑하되 사랑으로 구속하지는 마라.
+차라리 너희 영혼의 해안 사이에 출렁이는 바다를 놓아두라.
+함께 노래하고 춤추며 즐거워하되
+각각 혼자로 있게 하라.`,
+    source: "해냄(2013)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s032",
+    title: "초원의 빛",
+    poet: "윌리엄 워즈워스",
+    year: "2002",
+    category: "자연·계절",
+    text: `여기 적힌 빛나던 한때의 광채가
+이제 눈앞에서 영원히 사라진다 한들 어떠리.
+초원의 빛, 꽃의 영광 어린 시간을
+그 어떤 것도 되돌릴 수 없다 한들 어떠리.
+우리는 슬퍼하지 않고, 오히려
+뒤에 남겨진 것에서 힘을 찾으리라.`,
+    source: "문학세계사(2002)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s033",
+    title: "즐거운 편지",
+    poet: "황동규",
+    year: "2002",
+    category: "사랑·이별",
+    text: `내 그대를 생각함은 항상 그대가 앉아 있는 배경에서 해가 지고 바람이 부는 일처럼 사소한 일일 것이나 언젠가 그대가 한없이 괴로움 속을 헤매일 때에 오랫동안 전해 오던 그 사소함으로 그대를 불러보리라.
+
+진실로 진실로 내가 그대를 사랑하는 까닭은 내 나의 사랑을 한없이 잇닿은 그 기다림으로 바꾸어 버린 데 있었다. 밤이 들면서 골짜기엔 눈이 퍼붓기 시작했다. 내 사랑도 어디쯤에선 반드시 그칠 것을 믿는다. 다만 그때 내 기다림의 자세를 생각하는 것뿐이다.`,
+    source: "문학과지성사(2002)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s034",
+    title: "귀천 (歸天)",
+    poet: "천상병",
+    year: "2013",
+    category: "삶·죽음",
+    text: `나 하늘로 돌아가리라.
+새벽빛 와 닿으면 스러지는
+이슬 더불어 손에 잡고,
+
+나 하늘로 돌아가리라.
+노을빛 함께 단둘이서
+기슭에서 놀다가 구름 손짓하며는,
+
+나 하늘로 돌아가리라.
+아름다운 이 세상 소풍 끝내는 날,
+가서, 아름다웠더라고 말하리라…….`,
+    source: "천상병 시인 전집(2013)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s035",
+    title: "수선화에게",
+    poet: "정호승",
+    year: "2015",
+    category: "고독·성찰",
+    text: `울지 마라
+외로우니까 사람이다
+살아간다는 것은 외로움을 견디는 일이다
+공연히 오지 않는 전화를 기다리지 마라
+눈이 내리면 눈길을 걸어가고
+비가 오면 빗길을 걸어가라
+갈대숲에서 가슴검은도요새도 너를 보고 있다
+가끔은 하느님도 외로워서 눈물을 흘리신다.`,
+    source: "비채(2015)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s036",
+    title: "담쟁이",
+    poet: "도종환",
+    year: "2004",
+    category: "저항·의지",
+    text: `저것은 벽
+어쩔 수 없는 벽이라고 우리가 느낄 때
+그때
+담쟁이는 말없이 그 벽을 오른다
+
+물 한 방울 없고 씨앗 한 톨 살아남을 수 없는
+저것은 절망의 벽이라고 말할 때
+담쟁이는 서두르지 않고 앞으로 나아간다
+한 뼘이라도 꼭 여럿이 함께 손을 잡고 올라간다.`,
+    source: "창비(2004)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s037",
+    title: "낙화 (落花)",
+    poet: "이형기",
+    year: "2006",
+    category: "자연·계절",
+    text: `가야 할 때가 언제인가를
+분명히 알고 가는 이의
+뒷모습은 얼마나 아름다운가.
+
+봄 한 철
+격정을 인내한
+나의 사랑은 지고 있다.
+
+분분한 낙화……
+결별이 이룩하는 축복에 싸여
+지금은 가야 할 때.`,
+    source: "문학세계사(2006)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s038",
+    title: "달이 떴다고 전화를 주시다니요",
+    poet: "김용택",
+    year: "2002",
+    category: "사랑·이별",
+    text: `달이 떴다고 전화를 주시다니요
+이 밤 너무 신나고 근사해요
+내 마음에도 생전 보지 못한
+환한 달이 뜨고
+별경이 다 생겼네요
+
+서늘한 저녁바람에 높은 가지 흔들리듯
+내 마음 당신께로 자꾸 흔들려 갑니다.`,
+    source: "푸른숲(2002)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s039",
+    title: "꽃자리",
+    poet: "구상",
+    year: "1996",
+    category: "삶·죽음",
+    text: `반갑고 고맙고 기쁘다.
+앉은 자리가 꽃자리니라!
+네가 시방 가시방석이라 여기는
+너의 앉은 자리가 바로 꽃자리니라.
+앉은 자리가 꽃자리니라.
+네가 시방 가시방석이라 여기는
+너의 앉은 자리가 바로 꽃자리니라.`,
+    source: "민음사(1996)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s040",
+    title: "별은 너에게로",
+    poet: "박노해",
+    year: "2010",
+    category: "저항·의지",
+    text: `어두운 길을 걷다가
+빛나는 별 하나 없다고
+절망하지 말아라
+
+가장 빛나는 별은 지금
+간절하게 길을 찾는 너에게로
+빛의 속도로 달려오고 있으니.`,
+    source: "느린걸음(2010)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s041",
+    title: "길",
+    poet: "윤동주",
+    year: "1991",
+    category: "고독·성찰",
+    text: `잃어버렸습니다.
+무얼 어디다 잃었는지 몰라
+두 손이 주머니를 더듬어
+길에 나아갑니다.`,
+    source: "미래사(1991)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s042",
+    title: "엄마 걱정",
+    poet: "기형도",
+    year: "1989",
+    category: "고향·기억",
+    text: `열무 삼십 단을 이고
+시장에 간 우리 엄마
+안 오시네, 해는 시든 지 오래
+나는 찬밥처럼 방에 담겨...`,
+    source: "문학과지성사(1989)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s043",
+    title: "폭포",
+    poet: "김수영",
+    year: "2003",
+    category: "저항·의지",
+    text: `폭포는 곧은 절벽을 무서운 기색도 없이 떨어진다.
+규정할 수 없는 물결이
+무엇을 향하여 떨어진다는 의미도 없이...`,
+    source: "민음사(2003)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s044",
+    title: "샤갈의 마을에 내리는 눈",
+    poet: "김춘수",
+    year: "2002",
+    category: "자연·계절",
+    text: `샤갈의 마을에는 3월에 눈이 온다.
+봄을 바라고 선 사나이의 관자놀이에
+새로 돋은 정맥이
+바르르 떤다.`,
+    source: "문학과지성사(2002)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s045",
+    title: "스물세 살",
+    poet: "서정주",
+    year: "1997",
+    category: "고독·성찰",
+    text: `스물세 살의 나를 키운 건 팔할(八割)이 바람이다.
+세상은 가도가도 부끄럽기만 하드라.`,
+    source: "민음사(1997)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s046",
+    title: "먼 후일",
+    poet: "김소월",
+    year: "2013",
+    category: "사랑·이별",
+    text: `먼 후일 당신이 찾으시면
+그때에 내 말이 '잊었노라'
+당신이 속으로 나무라시면
+'무척 그리다가 잊었노라'`,
+    source: "문학동네(2013)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s047",
+    title: "광야",
+    poet: "이육사",
+    year: "1991",
+    category: "저항·의지",
+    text: `까마득한 날에
+하늘이 처음 열리고
+어데 닭 우는 소리 들렸으랴.
+모든 산맥들이
+바다를 연모해 휘달릴 때도
+차마 이곳을 범하던 못하였으리라.`,
+    source: "미래사(1991)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s048",
+    title: "산유화",
+    poet: "김소월",
+    year: "2013",
+    category: "자연·계절",
+    text: `산에는 꽃 피네
+꽃이 피네
+갈 봄 여름 없이
+꽃이 피네.
+산에
+산에
+피는 꽃은
+저만치 혼자서 피어 있네.`,
+    source: "문학동네(2013)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s049",
+    title: "거울",
+    poet: "이상",
+    year: "2003",
+    category: "고독·성찰",
+    text: `거울속에는소리가없소
+저렇게까지조용한세상은참없을것이오
+거울속에도내게귀가있소
+내말을못알아듣는딱한귀가두개나있소`,
+    source: "문학과지성사(2003)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s050",
+    title: "흰 바람벽이 있어",
+    poet: "백석",
+    year: "1997",
+    category: "고향·기억",
+    text: `오늘 저녁 이 좁다란 방의 흰 바람벽에
+어쩐지 외로운 생각만이 오간다
+이 흰 바람벽에
+내 가난한 늙은 어머니가 있다
+내 가난한 늙은 어머니가
+이렇게 시퍼러둥둥하니 추운 날인데 차디찬 물에 손은 담그고 무이며 배추를 씻고 있다`,
+    source: "실천문학사(1997)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s051",
+    title: "내 마음은 호수요",
+    poet: "김동명",
+    year: "1936",
+    category: "사랑·이별",
+    text: `내 마음은 호수요
+그대 저어 오오
+나는 그대의 흰 그림자를 안고 옥같이
+그대의 뱃전에 부서지리이다.`,
+    source: "문장(1936)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s052",
+    title: "해가 뜨는 아침",
+    poet: "심훈",
+    year: "2004",
+    category: "저항·의지",
+    text: `먼동이 트는 아침의 그 서광을 보라
+어둠을 뚫고 솟아오르는 저 붉은 태양을!
+우리의 앞길을 밝혀주는 찬란한 빛이여
+어제의 고통을 씻어주는 희망의 노래여.`,
+    source: "창비(2004)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s053",
+    title: "연가",
+    poet: "김남조",
+    year: "2001",
+    category: "사랑·이별",
+    text: `눈이 오면
+눈길을 걸어 당신께 가겠습니다.
+비가 오면
+빗길을 뚫고 당신께 가겠습니다.
+우리의 사랑이 비바람에 젖을지라도
+그 인내의 끝에 당신이 계시기에.`,
+    source: "서문당(2001)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s054",
+    title: "성북동 비둘기",
+    poet: "김광섭",
+    year: "2004",
+    category: "저항·의지",
+    text: `성북동 산에 번지가 새로 생기면서
+본래 살던 성북동 비둘기만이 번지가 없어졌다.
+새벽부터 돌 깨는 산울림에 떨다가
+가슴에 금이 갔다.`,
+    source: "창비(2004)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s055",
+    title: "귀가",
+    poet: "문정희",
+    year: "2010",
+    category: "고독·성찰",
+    text: `돌아갈 곳이 있다는 것은 얼마나 다행인가.
+저녁놀이 지는 거리에 서서
+내 이름 부르는 따뜻한 등불 하나를 생각하는 일.
+인생은 결국 그 불빛을 찾아가는 긴 여정이다.`,
+    source: "민음사(2010)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s056",
+    title: "낙화",
+    poet: "조지훈",
+    year: "2006",
+    category: "자연·계절",
+    text: `꽃이 지기로소니
+바람을 탓하랴.
+주렴 밖에 별이 지는 풍경을
+차마 보지 못해 눈을 감는다.
+낙화가 쌓이는 마당에 고요한 슬픔이 흐른다.`,
+    source: "나남(2006)",
+    isSample: true,
+    addedAt: "2026-04-07"
+  },
+  {
+    id: "s057",
+    title: "접시꽃 당신",
+    poet: "도종환",
+    year: "1986",
+    category: "사랑·이별",
+    text: `흔들리지 않고 피는 꽃이 어디 있으랴
+이 세상 그 어떤 아름다운 꽃들도
+다 흔들리면서 피었나니
+흔들리면서 줄기를 곧게 세웠나니
+흔들리지 않고 가는 사랑이 어디 있으랴
+
+젖지 않고 피는 꽃이 어디 있으랴
+이 세상 그 어떤 빛나는 꽃들도
+다 젖으며 피었나니
+바람과 비에 젖으며 꽃잎 따뜻하게 피웠나니
+젖지 않고 가는 삶이 어디 있으랴`,
+    source: "《접시꽃 당신》, 실천문학사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s058",
+    title: "오늘도 날이 저문다",
+    poet: "이해인",
+    year: "1976",
+    category: "고독·성찰",
+    text: `오늘도 날이 저문다
+저무는 하늘 아래
+나는 무엇을 했는가
+
+사랑하기에도 짧은 하루를
+미워하고 다투다
+보냈는가
+
+내일은 오늘보다 더
+많이 사랑하리라
+더 많이 참으리라
+
+오늘도 날이 저문다
+저무는 하늘 앞에
+나는 고개를 숙인다`,
+    source: "《민들레의 영토》, 분도출판사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s059",
+    title: "봄길",
+    poet: "정호승",
+    year: "1993",
+    category: "위로·희망",
+    text: `길이 끝나는 곳에서도
+길이 있다
+길이 끝나는 곳에서도
+길이 되는 사람이 있다
+
+스스로 봄길이 되어
+끝없이 걸어가는 사람이 있다
+
+강물은 흘러가고
+꽃들은 떨어지고
+산은 저만치 물러서는데
+
+길이 끝나는 곳에서도
+길이 있다
+길이 끝나는 곳에서도
+길이 되는 사람이 있다`,
+    source: "《외롭고 높고 쓸쓸한》, 창작과비평사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s060",
+    title: "내가 사랑하는 사람",
+    poet: "정호승",
+    year: "2000",
+    category: "사랑·이별",
+    text: `나는 그늘이 없는 사람을 사랑하지 않는다
+나는 여름 한낮의 햇볕 아래
+뚜렷한 그늘을 거느리지 않는 사람을 사랑하지 않는다
+
+나는 한번도 울어보지 않은 사람을 사랑하지 않는다
+나는 죽음보다 더 깊은 슬픔의 강을
+건너가보지 않은 사람을 사랑하지 않는다
+
+나는 넘어져보지 않은 사람을 사랑하지 않는다
+나는 자신이 낮아지는 것을 두려워하지 않는
+그리하여 이 세상 마지막 날까지
+소외된 사람들의 눈물을 닦아줄 수 있는
+영원히 넘어지는 사람을 사랑한다`,
+    source: "《눈물이 나면 기차를 타라》, 창작과비평사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s061",
+    title: "나와 나타샤와 흰 당나귀",
+    poet: "백석",
+    year: "1938",
+    category: "사랑·이별",
+    text: `가난한 내가
+아름다운 나타샤를 사랑해서
+오늘밤은 푹푹 눈이 나린다
+
+나타샤를 사랑은 하고
+눈은 푹푹 날리고
+나는 혼자 쓸쓸히 앉어 소주를 마신다
+소주를 마시며 생각한다
+나타샤와 나는
+눈이 푹푹 쌓이는 밤 흰 당나귀 타고
+산골로 가자 출출이 우는 깊은 산골로 가 마가리에 살자
+
+눈은 푹푹 나리고
+나는 나타샤를 생각하고
+나타샤가 아니올시다 하면
+눈은 더 푹푹 날리고
+나는 나타샤를 사랑하고`,
+    source: "《백석 시집》",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s062",
+    title: "목계장터",
+    poet: "신경림",
+    year: "1973",
+    category: "고향·기억",
+    text: `하늘은 날더러 구름이 되라 하고
+땅은 날더러 바람이 되라 하네
+청룡 흑룡 흩어져 비 개인 나루
+잡초나 일깨우는 잔바람이 되라네
+
+뱃길이라 서울 사흘 목계나루에
+아흐레 나흘 찾아 박가분 파는
+가을볕도 서러운 방물장수 되라네
+
+산은 날더러 들꽃이 되라 하고
+강은 날더러 잔돌이 되라 하네`,
+    source: "《농무》, 창작과비평사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s063",
+    title: "저문강에 삽을 씻고",
+    poet: "정희성",
+    year: "1978",
+    category: "삶·죽음",
+    text: `흐르는 것이 물뿐이랴
+우리가 저와 같아서
+강변에 나가 삽을 씻으며
+거기 슬픔도 씻을 수 있다면
+
+삽자루에 맡긴 한 생애가
+이렇게 저물고, 저물어서
+샛강 바닥 썩은 물에
+달이 뜨는구나
+
+우리가 저와 같아서
+흐르는 것이 물뿐이랴
+강변에 나가 삽을 씻으며
+거기 쓸쓸함도 씻을 수 있다면`,
+    source: "《저문강에 삽을 씻고》, 창작과비평사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s064",
+    title: "그대가 곁에 있어도 나는 그대가 그립다",
+    poet: "류시화",
+    year: "1991",
+    category: "사랑·이별",
+    text: `그대가 곁에 있어도
+나는 그대가 그립다
+
+이 세상 어딘가에 그대가 있어
+나는 혼자가 아니다
+그러나 그대가 곁에 있어도
+나는 그대가 그립다
+
+어떤 슬픔은 만남 속에 있고
+어떤 그리움은 가까움 속에 있다`,
+    source: "《그대가 곁에 있어도 나는 그대가 그립다》, 열림원",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s065",
+    title: "사람이 온다는 건",
+    poet: "정현종",
+    year: "1975",
+    category: "인간·관계",
+    text: `사람이 온다는 건
+실은 어마어마한 일이다
+그는
+그의 과거와
+현재와
+그리고
+그의 미래와 함께 오기 때문이다
+한 사람의 일생이 오기 때문이다
+
+부서지기 쉬운
+그래서 부서지기도 했을
+마음이 오는 것이다`,
+    source: "《사랑할 시간이 많지 않다》, 문학과지성사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s066",
+    title: "행복",
+    poet: "유치환",
+    year: "1954",
+    category: "고독·성찰",
+    text: `사랑하는 것은
+사랑을 받느니보다 행복하나니라
+오늘도 나는 에메랄드빛 하늘이
+환히 내다뵈는 우물 속에 들어앉아
+이 세상 한편 구석에서
+하나의 작은 유리알처럼
+아름답게 굴러가고 싶다`,
+    source: "《청마 유치환 시집》",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s067",
+    title: "깃발",
+    poet: "유치환",
+    year: "1939",
+    category: "저항·의지",
+    text: `이것은 소리 없는 아우성
+저 푸른 해원을 향하여 흔드는
+영원한 노스탤지어의 손수건
+순정은 물결같이 바람에 나부끼고
+오로지 맑고 곧은 이념의 깃대 끝에
+애수는 백로처럼 날개를 펴다
+아아 누구던가
+이렇게 슬프고도 애달픈 마음을
+맨 처음 공중에 달 줄을 안 그는`,
+    source: "《청마 유치환 시집》",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s068",
+    title: "봄은",
+    poet: "신동엽",
+    year: "1959",
+    category: "저항·의지",
+    text: `봄은
+남해에서도 북녘에서도
+오지 않는다
+
+너그럽고
+빛나는
+봄의 그 곳은
+삼천리 마음속에 있다
+
+폭압의 구름 몰아간 뒤
+혁명처럼 쏟아지는
+맑은 하늘
+그 환한 봄`,
+    source: "《껍데기는 가라》, 창작과비평사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s069",
+    title: "어느 날 고궁을 나오면서",
+    poet: "김수영",
+    year: "1965",
+    category: "저항·의지",
+    text: `왜 나는 조그마한 일에만 분개하는가
+저 王宮 대신에 王宮의 음탕 대신에
+오십 원짜리 갈비가 기름 덩어리만 나왔다고 분개하고
+
+이 땅의 지배 체계를
+아무도 모르는 사이에
+하나하나 무너뜨리고 있는 것에
+분개하지 못하는가
+
+나는 왜 이처럼 조그마한 일에만 분개하는가`,
+    source: "《김수영 전집》, 민음사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s070",
+    title: "사랑을 잃고 나는 쓰네",
+    poet: "기형도",
+    year: "1989",
+    category: "사랑·이별",
+    text: `잊어버리자, 그대 이름
+사랑을 잃고 나는 쓰네
+
+잘 있거라, 짧았던 봄날들아
+꽃들도 시름없이 지고
+
+사랑을 잃고 나는 쓰네
+쓸 수 있으므로 아직 살아있고
+살아있으므로 쓸 수 있다`,
+    source: "《입 속의 검은 잎》, 문학과지성사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s071",
+    title: "엄마야 누나야",
+    poet: "김소월",
+    year: "1922",
+    category: "고향·기억",
+    text: `엄마야 누나야 강변 살자
+뜰에는 반짝이는 금모래빛
+뒷문 밖에는 갈잎의 노래
+엄마야 누나야 강변 살자`,
+    source: "《개벽》",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s072",
+    title: "모든 순간이 꽃봉오리인 것을",
+    poet: "고은",
+    year: "1997",
+    category: "위로·희망",
+    text: `나 이제 가노라
+저 무성한 갈대숲을 지나
+청량한 강물에 몸을 씻고
+가노라
+
+남은 것은 남아 있는 이들의 것
+
+모든 순간이 꽃봉오리인 것을
+나는 이제야 알았노라`,
+    source: "《순간의 꽃》, 문학동네",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s073",
+    title: "당신이 없어서",
+    poet: "나태주",
+    year: "2015",
+    category: "사랑·이별",
+    text: `당신이 없어서
+세상이 이리 허전하고
+
+당신이 없어서
+하루가 이리 길고
+
+당신이 없어서
+밥이 이리 맛이 없고
+
+당신이 없어서
+잠이 이리 오지 않고
+
+당신이 없어서
+나는 이리 나약해졌나봐`,
+    source: "《꽃을 보듯 너를 본다》, 지혜",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s074",
+    title: "봄길 (도종환)",
+    poet: "도종환",
+    year: "1986",
+    category: "위로·희망",
+    text: `흔들리지 않고 피는 꽃이 어디 있으랴
+이 세상 그 어떤 아름다운 꽃들도
+다 흔들리면서 피었나니
+흔들리면서 줄기를 곧게 세웠나니
+
+젖지 않고 피는 꽃이 어디 있으랴
+이 세상 그 어떤 빛나는 꽃들도
+다 젖으며 피었나니
+바람과 비에 젖으며 꽃잎 따뜻하게 피웠나니`,
+    source: "《접시꽃 당신》, 실천문학사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s075",
+    title: "봄길 (정호승)",
+    poet: "정호승",
+    year: "1993",
+    category: "위로·희망",
+    text: `길이 끝나는 곳에서도
+길이 있다
+길이 끝나는 곳에서도
+길이 되는 사람이 있다
+
+스스로 봄길이 되어
+끝없이 걸어가는 사람이 있다`,
+    source: "《외롭고 높고 쓸쓸한》, 창작과비평사",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s076",
+    title: "The Road Not Taken",
+    poet: "Robert Frost",
+    year: "1916",
+    category: "고독·성찰",
+    text: `Two roads diverged in a yellow wood,
+And sorry I could not travel both
+And be one traveler, long I stood
+And looked down one as far as I could
+To where it bent in the undergrowth;
+
+I shall be telling this with a sigh
+Somewhere ages and ages hence:
+Two roads diverged in a wood, and I—
+I took the one less traveled by,
+And that has made all the difference.
+
+두 길이 숲 속에서 갈라졌습니다
+나는 두 길을 다 가지 못하는 것을 아쉬워하며
+오랫동안 서서 바라보았습니다
+사람들이 덜 걸어간 길을 택하였다고
+그리고 그것이 모든 것을 바꾸어 놓았다고`,
+    source: "《Mountain Interval》, Henry Holt and Company",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s077",
+    title: "If",
+    poet: "Rudyard Kipling",
+    year: "1910",
+    category: "저항·의지",
+    text: `If you can keep your head when all about you
+Are losing theirs and blaming it on you,
+If you can trust yourself when all men doubt you,
+But make allowance for their doubting too;
+
+If you can dream—and not make dreams your master;
+If you can think—and not make thoughts your aim;
+If you can meet with Triumph and Disaster
+And treat those two impostors just the same:
+
+Yours is the Earth and everything that's in it,
+And—which is more—you'll be a Man, my son!
+
+모두가 너를 의심할 때 너 자신을 믿을 수 있다면
+승리와 패배를 똑같이 받아들일 수 있다면
+이 세상도 그 안의 모든 것도 너의 것이 될 것이다`,
+    source: "《Rewards and Fairies》, Macmillan",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s078",
+    title: "Still I Rise",
+    poet: "Maya Angelou",
+    year: "1978",
+    category: "저항·의지",
+    text: `You may write me down in history
+With your bitter, twisted lies,
+You may trod me in the very dirt
+But still, like dust, I'll rise.
+
+Out of the huts of history's shame I rise
+Up from a past that's rooted in pain I rise
+I'm a black ocean, leaping and wide,
+Welling and swelling I bear in the tide.
+
+너는 나를 역사 속에 묻으려 하지만
+먼지처럼 나는 일어선다
+고통의 뿌리로부터 나는 일어선다`,
+    source: "《And Still I Rise》, Random House",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s079",
+    title: "Wild Geese",
+    poet: "Mary Oliver",
+    year: "1986",
+    category: "위로·희망",
+    text: `You do not have to be good.
+You do not have to walk on your knees
+for a hundred miles through the desert repenting.
+You only have to let the soft animal of your body
+love what it loves.
+
+Tell me about despair, yours, and I will tell you mine.
+Meanwhile the world goes on.
+
+착하지 않아도 된다
+사막을 무릎으로 기어가지 않아도 된다
+그저 너의 몸이라는 부드러운 동물이
+사랑하는 것을 사랑하게 두어라`,
+    source: "《Dream Work》, Atlantic Monthly Press",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s080",
+    title: "Tell me, what is it you plan to do",
+    poet: "Mary Oliver",
+    year: "1990",
+    category: "삶·죽음",
+    text: `Who made the world?
+Who made the swan, and the black bear?
+Who made the grasshopper?
+
+Tell me, what is it you plan to do
+with your one wild and precious life?
+
+이 하나뿐인
+거칠고 소중한 삶으로
+당신은 무엇을 할 것인가?`,
+    source: "《House of Light》, Beacon Press",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s081",
+    title: "Invictus",
+    poet: "William Ernest Henley",
+    year: "1875",
+    category: "저항·의지",
+    text: `Out of the night that covers me,
+Black as the pit from pole to pole,
+I thank whatever gods may be
+For my unconquerable soul.
+
+In the fell clutch of circumstance
+I have not winced nor cried aloud.
+Under the bludgeonings of chance
+My head is bloody, but unbowed.
+
+I am the master of my fate,
+I am the captain of my soul.
+
+나는 내 운명의 주인이요
+나는 내 영혼의 선장이다`,
+    source: "《Book of Verses》, David Nutt",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s082",
+    title: "When You Are Old",
+    poet: "W.B. Yeats",
+    year: "1893",
+    category: "사랑·이별",
+    text: `When you are old and grey and full of sleep,
+And nodding by the fire, take down this book,
+And slowly read, and dream of the soft look
+Your eyes had once, and of their shadows deep;
+
+How many loved your moments of glad grace,
+And loved your beauty with love false or true,
+But one man loved the pilgrim soul in you,
+And loved the sorrows of your changing face;
+
+그대 늙어 졸음에 가득 차 난롯가에 앉아
+한 사람만이 그대의 순례하는 영혼을 사랑했노라`,
+    source: "《The Rose》, T. Fisher Unwin",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s083",
+    title: "Do Not Go Gentle into That Good Night",
+    poet: "Dylan Thomas",
+    year: "1947",
+    category: "삶·죽음",
+    text: `Do not go gentle into that good night,
+Old age should burn and rave at close of day;
+Rage, rage against the dying of the light.
+
+Though wise men at their end know dark is right,
+Because their words had forked no lightning they
+Do not go gentle into that good night.
+
+And you, my father, there on the sad height,
+Curse, bless, me now with your fierce tears, I pray.
+Rage, rage against the dying of the light.
+
+저 좋은 밤 속으로 순순히 가지 마오
+꺼져가는 빛에 맞서 분노하고 또 분노하오`,
+    source: "《In Country Sleep and Other Poems》",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s084",
+    title: "The Guest House",
+    poet: "Rumi",
+    year: "1207",
+    category: "위로·희망",
+    text: `This being human is a guest house.
+Every morning a new arrival.
+
+A joy, a depression, a meanness,
+some momentary awareness comes
+as an unexpected visitor.
+
+Welcome and entertain them all!
+Even if they are a crowd of sorrows,
+who violently sweep your house
+empty of its furniture,
+still, treat each guest honorably.
+
+인간이라는 것은 여인숙이다
+매일 아침 새로운 손님이 온다
+기쁨이든 슬픔이든 모두 환영하라`,
+    source: "《Masnavi》, 13세기 페르시아 원전",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s085",
+    title: "Love After Love",
+    poet: "Derek Walcott",
+    year: "1976",
+    category: "고독·성찰",
+    text: `The time will come
+when, with elation,
+you will greet yourself arriving
+at your own door, in your own mirror,
+and each will smile at the other's welcome,
+
+and say, sit here. Eat.
+You will love again the stranger who was your self.
+Give wine. Give bread. Give back your heart
+to itself, to the stranger who has loved you
+all your life, whom you ignored for another.
+
+때가 오면 너는 환호하며
+너 자신을 맞이하게 될 것이다
+오래 무시해온 낯선 자, 바로 너 자신을`,
+    source: "《Sea Grapes》, Farrar Straus Giroux",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s086",
+    title: "Desiderata",
+    poet: "Max Ehrmann",
+    year: "1927",
+    category: "고독·성찰",
+    text: `Go placidly amid the noise and haste,
+and remember what peace there may be in silence.
+As far as possible, without surrender,
+be on good terms with all persons.
+
+Speak your truth quietly and clearly;
+and listen to others,
+even the dull and the ignorant;
+they too have their story.
+
+Be yourself. Especially do not feign affection.
+Neither be cynical about love,
+for in the face of all aridity and disenchantment,
+it is as perennial as the grass.
+
+소음과 서두름 속에서 조용히 나아가라
+침묵 속에 평화가 있음을 기억하라
+가능한 한 모든 사람과 좋은 관계를 유지하라`,
+    source: "《Desiderata》, Crescendo Publishing",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s087",
+    title: "Phenomenal Woman",
+    poet: "Maya Angelou",
+    year: "1978",
+    category: "인간·관계",
+    text: `Pretty women wonder where my secret lies.
+I'm not cute or built to suit a fashion model's size
+But when I start to tell them,
+They think I'm telling lies.
+I say,
+It's in the reach of my arms,
+The span of my hips,
+The stride of my step,
+The curl of my lips.
+I'm a woman, Phenomenally.
+Phenomenal woman, that's me.
+
+아름다운 여인들은 내 비밀이 어디 있냐고 묻지
+나는 그저 나답게 걷고 나답게 웃는다`,
+    source: "《And Still I Rise》, Random House",
+    isSample: true,
+    addedAt: "2026-04-08"
+  },
+  {
+    id: "s088",
+    title: "The Peace of Wild Things",
+    poet: "Wendell Berry",
+    year: "1968",
+    category: "자연·계절",
+    text: `When despair for the world grows in me
+and I wake in the night at the least sound
+in fear of what my life and my children's lives may be,
+I go and lie down where the wood drake
+rests in his beauty on the water, and the great heron feeds.
+
+I come into the peace of wild things
+who do not tax their lives with forethought of grief.
+
+세상에 대한 절망이 내 안에 자랄 때
+나는 야생의 평화 속으로 들어간다
+슬픔을 미리 걱정하지 않는 것들 곁에서`,
+    source: "《Openings》, Harcourt Brace",
+    isSample: true,
+    addedAt: "2026-04-08"
+  }
+
+];
+
+/* ═══════════════════════════════════════
+   앱 상태
+═══════════════════════════════════════ */
+let POEMS     = [...BASE];
+let userPoems = JSON.parse(localStorage.getItem('ps_user') || '[]');
+let favs      = JSON.parse(localStorage.getItem('ps_favs') || '[]');
+let memos     = JSON.parse(localStorage.getItem('ps_memos') || '{}');
+let emotions  = JSON.parse(localStorage.getItem('ps_emotions') || '{}');
+let readLog   = JSON.parse(localStorage.getItem('ps_read') || '[]');
+let activeFilter = '전체';
+let activeMood   = '';
+let favOnly   = false;
+let searchQ   = '';
+let currentId = null;
+let todayIdx  = parseInt(localStorage.getItem('ps_today') || '0');
+
+/* 사용자 시 병합 */
+(function(){
+  const ids = new Set(POEMS.map(p=>p.id));
+  userPoems.forEach(p=>{ if(!ids.has(p.id)) POEMS.push(p); });
+})();
+
+/* ── 인트로 수록 수 업데이트 */
+document.getElementById('intro-count').textContent = POEMS.length;
+
+/* ── 카테고리 select 채우기 */
+(function(){
+  const sel = document.getElementById('new-cat');
+  Object.keys(CAT).forEach(c=>{
+    const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o);
+  });
+})();
+
+/* ═══════════════════════════════════════
+   진입 / 인트로
+═══════════════════════════════════════ */
+function enterApp(){
+  document.getElementById('intro').style.display='none';
+  document.getElementById('app').style.display='block';
+  checkBackupWarning();
+  /* 하루 한 번 오늘의 詩 자동 팝업 */
+  const today = new Date().toISOString().slice(0,10);
+  if(localStorage.getItem('ps_today_shown') !== today){
+    localStorage.setItem('ps_today_shown', today);
+    setTimeout(()=>openToday(), 400);
+  }
+}
+function showIntro(){
+  document.getElementById('intro').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+
+/* ═══════════════════════════════════════
+   백업 경고
+═══════════════════════════════════════ */
+function checkBackupWarning(){
+  const last = localStorage.getItem('ps_last_backup');
+  if(!last) return;
+  const days = Math.floor((Date.now()-new Date(last).getTime())/(86400000));
+  if(days >= 30){
+    document.getElementById('backup-banner').style.display='flex';
+  }
+}
+function dismissBackup(){
+  document.getElementById('backup-banner').style.display='none';
+}
+
+/* ═══════════════════════════════════════
+   필터
+═══════════════════════════════════════ */
+function renderFilters(){
+  const cats = ['전체',...Object.keys(CAT)];
+  document.getElementById('filter-wrap').innerHTML = cats.map(c=>{
+    const cnt = c==='전체' ? POEMS.length : POEMS.filter(p=>p.category===c).length;
+    if(c==='전체'){
+      return `<div class="filter-btn all-btn${activeFilter==='전체'?' active':''}" onclick="setFilter('전체')">전체 <span style="opacity:.5">${cnt}</span></div>`;
+    }
+    const cl = CAT[c];
+    const isActive = activeFilter===c;
+    const st = isActive
+      ? `background:${cl.bg};color:${cl.color};border-color:${cl.border}`
+      : `background:rgba(255,255,255,.04);color:var(--dust2);border-color:rgba(255,255,255,.08)`;
+    return `<div class="filter-btn" style="${st}" onclick="setFilter('${c}')">${c} <span style="opacity:.5">${cnt}</span></div>`;
+  }).join('');
+}
+function setFilter(cat){
+  activeFilter=cat;
+  if(cat==='전체' && favOnly) favOnly=false;
+  renderFilters(); renderGrid(); renderStats();
+}
+
+/* ═══════════════════════════════════════
+   통계
+═══════════════════════════════════════ */
+function renderStats(){
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat-item"><strong>${POEMS.length}</strong>편 수록</div>
+    <div class="stat-sep">·</div>
+    <div class="stat-item"><strong>${favs.length}</strong>개 즐겨찾기</div>
+    <div class="stat-sep">·</div>
+    <div class="stat-item"><strong>${getFiltered().length}</strong>개 표시</div>
+  `;
+  document.getElementById('btn-fav').classList.toggle('active', favOnly);
+}
+
+/* ═══════════════════════════════════════
+   그리드
+═══════════════════════════════════════ */
+/* 기분(무드) 필터 매핑 */
+const MOOD_MAP = {
+  '위로':  ['위로·희망', '고독·성찰'],
+  '사랑':  ['사랑·이별', '인간·관계'],
+  '고독':  ['고독·성찰', '삶·죽음'],
+  '자연':  ['자연·계절'],
+  '의지':  ['저항·의지', '위로·희망'],
+  '기억':  ['고향·기억'],
+};
+
+function setMood(el, mood){
+  activeMood = mood;
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));
+  if(mood) el.classList.add('active');
+  renderGrid();
+}
+
+function getFiltered(){
+  let list = POEMS;
+  if(favOnly) list = list.filter(p=>favs.includes(p.id));
+  if(activeFilter!=='전체') list = list.filter(p=>p.category===activeFilter);
+  if(activeMood && MOOD_MAP[activeMood]){
+    list = list.filter(p=>MOOD_MAP[activeMood].includes(p.category));
+  }
+  if(searchQ){
+    const s=searchQ.toLowerCase();
+    list=list.filter(p=>
+      p.title.toLowerCase().includes(s) ||
+      p.poet.toLowerCase().includes(s) ||
+      p.text.toLowerCase().includes(s)
+    );
+  }
+  return list;
+}
+
+function renderGrid(){
+  /* 최신 추가순: userPoems(사용자추가) 먼저, 그 다음 샘플 역순 */
+  const list = getFiltered().slice().sort((a,b)=>{
+    const aUser = !a.isSample; const bUser = !b.isSample;
+    if(aUser && !bUser) return -1;
+    if(!aUser && bUser) return 1;
+    /* 같은 그룹 내에선 addedAt 역순 */
+    return (b.addedAt||'').localeCompare(a.addedAt||'');
+  });
+  const grid = document.getElementById('grid');
+  if(!list.length){
+    grid.innerHTML='<div class="empty"><div class="empty-icon">🌿</div><div>詩가 없습니다</div></div>';
+    renderStats(); return;
+  }
+  grid.innerHTML = list.map((p,i)=>{
+    const isFav = favs.includes(p.id);
+    const c = CAT[p.category]||CAT['기타'];
+    const preview = p.text.split('\n').filter(l=>l.trim()).slice(0,3).join('\n');
+    const delay = Math.min(i*15,400);
+    const hasRead = readLog.includes(p.id);
+    const hasMemo = memos[p.id] && memos[p.id].trim();
+    const isUser = !p.isSample;
+    return `
+    <div class="pcard${isFav?' fav':''}${hasRead?' read':''}" style="animation-delay:${delay}ms" onclick="openModal('${p.id}')">
+      <div class="pcard-head">
+        <span class="pcard-cat" style="background:${c.bg};color:${c.color}">${p.category}</span>
+        <div style="display:flex;align-items:center;gap:5px">
+          ${p.isSample?'<span class="pcard-sample">sample</span>':''}
+          ${hasMemo?'<span title="메모 있음" style="font-size:10px;color:var(--gold);opacity:.7">✏️</span>':''}
+          <button class="fav-star${isFav?' on':''}" onclick="event.stopPropagation();toggleFav('${p.id}')">${isFav?'★':'☆'}</button>
+        </div>
+      </div>
+      <div class="pcard-title">${p.title}</div>
+      <div class="pcard-poet">${p.poet}${p.year?' · '+p.year:''}</div>
+      <div class="pcard-preview">${preview}</div>
+      <div class="pcard-foot">
+        <div class="pcard-year">${p.source||''}</div>
+        <div class="pcard-actions">
+          ${isUser?`<button class="pcard-edit-btn" onclick="event.stopPropagation();openEdit('${p.id}')" title="수정">✎</button>`:''}
+          ${isUser?`<button class="pcard-del-btn" onclick="event.stopPropagation();deletePoem('${p.id}')" title="삭제">✕</button>`:''}
+          <button class="pcard-btn" onclick="event.stopPropagation();copyPoem('${p.id}')" title="복사">📋</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  renderStats();
+}
+
+/* ═══════════════════════════════════════
+   시 상세 모달
+═══════════════════════════════════════ */
+function openModal(id){
+  currentId = id;
+  const p = POEMS.find(x=>x.id===id);
+  const c = CAT[p.category]||CAT['기타'];
+  document.getElementById('modal-cat').innerHTML =
+    `<span style="background:${c.bg};color:${c.color};font-size:10px;padding:2px 9px;border-radius:20px;font-weight:500;border:1px solid ${c.border}">${p.category}</span>`;
+  document.getElementById('modal-sample-badge').innerHTML =
+    p.isSample ? '<span style="font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(184,147,106,.1);color:var(--gold);border:1px solid rgba(184,147,106,.2);margin-left:6px">sample</span>' : '';
+  document.getElementById('modal-title').textContent = p.title;
+  document.getElementById('modal-poet').textContent = p.poet;
+  document.getElementById('modal-year').textContent = p.year ? '· '+p.year : '';
+  document.getElementById('modal-poem').textContent = p.text;
+  document.getElementById('modal-source').textContent = p.source ? '— '+p.source : '';
+  document.getElementById('modal-fav-btn').textContent = favs.includes(id)?'★ 즐겨찾기 해제':'☆ 즐겨찾기';
+
+  /* 읽기 기록 */
+  if(!readLog.includes(id)){ readLog.push(id); localStorage.setItem('ps_read',JSON.stringify(readLog)); }
+
+  /* 감정 태그 */
+  const EMOTION_LABELS = ['위로됐어','울컥했어','설렜어','공감됐어','힘이 났어','추억이 떠올랐어','다시 읽고 싶어'];
+  const myEmotions = emotions[id] || [];
+  document.getElementById('modal-emotions').innerHTML = EMOTION_LABELS.map(e=>
+    `<span class="emotion-tag${myEmotions.includes(e)?' active':''}" onclick="toggleEmotion('${id}','${e}',this)">${e}</span>`
+  ).join('');
+
+  /* 메모 */
+  document.getElementById('modal-memo').value = memos[id] || '';
+
+  document.getElementById('modal-bg').classList.add('show');
+  renderGrid();
+}
+function toggleEmotion(id, label, el){
+  if(!emotions[id]) emotions[id]=[];
+  if(emotions[id].includes(label)){
+    emotions[id]=emotions[id].filter(e=>e!==label);
+    el.classList.remove('active');
+  } else {
+    emotions[id].push(label);
+    el.classList.add('active');
+  }
+  localStorage.setItem('ps_emotions',JSON.stringify(emotions));
+  renderGrid();
+}
+function saveMemo(id, val){
+  if(!id) return;
+  memos[id] = val;
+  localStorage.setItem('ps_memos',JSON.stringify(memos));
+  renderGrid();
+}
+function closeModal(){ document.getElementById('modal-bg').classList.remove('show'); }
+function onModalBg(e){ if(e.target===document.getElementById('modal-bg')) closeModal(); }
+function modalNav(dir){
+  const list=getFiltered(); const idx=list.findIndex(x=>x.id===currentId);
+  if(idx===-1) return;
+  openModal(list[(idx+dir+list.length)%list.length].id);
+}
+
+/* ═══════════════════════════════════════
+   오늘의 시
+═══════════════════════════════════════ */
+function getTodayPoem(){
+  const d=new Date();
+  const seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  return POEMS[(seed+todayIdx)%POEMS.length];
+}
+function openToday(){
+  const p=getTodayPoem();
+  document.getElementById('today-title').textContent=p.title;
+  document.getElementById('today-poet').textContent=p.poet+(p.year?' ('+p.year+')':'');
+  /* 시 본문 앞 4~6줄만 미리보기 */
+  const lines=p.text.split('\n').filter(l=>l.trim());
+  const preview=lines.slice(0,Math.min(6,lines.length)).join('\n')+(lines.length>6?'\n…':'');
+  document.getElementById('today-text').textContent=preview;
+  document.getElementById('today-bg').classList.add('show');
+}
+function closeToday(){ document.getElementById('today-bg').classList.remove('show'); }
+function onTodayBg(e){ if(e.target===document.getElementById('today-bg')) closeToday(); }
+function nextToday(){ todayIdx++; localStorage.setItem('ps_today',todayIdx); openToday(); }
+function copyToday(){ const p=getTodayPoem(); copyText(p.title+'\n— '+p.poet+'\n\n'+p.text); }
+function shareToday(){ const p=getTodayPoem(); shareText(p.title+'\n— '+p.poet+'\n\n'+p.text); }
+
+/* ═══════════════════════════════════════
+   즐겨찾기
+═══════════════════════════════════════ */
+function toggleFav(id){
+  favs = favs.includes(id) ? favs.filter(x=>x!==id) : [...favs,id];
+  localStorage.setItem('ps_favs', JSON.stringify(favs));
+  document.getElementById('modal-fav-btn').textContent = favs.includes(id)?'★ 즐겨찾기 해제':'☆ 즐겨찾기';
+  renderGrid();
+  showToast(favs.includes(id)?'즐겨찾기에 추가됨':'즐겨찾기 해제','ok');
+}
+function toggleFavOnly(){ favOnly=!favOnly; renderFilters(); renderGrid(); }
+function showRandom(){
+  const list=getFiltered(); if(!list.length)return;
+  openModal(list[Math.floor(Math.random()*list.length)].id);
+}
+
+/* ═══════════════════════════════════════
+   시 추가
+═══════════════════════════════════════ */
+function addPoem(){
+  const title  = document.getElementById('new-title').value.trim();
+  const poet   = document.getElementById('new-poet').value.trim();
+  const year   = document.getElementById('new-year').value.trim();
+  const text   = document.getElementById('new-text').value; /* trim 제거 — 원문 줄바꿈 보존 */
+  const source = document.getElementById('new-source').value.trim();
+  const cat    = document.getElementById('new-cat').value;
+  if(!title||!poet||!text.trim()||!cat){ showToast('제목, 시인, 본문, 카테고리를 입력해주세요'); return; }
+
+  const newId = 'u_' + Date.now();
+  /* addedAt에 ms까지 포함 → 최신순 정렬 정확도 확보 */
+  const newP  = { id:newId, title, poet, year, text:text.trim(), source, category:cat,
+                  isSample:false, addedAt:new Date().toISOString() };
+  POEMS.push(newP); userPoems.push(newP);
+  localStorage.setItem('ps_user', JSON.stringify(userPoems));
+
+  if(userPoems.length % 10 === 0){
+    showToast('詩집이 '+userPoems.length+'편이 되었습니다. 백업을 권장합니다 💾','warn');
+  } else {
+    showToast('詩가 추가되었습니다','ok');
+  }
+
+  ['new-title','new-poet','new-year','new-text','new-source'].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+  document.getElementById('new-cat').value='';
+  renderFilters(); renderGrid();
+  document.getElementById('intro-count').textContent = POEMS.length;
+}
+
+/* ═══════════════════════════════════════
+   수정 / 삭제
+═══════════════════════════════════════ */
+function deletePoem(id){
+  const p = POEMS.find(x=>x.id===id);
+  if(!p || p.isSample){ showToast('샘플 詩는 삭제할 수 없습니다'); return; }
+  if(!confirm('「'+p.title+'」을 삭제하시겠습니까?')) return;
+  POEMS = POEMS.filter(x=>x.id!==id);
+  userPoems = userPoems.filter(x=>x.id!==id);
+  localStorage.setItem('ps_user', JSON.stringify(userPoems));
+  delete memos[id]; delete emotions[id];
+  localStorage.setItem('ps_memos',JSON.stringify(memos));
+  localStorage.setItem('ps_emotions',JSON.stringify(emotions));
+  document.getElementById('intro-count').textContent = POEMS.length;
+  renderFilters(); renderGrid();
+  showToast('삭제되었습니다');
+}
+
+let editingId = null;
+function openEdit(id){
+  const p = POEMS.find(x=>x.id===id);
+  if(!p || p.isSample){ showToast('샘플 詩는 수정할 수 없습니다'); return; }
+  editingId = id;
+  document.getElementById('edit-title').value  = p.title;
+  document.getElementById('edit-poet').value   = p.poet;
+  document.getElementById('edit-year').value   = p.year||'';
+  document.getElementById('edit-text').value   = p.text;
+  document.getElementById('edit-source').value = p.source||'';
+  const sel = document.getElementById('edit-cat');
+  if(sel.options.length <= 1){
+    Object.keys(CAT).forEach(c=>{
+      const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o);
+    });
+  }
+  sel.value = p.category;
+  document.getElementById('edit-bg').classList.add('show');
+}
+function closeEdit(){ document.getElementById('edit-bg').classList.remove('show'); editingId=null; }
+function onEditBg(e){ if(e.target===document.getElementById('edit-bg')) closeEdit(); }
+function saveEdit(){
+  if(!editingId) return;
+  const title  = document.getElementById('edit-title').value.trim();
+  const poet   = document.getElementById('edit-poet').value.trim();
+  const year   = document.getElementById('edit-year').value.trim();
+  const text   = document.getElementById('edit-text').value.trim();
+  const source = document.getElementById('edit-source').value.trim();
+  const cat    = document.getElementById('edit-cat').value;
+  if(!title||!poet||!text||!cat){ showToast('필수 항목을 입력해주세요'); return; }
+  const idx  = POEMS.findIndex(x=>x.id===editingId);
+  const uIdx = userPoems.findIndex(x=>x.id===editingId);
+  if(idx===-1) return;
+  POEMS[idx]      = {...POEMS[idx], title, poet, year, text, source, category:cat};
+  if(uIdx>-1) userPoems[uIdx] = {...userPoems[uIdx], title, poet, year, text, source, category:cat};
+  localStorage.setItem('ps_user', JSON.stringify(userPoems));
+  closeEdit();
+  renderFilters(); renderGrid();
+  showToast('수정되었습니다','ok');
+}
+function clearUserPoems(){
+  if(!confirm('내가 추가한 詩를 모두 삭제하시겠습니까?\n샘플 詩와 샘플에 남긴 메모·감정태그는 유지됩니다.')) return;
+  const userIds = new Set(userPoems.map(p=>p.id));
+  userPoems=[]; POEMS=[...BASE];
+  /* 사용자 추가 시의 메모·감정태그만 제거 */
+  userIds.forEach(id=>{ delete memos[id]; delete emotions[id]; });
+  readLog = readLog.filter(id=>!userIds.has(id));
+  localStorage.removeItem('ps_user');
+  localStorage.setItem('ps_memos',JSON.stringify(memos));
+  localStorage.setItem('ps_emotions',JSON.stringify(emotions));
+  localStorage.setItem('ps_read',JSON.stringify(readLog));
+  renderFilters(); renderGrid();
+  showToast('초기화 완료');
+}
+
+/* ═══════════════════════════════════════
+   공유 — 시 → JSON 스니펫 클립보드
+═══════════════════════════════════════ */
+function sharePoem(id){
+  const p = POEMS.find(x=>x.id===id);
+  const snippet = JSON.stringify({
+    title:p.title, poet:p.poet, year:p.year||'',
+    text:p.text, source:p.source||'', category:p.category
+  }, null, 2);
+  copyText(snippet);
+  showToast('詩 코드가 복사되었습니다. 상대방에게 붙여넣기로 전달하세요 📤','ok');
+}
+
+/* ═══════════════════════════════════════
+   받은 詩 추가
+═══════════════════════════════════════ */
+function openReceive(){
+  closeSettings();
+  document.getElementById('receive-input').value='';
+  document.getElementById('receive-preview').style.display='none';
+  document.getElementById('receive-bg').classList.add('show');
+}
+function closeReceive(){ document.getElementById('receive-bg').classList.remove('show'); }
+function onReceiveBg(e){ if(e.target===document.getElementById('receive-bg')) closeReceive(); }
+function doReceive(){
+  const raw = document.getElementById('receive-input').value.trim();
+  if(!raw){ showToast('코드를 입력해주세요'); return; }
+  let data;
+  try{ data = JSON.parse(raw); } catch{ showToast('형식이 올바르지 않습니다'); return; }
+
+  /* 배열·단일 모두 지원 */
+  const arr = Array.isArray(data) ? data : [data];
+  let added=0, dupes=0;
+  const existIds = new Set(POEMS.map(p=>p.id));
+  const existTitles = new Set(POEMS.map(p=>p.title+'_'+p.poet));
+
+  arr.forEach(item=>{
+    if(!item.title||!item.text){ return; }
+    const key = item.title+'_'+item.poet;
+    if(existTitles.has(key)){ dupes++; return; }
+    const newId = 'r_'+Date.now()+'_'+added;
+    const newP = {
+      id:newId, title:item.title, poet:item.poet||'',
+      year:item.year||'', text:item.text,
+      source:item.source||'', category:item.category||'기타',
+      isSample:false, addedAt:new Date().toISOString().slice(0,10),
+      sharedFrom:item.poet||''
+    };
+    POEMS.push(newP); userPoems.push(newP);
+    existTitles.add(key); added++;
+  });
+
+  localStorage.setItem('ps_user', JSON.stringify(userPoems));
+  renderFilters(); renderGrid();
+  closeReceive();
+  if(added>0 && dupes>0) showToast(`${added}편 추가, ${dupes}편 중복 제외`,'ok');
+  else if(added>0) showToast(`${added}편이 내 시집에 추가되었습니다`,'ok');
+  else showToast(`이미 있는 시입니다 (중복 ${dupes}편)`);
+}
+
+/* ═══════════════════════════════════════
+   백업 / 복원
+═══════════════════════════════════════ */
+function exportData(){
+  const data = {
+    meta:{ version:'1.1', exportedAt:new Date().toISOString(), totalPoems:POEMS.length },
+    poems: userPoems,
+    favorites: favs,
+    memos: memos,
+    emotions: emotions,
+    readLog: readLog
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='poetryshelf_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  localStorage.setItem('ps_last_backup', new Date().toISOString());
+  document.getElementById('backup-banner').style.display='none';
+  showToast('백업 완료 💾','ok');
+}
+function importData(e){
+  const file=e.target.files[0]; if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      const arr = data.poems||data;
+      const existTitles = new Set(POEMS.map(p=>p.title+'_'+p.poet));
+      let added=0, dupes=0;
+      arr.forEach(p=>{
+        const key=p.title+'_'+p.poet;
+        if(existTitles.has(key)){ dupes++; return; }
+        const newP={...p, id:'i_'+Date.now()+'_'+added, isSample:false};
+        POEMS.push(newP); userPoems.push(newP);
+        existTitles.add(key); added++;
+      });
+      /* 즐겨찾기 병합 */
+      if(data.favorites){
+        data.favorites.forEach(id=>{ if(!favs.includes(id)) favs.push(id); });
+        localStorage.setItem('ps_favs',JSON.stringify(favs));
+      }
+      /* 메모 병합 */
+      if(data.memos){
+        Object.assign(memos, data.memos);
+        localStorage.setItem('ps_memos',JSON.stringify(memos));
+      }
+      /* 감정태그 병합 */
+      if(data.emotions){
+        Object.assign(emotions, data.emotions);
+        localStorage.setItem('ps_emotions',JSON.stringify(emotions));
+      }
+      /* 읽기기록 병합 */
+      if(data.readLog){
+        data.readLog.forEach(id=>{ if(!readLog.includes(id)) readLog.push(id); });
+        localStorage.setItem('ps_read',JSON.stringify(readLog));
+      }
+      localStorage.setItem('ps_user',JSON.stringify(userPoems));
+      renderFilters(); renderGrid();
+      showToast(`${added}편 추가, ${dupes}편 중복 제외`,'ok');
+    }catch{ showToast('파일 형식이 올바르지 않습니다'); }
+  };
+  r.readAsText(file); e.target.value='';
+}
+
+/* ═══════════════════════════════════════
+   도움말
+═══════════════════════════════════════ */
+function openHelp(){ document.getElementById('help-bg').classList.add('show'); }
+function closeHelp(){ document.getElementById('help-bg').classList.remove('show'); }
+function onHelpBg(e){ if(e.target===document.getElementById('help-bg')) closeHelp(); }
+
+/* ═══════════════════════════════════════
+   설정
+═══════════════════════════════════════ */
+function openSettings(){ document.getElementById('settings-ov').classList.add('show'); }
+function closeSettings(){ document.getElementById('settings-ov').classList.remove('show'); }
+function onSettingsOv(e){ if(e.target===document.getElementById('settings-ov')) closeSettings(); }
+
+/* ═══════════════════════════════════════
+   검색
+═══════════════════════════════════════ */
+function onSearch(v){ searchQ=v.trim(); renderGrid(); }
+
+/* ═══════════════════════════════════════
+   유틸
+═══════════════════════════════════════ */
+function copyPoem(id){
+  const p=POEMS.find(x=>x.id===id);
+  copyText(p.title+'\n— '+p.poet+(p.year?' ('+p.year+')':'')+'\n\n'+p.text+(p.source?'\n\n출처: '+p.source:''));
+}
+function copyText(t){ navigator.clipboard.writeText(t).then(()=>showToast('복사되었습니다','ok')).catch(()=>showToast('복사 실패')); }
+function shareText(t){ if(navigator.share) navigator.share({text:t}).catch(()=>{}); else copyText(t); }
+function showToast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast show '+(type||'');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+renderFilters(); renderGrid();
+</script>
+</body>
+</html>
