@@ -1265,7 +1265,7 @@ button:focus-visible,
 }
 
 /* ════════════════════════════
-   SETTINGS PANEL (설정)
+   SETTINGS PANEL — right drawer
 ════════════════════════════ */
 /* gnav 설정 버튼 */
 .gnav-sp-btn{
@@ -1278,113 +1278,290 @@ button:focus-visible,
 .gnav-sp-btn:hover,.gnav-sp-btn.on{
   background:var(--gold-glow);color:var(--gold);border-color:rgba(184,151,106,.35);
 }
-@media(max-width:600px){
-  .gnav-sp-btn{width:28px;height:28px;font-size:.82rem;}
-}
+@media(max-width:600px){.gnav-sp-btn{width:28px;height:28px;font-size:.82rem;}}
 
-/* 설정 패널 배경 */
+/* 배경 오버레이 */
 #sp-bg{
   display:none;position:fixed;inset:0;z-index:700;
-  background:rgba(0,0,0,.5);
+  background:rgba(0,0,0,.45);backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
 }
 #sp-bg.open{display:block;}
 
-/* 설정 패널 (bottom sheet) */
+/* 패널 본체 — 우측 고정 드로어 */
 #sp-panel{
-  position:fixed;bottom:0;left:0;right:0;z-index:701;
-  background:var(--bg2);border-top:1px solid rgba(184,151,106,.2);
-  border-radius:18px 18px 0 0;
-  max-height:82vh;display:flex;flex-direction:column;overflow:hidden;
-  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  position:fixed;top:0;right:0;bottom:0;z-index:701;
+  width:min(360px,26vw);              /* 데스크탑: ~1/4 */
+  min-width:280px;
+  background:var(--bg2);
+  border-left:1px solid rgba(184,151,106,.15);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;                     /* 패널 자체는 넘침 숨김 */
 }
-#sp-panel.open{transform:translateY(0);}
+#sp-panel.open{transform:translateX(0);}
 
-.sp-handle-wrap{padding:10px 0 0;display:flex;justify-content:center;flex-shrink:0;}
-.sp-handle{width:38px;height:3px;border-radius:2px;background:rgba(255,255,255,.15);}
+/* 모바일: 50% */
+@media(max-width:600px){
+  #sp-panel{width:50vw;min-width:0;}
+}
 
-/* 탭 행 */
+/* ── 패널 헤더 (고정) */
+.sp-header{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 14px 10px;
+  border-bottom:1px solid var(--divider);
+  background:var(--bg2);
+}
+.sp-title{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:.85rem;color:var(--gold);letter-spacing:.03em;
+}
+.sp-close{
+  width:26px;height:26px;border-radius:6px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--text-dim);font-size:.72rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;transition:all .15s;
+}
+.sp-close:hover{color:var(--text);background:rgba(255,255,255,.1);}
+
+/* ── 탭 행 (책갈피 스타일, 고정) */
 .sp-tabrow{
-  display:flex;gap:0;border-bottom:1px solid var(--divider);
-  padding:0 4px;flex-shrink:0;
+  flex-shrink:0;display:flex;gap:0;
+  border-bottom:1px solid var(--divider);
+  background:rgba(255,255,255,.02);
+  overflow-x:auto;scrollbar-width:none;
 }
+.sp-tabrow::-webkit-scrollbar{display:none;}
 .sp-tab{
-  flex:1;padding:10px 4px;text-align:center;cursor:pointer;
-  font-family:'Montserrat',sans-serif;font-size:.58rem;letter-spacing:1px;
+  flex:1;padding:9px 4px 8px;
+  text-align:center;cursor:pointer;
+  font-family:'Montserrat',sans-serif;font-size:.52rem;letter-spacing:.8px;
   color:var(--text-faint);border:none;background:none;
-  border-bottom:2px solid transparent;transition:all .2s;
-  text-transform:uppercase;touch-action:manipulation;
+  border-bottom:2px solid transparent;border-top:2px solid transparent;
+  transition:all .18s;white-space:nowrap;
+  touch-action:manipulation;min-height:36px;
 }
-.sp-tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.sp-tab.on{
+  color:var(--gold);
+  border-bottom-color:var(--gold);
+  background:rgba(184,151,106,.05);
+}
+@media(max-width:600px){
+  .sp-tab{font-size:.46rem;padding:8px 2px;letter-spacing:.4px;}
+}
 
-/* 패널 본문 */
-.sp-body{flex:1;overflow-y:auto;padding:0;}
-.sp-body::-webkit-scrollbar{width:3px;}
+/* ── 스크롤 가능한 본문 영역만 (고정 아님) */
+.sp-body{
+  flex:1;overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.sp-body::-webkit-scrollbar{width:2px;}
 .sp-body::-webkit-scrollbar-thumb{background:rgba(184,151,106,.2);}
 
-/* 각 탭 패널 */
-.sp-pane{padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px));}
-.sp-field{margin-bottom:12px;}
+/* ── 각 탭 패널 */
+.sp-pane{padding:14px 14px calc(24px + env(safe-area-inset-bottom,0px));}
+
+/* ── 폼 요소 */
+.sp-field{margin-bottom:11px;}
 .sp-label{
-  font-family:'Montserrat',sans-serif;font-size:.54rem;letter-spacing:1.5px;
-  color:var(--text-faint);text-transform:uppercase;margin-bottom:5px;
+  font-family:'Montserrat',sans-serif;font-size:.5rem;letter-spacing:1.3px;
+  color:var(--text-faint);text-transform:uppercase;margin-bottom:4px;
 }
 .sp-input,.sp-textarea,.sp-select{
   width:100%;background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.09);border-radius:8px;
-  color:var(--text);font-family:'Noto Serif KR',serif;font-size:.88rem;
-  padding:9px 12px;outline:none;transition:border-color .2s;
+  border:1px solid rgba(255,255,255,.09);border-radius:7px;
+  color:var(--text);font-family:'Noto Serif KR',serif;font-size:.82rem;
+  padding:8px 10px;outline:none;transition:border-color .2s;
   -webkit-text-size-adjust:100%;
 }
-.sp-input:focus,.sp-textarea:focus{border-color:rgba(184,151,106,.4);}
-.sp-textarea{resize:vertical;min-height:100px;line-height:1.9;font-size:.84rem;}
+.sp-input:focus,.sp-textarea:focus,.sp-select:focus{border-color:rgba(184,151,106,.4);}
+.sp-textarea{
+  resize:none;
+  line-height:1.9;font-size:.8rem;
+  min-height:90px;
+  overflow-y:auto;
+}
 .sp-select{
-  cursor:pointer;font-family:'Montserrat',sans-serif;font-size:.72rem;
-  -webkit-appearance:none;
+  cursor:pointer;font-family:'Montserrat',sans-serif;font-size:.68rem;
+  -webkit-appearance:none;appearance:none;
 }
 .sp-note{
-  font-family:'Montserrat',sans-serif;font-size:.58rem;letter-spacing:.5px;
-  color:var(--text-faint);margin-bottom:12px;line-height:1.6;
+  font-family:'Montserrat',sans-serif;font-size:.52rem;letter-spacing:.4px;
+  color:var(--text-faint);margin-bottom:8px;line-height:1.6;
 }
 .sp-submit{
-  width:100%;padding:13px;border-radius:10px;
-  background:rgba(184,151,106,.85);border:none;color:var(--bg);
-  font-family:'Montserrat',sans-serif;font-size:.72rem;letter-spacing:1.5px;
+  width:100%;padding:11px;border-radius:8px;
+  background:rgba(184,151,106,.8);border:none;color:var(--bg);
+  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:1.5px;
   cursor:pointer;text-transform:uppercase;font-weight:500;
   touch-action:manipulation;transition:background .2s;
 }
-.sp-submit:hover{background:var(--gold);}
+.sp-submit:hover,.sp-submit:active{background:var(--gold);}
 
-/* 관리 탭 */
+/* ── 관리 탭 */
 .sp-manage-btn{
-  width:100%;padding:13px;border-radius:10px;
-  background:rgba(255,255,255,.05);border:1px solid var(--divider);
+  width:100%;padding:11px 12px;border-radius:8px;
+  background:rgba(255,255,255,.04);border:1px solid var(--divider);
   color:var(--text-dim);font-family:'Montserrat',sans-serif;
-  font-size:.68rem;letter-spacing:1.5px;cursor:pointer;margin-bottom:10px;
-  transition:all .18s;text-align:left;display:flex;align-items:center;gap:10px;
+  font-size:.6rem;letter-spacing:1px;cursor:pointer;margin-bottom:8px;
+  transition:all .16s;text-align:left;display:flex;align-items:center;gap:8px;
   touch-action:manipulation;
 }
-.sp-manage-btn:hover{color:var(--text);background:rgba(255,255,255,.08);}
+.sp-manage-btn:hover{color:var(--text);background:rgba(255,255,255,.07);}
 .sp-manage-btn.danger{color:#cf6679;}
 .sp-manage-btn.danger:hover{background:rgba(207,102,121,.1);border-color:rgba(207,102,121,.3);}
 .sp-stats{
   background:rgba(255,255,255,.03);border:1px solid var(--divider);
-  border-radius:8px;padding:14px 16px;margin-top:16px;
+  border-radius:7px;padding:12px 13px;margin-top:12px;
 }
 .sp-stat-row{
   display:flex;justify-content:space-between;align-items:center;
-  padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);
-  font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:.8px;
+  padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);
+  font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:.6px;
   color:var(--text-faint);
 }
 .sp-stat-row:last-child{border-bottom:none;}
-.sp-stat-row span{color:var(--gold);font-size:.75rem;}
+.sp-stat-row span{color:var(--gold);font-size:.68rem;}
 .sp-sec-title{
-  font-family:'Montserrat',sans-serif;font-size:.56rem;letter-spacing:2px;
+  font-family:'Montserrat',sans-serif;font-size:.52rem;letter-spacing:1.8px;
   color:var(--text-faint);text-transform:uppercase;
-  padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.05);
-  margin-bottom:12px;
+  padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.05);
+  margin-bottom:10px;
 }
 
+/* ── 도움말 탭 */
+.help-section-title{
+  font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:1.5px;
+  color:var(--gold);text-transform:uppercase;margin:14px 0 6px;
+  padding-bottom:5px;border-bottom:1px solid rgba(184,151,106,.15);
+}
+.help-item{
+  display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;
+}
+.help-icon{font-size:.85rem;flex-shrink:0;margin-top:1px;}
+.help-text{
+  font-family:'Noto Serif KR',serif;font-size:.75rem;color:var(--text-dim);
+  line-height:1.9;
+}
+.help-text strong{color:var(--text);font-weight:500;}
+
+/* ── 섹션 내 추가 버튼 (카드 그리드 하단) */
+.section-add-btn{
+  margin:14px 0 0;width:100%;
+  padding:10px;border-radius:8px;
+  background:rgba(255,255,255,.03);
+  border:1px dashed rgba(255,255,255,.12);
+  color:var(--text-faint);
+  font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:1.2px;
+  cursor:pointer;transition:all .18s;touch-action:manipulation;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.section-add-btn:hover,.section-add-btn:active{
+  color:var(--gold);border-color:rgba(184,151,106,.35);
+  background:rgba(184,151,106,.05);
+}
+
+/* ── 카드 인라인 편집 버튼 (하단에 항상 노출) */
+.card-actions{
+  display:flex;gap:5px;margin-top:8px;padding-top:7px;
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.card-act-btn{
+  flex:1;height:26px;border-radius:5px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  color:var(--text-faint);font-size:.58rem;font-family:'Montserrat',sans-serif;
+  letter-spacing:.8px;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:3px;
+  touch-action:manipulation;
+}
+.card-act-btn:hover,.card-act-btn:active{
+  color:var(--text-dim);background:rgba(255,255,255,.08);
+}
+.card-act-btn.del:hover,.card-act-btn.del:active{
+  color:#cf6679;background:rgba(207,102,121,.08);border-color:rgba(207,102,121,.25);
+}
+@media(max-width:600px){
+  .card-act-btn{font-size:.52rem;height:28px;letter-spacing:.4px;}
+}
+
+/* ── 모바일 ecard: 본문 2줄 노출 */
+@media(max-width:600px){
+  .ch-grid{grid-template-columns:repeat(2,1fr)!important;border-radius:6px!important;}
+  .ch-grid .ecard:first-child{grid-column:1!important;padding:14px 12px!important;}
+  .ch-grid .ecard:first-child .ecard-title{font-size:.88rem!important;}
+  .ecard{min-height:auto!important;padding:13px 11px 10px!important;}
+  .ecard-title{font-size:.8rem!important;-webkit-line-clamp:2!important;}
+  .ecard-pre{
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+    font-size:.7rem!important;
+    line-height:1.7!important;
+    margin-bottom:6px!important;
+    color:rgba(154,144,136,.7)!important;
+  }
+  .ecard-num{font-size:1rem!important;top:7px!important;right:8px!important;}
+  .ecard-date{font-size:.5rem!important;margin-bottom:4px!important;}
+  .ecard-tag{font-size:.48rem!important;}
+  .ecard-menu-btn{display:none!important;}  /* 인라인 버튼으로 대체 */
+  .friend-grid{grid-template-columns:repeat(2,1fr)!important;}
+  .fcard{min-height:auto!important;padding:13px 11px 10px!important;}
+  .fcard-title{font-size:.8rem!important;}
+  .fcard-menu-btn{display:none!important;}
+}
+
+/* ── 백업 유도 토스트 배너 */
+#backup-prompt{
+  display:none;position:fixed;bottom:calc(70px + env(safe-area-inset-bottom,0px));
+  left:50%;transform:translateX(-50%);
+  z-index:850;
+  background:rgba(8,8,16,.97);border:1px solid rgba(184,151,106,.4);
+  border-radius:14px;padding:14px 18px;
+  box-shadow:0 8px 32px rgba(0,0,0,.7);
+  width:min(340px, calc(100vw - 28px));
+}
+#backup-prompt.show{display:block;}
+.bp-title{
+  font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:1.5px;
+  color:var(--gold);text-transform:uppercase;margin-bottom:6px;
+}
+.bp-msg{
+  font-family:'Noto Serif KR',serif;font-size:.78rem;
+  color:var(--text-dim);line-height:1.8;margin-bottom:10px;
+}
+.bp-btns{display:flex;gap:8px;}
+.bp-btn{
+  flex:1;padding:8px;border-radius:8px;
+  font-family:'Montserrat',sans-serif;font-size:.58rem;letter-spacing:1px;
+  cursor:pointer;touch-action:manipulation;text-align:center;
+  transition:all .18s;
+}
+.bp-btn-save{
+  background:rgba(184,151,106,.15);border:1px solid rgba(184,151,106,.4);
+  color:var(--gold);
+}
+.bp-btn-save:hover{background:rgba(184,151,106,.25);}
+.bp-btn-later{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  color:var(--text-faint);
+}
+
+
+/* ── textarea 스크롤 격리 */
+.sp-textarea{touch-action:pan-y;}
+#sp-panel *{-webkit-overflow-scrolling:touch;}
+/* 각서 카테고리 필터 */
+
+/* ── textarea 스크롤 격리 */
+.sp-textarea{touch-action:pan-y;}
+#sp-panel *{-webkit-overflow-scrolling:touch;}
 /* 각서 카테고리 필터 */
 .memo-filter-row{
   display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;
@@ -1600,20 +1777,30 @@ button:focus-visible,
 <!-- ══ SETTINGS PANEL ══ -->
 <div id="sp-bg" onclick="if(event.target===this)closeSettings()"></div>
 <div id="sp-panel">
-  <div class="sp-handle-wrap"><div class="sp-handle"></div></div>
+
+  <!-- 헤더 고정 -->
+  <div class="sp-header">
+    <div class="sp-title">設定 · 설정</div>
+    <div class="sp-close" onclick="closeSettings()">✕</div>
+  </div>
+
+  <!-- 탭 행 고정 -->
   <div class="sp-tabrow">
     <button class="sp-tab on" data-tab="diary" onclick="switchSpTab('diary')">감정기록</button>
     <button class="sp-tab" data-tab="soga" onclick="switchSpTab('soga')">서가</button>
     <button class="sp-tab" data-tab="memo" onclick="switchSpTab('memo')">각서</button>
     <button class="sp-tab" data-tab="manage" onclick="switchSpTab('manage')">관리</button>
+    <button class="sp-tab" data-tab="help" onclick="switchSpTab('help')">도움말</button>
   </div>
+
+  <!-- 스크롤 본문만 스크롤 -->
   <div class="sp-body">
 
     <!-- 감정기록 추가 -->
     <div class="sp-pane" id="sp-pane-diary">
       <div class="sp-field">
         <div class="sp-label">제목</div>
-        <input class="sp-input" id="sp-diary-title" type="text" placeholder="제목을 입력하세요"/>
+        <input class="sp-input" id="sp-diary-title" type="text" placeholder="제목"/>
       </div>
       <div class="sp-field">
         <div class="sp-label">날짜</div>
@@ -1622,11 +1809,11 @@ button:focus-visible,
       <div class="sp-field">
         <div class="sp-label">챕터</div>
         <select class="sp-select" id="sp-diary-ch">
-          <option value="1">Ⅰ 방황 (2000–2006)</option>
-          <option value="2">Ⅱ 갈증 (2006–2010)</option>
-          <option value="3">Ⅲ 성찰 (2011–2014)</option>
-          <option value="4">Ⅳ 정착 (2015–2016)</option>
-          <option value="5" selected>Ⅴ 회복 (2017–현재)</option>
+          <option value="1">Ⅰ 방황</option>
+          <option value="2">Ⅱ 갈증</option>
+          <option value="3">Ⅲ 성찰</option>
+          <option value="4">Ⅳ 정착</option>
+          <option value="5" selected>Ⅴ 회복</option>
         </select>
       </div>
       <div class="sp-field">
@@ -1635,18 +1822,17 @@ button:focus-visible,
           <option value="고독">고독</option>
           <option value="가족">가족</option>
           <option value="시간">시간</option>
-          <option value="성찰">성찰</option>
+          <option value="성찰" selected>성찰</option>
           <option value="도시">도시</option>
         </select>
       </div>
       <div class="sp-field">
-        <div class="sp-label">본문</div>
-        <div class="sp-note">연(연) 구분은 빈 줄로 구분합니다.</div>
-        <textarea class="sp-textarea" id="sp-diary-body" placeholder="글을 입력하세요&#10;&#10;빈 줄로 연을 구분합니다" style="min-height:130px"></textarea>
+        <div class="sp-label">본문 (빈 줄로 연 구분)</div>
+        <textarea class="sp-textarea" id="sp-diary-body" placeholder="글을 입력하세요&#10;&#10;빈 줄로 연을 구분합니다"></textarea>
       </div>
       <div class="sp-field">
         <div class="sp-label">맺음말 (선택)</div>
-        <input class="sp-input" id="sp-diary-coda" type="text" placeholder="맺음말 한 줄 (없으면 비워두세요)"/>
+        <input class="sp-input" id="sp-diary-coda" type="text" placeholder="맺음말 한 줄"/>
       </div>
       <button class="sp-submit" onclick="addUserEntry(false)">➕ 감정기록 추가</button>
     </div>
@@ -1655,29 +1841,29 @@ button:focus-visible,
     <div class="sp-pane" id="sp-pane-soga" style="display:none">
       <div class="sp-field">
         <div class="sp-label">제목</div>
-        <input class="sp-input" id="sp-soga-title" type="text" placeholder="제목을 입력하세요"/>
+        <input class="sp-input" id="sp-soga-title" type="text" placeholder="제목"/>
       </div>
       <div class="sp-field">
         <div class="sp-label">날짜</div>
         <input class="sp-input" id="sp-soga-date" type="text" placeholder="예) 2000년 03월"/>
       </div>
       <div class="sp-field">
-        <div class="sp-label">감정 태그</div>
+        <div class="sp-label">태그</div>
         <select class="sp-select" id="sp-soga-tag">
           <option value="고독">고독</option>
           <option value="가족">가족</option>
           <option value="시간">시간</option>
           <option value="성찰">성찰</option>
-          <option value="도시">도시</option>
+          <option value="도시" selected>도시</option>
         </select>
       </div>
       <div class="sp-field">
-        <div class="sp-label">본문</div>
-        <textarea class="sp-textarea" id="sp-soga-body" placeholder="원문을 입력하세요&#10;&#10;빈 줄로 연을 구분합니다" style="min-height:130px"></textarea>
+        <div class="sp-label">본문 (빈 줄로 연 구분)</div>
+        <textarea class="sp-textarea" id="sp-soga-body" placeholder="원문을 입력하세요&#10;&#10;빈 줄로 연을 구분합니다"></textarea>
       </div>
       <div class="sp-field">
         <div class="sp-label">맺음말 (선택)</div>
-        <input class="sp-input" id="sp-soga-coda" type="text" placeholder="맺음말 한 줄"/>
+        <input class="sp-input" id="sp-soga-coda" type="text" placeholder="맺음말"/>
       </div>
       <button class="sp-submit" onclick="addUserEntry(true)">➕ 서가 추가</button>
     </div>
@@ -1686,7 +1872,7 @@ button:focus-visible,
     <div class="sp-pane" id="sp-pane-memo" style="display:none">
       <div class="sp-field">
         <div class="sp-label">내용</div>
-        <textarea class="sp-textarea" id="sp-memo-content" placeholder="메모 내용을 입력하세요&#10;줄바꿈은 Enter로 구분됩니다" style="min-height:120px"></textarea>
+        <textarea class="sp-textarea" id="sp-memo-content" placeholder="메모 내용 (줄바꿈은 Enter)"></textarea>
       </div>
       <div class="sp-field">
         <div class="sp-label">출처 (선택)</div>
@@ -1695,7 +1881,7 @@ button:focus-visible,
       <div class="sp-field">
         <div class="sp-label">카테고리</div>
         <select class="sp-select" id="sp-memo-tag">
-          <option value="성찰">성찰</option>
+          <option value="성찰" selected>성찰</option>
           <option value="고독">고독</option>
           <option value="가족">가족</option>
           <option value="시간">시간</option>
@@ -1709,14 +1895,44 @@ button:focus-visible,
     <!-- 관리 -->
     <div class="sp-pane" id="sp-pane-manage" style="display:none">
       <div class="sp-sec-title">데이터 백업</div>
-      <button class="sp-manage-btn" onclick="exportBackup()">💾 JSON 백업 파일 저장</button>
-      <button class="sp-manage-btn" onclick="document.getElementById('sp-import-file').click()">📥 백업 파일 복원 (병합)</button>
+      <button class="sp-manage-btn" onclick="exportBackup()">💾 &nbsp;JSON 백업 저장 (파일 앱)</button>
+      <button class="sp-manage-btn" onclick="exportHtmlWithData()">📄 &nbsp;데이터 포함 HTML 저장</button>
+      <button class="sp-manage-btn" onclick="document.getElementById('sp-import-file').click()">📥 &nbsp;백업 파일로 복원 (병합)</button>
       <input type="file" id="sp-import-file" accept=".json" style="display:none" onchange="importBackup(event)"/>
-      <div class="sp-sec-title" style="margin-top:20px">사용자 데이터</div>
-      <button class="sp-manage-btn danger" onclick="resetUserData()">🗑 사용자 추가 데이터 초기화</button>
+      <div class="sp-sec-title" style="margin-top:16px">데이터 현황</div>
       <div class="sp-stats" id="sp-stats-box"></div>
+      <div class="sp-sec-title" style="margin-top:16px">초기화</div>
+      <button class="sp-manage-btn danger" onclick="resetUserData()">🗑 &nbsp;사용자 데이터 초기화</button>
     </div>
 
+    <!-- 도움말 -->
+    <div class="sp-pane" id="sp-pane-help" style="display:none">
+      <div class="help-section-title">탐색</div>
+      <div class="help-item"><div class="help-icon">📖</div><div class="help-text"><strong>본문 읽기</strong> — 카드를 탭하면 전체 글을 읽을 수 있습니다. 상단 챕터 버튼으로 필터링됩니다.</div></div>
+      <div class="help-item"><div class="help-icon">🔍</div><div class="help-text"><strong>검색</strong> — 상단 검색창(데스크탑) 또는 하단 검색바(모바일)로 제목·본문을 즉시 검색합니다.</div></div>
+      <div class="help-item"><div class="help-icon">✨</div><div class="help-text"><strong>계속 읽기</strong> — 랜딩에서 마지막으로 읽은 글을 이어 읽을 수 있습니다.</div></div>
+      <div class="help-section-title">편집</div>
+      <div class="help-item"><div class="help-icon">➕</div><div class="help-text"><strong>추가</strong> — 각 섹션 하단 [+ 추가] 버튼 또는 설정 탭에서 감정기록·서가·각서를 추가합니다.</div></div>
+      <div class="help-item"><div class="help-icon">✎</div><div class="help-text"><strong>수정</strong> — 카드 하단 [수정] 버튼으로 내용을 편집합니다.</div></div>
+      <div class="help-item"><div class="help-icon">🗑</div><div class="help-text"><strong>삭제</strong> — 카드 하단 [삭제] 버튼. 기본 수록 데이터는 숨김 처리되고, 사용자 추가 항목은 완전히 제거됩니다.</div></div>
+      <div class="help-section-title">백업 & 복원</div>
+      <div class="help-item"><div class="help-icon">💾</div><div class="help-text"><strong>JSON 백업</strong> — 관리 탭에서 백업 저장. 아이폰 [파일 앱]에 저장 후 나중에 복원할 수 있습니다.</div></div>
+      <div class="help-item"><div class="help-icon">📄</div><div class="help-text"><strong>HTML 저장</strong> — 현재 데이터가 내장된 HTML 파일을 저장합니다. 앱 업데이트 시에도 데이터가 유지됩니다.</div></div>
+      <div class="help-item"><div class="help-icon">📥</div><div class="help-text"><strong>복원</strong> — 이전에 저장한 JSON 백업 파일을 불러와 데이터를 병합합니다. 중복은 자동으로 제외됩니다.</div></div>
+      <div class="help-section-title">각서</div>
+      <div class="help-item"><div class="help-icon">覺</div><div class="help-text"><strong>카테고리 필터</strong> — 각서 섹션 상단에서 성찰·고독·가족·시간·도시·기타로 필터링합니다.</div></div>
+    </div>
+
+  </div><!-- /.sp-body -->
+</div><!-- /#sp-panel -->
+
+<!-- ── 백업 유도 배너 -->
+<div id="backup-prompt">
+  <div class="bp-title">💾 백업을 권장합니다</div>
+  <div class="bp-msg">소중한 기록이 추가되었습니다.<br>파일 앱에 백업해두시겠습니까?</div>
+  <div class="bp-btns">
+    <div class="bp-btn bp-btn-save" onclick="exportBackup();hideBackupPrompt()">지금 백업</div>
+    <div class="bp-btn bp-btn-later" onclick="hideBackupPrompt()">나중에</div>
   </div>
 </div>
 
@@ -1725,9 +1941,9 @@ button:focus-visible,
 <div id="card-sheet">
   <div class="cs-handle"></div>
   <div class="cs-title" id="cs-entry-title">—</div>
-  <button class="cs-btn" id="cs-edit-btn" onclick="if(!document.getElementById('card-sheet').dataset.memoMode)openEditModal()">✎ &nbsp;수정하기</button>
+  <button class="cs-btn" id="cs-edit-btn" onclick="openEditModal()">✎ &nbsp;수정하기</button>
   <div class="cs-btn-sep"></div>
-  <button class="cs-btn cs-btn-del" id="cs-del-btn" onclick="document.getElementById('card-sheet').dataset.memoMode?deleteMemo():deleteCard()">🗑 &nbsp;삭제하기</button>
+  <button class="cs-btn cs-btn-del" id="cs-del-btn" onclick="deleteCard()">🗑 &nbsp;삭제하기</button>
   <div class="cs-btn-sep"></div>
   <button class="cs-btn cs-btn-cancel" onclick="closeCardSheet()">취소</button>
 </div>
@@ -2157,10 +2373,15 @@ function buildArchive(){
           <div class="ecard-title">${td.title}</div>
           <div class="ecard-pre">${pre}…</div>
           <div class="ecard-tag">${td.tag}</div>
-          <button class="ecard-menu-btn" onclick="event.stopPropagation();showCardMenu(${td.seq})" title="수정/삭제">⋯</button>
+          <div class="card-actions" onclick="event.stopPropagation()">
+            <button class="card-act-btn" onclick="quickEdit(${td.seq})">✎ 수정</button>
+            <button class="card-act-btn del" onclick="quickDelete(${td.seq})">🗑 삭제</button>
+          </div>
         </div>`;
     });
-    html+=`</div></div>`;
+    html+=`</div>
+      <button class="section-add-btn" onclick="openSpTab('diary')">＋ 감정기록 추가</button>
+    </div>`;
   });
 
   // Friend section
@@ -2182,11 +2403,13 @@ function buildArchive(){
         <div class="fcard-date">${td.date}</div>
         <div class="fcard-title">${td.title}</div>
         <div class="fcard-pre">${pre}…</div>
-        <button class="fcard-menu-btn" onclick="event.stopPropagation();showCardMenu(${td.seq})" title="수정/삭제">⋯</button>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="card-act-btn" onclick="quickEdit(${td.seq})">✎ 수정</button>
+          <button class="card-act-btn del" onclick="quickDelete(${td.seq})">🗑 삭제</button>
+        </div>
       </div>`;
   });
-  html+=`</div></div>`;
-
+  html+=`<button class="section-add-btn" style="margin:14px 0 20px" onclick="openSpTab('soga')">＋ 서가 추가</button></div></div>`;
 
   // Memo section (覺書) — 전체보기 맨 아래 노출
   const memoTags=['전체','성찰','고독','가족','시간','도시','기타'];
@@ -2207,6 +2430,7 @@ function buildArchive(){
     </div>
     ${memoFilterHtml}
     <div class="memo-grid" id="memo-grid">${buildMemoGrid('전체')}</div>
+    <button class="section-add-btn" style="margin:14px 0 0" onclick="openSpTab('memo')">＋ 각서 추가</button>
   </div>`;
 
   el.innerHTML=html;
@@ -2221,15 +2445,18 @@ function buildMemoGrid(filterTag){
   const filtered=filterTag==='전체'?allM:allM.filter(m=>m.tag===filterTag);
   return filtered.map((m,i)=>{
     const srcHtml = m.src ? `<div class="memo-src">— ${m.src}</div>` : '';
-    const editBtn = m.isUser
-      ? `<button class="ecard-menu-btn" style="bottom:8px;right:8px;width:24px;height:24px" onclick="event.stopPropagation();showMemoMenu('${m.id||m.num}')"  title="수정/삭제">⋯</button>`
+    const editBtns = m.isUser
+      ? `<div class="card-actions" onclick="event.stopPropagation()">
+           <button class="card-act-btn" onclick="quickEditMemo('${m.id||m.num}')">✎ 수정</button>
+           <button class="card-act-btn del" onclick="quickDeleteMemo('${m.id||m.num}')">🗑 삭제</button>
+         </div>`
       : '';
-    return `<div class="memo-card" data-mtag="${m.tag}" style="position:relative">
+    return `<div class="memo-card" data-mtag="${m.tag}">
       <div class="memo-num">${String(m.num||i+1).padStart(2,'0')}</div>
       <div class="memo-body">${m.content.replace(/\n/g,'<br>')}</div>
       ${srcHtml}
       <div class="memo-tag">${m.tag}</div>
-      ${editBtn}
+      ${editBtns}
     </div>`;
   }).join('');
 }
@@ -2704,18 +2931,22 @@ document.addEventListener('click',e=>{
 /* ══ SETTINGS PANEL ══ */
 let curSpTab='diary';
 
-function openSettings(){
+function openSettings(tab){
+  if(tab) switchSpTab(tab);
   document.getElementById('sp-bg').classList.add('open');
   document.getElementById('sp-panel').classList.add('open');
   document.getElementById('gnav-sp-btn').classList.add('on');
   document.body.classList.add('no-scroll');
-  updateSpStats();
+  if(curSpTab==='manage') updateSpStats();
 }
 function closeSettings(){
   document.getElementById('sp-bg').classList.remove('open');
   document.getElementById('sp-panel').classList.remove('open');
   document.getElementById('gnav-sp-btn').classList.remove('on');
   document.body.classList.remove('no-scroll');
+}
+function openSpTab(tab){
+  openSettings(tab);
 }
 function switchSpTab(tab){
   curSpTab=tab;
@@ -2728,16 +2959,13 @@ function updateSpStats(){
   const box=document.getElementById('sp-stats-box');
   if(!box)return;
   const au=getActiveUserEntries();
-  const uDiary=au.filter(e=>!e.isFriend).length;
-  const uSoga=au.filter(e=>e.isFriend).length;
-  const uMemo=userMemos.length;
-  const del=userDeleted.length;
   box.innerHTML=`
     <div class="sp-stat-row">기본 수록<span>${DATA.length}편</span></div>
-    <div class="sp-stat-row">추가 감정기록<span>${uDiary}편</span></div>
-    <div class="sp-stat-row">추가 서가<span>${uSoga}편</span></div>
-    <div class="sp-stat-row">추가 각서<span>${uMemo}건</span></div>
-    <div class="sp-stat-row">삭제된 항목<span>${del}건</span></div>`;
+    <div class="sp-stat-row">추가 감정기록<span>${au.filter(e=>!e.isFriend).length}편</span></div>
+    <div class="sp-stat-row">추가 서가<span>${au.filter(e=>e.isFriend).length}편</span></div>
+    <div class="sp-stat-row">추가 각서<span>${userMemos.length}건</span></div>
+    <div class="sp-stat-row">수정된 항목<span>${Object.keys(userEdits).length}건</span></div>
+    <div class="sp-stat-row">숨김(삭제) 항목<span>${userDeleted.length}건</span></div>`;
 }
 
 /* ══ 항목 추가 ══ */
@@ -2746,7 +2974,6 @@ function parseBodyToLines(txt){
     st.split('\n').map(l=>l.trim()).filter(Boolean)
   ).filter(st=>st.length>0);
 }
-
 function addUserEntry(isFriend){
   const prefix=isFriend?'soga':'diary';
   const title=document.getElementById(`sp-${prefix}-title`).value.trim();
@@ -2754,9 +2981,7 @@ function addUserEntry(isFriend){
   const tag=document.getElementById(`sp-${prefix}-tag`).value;
   const bodyRaw=document.getElementById(`sp-${prefix}-body`).value;
   const coda=document.getElementById(`sp-${prefix}-coda`).value.trim();
-  if(!title||!date||!bodyRaw.trim()){
-    showToastMsg('제목, 날짜, 본문은 필수입니다');return;
-  }
+  if(!title||!date||!bodyRaw.trim()){showToastMsg('제목, 날짜, 본문은 필수입니다');return;}
   const chNum=isFriend?1:parseInt(document.getElementById('sp-diary-ch').value);
   const chName=CH_NAMES[chNum]||'방황';
   const cc=CH_COLORS[chNum]||'var(--c1)';
@@ -2773,7 +2998,6 @@ function addUserEntry(isFriend){
   };
   userEntries.push(entry);
   localStorage.setItem('hj_entries',JSON.stringify(userEntries));
-  // 폼 초기화
   ['title','date','body','coda'].forEach(f=>{
     const el=document.getElementById(`sp-${prefix}-${f}`);
     if(el) el.value='';
@@ -2783,8 +3007,8 @@ function addUserEntry(isFriend){
   updateLandingCounter();
   closeSettings();
   showToastMsg(`${isFriend?'서가':'감정기록'}이 추가되었습니다`);
+  maybePromptBackup();
 }
-
 function addUserMemo(){
   const content=document.getElementById('sp-memo-content').value.trim();
   const src=document.getElementById('sp-memo-src').value.trim();
@@ -2793,10 +3017,8 @@ function addUserMemo(){
   const baseLen=(window.MEMOS||MEMOS).length;
   const newId='m_'+Date.now();
   const memo={
-    id:newId,
-    num:baseLen+userMemos.length+1,
-    content, src:src||null, tag,
-    isUser:true,
+    id:newId, num:baseLen+userMemos.length+1,
+    content, src:src||null, tag, isUser:true,
     addedAt:new Date().toISOString().slice(0,10)
   };
   userMemos.push(memo);
@@ -2807,9 +3029,148 @@ function addUserMemo(){
   if(curView==='archive'){buildArchive();archBuilt=true;}
   closeSettings();
   showToastMsg('각서가 추가되었습니다');
+  maybePromptBackup();
 }
 
-/* ══ 각서 메뉴 ══ */
+/* ══ 인라인 빠른 편집/삭제 ══ */
+function quickEdit(seq){
+  curMenuSeq=seq;
+  openEditModal();
+}
+function quickDelete(seq){
+  curMenuSeq=seq;
+  deleteCard();
+}
+function quickEditMemo(memoId){
+  curMemoMenuId=String(memoId);
+  const m=userMemos.find(x=>(x.id||String(x.num))===String(memoId));
+  if(!m)return;
+  // 각서 수정: sp 패널 각서 탭에 내용 채우고 열기
+  openSettings('memo');
+  document.getElementById('sp-memo-content').value=m.content;
+  document.getElementById('sp-memo-src').value=m.src||'';
+  document.getElementById('sp-memo-tag').value=m.tag||'성찰';
+  // submit 버튼 텍스트 변경 + 동작 변경
+  const btn=document.querySelector('#sp-pane-memo .sp-submit');
+  if(btn){
+    btn.textContent='💾 수정 저장';
+    btn.onclick=function(){saveMemoEdit(memoId);};
+  }
+}
+function saveMemoEdit(memoId){
+  const content=document.getElementById('sp-memo-content').value.trim();
+  const src=document.getElementById('sp-memo-src').value.trim();
+  const tag=document.getElementById('sp-memo-tag').value;
+  if(!content){showToastMsg('내용을 입력해주세요');return;}
+  const idx=userMemos.findIndex(m=>(m.id||String(m.num))===String(memoId));
+  if(idx<0)return;
+  userMemos[idx]={...userMemos[idx],content,src:src||null,tag};
+  localStorage.setItem('hj_umemos',JSON.stringify(userMemos));
+  // 버튼 원래대로
+  const btn=document.querySelector('#sp-pane-memo .sp-submit');
+  if(btn){btn.textContent='➕ 각서 추가';btn.onclick=addUserMemo;}
+  document.getElementById('sp-memo-content').value='';
+  document.getElementById('sp-memo-src').value='';
+  archBuilt=false;
+  if(curView==='archive'){buildArchive();archBuilt=true;}
+  closeSettings();
+  showToastMsg('각서가 수정되었습니다');
+  curMemoMenuId=null;
+}
+function quickDeleteMemo(memoId){
+  if(!confirm('이 각서를 삭제하시겠습니까?'))return;
+  userMemos=userMemos.filter(m=>(m.id||String(m.num))!==String(memoId));
+  localStorage.setItem('hj_umemos',JSON.stringify(userMemos));
+  archBuilt=false;
+  if(curView==='archive'){buildArchive();archBuilt=true;}
+  showToastMsg('각서가 삭제되었습니다');
+}
+
+/* ══ 백업 유도 ══ */
+let _addCount=parseInt(localStorage.getItem('hj_addcnt')||'0');
+function maybePromptBackup(){
+  _addCount++;
+  localStorage.setItem('hj_addcnt',_addCount);
+  // 1번 추가할 때마다, 또는 5의 배수마다 유도
+  if(_addCount===1||_addCount%5===0){
+    setTimeout(()=>showBackupPrompt(),800);
+  }
+}
+function showBackupPrompt(){
+  document.getElementById('backup-prompt').classList.add('show');
+  setTimeout(()=>hideBackupPrompt(),8000);
+}
+function hideBackupPrompt(){
+  document.getElementById('backup-prompt').classList.remove('show');
+}
+
+/* ══ 백업/복원 ══ */
+function exportBackup(){
+  const data={
+    version:'2.0', exportedAt:new Date().toISOString(),
+    userEntries, userMemos, userEdits, userDeleted
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='흔적_백업_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  showToastMsg('백업이 저장되었습니다 💾');
+}
+
+function exportHtmlWithData(){
+  // 현재 HTML에 사용자 데이터를 내장하여 저장
+  const data={userEntries,userMemos,userEdits,userDeleted};
+  const inject=`\n/* ══ EMBEDDED USER DATA ══ */\n(function(){try{const d=JSON.parse(atob('${btoa(unescape(encodeURIComponent(JSON.stringify(data))))}'));if(d.userEntries)d.userEntries.forEach(e=>{if(!userEntries.find(x=>x.id===e.id))userEntries.push(e)});if(d.userMemos)d.userMemos.forEach(m=>{if(!userMemos.find(x=>x.id===m.id))userMemos.push(m)});if(d.userEdits)Object.assign(userEdits,d.userEdits);if(d.userDeleted)userDeleted=[...new Set([...userDeleted,...d.userDeleted])];localStorage.setItem('hj_entries',JSON.stringify(userEntries));localStorage.setItem('hj_umemos',JSON.stringify(userMemos));localStorage.setItem('hj_edits',JSON.stringify(userEdits));localStorage.setItem('hj_deleted',JSON.stringify(userDeleted));}catch(e){}})();`;
+  let pageHtml=document.documentElement.outerHTML;
+  pageHtml=pageHtml.replace('</body>','<script>'+inject+'</sc'+'ript></body>');
+  const blob=new Blob([pageHtml],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='heunjuk_v9.html';
+  a.click();
+  showToastMsg('데이터 포함 HTML이 저장되었습니다 📄');
+}
+
+function importBackup(e){
+  const file=e.target.files[0]; if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(data.userEntries&&Array.isArray(data.userEntries)){
+        const existIds=new Set(userEntries.map(x=>x.id));
+        data.userEntries.forEach(x=>{if(!existIds.has(x.id))userEntries.push(x);});
+        localStorage.setItem('hj_entries',JSON.stringify(userEntries));
+      }
+      if(data.userMemos&&Array.isArray(data.userMemos)){
+        const existIds=new Set(userMemos.map(x=>x.id||x.num));
+        data.userMemos.forEach(x=>{if(!existIds.has(x.id||x.num))userMemos.push(x);});
+        localStorage.setItem('hj_umemos',JSON.stringify(userMemos));
+      }
+      if(data.userEdits){Object.assign(userEdits,data.userEdits);localStorage.setItem('hj_edits',JSON.stringify(userEdits));}
+      if(data.userDeleted){userDeleted=[...new Set([...userDeleted,...data.userDeleted])];localStorage.setItem('hj_deleted',JSON.stringify(userDeleted));}
+      archBuilt=false;
+      if(curView==='archive'){buildArchive();archBuilt=true;}
+      updateLandingCounter();
+      showToastMsg('복원 완료');
+    }catch(err){showToastMsg('파일 형식 오류');}
+  };
+  r.readAsText(file); e.target.value='';
+}
+
+function resetUserData(){
+  if(!confirm('사용자가 추가/수정한 데이터를 모두 초기화하시겠습니까?'))return;
+  userEntries=[]; userMemos=[]; userEdits={}; userDeleted=[];
+  ['hj_entries','hj_umemos','hj_edits','hj_deleted','hj_addcnt'].forEach(k=>localStorage.removeItem(k));
+  archBuilt=false;
+  if(curView==='archive'){buildArchive();archBuilt=true;}
+  updateLandingCounter();
+  closeSettings();
+  showToastMsg('초기화 완료');
+}
+
+/* ══ 각서 메뉴 ══ *//* ══ 각서 메뉴 ══ */
 function showMemoMenu(memoId){
   curMemoMenuId=memoId;
   const m=userMemos.find(x=>(x.id||String(x.num))===String(memoId));
