@@ -12,355 +12,459 @@
     <link rel="icon" type="image/png" sizes="192x192" href="https://casio8000.github.io/film-humanities_Mobile/images/Stranger_in_the_City.png">
     <meta name="theme-color" content="#F8F4ED">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap');
+        /* ── Google Fonts: Noto Serif KR fallback ── */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;700&display=swap');
 
-        * { margin:0; padding:0; box-sizing: border-box; }
-        body {
-            background: #F8F4ED;
-            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'KoPubWorldBatang', 'Noto Serif KR', '바탕', 'Batang', 'Times New Roman', Georgia, serif;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            color: #2c2a27;
+        /* ── CSS 변수 ── */
+        :root {
+            --font-myeongjo: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'KoPubWorldBatang', 'Noto Serif KR', '바탕', 'Batang', Georgia, serif;
+            --color-bg:       #F6F2EA;
+            --color-page:     #FDFAF4;
+            --color-page-alt: #F9F5EC;
+            --color-ink:      #2E2A22;
+            --color-ink-soft: #4A4035;
+            --color-ink-dim:  #7A6E5F;
+            --color-accent:   #B8965A;
+            --color-accent2:  #9B7A4A;
+            --color-border:   #E4D8C4;
+            --color-poem-bg:  #F3EDE1;
+            --color-quote-bg: #EDE8DF;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-top:    env(safe-area-inset-top, 0px);
         }
+
+        * { margin:0; padding:0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: var(--color-bg);
+            font-family: var(--font-myeongjo);
+            color: var(--color-ink);
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* ─────────────────────────────
+           BOOK / SCROLL CONTAINER
+        ───────────────────────────── */
         .book {
             height: 100vh;
+            height: 100dvh;
             width: 100%;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
         }
+
+        /* ─────────────────────────────
+           PAGE BASE
+        ───────────────────────────── */
         .page {
             scroll-snap-align: start;
             min-height: 100vh;
+            min-height: 100dvh;
             width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 2.5rem 1.8rem;
-            background: #FEFCF8;
-            border-bottom: 1px solid #EADDCB;
+            background: var(--color-page);
+            border-bottom: 1px solid var(--color-border);
             position: relative;
+            /* 상하 패딩: 상단 메뉴 버튼 + 하단 네비 공간 확보 */
+            padding: 5rem 2.4rem 5.5rem;
         }
-        .page-soft {
-            background: #FCF9F3;
-        }
+        .page-soft { background: var(--color-page-alt); }
+        .part-page { background: #F5EFE3; }
+
+        /* 페이지 내용 래퍼 */
         .page-content {
-            max-width: 680px;
-            margin: 0 auto;
+            max-width: 640px;
             width: 100%;
-        }
-        .page-title {
-            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'KoPubWorldBatang', 'Noto Serif KR', '바탕', serif;
-            font-size: 1.9rem;
-            font-weight: 700;
-            color: #5C4B3A;
-            margin-bottom: 1.2rem;
-            letter-spacing: -0.3px;
-            border-left: 5px solid #C8AA7B;
-            padding-left: 1rem;
-            word-break: keep-all;
-            overflow-wrap: break-word;
-        }
-        .page-subtitle {
-            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'Noto Serif KR', serif;
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            color: #A68F72;
-            margin-bottom: 1.2rem;
-            text-transform: uppercase;
-        }
-        .page-text {
-            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'KoPubWorldBatang', 'Noto Serif KR', '바탕', serif;
-            font-size: 1rem;
-            line-height: 2;
-            color: #3D3529;
-            word-break: keep-all;
-            overflow-wrap: break-word;
-            word-spacing: 0.05em;
-        }
-        .page-text p { margin-bottom: 1.4rem; }
-        .poem-lines {
-            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'Noto Serif KR', serif;
-            background: #FCF8F0;
-            padding: 1.6rem 1.5rem;
-            border-radius: 28px;
-            margin: 1.5rem 0;
-            color: #4F4233;
-            border-left: 3px solid #D8C2A2;
-            line-height: 2.2;
-            white-space: pre-wrap;
-            word-break: keep-all;
-            overflow-wrap: break-word;
-        }
-        .poem-lines p { margin-bottom: 0.8rem; }
-        .block-quote {
-            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'Noto Serif KR', serif;
-            background: #F3EFE7;
-            padding: 1.2rem 1.6rem;
-            border-radius: 32px;
-            text-align: center;
-            font-size: 0.95rem;
-            color: #5C5344;
-            margin: 1.8rem 0;
-            border: 1px solid #E2D5C4;
-            word-break: keep-all;
-            overflow-wrap: break-word;
-            line-height: 1.9;
-        }
-        .soft-divider {
-            width: 70px;
-            height: 2px;
-            background: #DDD0BC;
-            margin: 1.8rem auto;
-        }
-        hr { margin: 1.5rem 0; border: none; height: 1px; background: #EADDCB; }
-        .cover .page-title {
-            font-size: 2.5rem;
-            border-left: none;
-            text-align: center;
-            padding-left: 0;
-            color: #4F3F2C;
-        }
-        .cover-meta { text-align: center; margin-top: 1.2rem; color: #9B8468; font-size: 0.85rem; }
-        .cover-quote { text-align: center; font-style: italic; margin-top: 1.8rem; font-size: 0.95rem; color: #A2886C; }
-        .part-page { background: #FBF7F0; }
-        .part-page .page-title {
-            font-size: 2rem;
-            text-align: center;
-            border-left: none;
-            padding-left: 0;
-            border-bottom: 2px solid #DECFAE;
-            display: inline-block;
-            margin-bottom: 0.8rem;
+            margin: 0 auto;
         }
 
-        /* ── 네비게이션 버튼 ── */
+        /* ─────────────────────────────
+           TYPOGRAPHY: TITLE
+        ───────────────────────────── */
+        .page-title {
+            font-family: var(--font-myeongjo);
+            font-size: clamp(1.45rem, 4.5vw, 2rem);
+            font-weight: 700;
+            color: var(--color-ink);
+            line-height: 1.45;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.4rem;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            /* 제목 왼쪽 금빛 라인 */
+            padding-left: 1.1rem;
+            border-left: 4px solid var(--color-accent);
+        }
+
+        /* 챕터 구분 페이지 제목 */
+        .part-page .page-title {
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            text-align: center;
+            border-left: none;
+            padding-left: 0;
+            color: var(--color-ink);
+            border-bottom: 1.5px solid var(--color-accent);
+            padding-bottom: 0.7rem;
+            display: inline-block;
+            margin-bottom: 1.2rem;
+        }
+
+        /* 표지 제목 */
+        .cover .page-title {
+            font-size: clamp(1.8rem, 6vw, 2.8rem);
+            border-left: none;
+            padding-left: 0;
+            text-align: center;
+            letter-spacing: 0.02em;
+        }
+
+        /* ─────────────────────────────
+           TYPOGRAPHY: SUBTITLE
+        ───────────────────────────── */
+        .page-subtitle {
+            font-family: var(--font-myeongjo);
+            font-size: 0.78rem;
+            color: var(--color-ink-dim);
+            margin-bottom: 1.4rem;
+            line-height: 1.7;
+            letter-spacing: 0.03em;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            padding-left: 0.1rem;
+            /* 인용구 느낌 */
+            font-style: italic;
+        }
+
+        /* ─────────────────────────────
+           TYPOGRAPHY: BODY TEXT
+        ───────────────────────────── */
+        .page-text {
+            font-family: var(--font-myeongjo);
+            font-size: clamp(0.95rem, 2.8vw, 1.05rem);
+            line-height: 2.1;
+            color: var(--color-ink-soft);
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            /* 자간/어간 미세 조정 */
+            letter-spacing: 0.015em;
+        }
+        .page-text p {
+            margin-bottom: 1.5rem;
+        }
+        .page-text p:last-child {
+            margin-bottom: 0;
+        }
+        .page-text strong {
+            color: var(--color-ink);
+            font-weight: 700;
+        }
+
+        /* ─────────────────────────────
+           시 블록
+        ───────────────────────────── */
+        .poem-lines {
+            font-family: var(--font-myeongjo);
+            background: var(--color-poem-bg);
+            border-left: 3px solid var(--color-accent);
+            border-radius: 0 20px 20px 0;
+            padding: 1.8rem 1.6rem 1.8rem 1.8rem;
+            margin: 0.5rem 0;
+            color: var(--color-ink);
+            line-height: 2.4;
+            font-size: clamp(0.97rem, 2.9vw, 1.05rem);
+            letter-spacing: 0.02em;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            /* 시집 특유의 여유 */
+            position: relative;
+        }
+        /* 인용 장식 따옴표 */
+        .poem-lines::before {
+            content: '\201C';
+            position: absolute;
+            top: 0.4rem;
+            left: 0.5rem;
+            font-size: 2.2rem;
+            color: var(--color-accent);
+            opacity: 0.25;
+            line-height: 1;
+            font-family: Georgia, serif;
+        }
+        .poem-lines p {
+            margin-bottom: 0.5rem;
+            padding-left: 0.2rem;
+        }
+        .poem-lines p:last-child { margin-bottom: 0; }
+
+        /* ─────────────────────────────
+           블록 인용 (목차 등)
+        ───────────────────────────── */
+        .block-quote {
+            font-family: var(--font-myeongjo);
+            background: var(--color-quote-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            font-size: clamp(0.82rem, 2.3vw, 0.93rem);
+            color: var(--color-ink-soft);
+            margin: 1rem 0;
+            line-height: 1.95;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            text-align: left;
+        }
+
+        /* 구분선 */
+        .soft-divider {
+            width: 48px;
+            height: 1.5px;
+            background: var(--color-accent);
+            margin: 1.8rem auto;
+            opacity: 0.5;
+        }
+        hr {
+            margin: 1.6rem 0;
+            border: none;
+            height: 1px;
+            background: var(--color-border);
+        }
+
+        /* 표지 전용 */
+        .cover-meta {
+            text-align: center;
+            margin-top: 1.4rem;
+            color: var(--color-ink-dim);
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+        .cover-quote {
+            text-align: center;
+            margin-top: 1.6rem;
+            font-size: 0.93rem;
+            color: var(--color-ink-dim);
+            line-height: 1.85;
+            font-style: italic;
+        }
+
+        /* ─────────────────────────────
+           UI CHROME — 투명 글래스모피즘
+        ───────────────────────────── */
+
+        /* 공통 pill/circle 버튼 */
+        .glass-btn {
+            background: rgba(248, 243, 234, 0.82);
+            backdrop-filter: blur(12px) saturate(1.5);
+            -webkit-backdrop-filter: blur(12px) saturate(1.5);
+            border: 1px solid rgba(200,185,160,0.45);
+            box-shadow: 0 2px 14px rgba(80,60,30,0.10);
+            color: var(--color-ink);
+            cursor: pointer;
+            transition: background 0.18s, transform 0.13s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-myeongjo);
+        }
+        .glass-btn:active { transform: scale(0.91); background: rgba(220,208,188,0.92); }
+
+        /* ── 메뉴 토글 ── */
+        #menuToggle {
+            position: fixed;
+            top: calc(14px + var(--safe-top));
+            right: 16px;
+            z-index: 300;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            font-size: 1.15rem;
+            letter-spacing: 0;
+        }
+
+        /* ── 네비게이션 버튼들 ── */
         .nav-buttons {
             position: fixed;
-            bottom: 22px;
-            right: 20px;
+            bottom: calc(20px + var(--safe-bottom));
+            right: 16px;
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 9px;
             z-index: 200;
         }
         .nav-btn {
-            background: rgba(224, 211, 194, 0.92);
-            border: none;
-            width: 48px;
-            height: 48px;
-            border-radius: 60px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #4E3F2F;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .nav-btn:hover { background: #CFC0AB; transform: scale(0.97); }
-        .nav-btn:active { transform: scale(0.93); }
-
-        /* 페이지 표시 */
-        .page-indicator {
-            position: fixed;
-            bottom: 28px;
-            left: 20px;
-            background: rgba(235, 225, 212, 0.88);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            color: #6B5A46;
-            z-index: 200;
-            font-weight: 500;
-            font-family: '조선일보명조', 'Noto Serif KR', serif;
-        }
-
-        /* ── 메뉴바 ── */
-        #menuToggle {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            z-index: 300;
-            background: rgba(224, 211, 194, 0.92);
-            border: none;
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: #4E3F2F;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
+            font-size: 1.25rem;
+            border: none;
         }
-        #menuToggle:active { transform: scale(0.93); }
 
+        /* ── 페이지 인디케이터 ── */
+        .page-indicator {
+            position: fixed;
+            bottom: calc(22px + var(--safe-bottom));
+            left: 16px;
+            z-index: 200;
+            padding: 5px 13px;
+            border-radius: 40px;
+            font-size: 0.72rem;
+            color: var(--color-ink-dim);
+            letter-spacing: 0.06em;
+            font-family: var(--font-myeongjo);
+        }
+
+        /* ─────────────────────────────
+           MENU PANEL
+        ───────────────────────────── */
         #menuOverlay {
             display: none;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(60,45,30,0.35);
+            inset: 0;
+            background: rgba(40,32,20,0.32);
             z-index: 250;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
         }
         #menuOverlay.open { display: block; }
 
         #menuPanel {
             position: fixed;
             top: 0; right: 0;
-            width: min(320px, 85vw);
-            height: 100vh;
-            background: #FBF7F0;
+            width: min(310px, 88vw);
+            height: 100%;
+            height: 100dvh;
+            background: #F8F3E9;
             z-index: 260;
             transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            transition: transform 0.32s cubic-bezier(0.32, 0, 0.08, 1);
             overflow-y: auto;
-            box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+            -webkit-overflow-scrolling: touch;
+            box-shadow: -6px 0 32px rgba(60,40,10,0.14);
             display: flex;
             flex-direction: column;
         }
         #menuPanel.open { transform: translateX(0); }
 
         .menu-header {
-            padding: 1.4rem 1.4rem 1rem;
-            border-bottom: 1px solid #EADDCB;
+            padding: calc(1.2rem + var(--safe-top)) 1.3rem 1rem;
+            border-bottom: 1px solid var(--color-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
-            background: #FBF7F0;
+            background: #F8F3E9;
             z-index: 1;
         }
         .menu-header-title {
-            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'Noto Serif KR', serif;
-            font-size: 1rem;
+            font-family: var(--font-myeongjo);
+            font-size: 0.95rem;
             font-weight: 700;
-            color: #5C4B3A;
-            letter-spacing: 0.5px;
+            color: var(--color-ink);
+            letter-spacing: 0.01em;
         }
         #menuClose {
             background: none;
             border: none;
-            font-size: 1.4rem;
-            color: #9B8468;
+            font-size: 1.3rem;
+            color: var(--color-ink-dim);
             cursor: pointer;
-            padding: 4px 8px;
-            line-height: 1;
+            padding: 6px 8px;
+            border-radius: 8px;
         }
+        #menuClose:active { background: var(--color-border); }
+
         .menu-list {
-            padding: 0.6rem 0 2rem;
+            padding: 0.5rem 0 calc(2rem + var(--safe-bottom));
             flex: 1;
         }
         .menu-section {
-            padding: 0.5rem 1.2rem 0.3rem;
-            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'Noto Serif KR', serif;
-            font-size: 0.68rem;
-            color: #B7A68B;
-            letter-spacing: 1.5px;
+            padding: 1rem 1.3rem 0.25rem;
+            font-family: var(--font-myeongjo);
+            font-size: 0.65rem;
+            color: #B0A090;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
         }
         .menu-item {
             display: block;
             width: 100%;
-            padding: 0.7rem 1.4rem;
+            padding: 0.75rem 1.3rem 0.75rem 1.5rem;
             background: none;
             border: none;
-            text-align: left;
-            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'Noto Serif KR', serif;
-            font-size: 0.92rem;
-            color: #4F3F2C;
-            cursor: pointer;
-            transition: background 0.15s;
             border-left: 3px solid transparent;
-            line-height: 1.5;
+            text-align: left;
+            font-family: var(--font-myeongjo);
+            font-size: 0.9rem;
+            line-height: 1.55;
+            color: var(--color-ink-soft);
+            cursor: pointer;
+            transition: background 0.13s, border-color 0.13s;
+            word-break: keep-all;
         }
-        .menu-item:hover, .menu-item:active {
-            background: #F3EFE7;
-            border-left-color: #C8AA7B;
-            color: #3A2E22;
-        }
-        .menu-item.active {
-            background: #F3EFE7;
-            border-left-color: #C8AA7B;
-            color: #3A2E22;
+        .menu-item:hover   { background: #EDE8DC; border-left-color: var(--color-accent); }
+        .menu-item:active  { background: #E5DFCF; }
+        .menu-item.active  {
+            background: #EDE8DC;
+            border-left-color: var(--color-accent);
+            color: var(--color-ink);
             font-weight: 700;
         }
 
-        /* ── 모바일 최적화 ── */
-        @media (max-width: 680px) {
-            .page {
-                padding: 3rem 1.4rem 4rem;
-                justify-content: flex-start;
-                padding-top: 3.5rem;
-            }
-            .page-content {
-                width: 100%;
-            }
-            .page-title {
-                font-size: 1.45rem;
-                line-height: 1.55;
-                letter-spacing: -0.2px;
-                word-break: keep-all;
-                overflow-wrap: break-word;
-            }
-            .page-text {
-                font-size: 1rem;
-                line-height: 2.05;
-                word-break: keep-all;
-                overflow-wrap: break-word;
-                word-spacing: 0.08em;
-                letter-spacing: 0.01em;
-            }
-            .page-text p {
-                margin-bottom: 1.5rem;
-            }
-            .poem-lines {
-                font-size: 0.97rem;
-                padding: 1.3rem 1.1rem;
-                line-height: 2.2;
-                border-radius: 20px;
-                word-break: keep-all;
-                overflow-wrap: break-word;
-                word-spacing: 0.06em;
-            }
-            .block-quote {
-                font-size: 0.9rem;
-                padding: 1rem 1.1rem;
-                border-radius: 20px;
-                word-break: keep-all;
-                overflow-wrap: break-word;
-                line-height: 2;
-            }
-            .nav-btn { width: 44px; height: 44px; font-size: 1.3rem; }
-            #menuToggle { top: 12px; right: 12px; width: 40px; height: 40px; font-size: 1.2rem; }
-            .page-indicator { bottom: 22px; left: 14px; }
-            .nav-buttons { bottom: 16px; right: 12px; gap: 8px; }
-            .cover .page-title { font-size: 1.8rem; }
-            .part-page .page-title { font-size: 1.6rem; }
+        /* ─────────────────────────────
+           FOOTER
+        ───────────────────────────── */
+        footer {
+            font-size: 0.72rem;
+            text-align: center;
+            margin-top: 2.4rem;
+            color: #B0A090;
+            line-height: 1.8;
         }
 
-        footer { font-size: 0.7rem; text-align: center; margin-top: 2rem; color: #B7A68B; }
+        /* ─────────────────────────────
+           PAGE ENTER ANIMATION
+        ───────────────────────────── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .page-content {
+            animation: fadeUp 0.45s ease both;
+        }
+
+        /* ─────────────────────────────
+           DESKTOP 보정 (768px+)
+        ───────────────────────────── */
+        @media (min-width: 768px) {
+            .page { padding: 4rem 3rem 5rem; }
+            .page-title { font-size: 1.9rem; }
+            .page-text  { font-size: 1.02rem; line-height: 2.05; }
+            .poem-lines { font-size: 1.03rem; padding: 2rem 2rem 2rem 2.2rem; }
+            .nav-buttons { flex-direction: row; bottom: 24px; right: 24px; gap: 10px; }
+            .nav-btn { width: 48px; height: 48px; font-size: 1.3rem; }
+            #menuToggle { width: 46px; height: 46px; font-size: 1.2rem; top: 18px; right: 18px; }
+            .page-indicator { bottom: 30px; left: 24px; font-size: 0.75rem; }
+            .block-quote { font-size: 0.92rem; line-height: 2; padding: 1.3rem 1.8rem; }
+        }
     </style>
 </head>
 <body>
 <div class="book" id="bookContainer"></div>
 
 <!-- 메뉴 토글 버튼 -->
-<button id="menuToggle" aria-label="목차 메뉴 열기">☰</button>
+<button id="menuToggle" class="glass-btn" aria-label="목차 메뉴 열기">☰</button>
 
 <!-- 메뉴 오버레이 -->
 <div id="menuOverlay"></div>
@@ -378,11 +482,11 @@
 
 <!-- 네비게이션 버튼 -->
 <div class="nav-buttons">
-    <button class="nav-btn" id="topBtn" title="맨 위로">↑</button>
-    <button class="nav-btn" id="prevBtn" title="이전 페이지">←</button>
-    <button class="nav-btn" id="nextBtn" title="다음 페이지">→</button>
+    <button class="nav-btn glass-btn" id="topBtn" title="맨 위로">↑</button>
+    <button class="nav-btn glass-btn" id="prevBtn" title="이전 페이지">←</button>
+    <button class="nav-btn glass-btn" id="nextBtn" title="다음 페이지">→</button>
 </div>
-<div class="page-indicator" id="pageIndicator">1 / 1</div>
+<div class="page-indicator glass-btn" id="pageIndicator" style="cursor:default; border-radius:40px; font-size:0.72rem; padding:5px 13px;">1 / 1</div>
 
 <script>
     // --------------------------------------------------------------
@@ -635,9 +739,25 @@
             div.className = 'page';
             div.dataset.pageIndex = idx;
             if (p.customClass) div.classList.add(p.customClass);
-            if (p.title && (p.title.includes('제') || p.title.includes('부')) && !p.title.includes('목차')) div.classList.add('part-page');
+            // 챕터 구분 페이지 감지 — 제N부 or 프롤로그/에필로그 섹션 헤더
+            const isPartPage = p.title && (
+                /^제\d+부/.test(p.title) ||
+                p.title.startsWith('프롤로그') ||
+                p.title.startsWith('에필로그')
+            ) && !p.title.includes('목차');
+            if (isPartPage) div.classList.add('part-page');
+
             const inner = document.createElement('div');
             inner.className = 'page-content';
+
+            // 챕터 헤더 페이지: 중앙 정렬 wrapper
+            if (isPartPage) {
+                inner.style.textAlign = 'center';
+                inner.style.display = 'flex';
+                inner.style.flexDirection = 'column';
+                inner.style.alignItems = 'center';
+            }
+
             if (p.title) {
                 const titleEl = document.createElement('h2');
                 titleEl.className = 'page-title';
