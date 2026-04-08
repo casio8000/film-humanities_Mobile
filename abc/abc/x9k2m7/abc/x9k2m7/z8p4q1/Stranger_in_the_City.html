@@ -12,10 +12,12 @@
     <link rel="icon" type="image/png" sizes="192x192" href="https://casio8000.github.io/film-humanities_Mobile/images/Stranger_in_the_City.png">
     <meta name="theme-color" content="#F8F4ED">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap');
+
         * { margin:0; padding:0; box-sizing: border-box; }
         body {
             background: #F8F4ED;
-            font-family: 'Noto Serif KR', 'Chosunilbo Myeongjo', '바탕', 'Times New Roman', serif;
+            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'KoPubWorldBatang', 'Noto Serif KR', '바탕', 'Batang', 'Times New Roman', Georgia, serif;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
@@ -51,6 +53,7 @@
             width: 100%;
         }
         .page-title {
+            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'KoPubWorldBatang', 'Noto Serif KR', '바탕', serif;
             font-size: 1.9rem;
             font-weight: 700;
             color: #5C4B3A;
@@ -59,8 +62,10 @@
             border-left: 5px solid #C8AA7B;
             padding-left: 1rem;
             word-break: keep-all;
+            overflow-wrap: break-word;
         }
         .page-subtitle {
+            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'Noto Serif KR', serif;
             font-size: 0.75rem;
             letter-spacing: 2px;
             color: #A68F72;
@@ -68,24 +73,31 @@
             text-transform: uppercase;
         }
         .page-text {
+            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'KoPubWorldBatang', 'Noto Serif KR', '바탕', serif;
             font-size: 1rem;
-            line-height: 1.8;
+            line-height: 2;
             color: #3D3529;
             word-break: keep-all;
+            overflow-wrap: break-word;
+            word-spacing: 0.05em;
         }
-        .page-text p { margin-bottom: 1.2rem; }
+        .page-text p { margin-bottom: 1.4rem; }
         .poem-lines {
+            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'Noto Serif KR', serif;
             background: #FCF8F0;
             padding: 1.6rem 1.5rem;
             border-radius: 28px;
             margin: 1.5rem 0;
             color: #4F4233;
             border-left: 3px solid #D8C2A2;
-            line-height: 2;
+            line-height: 2.2;
             white-space: pre-wrap;
+            word-break: keep-all;
+            overflow-wrap: break-word;
         }
-        .poem-lines p { margin-bottom: 0.6rem; }
+        .poem-lines p { margin-bottom: 0.8rem; }
         .block-quote {
+            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'ChosunilboMyeongjo', 'Chosunilbo Myeongjo', 'Noto Serif KR', serif;
             background: #F3EFE7;
             padding: 1.2rem 1.6rem;
             border-radius: 32px;
@@ -94,6 +106,9 @@
             color: #5C5344;
             margin: 1.8rem 0;
             border: 1px solid #E2D5C4;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            line-height: 1.9;
         }
         .soft-divider {
             width: 70px;
@@ -121,59 +136,251 @@
             display: inline-block;
             margin-bottom: 0.8rem;
         }
+
+        /* ── 네비게이션 버튼 ── */
         .nav-buttons {
             position: fixed;
             bottom: 22px;
             right: 20px;
             display: flex;
-            gap: 12px;
-            z-index: 100;
+            gap: 10px;
+            z-index: 200;
         }
         .nav-btn {
-            background: #E0D3C2;
+            background: rgba(224, 211, 194, 0.92);
             border: none;
             width: 48px;
             height: 48px;
             border-radius: 60px;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             cursor: pointer;
             color: #4E3F2F;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             transition: 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .nav-btn:hover { background: #CFC0AB; transform: scale(0.97); }
+        .nav-btn:active { transform: scale(0.93); }
+
+        /* 페이지 표시 */
         .page-indicator {
             position: fixed;
             bottom: 28px;
             left: 20px;
-            background: rgba(235, 225, 212, 0.85);
+            background: rgba(235, 225, 212, 0.88);
             backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             padding: 6px 14px;
             border-radius: 40px;
             font-size: 0.75rem;
             color: #6B5A46;
-            z-index: 100;
+            z-index: 200;
             font-weight: 500;
+            font-family: '조선일보명조', 'Noto Serif KR', serif;
         }
+
+        /* ── 메뉴바 ── */
+        #menuToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 300;
+            background: rgba(224, 211, 194, 0.92);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #4E3F2F;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        #menuToggle:active { transform: scale(0.93); }
+
+        #menuOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(60,45,30,0.35);
+            z-index: 250;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+        #menuOverlay.open { display: block; }
+
+        #menuPanel {
+            position: fixed;
+            top: 0; right: 0;
+            width: min(320px, 85vw);
+            height: 100vh;
+            background: #FBF7F0;
+            z-index: 260;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            overflow-y: auto;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+            display: flex;
+            flex-direction: column;
+        }
+        #menuPanel.open { transform: translateX(0); }
+
+        .menu-header {
+            padding: 1.4rem 1.4rem 1rem;
+            border-bottom: 1px solid #EADDCB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: #FBF7F0;
+            z-index: 1;
+        }
+        .menu-header-title {
+            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'Noto Serif KR', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #5C4B3A;
+            letter-spacing: 0.5px;
+        }
+        #menuClose {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: #9B8468;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+        .menu-list {
+            padding: 0.6rem 0 2rem;
+            flex: 1;
+        }
+        .menu-section {
+            padding: 0.5rem 1.2rem 0.3rem;
+            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'Noto Serif KR', serif;
+            font-size: 0.68rem;
+            color: #B7A68B;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .menu-item {
+            display: block;
+            width: 100%;
+            padding: 0.7rem 1.4rem;
+            background: none;
+            border: none;
+            text-align: left;
+            font-family: '조선일보명조', 'Chosunilbo_myeongjo', 'Noto Serif KR', serif;
+            font-size: 0.92rem;
+            color: #4F3F2C;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-left: 3px solid transparent;
+            line-height: 1.5;
+        }
+        .menu-item:hover, .menu-item:active {
+            background: #F3EFE7;
+            border-left-color: #C8AA7B;
+            color: #3A2E22;
+        }
+        .menu-item.active {
+            background: #F3EFE7;
+            border-left-color: #C8AA7B;
+            color: #3A2E22;
+            font-weight: 700;
+        }
+
+        /* ── 모바일 최적화 ── */
         @media (max-width: 680px) {
-            .page { padding: 2rem 1.2rem; }
-            .page-title { font-size: 1.6rem; }
-            .page-text { font-size: 0.95rem; }
-            .nav-btn { width: 44px; height: 44px; font-size: 1.4rem; }
-            .poem-lines { padding: 1.2rem; }
+            .page {
+                padding: 3rem 1.4rem 4rem;
+                justify-content: flex-start;
+                padding-top: 3.5rem;
+            }
+            .page-content {
+                width: 100%;
+            }
+            .page-title {
+                font-size: 1.45rem;
+                line-height: 1.55;
+                letter-spacing: -0.2px;
+                word-break: keep-all;
+                overflow-wrap: break-word;
+            }
+            .page-text {
+                font-size: 1rem;
+                line-height: 2.05;
+                word-break: keep-all;
+                overflow-wrap: break-word;
+                word-spacing: 0.08em;
+                letter-spacing: 0.01em;
+            }
+            .page-text p {
+                margin-bottom: 1.5rem;
+            }
+            .poem-lines {
+                font-size: 0.97rem;
+                padding: 1.3rem 1.1rem;
+                line-height: 2.2;
+                border-radius: 20px;
+                word-break: keep-all;
+                overflow-wrap: break-word;
+                word-spacing: 0.06em;
+            }
+            .block-quote {
+                font-size: 0.9rem;
+                padding: 1rem 1.1rem;
+                border-radius: 20px;
+                word-break: keep-all;
+                overflow-wrap: break-word;
+                line-height: 2;
+            }
+            .nav-btn { width: 44px; height: 44px; font-size: 1.3rem; }
+            #menuToggle { top: 12px; right: 12px; width: 40px; height: 40px; font-size: 1.2rem; }
+            .page-indicator { bottom: 22px; left: 14px; }
+            .nav-buttons { bottom: 16px; right: 12px; gap: 8px; }
+            .cover .page-title { font-size: 1.8rem; }
+            .part-page .page-title { font-size: 1.6rem; }
         }
+
         footer { font-size: 0.7rem; text-align: center; margin-top: 2rem; color: #B7A68B; }
     </style>
 </head>
 <body>
 <div class="book" id="bookContainer"></div>
+
+<!-- 메뉴 토글 버튼 -->
+<button id="menuToggle" aria-label="목차 메뉴 열기">☰</button>
+
+<!-- 메뉴 오버레이 -->
+<div id="menuOverlay"></div>
+
+<!-- 메뉴 패널 -->
+<div id="menuPanel">
+    <div class="menu-header">
+        <span class="menu-header-title">『도시의 이방인』 목차</span>
+        <button id="menuClose" aria-label="메뉴 닫기">✕</button>
+    </div>
+    <div class="menu-list" id="menuList">
+        <!-- JS로 동적 생성 -->
+    </div>
+</div>
+
+<!-- 네비게이션 버튼 -->
 <div class="nav-buttons">
-    <button class="nav-btn" id="prevBtn">←</button>
-    <button class="nav-btn" id="nextBtn">→</button>
+    <button class="nav-btn" id="topBtn" title="맨 위로">↑</button>
+    <button class="nav-btn" id="prevBtn" title="이전 페이지">←</button>
+    <button class="nav-btn" id="nextBtn" title="다음 페이지">→</button>
 </div>
 <div class="page-indicator" id="pageIndicator">1 / 1</div>
 
@@ -395,11 +602,38 @@
 
     // ========== 렌더링 및 네비게이션 ==========
     const container = document.getElementById('bookContainer');
+
+    // 메뉴에 표시할 주요 페이지 목록 (index, label, section)
+    const menuStructure = [
+        { section: "머리말" },
+        { label: "표지", match: "『도시의 이방인』" },
+        { label: "책 소개", match: "책 소개" },
+        { label: "작가의 말", match: "작가의 말" },
+        { label: "프롤로그", match: "프롤로그" },
+        { label: "목차", match: "목차" },
+        { section: "본문" },
+        { label: "제1부 – 이방인의 탄생", match: "제1부" },
+        { label: "제2부 – 상처의 감정들", match: "제2부" },
+        { label: "제3부 – 잠들 수 없는 사람들", match: "제3부" },
+        { label: "제4부 – 질문의 계절", match: "제4부" },
+        { label: "제5부 – 부모라는 그늘", match: "제5부" },
+        { label: "제6부 – 궤도 바깥에서", match: "제6부" },
+        { label: "제7부 – 그래도 나는", match: "제7부" },
+        { label: "제8부 – 잊힌 조각들", match: "제8부" },
+        { label: "제9부 – 타인의 목소리", match: "제9부" },
+        { section: "마무리" },
+        { label: "에필로그", match: "에필로그" },
+        { label: "노바의 말", match: "노바의 말" },
+        { label: "Afterword", match: "Afterword" },
+        { label: "출판 정보", match: "출판 정보" },
+    ];
+
     function renderAll() {
         container.innerHTML = '';
-        pages.forEach(p => {
+        pages.forEach((p, idx) => {
             const div = document.createElement('div');
             div.className = 'page';
+            div.dataset.pageIndex = idx;
             if (p.customClass) div.classList.add(p.customClass);
             if (p.title && (p.title.includes('제') || p.title.includes('부')) && !p.title.includes('목차')) div.classList.add('part-page');
             const inner = document.createElement('div');
@@ -423,36 +657,108 @@
             div.appendChild(inner);
             container.appendChild(div);
         });
+        buildMenu();
         updateIndicator();
+    }
+
+    function buildMenu() {
+        const menuList = document.getElementById('menuList');
+        menuList.innerHTML = '';
+        menuStructure.forEach(item => {
+            if (item.section !== undefined) {
+                const sec = document.createElement('div');
+                sec.className = 'menu-section';
+                sec.textContent = item.section;
+                menuList.appendChild(sec);
+                return;
+            }
+            // 해당 match를 가진 페이지 인덱스 찾기
+            const idx = pages.findIndex(p => p.title && p.title.startsWith(item.match));
+            if (idx === -1) return;
+            const btn = document.createElement('button');
+            btn.className = 'menu-item';
+            btn.textContent = item.label;
+            btn.dataset.pageIdx = idx;
+            btn.addEventListener('click', () => {
+                scrollToPage(idx);
+                closeMenu();
+            });
+            menuList.appendChild(btn);
+        });
+    }
+
+    function updateMenuActive() {
+        const pagesDom = document.querySelectorAll('.page');
+        const scrollTop = container.scrollTop;
+        const pageHeight = window.innerHeight;
+        let current = Math.round(scrollTop / pageHeight);
+        current = Math.min(Math.max(0, current), pagesDom.length - 1);
+        document.querySelectorAll('.menu-item').forEach(btn => {
+            btn.classList.toggle('active', parseInt(btn.dataset.pageIdx) === current);
+        });
     }
 
     function updateIndicator() {
         const pagesDom = document.querySelectorAll('.page');
         const total = pagesDom.length;
-        const scrollTop = document.getElementById('bookContainer').scrollTop;
+        const scrollTop = container.scrollTop;
         const pageHeight = window.innerHeight;
         let current = Math.round(scrollTop / pageHeight);
         current = Math.min(Math.max(0, current), total - 1);
         document.getElementById('pageIndicator').innerText = `${current+1} / ${total}`;
+        updateMenuActive();
     }
+
     function scrollToPage(idx) {
         const pagesDom = document.querySelectorAll('.page');
         if (idx >= 0 && idx < pagesDom.length) {
             pagesDom[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
-            setTimeout(updateIndicator, 200);
+            setTimeout(updateIndicator, 300);
         }
     }
+
+    // 네비게이션 버튼
     document.getElementById('prevBtn').addEventListener('click', () => {
-        const cur = Math.round(document.getElementById('bookContainer').scrollTop / window.innerHeight);
+        const cur = Math.round(container.scrollTop / window.innerHeight);
         scrollToPage(cur - 1);
     });
     document.getElementById('nextBtn').addEventListener('click', () => {
-        const cur = Math.round(document.getElementById('bookContainer').scrollTop / window.innerHeight);
+        const cur = Math.round(container.scrollTop / window.innerHeight);
         scrollToPage(cur + 1);
     });
-    window.addEventListener('keydown', e => { if(e.key === 'ArrowLeft') document.getElementById('prevBtn').click(); if(e.key === 'ArrowRight') document.getElementById('nextBtn').click(); });
-    const scroller = document.getElementById('bookContainer');
-    scroller.addEventListener('scroll', () => requestAnimationFrame(updateIndicator));
+    document.getElementById('topBtn').addEventListener('click', () => {
+        scrollToPage(0);
+    });
+
+    // 키보드
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') document.getElementById('prevBtn').click();
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') document.getElementById('nextBtn').click();
+        if (e.key === 'Home') document.getElementById('topBtn').click();
+        if (e.key === 'Escape') closeMenu();
+    });
+
+    // 스크롤 이벤트
+    container.addEventListener('scroll', () => requestAnimationFrame(updateIndicator));
+
+    // 메뉴 열기/닫기
+    function openMenu() {
+        document.getElementById('menuPanel').classList.add('open');
+        document.getElementById('menuOverlay').classList.add('open');
+        document.getElementById('menuToggle').textContent = '✕';
+    }
+    function closeMenu() {
+        document.getElementById('menuPanel').classList.remove('open');
+        document.getElementById('menuOverlay').classList.remove('open');
+        document.getElementById('menuToggle').textContent = '☰';
+    }
+    document.getElementById('menuToggle').addEventListener('click', () => {
+        if (document.getElementById('menuPanel').classList.contains('open')) closeMenu();
+        else openMenu();
+    });
+    document.getElementById('menuClose').addEventListener('click', closeMenu);
+    document.getElementById('menuOverlay').addEventListener('click', closeMenu);
+
     renderAll();
     setTimeout(updateIndicator, 100);
 </script>
