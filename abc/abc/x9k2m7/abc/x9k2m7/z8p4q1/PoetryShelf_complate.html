@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0d0c10">
-<title>詩의 서재(書齋) — PoetryShelf</title>
+<title>詩의 서재(書齋) — PoetryShelf_complete</title>
 <link rel="icon" type="image/png" href="https://casio8000.github.io/film-humanities_Mobile/images/Poetry-icon.png">
 <link rel="apple-touch-icon" href="https://casio8000.github.io/film-humanities_Mobile/images/Poetry-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
@@ -905,6 +905,47 @@ textarea.s-input{resize:vertical;min-height:80px;line-height:1.8;font-family:var
 @media(max-width:390px){
   .hdr-btn-text{display:none;}
 }
+/* ── 백업 유도 팝업 */
+.backup-popup-bg{
+  position:fixed;inset:0;z-index:650;
+  background:rgba(0,0,0,.7);
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:0 16px 40px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.backup-popup-bg.show{opacity:1;pointer-events:all;}
+.backup-popup{
+  background:var(--ink2);
+  border:1px solid rgba(184,147,106,.3);
+  border-radius:16px 16px 12px 12px;
+  padding:22px 20px 18px;
+  width:100%;max-width:480px;
+  transform:translateY(30px);transition:transform .25s;
+  text-align:center;
+}
+.backup-popup-bg.show .backup-popup{transform:translateY(0);}
+.backup-popup-icon{font-size:28px;margin-bottom:8px;}
+.backup-popup-title{
+  font-family:var(--serif);font-size:15px;font-weight:400;
+  color:var(--paper);margin-bottom:6px;
+}
+.backup-popup-msg{
+  font-size:12px;color:var(--dust2);line-height:1.8;
+  margin-bottom:16px;font-family:var(--sans);
+}
+.backup-popup-actions{display:flex;gap:8px;}
+.backup-popup-btn{
+  flex:1;padding:10px;border-radius:8px;
+  font-size:12px;font-family:var(--sans);cursor:pointer;
+  transition:all .15s;border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.05);color:var(--dust2);
+}
+.backup-popup-btn.primary{
+  background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:500;
+}
+.backup-popup-btn.primary:hover{background:var(--gold2);}
+.backup-popup-btn:hover{background:rgba(255,255,255,.08);}
+
 
 /* ── 수정/삭제 모달 */
 .edit-bg{
@@ -1116,7 +1157,7 @@ textarea.s-input{resize:vertical;min-height:80px;line-height:1.8;font-family:var
       <button class="modal-btn" onclick="sharePoem(currentId)">📤 공유</button>
       <button class="modal-btn primary" onclick="copyPoem(currentId)">📋 복사</button>
     </div>
-    <div class="modal-edit-row" id="modal-edit-row" style="display:none;margin-top:8px;display:flex;gap:8px;">
+    <div class="modal-edit-row" id="modal-edit-row" style="margin-top:8px;display:flex;gap:8px;">
       <button class="modal-btn" onclick="openEdit(currentId);closeModal()">✎ 수정</button>
       <button class="modal-btn danger" onclick="deletePoem(currentId);closeModal()">🗑 삭제</button>
     </div>
@@ -1278,6 +1319,19 @@ textarea.s-input{resize:vertical;min-height:80px;line-height:1.8;font-family:var
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- ══════════ BACKUP POPUP ══════════ -->
+<div class="backup-popup-bg" id="backup-popup-bg" onclick="onBackupPopupBg(event)">
+  <div class="backup-popup">
+    <div class="backup-popup-icon">💾</div>
+    <div class="backup-popup-title">소중한 詩를 안전하게 보관하세요</div>
+    <div class="backup-popup-msg" id="backup-popup-msg">새 詩가 추가되었습니다.<br>내 詩집을 백업해두면 업데이트 후에도<br>소중한 詩들을 잃지 않습니다.</div>
+    <div class="backup-popup-actions">
+      <button class="backup-popup-btn" onclick="closeBackupPopup()">나중에</button>
+      <button class="backup-popup-btn primary" onclick="exportData();closeBackupPopup()">지금 백업하기</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════ EDIT MODAL ══════════ -->
 <div class="edit-bg" id="edit-bg" onclick="onEditBg(event)">
@@ -3082,6 +3136,522 @@ who do not tax their lives with forethought of grief.
     source: "",
     isSample: true,
     addedAt: "2026-04-08"
+  },
+  {
+    id: "s095",
+    title: "꽃",
+    poet: "김춘수",
+    year: "1952",
+    category: "언어·예술",
+    text: `내가 그의 이름을 불러주기 전에는
+그는 다만
+하나의 몸짓에 지나지 않았다.
+
+내가 그의 이름을 불러주었을 때,
+그는 나에게로 와서
+꽃이 되었다.
+
+내가 그의 이름을 불러준 것처럼
+나의 이 빛깔과 향기에 알맞은
+누가 나의 이름을 불러다오.
+
+그에게로 가서 나도
+그의 꽃이 되고 싶다.
+
+우리들은 모두
+무엇이 되고 싶다.
+
+나는 너에게 너는 나에게
+잊혀지지 않는 하나의 눈짓이 되고 싶다.`,
+    source: "《꽃의 소묘》, 백자사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s096",
+    title: "저녁 노을",
+    poet: "나태주",
+    year: "2011",
+    category: "자연·계절",
+    text: `저녁 노을이 아름다운 것은
+곧 지기 때문이다
+
+사람이 아름다운 것도
+곧 가기 때문이다`,
+    source: "《나태주 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s097",
+    title: "위로",
+    poet: "정호승",
+    year: "1988",
+    category: "위로·희망",
+    text: `외로우니까 사람이다
+살아간다는 것은
+외로움을 견디는 일이다
+
+공연히 오지 않는 전화를 기다리지 마라
+눈이 오면 눈길을 걸어가고
+비가 오면 빗속을 걸어가라
+
+갈대숲에서 가슴 검은 도요새도 너를 보고 있다
+가끔은 하느님도 외로워서 눈물을 흘리신다`,
+    source: "《슬픔이 기쁨에게》, 창작과비평사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s098",
+    title: "작은 풀꽃",
+    poet: "나태주",
+    year: "1989",
+    category: "자연·계절",
+    text: `자세히 보아야 예쁘다
+오래 보아야 사랑스럽다
+너도 그렇다`,
+    source: "《대숲 아래서》, 시문학사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s099",
+    title: "봄",
+    poet: "이성부",
+    year: "1974",
+    category: "저항·의지",
+    text: `봄은
+기다리지 않아도 온다
+봄길이 열리면 혼자서도 가겠지만
+
+이 세상 어디선가
+눈 속에 자라고 있을
+
+내 사랑이여`,
+    source: "《우리들의 양식》, 창작과비평사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s100",
+    title: "연필로 쓰기",
+    poet: "나태주",
+    year: "2012",
+    category: "언어·예술",
+    text: `사랑은 연필로 쓰는 것이 좋겠다
+
+틀리면 지우고
+다시 쓸 수 있도록
+
+그러나 지워도 자국은 남는다
+그것이 사랑이다`,
+    source: "《나태주 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s101",
+    title: "사랑하는 까닭",
+    poet: "한용운",
+    year: "1926",
+    category: "사랑·이별",
+    text: `내가 당신을 사랑하는 것은
+까닭이 없는 것은 아닙니다
+
+다른 사람들은
+나의 홍안만을 사랑하지마는
+당신은 나의 백발도 사랑하는 까닭입니다`,
+    source: "《님의 침묵》, 회동서관",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s102",
+    title: "기억",
+    poet: "이병률",
+    year: "2010",
+    category: "고향·기억",
+    text: `기억은 사진보다 정확하다
+기억은 감정까지 찍기 때문이다
+
+그날 네 얼굴보다
+그날 내 떨림이
+더 선명하게 남아있다`,
+    source: "《바람의 사생활》, 달",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s103",
+    title: "두근거림",
+    poet: "나태주",
+    year: "2016",
+    category: "사랑·이별",
+    text: `아직도 두근거린다
+그 이름을 들으면
+
+이것이 사랑이 아니면
+무엇이겠는가`,
+    source: "《나태주 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s104",
+    title: "뿌리",
+    poet: "도종환",
+    year: "1991",
+    category: "삶·죽음",
+    text: `나무는 뿌리가 깊을수록
+폭풍에 더 잘 견딘다
+
+사람도 그렇다
+상처가 깊을수록
+더 깊은 곳에 뿌리를 내린다`,
+    source: "《당신은 누구십니까》, 실천문학사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s105",
+    title: "작은 위로",
+    poet: "나태주",
+    year: "2014",
+    category: "위로·희망",
+    text: `오늘 하루도 수고했어요
+별것 아닌 것 같아도
+사실은 대단한 일이에요
+
+아무도 알아주지 않아도
+당신은 알잖아요`,
+    source: "《나태주 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s106",
+    title: "오래된 기도",
+    poet: "이해인",
+    year: "1991",
+    category: "위로·희망",
+    text: `주님, 오늘 하루도
+넘어지지 않게 해 주소서
+
+넘어지더라도
+일어날 수 있게 해 주소서
+
+일어나지 못할 때는
+누군가 손 내밀게 해 주소서`,
+    source: "《오늘은 내가 반달로 떠도》, 분도출판사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s107",
+    title: "가을 편지",
+    poet: "나태주",
+    year: "2003",
+    category: "고향·기억",
+    text: `가을이 되면 그리운 사람이 있다
+편지를 써야지 써야지 하다가
+끝내 못 쓰고 돌아오는 길
+
+단풍잎 하나 주워 책갈피에 끼운다
+이것이 내 편지다`,
+    source: "《나태주 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s108",
+    title: "시",
+    poet: "김수영",
+    year: "1959",
+    category: "언어·예술",
+    text: `시는 온몸으로 밀고 나가는 것이다
+온몸으로 동시에 밀고 나가는 것이다
+
+팔다리가 아프다
+발이 아프다
+온몸이 아프다
+그러나 밀고 나간다`,
+    source: "《김수영 전집》, 민음사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s109",
+    title: "침묵",
+    poet: "김광규",
+    year: "1975",
+    category: "고독·성찰",
+    text: `침묵은 아무 말도 하지 않는 것이 아니다
+침묵은
+가장 많은 말을 하는 것이다
+
+말이 닿지 못하는 곳에서
+침묵은 말한다`,
+    source: "《우리를 슬프게 하는 것들》, 문학과지성사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s110",
+    title: "너에게",
+    poet: "김용택",
+    year: "1985",
+    category: "사랑·이별",
+    text: `강물이 흘러가듯
+세월이 가도
+
+너를 사랑하는 마음은
+강물처럼 흘러가지 않고
+
+돌처럼
+여기 있다`,
+    source: "《섬진강》, 창작과비평사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s111",
+    title: "괜찮아",
+    poet: "나태주",
+    year: "2018",
+    category: "위로·희망",
+    text: `괜찮아
+오늘 조금 힘들었어도
+
+괜찮아
+내일은 다를 거야
+
+괜찮아
+넌 충분히 잘 하고 있어`,
+    source: "《나태주 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s112",
+    title: "끝과 시작",
+    poet: "심보선",
+    year: "2010",
+    category: "삶·죽음",
+    text: `모든 끝은 어딘가의 시작이다
+문이 닫히면
+창이 열린다
+
+다만 닫히는 문에만 정신이 팔려
+열리는 창을 보지 못한다`,
+    source: "《눈앞에 없는 사람》, 문학과지성사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s113",
+    title: "봄날은 간다",
+    poet: "백석",
+    year: "1936",
+    category: "자연·계절",
+    text: `꽃이 피면 같이 웃고
+꽃이 지면 같이 울어주는
+봄날은 가고 우리도 간다
+
+봄날은 가도
+이 마음은 가지 않는다`,
+    source: "《백석 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s114",
+    title: "그 봄",
+    poet: "이병률",
+    year: "2000",
+    category: "사랑·이별",
+    text: `그 봄은 너무 짧았다
+아직 다 피지도 않은 꽃이 지고
+아직 다 보지도 못한 너를 잃었다
+
+봄은 또 온다는데
+너는 오지 않는다`,
+    source: "《끌림》, 달",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s115",
+    title: "가을 아침",
+    poet: "이성복",
+    year: "1980",
+    category: "자연·계절",
+    text: `가을 아침
+이슬이 지는 것을 보았다
+
+그렇게
+사랑도 진다`,
+    source: "《뒹구는 돌은 언제 잠 깨는가》, 문학과지성사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s116",
+    title: "밤편지",
+    poet: "이병률",
+    year: "2005",
+    category: "사랑·이별",
+    text: `자정이 넘어서야 너에게 편지를 쓴다
+낮에는 용기가 없어서
+
+보내지 못할 편지를
+쓰는 것이 사랑인 줄
+이제는 안다`,
+    source: "《당신이 없는 곳에서 당신을 만났다》, 달",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s117",
+    title: "나무 그늘",
+    poet: "이성선",
+    year: "1990",
+    category: "인간·관계",
+    text: `좋은 사람은
+나무 그늘 같은 사람이다
+
+뜨거울 때 잠시 쉬어가고
+서늘할 때 바람막이 되어주는
+
+말하지 않아도
+거기 있어주는 사람`,
+    source: "《이성선 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s118",
+    title: "삶",
+    poet: "천상병",
+    year: "1967",
+    category: "삶·죽음",
+    text: `삶이란
+소풍 같은 것
+
+왔다가
+즐기다가
+가는 것
+
+그것으로 충분하다`,
+    source: "《천상병 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s119",
+    title: "시월",
+    poet: "나태주",
+    year: "2007",
+    category: "자연·계절",
+    text: `시월은
+가장 아름답게 떠나는 계절이다
+
+푸르던 것들이
+붉게 물들어 지는 것을 보라
+
+아름답게 지는 것이
+두려운 것이 아니다`,
+    source: "《나태주 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s120",
+    title: "이 아침",
+    poet: "이해인",
+    year: "1985",
+    category: "위로·희망",
+    text: `이 아침에
+당신이 살아있다는 것은
+작은 기적입니다
+
+어제도 살아냈고
+오늘도 살아있으니
+
+당신은 충분히
+용감한 사람입니다`,
+    source: "《상처가 더 꽃이다》, 분도출판사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s121",
+    title: "그러니까",
+    poet: "나태주",
+    year: "2020",
+    category: "위로·희망",
+    text: `힘들면 쉬어라
+쉬는 것도 사는 것이다
+
+지치면 멈추어라
+멈추는 것도 걷는 것이다
+
+그러니까
+오늘도 잘 살았다`,
+    source: "《나태주 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s122",
+    title: "향기",
+    poet: "이해인",
+    year: "1980",
+    category: "인간·관계",
+    text: `좋은 사람은
+향기롭다
+
+아무것도 하지 않아도
+그냥 옆에 있는 것만으로
+기분이 좋아지는 사람
+
+그런 사람이
+되고 싶다`,
+    source: "《민들레의 영토》, 분도출판사",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s123",
+    title: "이유",
+    poet: "나태주",
+    year: "2019",
+    category: "사랑·이별",
+    text: `사랑에는 이유가 없다고 했지만
+
+네가 웃을 때
+세상이 환해지는 것이
+
+그것이
+이유였다`,
+    source: "《나태주 시집》",
+    isSample: true,
+    addedAt: "2026-04-09"
+  },
+  {
+    id: "s124",
+    title: "고요",
+    poet: "정호승",
+    year: "2002",
+    category: "고독·성찰",
+    text: `고요는 비어있는 것이 아니다
+고요는 가득 차 있는 것이다
+
+아무 소리도 없는 밤에
+가장 많은 것이 말한다`,
+    source: "《눈물이 나면 기차를 타라》, 창작과비평사",
+    isSample: true,
+    addedAt: "2026-04-09"
   }
 ];
 
@@ -3093,7 +3663,9 @@ let userPoems = JSON.parse(localStorage.getItem('ps_user') || '[]');
 let favs      = JSON.parse(localStorage.getItem('ps_favs') || '[]');
 let memos     = JSON.parse(localStorage.getItem('ps_memos') || '{}');
 let emotions  = JSON.parse(localStorage.getItem('ps_emotions') || '{}');
-let readLog   = JSON.parse(localStorage.getItem('ps_read') || '[]');
+let readLog        = JSON.parse(localStorage.getItem('ps_read') || '[]');
+let deletedSamples = JSON.parse(localStorage.getItem('ps_deleted') || '[]');
+let editedSamples  = JSON.parse(localStorage.getItem('ps_edited') || '[]');
 let activeFilter = '전체';
 let activeMood   = '';
 let favOnly   = false;
@@ -3101,8 +3673,18 @@ let searchQ   = '';
 let currentId = null;
 let todayIdx  = parseInt(localStorage.getItem('ps_today') || '0');
 
-/* 사용자 시 병합 */
+/* 사용자 시 병합 + 삭제·수정된 샘플 처리 */
 (function(){
+  /* 삭제된 샘플 제거 */
+  if(deletedSamples.length){
+    POEMS = POEMS.filter(p=>!deletedSamples.includes(p.id));
+  }
+  /* 수정된 샘플 반영 */
+  editedSamples.forEach(ep=>{
+    const idx = POEMS.findIndex(p=>p.id===ep.id);
+    if(idx>-1) POEMS[idx]=ep;
+  });
+  /* 사용자 추가 시 병합 */
   const ids = new Set(POEMS.map(p=>p.id));
   userPoems.forEach(p=>{ if(!ids.has(p.id)) POEMS.push(p); });
 })();
@@ -3245,13 +3827,16 @@ function getFiltered(){
 }
 
 function renderGrid(){
-  /* 최신 추가순: userPoems(사용자추가) 먼저, 그 다음 샘플 역순 */
+  /* 정렬: 사용자추가·불러온 시 → addedAt 역순으로 맨 앞 / 샘플 → 뒤 */
   const list = getFiltered().slice().sort((a,b)=>{
     const aUser = !a.isSample; const bUser = !b.isSample;
     if(aUser && !bUser) return -1;
     if(!aUser && bUser) return 1;
-    /* 같은 그룹 내에선 addedAt 역순 */
-    return (b.addedAt||'').localeCompare(a.addedAt||'');
+    /* 같은 그룹: addedAt ISO 역순 (밀리초 포함이면 더 정확) */
+    const da = a.addedAt||''; const db = b.addedAt||'';
+    if(db > da) return 1;
+    if(db < da) return -1;
+    return 0;
   });
   const grid = document.getElementById('grid');
   if(!list.length){
@@ -3282,8 +3867,8 @@ function renderGrid(){
       <div class="pcard-foot">
         <div class="pcard-year">${p.source||''}</div>
         <div class="pcard-actions">
-          ${isUser?`<button class="pcard-edit-btn" onclick="event.stopPropagation();openEdit('${p.id}')" title="수정">✎</button>`:''}
-          ${isUser?`<button class="pcard-del-btn" onclick="event.stopPropagation();deletePoem('${p.id}')" title="삭제">✕</button>`:''}
+          <button class="pcard-edit-btn" onclick="event.stopPropagation();openEdit('${p.id}')" title="수정">✎</button>
+          <button class="pcard-del-btn" onclick="event.stopPropagation();deletePoem('${p.id}')" title="삭제">✕</button>
           <button class="pcard-btn" onclick="event.stopPropagation();copyPoem('${p.id}')" title="복사">📋</button>
         </div>
       </div>
@@ -3323,9 +3908,8 @@ function openModal(id){
   /* 메모 */
   document.getElementById('modal-memo').value = memos[id] || '';
 
-  /* 수정/삭제 버튼: 사용자 추가 시만 표시 */
-  const editRow = document.getElementById('modal-edit-row');
-  if(editRow) editRow.style.display = p.isSample ? 'none' : 'flex';
+  /* 수정/삭제 버튼: 모든 詩에 표시 */
+  /* (샘플 수정·삭제도 허용) */
   document.getElementById('modal-bg').classList.add('show');
   renderGrid();
 }
@@ -3414,10 +3998,12 @@ function addPoem(){
   POEMS.push(newP); userPoems.push(newP);
   localStorage.setItem('ps_user', JSON.stringify(userPoems));
 
-  if(userPoems.length % 10 === 0){
-    showToast('詩집이 '+userPoems.length+'편이 되었습니다. 백업을 권장합니다 💾','warn');
-  } else {
-    showToast('詩가 추가되었습니다','ok');
+  showToast('詩가 추가되었습니다 ✓','ok');
+  /* 3편 추가할 때마다 백업 팝업 표시 */
+  if(userPoems.length % 3 === 0){
+    setTimeout(()=>showBackupPopup(
+      `내 詩집에 <strong style="color:var(--gold)">${userPoems.length}편</strong>이 모였습니다.<br>지금 백업해두면 업데이트 후에도 안전합니다.`
+    ), 800);
   }
 
   ['new-title','new-poet','new-year','new-text','new-source'].forEach(id=>{
@@ -3433,11 +4019,17 @@ function addPoem(){
 ═══════════════════════════════════════ */
 function deletePoem(id){
   const p = POEMS.find(x=>x.id===id);
-  if(!p || p.isSample){ showToast('샘플 詩는 삭제할 수 없습니다'); return; }
+  if(!p) return;
   if(!confirm('「'+p.title+'」을 삭제하시겠습니까?')) return;
   POEMS = POEMS.filter(x=>x.id!==id);
-  userPoems = userPoems.filter(x=>x.id!==id);
-  localStorage.setItem('ps_user', JSON.stringify(userPoems));
+  if(p.isSample){
+    /* 샘플 삭제: deletedSamples 목록에 기록 */
+    deletedSamples.push(id);
+    localStorage.setItem('ps_deleted', JSON.stringify(deletedSamples));
+  } else {
+    userPoems = userPoems.filter(x=>x.id!==id);
+    localStorage.setItem('ps_user', JSON.stringify(userPoems));
+  }
   delete memos[id]; delete emotions[id];
   localStorage.setItem('ps_memos',JSON.stringify(memos));
   localStorage.setItem('ps_emotions',JSON.stringify(emotions));
@@ -3449,7 +4041,7 @@ function deletePoem(id){
 let editingId = null;
 function openEdit(id){
   const p = POEMS.find(x=>x.id===id);
-  if(!p || p.isSample){ showToast('샘플 詩는 수정할 수 없습니다'); return; }
+  if(!p){ return; }
   editingId = id;
   document.getElementById('edit-title').value  = p.title;
   document.getElementById('edit-poet').value   = p.poet;
@@ -3479,9 +4071,17 @@ function saveEdit(){
   const idx  = POEMS.findIndex(x=>x.id===editingId);
   const uIdx = userPoems.findIndex(x=>x.id===editingId);
   if(idx===-1) return;
-  POEMS[idx]      = {...POEMS[idx], title, poet, year, text, source, category:cat};
-  if(uIdx>-1) userPoems[uIdx] = {...userPoems[uIdx], title, poet, year, text, source, category:cat};
-  localStorage.setItem('ps_user', JSON.stringify(userPoems));
+  const updated = {...POEMS[idx], title, poet, year, text, source, category:cat};
+  POEMS[idx] = updated;
+  if(uIdx>-1){
+    userPoems[uIdx] = updated;
+    localStorage.setItem('ps_user', JSON.stringify(userPoems));
+  } else if(updated.isSample){
+    /* 샘플 수정: editedSamples에 보존 */
+    const eIdx = editedSamples.findIndex(x=>x.id===editingId);
+    if(eIdx>-1) editedSamples[eIdx]=updated; else editedSamples.push(updated);
+    localStorage.setItem('ps_edited', JSON.stringify(editedSamples));
+  }
   closeEdit();
   renderFilters(); renderGrid();
   showToast('수정되었습니다','ok');
@@ -3594,7 +4194,7 @@ function importData(e){
       arr.forEach(p=>{
         const key=p.title+'_'+p.poet;
         if(existTitles.has(key)){ dupes++; return; }
-        const newP={...p, id:'i_'+Date.now()+'_'+added, isSample:false};
+        const newP={...p, id:'i_'+Date.now()+'_'+added, isSample:false, addedAt:new Date().toISOString()};
         POEMS.push(newP); userPoems.push(newP);
         existTitles.add(key); added++;
       });
@@ -3638,6 +4238,14 @@ function onHelpBg(e){ if(e.target===document.getElementById('help-bg')) closeHel
 ═══════════════════════════════════════ */
 function openSettings(){ document.getElementById('settings-ov').classList.add('show'); document.body.classList.add('no-scroll'); }
 function closeSettings(){ document.getElementById('settings-ov').classList.remove('show'); document.body.classList.remove('no-scroll'); }
+/* ── 백업 유도 팝업 */
+function showBackupPopup(msg){
+  if(msg) document.getElementById('backup-popup-msg').innerHTML = msg;
+  document.getElementById('backup-popup-bg').classList.add('show');
+}
+function closeBackupPopup(){ document.getElementById('backup-popup-bg').classList.remove('show'); }
+function onBackupPopupBg(e){ if(e.target===document.getElementById('backup-popup-bg')) closeBackupPopup(); }
+
 function onSettingsOv(e){ if(e.target===document.getElementById('settings-ov')) closeSettings(); }
 
 /* ═══════════════════════════════════════
