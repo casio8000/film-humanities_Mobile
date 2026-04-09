@@ -963,6 +963,8 @@ button:focus-visible,
   outline-offset:2px;
 }
 
+
+.ecard-num{display:none;}  /* 별표가 우상단 차지 — 번호는 숨김 */
 /* ── 카드 시각 구분 강화 ── */
 .ecard{
   border-bottom:1px solid rgba(255,255,255,.04);
@@ -1577,6 +1579,61 @@ button:focus-visible,
   color:#d2af64;border-color:#d2af64;background:rgba(210,175,100,.1);
 }
 
+
+/* ── 즐겨찾기 별표 (카드 우상단) */
+.fav-star{
+  position:absolute;top:9px;right:9px;
+  width:26px;height:26px;border-radius:50%;
+  background:none;border:none;
+  font-size:1rem;line-height:1;
+  color:rgba(255,255,255,.18);
+  cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;z-index:3;
+  -webkit-tap-highlight-color:transparent;
+}
+.fav-star:hover,.fav-star:active{color:rgba(255,200,40,.7);transform:scale(1.15);}
+.fav-star.on{color:#ffc828;text-shadow:0 0 8px rgba(255,200,40,.5);}
+
+/* ── 즐겨찾기 필터 칩 */
+.gchip-fav{
+  font-size:.62rem;padding:3px 11px;border-radius:12px;
+  color:rgba(255,200,40,.55);border-color:rgba(255,200,40,.2);
+}
+.gchip-fav:hover{color:rgba(255,200,40,.9);border-color:rgba(255,200,40,.45);background:rgba(255,200,40,.06);}
+.gchip-fav.on{color:#ffc828;border-color:#ffc828;background:rgba(255,200,40,.08);}
+
+/* ── 본문 페이지 편집 바 */
+.e-edit-bar{
+  display:flex;gap:8px;
+  margin-top:18px;padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.e-edit-btn{
+  padding:8px 16px;border-radius:8px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  color:var(--text-faint);
+  font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:1px;
+  cursor:pointer;transition:all .16s;touch-action:manipulation;
+  display:flex;align-items:center;gap:5px;
+}
+.e-edit-btn:hover,.e-edit-btn:active{color:var(--text-dim);background:rgba(255,255,255,.08);}
+.e-edit-btn.del:hover,.e-edit-btn.del:active{
+  color:#cf6679;background:rgba(207,102,121,.08);border-color:rgba(207,102,121,.25);
+}
+.e-fav-btn{
+  margin-left:auto;
+  padding:8px 14px;border-radius:8px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.2);font-size:.95rem;
+  cursor:pointer;transition:all .18s;touch-action:manipulation;
+}
+.e-fav-btn.on{color:#ffc828;border-color:rgba(255,200,40,.4);background:rgba(255,200,40,.06);}
+.e-fav-btn:hover,.e-fav-btn:active{color:rgba(255,200,40,.8);}
+@media(max-width:600px){
+  .e-edit-btn{font-size:.56rem;padding:8px 12px;letter-spacing:.6px;}
+  .e-fav-btn{padding:8px 12px;}
+}
 </style>
 </head>
 <body>
@@ -1604,6 +1661,7 @@ button:focus-visible,
       <span class="gnav-sep">│</span>
       <button class="gchip gchip-soga" data-f="friend" onclick="filter(this,'friend')" data-tip="원문 보존 · 서정 산문">서가 書架</button>
       <button class="gchip gchip-gak" data-f="memo" onclick="filter(this,'memo')" data-tip="순간의 단상 · 삶의 언어">각서 覺書</button>
+      <button class="gchip gchip-fav" data-f="fav" onclick="filter(this,'fav')" data-tip="즐겨찾기 모아보기">★ 즐겨찾기</button>
     </div>
   </div>
   <!-- search -->
@@ -1628,6 +1686,7 @@ button:focus-visible,
     <button class="gchip gchip-tag" data-f="도시" onclick="filter(this,'도시')">도시</button>
     <button class="gchip gchip-soga" data-f="friend" onclick="filter(this,'friend')">서가</button>
     <button class="gchip gchip-gak" data-f="memo" onclick="filter(this,'memo')">각서</button>
+    <button class="gchip gchip-fav" data-f="fav" onclick="filter(this,'fav')">★</button>
   </div>
   <!-- 항상 노출되는 검색바 -->
   <div class="mbn-row mbn-row-search">
@@ -2170,6 +2229,7 @@ let userEdits    = JSON.parse(localStorage.getItem('hj_edits')    || '{}');
 let userDeleted  = JSON.parse(localStorage.getItem('hj_deleted')  || '[]');
 let userEntries  = JSON.parse(localStorage.getItem('hj_entries')  || '[]'); // 사용자 추가 감정기록/서가
 let userMemos    = JSON.parse(localStorage.getItem('hj_umemos')   || '[]'); // 사용자 추가 각서
+let favs = JSON.parse(localStorage.getItem('hj_favs') || '[]');
 let curMenuSeq   = -1;
 let curMenuIsUser = false;
 let curMemoMenuId = null;
@@ -2368,7 +2428,9 @@ function buildArchive(){
       html+=`<div class="ecard" style="--cc:${td.cc}"
           data-ch="${td.ch}" data-tag="${td.tag}" data-seq="${td.seq}"
           onclick="openEntry(${td.seq})">
-          <div class="ecard-num">${String(d.id+1).padStart(3,'0')}</div>
+          <button class="fav-star${favs.includes(td.seq)?' on':''}"
+            onclick="event.stopPropagation();toggleFav(${td.seq},this)"
+            title="즐겨찾기">★</button>
           <div class="ecard-date">${td.date}</div>
           <div class="ecard-title">${td.title}</div>
           <div class="ecard-pre">${pre}…</div>
@@ -2399,6 +2461,9 @@ function buildArchive(){
     const td=ed?{...d,...ed}:d;
     const pre=td.lines.flat().join(' ').substring(0,60);
     html+=`<div class="fcard" data-seq="${td.seq}" onclick="openEntry(${td.seq})">
+        <button class="fav-star${favs.includes(td.seq)?' on':''}"
+          onclick="event.stopPropagation();toggleFav(${td.seq},this)"
+          title="즐겨찾기">★</button>
         <div class="fcard-badge">원문</div>
         <div class="fcard-date">${td.date}</div>
         <div class="fcard-title">${td.title}</div>
@@ -2508,6 +2573,26 @@ function filter(el,f){
     if(fs) fs.style.display='';
     return;
   }
+  if(f==='fav'){
+    // 즐겨찾기 필터: 즐겨찾기된 seq만 표시
+    document.querySelectorAll('[data-chsec]').forEach(s=>s.style.display='');
+    const ms3=document.getElementById('memo-section');if(ms3) ms3.style.display='none';
+    const fsf=document.getElementById('friend-section');if(fsf) fsf.style.display='';
+    document.querySelectorAll('.ecard').forEach(c=>{
+      c.classList.toggle('hidden', !favs.includes(parseInt(c.dataset.seq)));
+    });
+    document.querySelectorAll('.fcard').forEach(c=>{
+      c.classList.toggle('hidden', !favs.includes(parseInt(c.dataset.seq)));
+    });
+    // 빈 챕터 섹션 숨김
+    document.querySelectorAll('[data-chsec]').forEach(s=>{
+      const has=[...s.querySelectorAll('.ecard')].some(c=>!c.classList.contains('hidden'));
+      s.style.display=has?'':'none';
+    });
+    const hasFriend=[...document.querySelectorAll('.fcard')].some(c=>!c.classList.contains('hidden'));
+    if(fsf) fsf.style.display=hasFriend?'':'none';
+    return;
+  }
   const fs3=document.getElementById('friend-section');if(fs3) fs3.style.display='none';
   const ms3=document.getElementById('memo-section');if(ms3) ms3.style.display='none';
   
@@ -2569,7 +2654,14 @@ function renderEntry(seq){
   if(d.isFriend) html+=`<div class="e-friend">— 원문 보존 · 원작자의 글</div>`;
   
   const totalE=getTotalEntryCount();
-  html+=`<div class="e-meta">
+  const isFav=favs.includes(seq);
+  html+=`<div class="e-edit-bar">
+    <button class="e-edit-btn" onclick="quickEdit(${seq})">✎ 수정</button>
+    <button class="e-edit-btn del" onclick="quickDelete(${seq})">🗑 삭제</button>
+    <button class="e-fav-btn${isFav?' on':''}" id="e-fav-btn"
+      onclick="toggleFav(${seq},this)">★</button>
+  </div>
+  <div class="e-meta">
     <span class="e-tag">${d.tag}</span>
     <div class="e-nav">
       <button class="pnb" onclick="navEntry(${seq-1})"${seq===0?' disabled':''}>← 이전</button>
@@ -2867,6 +2959,34 @@ function saveEdit(){
   // 현재 읽고 있는 글이면 즉시 재렌더
   if(curView==='entry'&&curSeq===curMenuSeq) renderEntry(curSeq);
   showToastMsg('수정 사항이 저장되었습니다');
+}
+
+
+/* ══ 즐겨찾기 ══ */
+function toggleFav(seq, btnEl){
+  const idx = favs.indexOf(seq);
+  if(idx >= 0){
+    favs.splice(idx, 1);
+  } else {
+    favs.push(seq);
+  }
+  localStorage.setItem('hj_favs', JSON.stringify(favs));
+  const on = favs.includes(seq);
+  // 버튼 상태 업데이트
+  if(btnEl){
+    btnEl.classList.toggle('on', on);
+  }
+  // 카드 그리드 내 별표도 동기화
+  document.querySelectorAll(`.fav-star[onclick*="toggleFav(${seq},"]`).forEach(b=>{
+    b.classList.toggle('on', on);
+  });
+  // 즐겨찾기 필터 활성 중이면 리빌드
+  if(curFilter==='fav'){ archBuilt=false; buildArchive(); archBuilt=true; }
+  showToastMsg(on ? '즐겨찾기에 추가했습니다 ★' : '즐겨찾기를 해제했습니다');
+}
+
+function filterFav(el){
+  filter(el, 'fav');
 }
 
 /* 간단 토스트 */
