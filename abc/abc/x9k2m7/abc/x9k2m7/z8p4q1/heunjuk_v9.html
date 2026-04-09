@@ -963,8 +963,6 @@ button:focus-visible,
   outline-offset:2px;
 }
 
-
-.ecard-num{display:none;}  /* 별표가 우상단 차지 — 번호는 숨김 */
 /* ── 카드 시각 구분 강화 ── */
 .ecard{
   border-bottom:1px solid rgba(255,255,255,.04);
@@ -1143,17 +1141,19 @@ button:focus-visible,
 #edit-modal-bg{
   display:none;position:fixed;inset:0;z-index:850;
   background:rgba(0,0,0,.82);
-  align-items:flex-end;justify-content:center;
+  align-items:center;justify-content:center;
 }
 #edit-modal-bg.open{display:flex;}
 #edit-modal{
   background:var(--bg2);border:1px solid var(--divider);
-  border-radius:18px 18px 0 0;
-  width:100%;max-height:88vh;overflow-y:auto;
-  padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));
-  transform:translateY(20px);transition:transform .25s;
+  border-radius:14px;
+  width:min(520px,46vw);max-height:92vh;overflow-y:auto;
+  padding:0 0 calc(16px + env(safe-area-inset-bottom,0px));
+  transform:scale(.97) translateY(8px);
+  transition:transform .25s;
+  box-shadow:0 24px 80px rgba(0,0,0,.9);
 }
-#edit-modal-bg.open #edit-modal{transform:translateY(0);}
+#edit-modal-bg.open #edit-modal{transform:scale(1) translateY(0);}
 #edit-modal::-webkit-scrollbar{display:none;}
 .em-hdr{
   display:flex;align-items:center;justify-content:space-between;
@@ -1170,7 +1170,7 @@ button:focus-visible,
   display:flex;align-items:center;justify-content:center;
   touch-action:manipulation;
 }
-.em-body{padding:16px 18px;}
+.em-body{padding:14px 16px;}
 .em-field{margin-bottom:12px;}
 .em-label{
   font-family:'Montserrat',sans-serif;font-size:.56rem;letter-spacing:1.5px;
@@ -1184,7 +1184,7 @@ button:focus-visible,
   -webkit-text-size-adjust:100%;
 }
 .em-input:focus,.em-textarea:focus{border-color:rgba(184,151,106,.4);}
-.em-textarea{resize:vertical;min-height:120px;line-height:2;font-size:.84rem;}
+.em-textarea{resize:vertical;min-height:360px;line-height:2;font-size:.88rem;}
 .em-select{cursor:pointer;font-family:'Montserrat',sans-serif;font-size:.75rem;}
 .em-foot{display:flex;gap:10px;padding:0 18px;}
 .em-save{
@@ -1293,14 +1293,14 @@ button:focus-visible,
 /* 패널 본체 — 우측 고정 드로어 */
 #sp-panel{
   position:fixed;top:0;right:0;bottom:0;z-index:701;
-  width:min(360px,26vw);              /* 데스크탑: ~1/4 */
-  min-width:280px;
+  width:min(540px,39vw);              /* 데스크탑: 기존 1.5배 */
+  min-width:380px;
   background:var(--bg2);
   border-left:1px solid rgba(184,151,106,.15);
   display:flex;flex-direction:column;
   transform:translateX(100%);
   transition:transform .3s cubic-bezier(.4,0,.2,1);
-  overflow:hidden;                     /* 패널 자체는 넘침 숨김 */
+  overflow:hidden;
 }
 #sp-panel.open{transform:translateX(0);}
 
@@ -1313,13 +1313,13 @@ button:focus-visible,
 .sp-header{
   flex-shrink:0;
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 14px 10px;
+  padding:18px 20px 14px;
   border-bottom:1px solid var(--divider);
   background:var(--bg2);
 }
 .sp-title{
   font-family:'Playfair Display',serif;font-style:italic;
-  font-size:.85rem;color:var(--gold);letter-spacing:.03em;
+  font-size:1rem;color:var(--gold);letter-spacing:.03em;
 }
 .sp-close{
   width:26px;height:26px;border-radius:6px;
@@ -1339,13 +1339,13 @@ button:focus-visible,
 }
 .sp-tabrow::-webkit-scrollbar{display:none;}
 .sp-tab{
-  flex:1;padding:9px 4px 8px;
+  flex:1;padding:12px 6px 10px;
   text-align:center;cursor:pointer;
-  font-family:'Montserrat',sans-serif;font-size:.52rem;letter-spacing:.8px;
+  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:.8px;
   color:var(--text-faint);border:none;background:none;
   border-bottom:2px solid transparent;border-top:2px solid transparent;
   transition:all .18s;white-space:nowrap;
-  touch-action:manipulation;min-height:36px;
+  touch-action:manipulation;min-height:42px;
 }
 .sp-tab.on{
   color:var(--gold);
@@ -1366,26 +1366,26 @@ button:focus-visible,
 .sp-body::-webkit-scrollbar-thumb{background:rgba(184,151,106,.2);}
 
 /* ── 각 탭 패널 */
-.sp-pane{padding:14px 14px calc(24px + env(safe-area-inset-bottom,0px));}
+.sp-pane{padding:20px 20px calc(28px + env(safe-area-inset-bottom,0px));}
 
 /* ── 폼 요소 */
-.sp-field{margin-bottom:11px;}
+.sp-field{margin-bottom:16px;}
 .sp-label{
-  font-family:'Montserrat',sans-serif;font-size:.5rem;letter-spacing:1.3px;
-  color:var(--text-faint);text-transform:uppercase;margin-bottom:4px;
+  font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:1.3px;
+  color:var(--text-faint);text-transform:uppercase;margin-bottom:6px;
 }
 .sp-input,.sp-textarea,.sp-select{
   width:100%;background:rgba(255,255,255,.04);
   border:1px solid rgba(255,255,255,.09);border-radius:7px;
-  color:var(--text);font-family:'Noto Serif KR',serif;font-size:.82rem;
-  padding:8px 10px;outline:none;transition:border-color .2s;
+  color:var(--text);font-family:'Noto Serif KR',serif;font-size:.92rem;
+  padding:10px 13px;outline:none;transition:border-color .2s;
   -webkit-text-size-adjust:100%;
 }
 .sp-input:focus,.sp-textarea:focus,.sp-select:focus{border-color:rgba(184,151,106,.4);}
 .sp-textarea{
-  resize:none;
-  line-height:1.9;font-size:.8rem;
-  min-height:90px;
+  resize:vertical;
+  line-height:2;font-size:.9rem;
+  min-height:280px;
   overflow-y:auto;
 }
 .sp-select{
@@ -1397,9 +1397,9 @@ button:focus-visible,
   color:var(--text-faint);margin-bottom:8px;line-height:1.6;
 }
 .sp-submit{
-  width:100%;padding:11px;border-radius:8px;
+  width:100%;padding:14px;border-radius:8px;
   background:rgba(184,151,106,.8);border:none;color:var(--bg);
-  font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:1.5px;
+  font-family:'Montserrat',sans-serif;font-size:.75rem;letter-spacing:1.5px;
   cursor:pointer;text-transform:uppercase;font-weight:500;
   touch-action:manipulation;transition:background .2s;
 }
@@ -1579,61 +1579,6 @@ button:focus-visible,
   color:#d2af64;border-color:#d2af64;background:rgba(210,175,100,.1);
 }
 
-
-/* ── 즐겨찾기 별표 (카드 우상단) */
-.fav-star{
-  position:absolute;top:9px;right:9px;
-  width:26px;height:26px;border-radius:50%;
-  background:none;border:none;
-  font-size:1rem;line-height:1;
-  color:rgba(255,255,255,.18);
-  cursor:pointer;transition:all .18s;
-  display:flex;align-items:center;justify-content:center;
-  touch-action:manipulation;z-index:3;
-  -webkit-tap-highlight-color:transparent;
-}
-.fav-star:hover,.fav-star:active{color:rgba(255,200,40,.7);transform:scale(1.15);}
-.fav-star.on{color:#ffc828;text-shadow:0 0 8px rgba(255,200,40,.5);}
-
-/* ── 즐겨찾기 필터 칩 */
-.gchip-fav{
-  font-size:.62rem;padding:3px 11px;border-radius:12px;
-  color:rgba(255,200,40,.55);border-color:rgba(255,200,40,.2);
-}
-.gchip-fav:hover{color:rgba(255,200,40,.9);border-color:rgba(255,200,40,.45);background:rgba(255,200,40,.06);}
-.gchip-fav.on{color:#ffc828;border-color:#ffc828;background:rgba(255,200,40,.08);}
-
-/* ── 본문 페이지 편집 바 */
-.e-edit-bar{
-  display:flex;gap:8px;
-  margin-top:18px;padding-top:14px;
-  border-top:1px solid rgba(255,255,255,.06);
-}
-.e-edit-btn{
-  padding:8px 16px;border-radius:8px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  color:var(--text-faint);
-  font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:1px;
-  cursor:pointer;transition:all .16s;touch-action:manipulation;
-  display:flex;align-items:center;gap:5px;
-}
-.e-edit-btn:hover,.e-edit-btn:active{color:var(--text-dim);background:rgba(255,255,255,.08);}
-.e-edit-btn.del:hover,.e-edit-btn.del:active{
-  color:#cf6679;background:rgba(207,102,121,.08);border-color:rgba(207,102,121,.25);
-}
-.e-fav-btn{
-  margin-left:auto;
-  padding:8px 14px;border-radius:8px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  color:rgba(255,255,255,.2);font-size:.95rem;
-  cursor:pointer;transition:all .18s;touch-action:manipulation;
-}
-.e-fav-btn.on{color:#ffc828;border-color:rgba(255,200,40,.4);background:rgba(255,200,40,.06);}
-.e-fav-btn:hover,.e-fav-btn:active{color:rgba(255,200,40,.8);}
-@media(max-width:600px){
-  .e-edit-btn{font-size:.56rem;padding:8px 12px;letter-spacing:.6px;}
-  .e-fav-btn{padding:8px 12px;}
-}
 </style>
 </head>
 <body>
@@ -1661,7 +1606,6 @@ button:focus-visible,
       <span class="gnav-sep">│</span>
       <button class="gchip gchip-soga" data-f="friend" onclick="filter(this,'friend')" data-tip="원문 보존 · 서정 산문">서가 書架</button>
       <button class="gchip gchip-gak" data-f="memo" onclick="filter(this,'memo')" data-tip="순간의 단상 · 삶의 언어">각서 覺書</button>
-      <button class="gchip gchip-fav" data-f="fav" onclick="filter(this,'fav')" data-tip="즐겨찾기 모아보기">★ 즐겨찾기</button>
     </div>
   </div>
   <!-- search -->
@@ -1686,7 +1630,6 @@ button:focus-visible,
     <button class="gchip gchip-tag" data-f="도시" onclick="filter(this,'도시')">도시</button>
     <button class="gchip gchip-soga" data-f="friend" onclick="filter(this,'friend')">서가</button>
     <button class="gchip gchip-gak" data-f="memo" onclick="filter(this,'memo')">각서</button>
-    <button class="gchip gchip-fav" data-f="fav" onclick="filter(this,'fav')">★</button>
   </div>
   <!-- 항상 노출되는 검색바 -->
   <div class="mbn-row mbn-row-search">
@@ -2078,7 +2021,7 @@ const DATA=[
 {id:78,seq:22,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 02월",year:2013,tag:"가족",title:"평창을 정리하고..",lines:[["4년여의 여정끝에 평창을 정리하고", "이도저도 어쩔수 없는", "무력감만 두 어깨에 짊어지고", "수지로 돌아왔습니다.", "결혼생활 18년여의 여정이", "마침내 원점으로 돌아온 것입니다."], ["결혼 초", "직장인으로서의 몇년간의 삶을 제외하곤", "삶은 그저 내게", "고달픈 일상과의 푸념이었을 뿐,", "세상과.. 사람과..", "부모형제를 등뒤로", "아쉬움에 미련만 남긴채", "한푼의 경제력없는 상실감만 남기고", "육체적, 정신적 후유증에 시달리는", "트라우마를 안고", "또 다른 시작을 하기위한", "몸부림을 준비합니다."], ["이제...", "희망과 도전의 활기로 출발했던", "그 긴 여정의 뒤안길을", "절망과 미련의 두려움을 간직한채", "알수도 없는 좁은문을 향해 가려", "준비를 해야 할진대,", "왜이리도 세상을 향한,", "사람을 향한 미움이 발목을 붙잡는지..."], ["사소한 것에 마음을 다치고,", "조그만 것에 울분을 토하는", "그저 심약한 존재가 되어 있음애,", "자신을 채찍해야할지,", "위로를 해야 할지 갈팡질창 하는 마음은..", "어느것 하나 명쾌한게 없는 것이", "또 그리 가슴 쓰리게 합니다."], ["세상사는게", "그저 별게 아니다 하면서도", "막상 세상과 호흡하려다 보면", "무엇이 그리 부족하고 무력하기만 한지..", "아직도 내게 치워내지 못한", "비워낼 수 있는", "그 무엇인가 남아있는 것일까요?"], ["가슴 저켠에", "비워낼 수 없는 작은 울분이라도..", "타인으로 향한 작은 미움의 불씨라도..", "아직은 비워낼 것이 존재한다면", "내겐 아직 세상을 받아들일", "준비가 부족한 것이겠지요.."], ["미움은 또 다른 미움으로", "내게 다가 온다는 것을", "너무도 잘 알면서도", "그 미움의 감정도", "제대로 다스리지 못하는 나는", "어쩌면.....", "지독스런 꿈을 꾸고 있는지도 모릅니다..", "아니 꿈이었으면 하는 바램입니다.."]],coda:"정리한다는 것은 — 끝이 아니라 다음의 시작이다.",isFriend:false,isOriginal:false},
 {id:77,seq:23,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 04월",year:2013,tag:"성찰",title:"내 의지와는 상관없이 벌어지는 것들..",lines:[["내 의지와는 상관없이 벌어지는 것들."], ["삶의 대부분은 사실", "내가 선택하지 않은 것들로 이루어진다.", "선택했다고 생각했던 것들조차", "어느새 다른 방향으로 흘러간다."], ["그렇다면 내 의지란 무엇인가.", "아무 대비 없이 맞닥뜨리는 현실 앞에서", "인간은 얼마나 작은 존재인가."], ["그러나 그 작음을 인정하는 순간부터", "비로소 진짜 선택이 시작된다."]],coda:"통제할 수 없는 것들에 대한 인정 — 그것이 성숙의 시작이다.",isFriend:false,isOriginal:false},
 {id:76,seq:24,ch:1,chName:"방황",cc:"var(--c1)",date:"2013년 05월",year:2013,tag:"고독",title:"사랑하는 법과 용서하는 법",lines:[["우리는 같이가는길을 늘 혼자간다고 생각합니다.", "바람부는날", "저 미루나무 언덕에 혼자있다 하여도", "가슴속에는 누군가가 함께있기 마련입니다."], ["우리는 힘이들때 혼자서만 힘들다고 생각합니다.", "하지만 그곁에는 또다른 누군가가", "같이 힘들어하며 살아가고 있습니다.", "나는 비오는날 창가에서 그사람을 생각합니다.", "나로인해 그사람이 창가에서", "나를 그리워 하고있다면", "그것만으로도 나는 행복한것입니다 ."], ["우리는 태어나면서부터 누구입니까?", "사람입니다. 영원히 가질 수도", "영원히 버릴 수도 없는", "여름날에 비와도같은 것입니다."], ["우리는 사랑해야 합니다.", "그사람이 좋을때보다", "그사람이 싫을때 사랑해야 합니다.", "그리고 용서해야합니다.", "그사람을 사랑하는것보다", "용서하는것을 먼저 배워야합니다."], ["우리는 새것보다 헌것을 사랑해야 합니다.", "우리가 가끔 옛날을 그리워 할 때에는", "우리가 늙어가고 있다고 느끼기 때문입니다."], ["사람들은 늙어가면서 새것이 돼 더아름답습니다.", "그리고 그것을 느낄때", "당신은 아름다움을 볼수있는 마음이", "진정생기는 것입니다."], ["우리는 사랑해야합니다", "그리고 용서해야합니다", "그래야 우리가 이세상에 없어도", "먼훗날", "우리를 그리워해 줄수 있는", "사람이 있기 때문입니다.", "오늘밤은 창밖에 비가내릴것같습니다", "그누구의 가슴속에도......"]],coda:"사랑하는 법과 용서하는 법은 — 결국 같은 것이다.",isFriend:false,isOriginal:false},
-
+{id:75,seq:25,ch:1,chName:"방황",cc:"var(--c1)",date:"2013년 07월",year:2013,tag:"가족",title:"119",lines:[["119."], ["위기는 예고 없이 찾아온다.", "그 번호를 누르는 손은 떨린다.", "그리고 그 순간", "세상의 모든 것이 정지한다."], ["그 번호가 필요 없었던 날들이", "얼마나 소중한 것인지를", "사람들은 잊고 산다."], ["오늘도 그 번호를 누르지 않아도 되는 하루였다.", "그것만으로 충분하다."]],coda:"평범한 하루는 기적이다. 위기 없이 지나간 오늘이 증거다.",isFriend:false,isOriginal:false},
 {id:74,seq:26,ch:1,chName:"방황",cc:"var(--c1)",date:"2013년 07월",year:2013,tag:"가족",title:"원룸으로 이사온지..",lines:[["원룸으로 온지 한달 반이 지났다.", "와이프의 이해못할 행동에 기분이 상한 후로", "주체할 수 없는 감정의 기복이 생긴이후부터", "잠을 이룰수 없다.", "자꾸만 빠져드는 소용돌이 처럼", "우울함에 온갖 지난날들에 회의감이 팽배해지고", "미래없는 나날속에 지나온 과거속 미련에", "어쩔줄 몰라한다."], ["아들녀석까지 방학해 좁은 공간에", "무더위와 함께 지내자니", "더구나 별로 좋지 않은 내 정신상태까지", "겹치다 보니 어찌할 바를 모르겠다."], ["잠은 오지않고 좁은 원룸에 가전제품 열기 탓에", "TV마저 켤수없어 오늘 이렇게 또", "차안에 홀로 앉아 술을 벗삼아", "정리되지 않은 번민들과 씨름을 하다", "고개를 들고 하늘을 보니 오늘도 그렇게", "먼발치서 아침의 동이터온다."]],coda:"새 공간에서의 첫 날은 — 언제나 낯설고 고요하다.",isFriend:false,isOriginal:false},
 {id:73,seq:27,ch:1,chName:"방황",cc:"var(--c1)",date:"2013년 07월",year:2013,tag:"성찰",title:"세상은 계속움직이는데..",lines:[["세상은 계속움직이는데.. 난 정지되었다.", "마음은 작은것들에 상처로 위안에 굶주리고", "낯설지 않은 안면이라도 마주 대할 수 없음에", "가슴은 터질것 같아 안달아닌 안달하는", "처량함이 묻어난다."], ["가난은 그저 동화속에 나오는", "나 하고는 동떨어진 것으로 여기며 살아왔다.", "어느날 갑자기 궁핍", "우리가 생각하"]],coda:"세상이 계속 움직이는 동안 — 나는 잠시 멈춰 있어도 된다.",isFriend:false,isOriginal:false},
 {id:72,seq:28,ch:3,chName:"성찰",cc:"var(--c3)",date:"2013년 08월",year:2013,tag:"고독",title:"배려가 필요한건데..",lines:[["생활이 여러모로 갑갑해지다보니", "칼날선 언행으로 서로 무언의 상처를", "서스럼없이 행한다.", "그저 잠시 답답한 현실이라도", "마음의 여유를 가지고 싶었던 내 마음은", "말 그대로 나 혼자만의 자위였을 뿐이다."], ["사람의 감정이란게", "자기 맘대로 되는것이 아니기에", "마치 '머치의 법칙' 과", "'셀리의 법칙'처럼", "흐름의 분위기란게 있는겐데,,,"], ["답답한 현실에 마음마저 각박해져", "자신에게 조차도 배려가 인색해지는게다."]],coda:"배려는 주는 것이 아니라 이해하는 것이다.",isFriend:false,isOriginal:false},
@@ -2172,7 +2115,7 @@ const DATA=[
 {id:204,seq:116,ch:5,chName:"회복",cc:"var(--c5)",date:"2018년 02월",year:2018,tag:"고독",title:"시간은 더디고 세월은 빠르다",lines:[["어떻게 하면 시간을 잘 보낼 수 있을까 —", "그 생각 하나에 골똘하며 살았다."], ["시간을 죽이는 일에 날을 세우며", "의미 없는 반복에 지칠 때면", "한 주가 다하고 한 달이 간다.", "그렇게 한 해가 지나고", "오십 중반에 한 살을 더 얹는다."], ["병 속에 갇힌 굴레처럼", "어떻게 벗어날 수 있을까."], ["아 — 정말", "시간은 지겹도록 더디고", "세월은 덧없이 빠르다.", "그 역설이 우리가 살아가는 방식이다."]],coda:"시간이 아까운 것은 — 그것이 돌아오지 않기 때문이 아니라, 제대로 살지 못했다는 자각 때문이다.",isFriend:false,isOriginal:false},
 {id:205,seq:117,ch:5,chName:"회복",cc:"var(--c5)",date:"2019년 05월",year:2019,tag:"가족",title:"말없는 중늙은이의 삶",lines:[["내 부모가 싫었다.", "그러나 거꾸로 생각해보면 —", "그것이 최선이었다.", "무지한 부모의 최선이", "자식에게 상처가 된다는 것을", "그들은 알지 못했을 것이다."], ["자식이기 이전에", "한 인간으로서 미안해서라도", "웃을 수도, 즐거워할 수도 없는 날이 있다.", "그 무게가 아내와 아들에게도", "말없는 중늙은이로 전해진다."], ["세대는 이렇게 흐른다.", "받은 상처를 품은 채 어른이 되고", "그 어른이 또 다른 상처를 남긴다.", "끊어내야 할 사슬이 있다면", "그것을 아는 것이 첫 번째다."]],coda:"부모를 이해한다는 것은 — 그들을 용서하는 것이 아니라, 그 서투름의 무게를 함께 지는 것이다.",isFriend:false,isOriginal:false},
 {id:206,seq:118,ch:5,chName:"회복",cc:"var(--c5)",date:"2019년 03월",year:2019,tag:"가족",title:"아내의 생일에",lines:[["생일인데."], ["즐겁지 못한 생일이라 미안하다.", "그래도 — 생일 축하해."], ["집에 들어서는 순간", "선의가 힘없이 허물어지고", "혼자라는 외로움의 동굴 속으로", "다시 빠지고 만다."], ["서로 나름의 이유가 있음에도", "그 이유마저도 공유하길 거부하고", "자신만의 일상에 우선하며", "서로 기대란 걸 포기하며 살아간다."], ["쌓아온 외면의 두께를", "한순간 허물기엔 버겁다는 걸", "우리 둘 다 잘 알기 때문이다.", "그럼에도 — 오늘은 생일이다."]],coda:"사랑이 식은 것이 아니라, 말하는 법을 잃어버린 것이다. 그리고 그 말을 다시 찾는 것이 두 번째 사랑이다.",isFriend:false,isOriginal:false},
-{id:207,seq:119,ch:5,chName:"회복",cc:"var(--c5)",date:"2013년 07월",year:2013,tag:"가족",title:"119",lines:[["그날, 나는 무심했다"], ["아내가 119에 실려 가던 날.", "나는 그 순간에도", "아들과 문자를 주고받고 있었다."], ["이어폰을 꽂고,", "술기운에 취해 음악을 듣고 있었다."], ["아내는 울부짖고 있었고,", "나는 그냥 멍하니 있었다."], ["그때의 나는", "무감각 그 자체였다."], ["누군가를 그렇게까지 아프게 만들고도", "아무렇지 않게 있었던 내 모습이", "지금도 떠오른다."], ["그날 이후,", "나는 진심으로", "나라는 사람을 의심하게 되었다."]],coda:"그날 이후 나는 오랫동안 나 자신을 바라볼 수가 없었다. 의심할 수 있다는 건 — 아직 감각이 살아 있다는 뜻이기도 하다.",isFriend:false,isOriginal:true},
+{id:207,seq:119,ch:5,chName:"회복",cc:"var(--c5)",date:"2020년 05월",year:2020,tag:"가족",title:"119",lines:[["119에 와이프가 실려갔다.", "난 그때까지 아들과 문자를 주고 받았다."], ["귀엔 이어폰을 끼고", "술한잔에 시름을 달래며 내 서글픈영혼과", "짠한 마음의 동요를 이해라도 해 달래듯", "알딸한 술기운에 뭔가 가슴속에", "울분을 토하며 음악을 듣고 있었다."], ["아니 와이프의 울부짖음을 외면하고", "있었는지도 모른다."], ["나도 힘들고 와이프의 답답함에", "진저리치고 있었는데..", "느닷없는 와이프의 돌발적 고통에", "체 놀랄 겨를없이 정말 얼떨결에 구급차에", "동승해 멀거니 침대 머리맡에 앉아", "링거를 바라보고 앉아았다."], ["1시간반이 언제 지나갈까?", "밀려오는 술기운은 응급실의 위급함은", "저 멀리한체 그저 밀려오는 잠기운이 날 또 그리", "무기력한 사람으로 내닺는다."], ["생전 듣도보도 못한 전해질 문제인가 싶다한다.", "난 아무것도 할 수가 할 수도 없다.", "그저 바라볼 뿐,,"], ["아픈것도 아니고 슬픈것도 아니다.", "다만 이 순간 어쩔수 없는 나약하고 힘없는", "자신이 왜그리 서글픈겐지..."], ["미안하다..", "사랑한다...", "네가 처한 형편 내 대신해줄 수 있는게라면", "나..그리 하리라..", "시간은 왜 그리도 더디게만 가는지..."]],coda:"미안하다.. 사랑한다... — 응급실 링거 옆에서.",isFriend:false,isOriginal:true},
 {id:208,seq:120,ch:5,chName:"회복",cc:"var(--c5)",date:"2020년 07월",year:2020,tag:"성찰",title:"정작 소외된 자들",lines:[["가족 중에 아픔과 상처를 가진 사람이 있으면", "그 사람에게 관심이 집중된다.", "당연한 일이다."], ["그러나 그 집중의 그늘 속에서", "또 다른 소외된 아픔이 조용히 자란다.", "표출할 수 없기에 더 외롭고", "보이지 않기에 더 무겁다."], ["눈에 보이는 상처에는 관대하고", "보이지 않는 상처에는 냉소적인 우리.", "그 냉소가 또 다른 상처의 씨앗이 된다."], ["어떤 영화가 말했다 —", "'힘겨운 싸움을 하고 있는 모두에게 친절하라.'", "옳음보다 친절함을 선택하는 것 —", "그것이 가장 어려운 덕이다."]],coda:"모든 사람은 각자의 전쟁을 치르고 있다. 보이지 않는 전장이 때로 더 깊다.",isFriend:false,isOriginal:false},
 {id:209,seq:121,ch:5,chName:"회복",cc:"var(--c5)",date:"2020년 07월",year:2020,tag:"성찰",title:"기다림은 만남을 목적으로 해야 한다",lines:[["젊은 날", "서정윤 시인의 '홀로서기'를 처음 읽고 전율했다.", "'기다림은 만남을 목적으로 하지 않아도 좋다'고 했지만 —"], ["기다림의 시간이 만남의 시간을 넘어 지나고 나면", "자기 성찰의 시간으로 변하고", "이내 기다림에 대한 기대와 설렘을 넘어", "미련과 후회로 남겨진 과거의 불안이 된다."], ["어떤 행위는 그 목적을 다하는 순간에 완전해진다.", "파생된 부차적 목적이 되어서는 안 된다.", "고로 기다림은", "기다리는 주체와의 만남을 반드시 목적으로 해야 한다."], ["기다림 끝에 얻어지는 것들은", "짙은 향기가 베어있다.", "그 향기는 목적 없는 기다림에선 오지 않는다."]],coda:"기다림이 아름다운 것은 그것이 끝나기 때문이다. 끝나지 않는 기다림은 — 집착이다.",isFriend:false,isOriginal:false},
 {id:210,seq:122,ch:5,chName:"회복",cc:"var(--c5)",date:"2022년 05월",year:2022,tag:"가족",title:"결혼기념일에",lines:[["몇 해인지 셈해보아야 인지할 정도로", "오래 살긴 했네."], ["소설로도 회자될 파란만장한 시간들이", "서로의 가슴 저편에", "많은 멍에들을 남겼지만 —"], ["이제 또 다른 소설의 시작이 되었으면 하네.", "물론 해피한 쪽으로."], ["부부의 연을 포기하지 않고", "지내온 시간들에 감사하며", "새마을운동의 캐치플레이처럼 —", "잘 살아보세, 우리."]],coda:"사랑이 끝난 뒤에도 함께 있다는 것은 — 그것이 진짜 사랑의 모습일 수도 있다.",isFriend:false,isOriginal:false},
@@ -2229,7 +2172,6 @@ let userEdits    = JSON.parse(localStorage.getItem('hj_edits')    || '{}');
 let userDeleted  = JSON.parse(localStorage.getItem('hj_deleted')  || '[]');
 let userEntries  = JSON.parse(localStorage.getItem('hj_entries')  || '[]'); // 사용자 추가 감정기록/서가
 let userMemos    = JSON.parse(localStorage.getItem('hj_umemos')   || '[]'); // 사용자 추가 각서
-let favs = JSON.parse(localStorage.getItem('hj_favs') || '[]');
 let curMenuSeq   = -1;
 let curMenuIsUser = false;
 let curMemoMenuId = null;
@@ -2428,9 +2370,7 @@ function buildArchive(){
       html+=`<div class="ecard" style="--cc:${td.cc}"
           data-ch="${td.ch}" data-tag="${td.tag}" data-seq="${td.seq}"
           onclick="openEntry(${td.seq})">
-          <button class="fav-star${favs.includes(td.seq)?' on':''}"
-            onclick="event.stopPropagation();toggleFav(${td.seq},this)"
-            title="즐겨찾기">★</button>
+          <div class="ecard-num">${String(d.id+1).padStart(3,'0')}</div>
           <div class="ecard-date">${td.date}</div>
           <div class="ecard-title">${td.title}</div>
           <div class="ecard-pre">${pre}…</div>
@@ -2461,9 +2401,6 @@ function buildArchive(){
     const td=ed?{...d,...ed}:d;
     const pre=td.lines.flat().join(' ').substring(0,60);
     html+=`<div class="fcard" data-seq="${td.seq}" onclick="openEntry(${td.seq})">
-        <button class="fav-star${favs.includes(td.seq)?' on':''}"
-          onclick="event.stopPropagation();toggleFav(${td.seq},this)"
-          title="즐겨찾기">★</button>
         <div class="fcard-badge">원문</div>
         <div class="fcard-date">${td.date}</div>
         <div class="fcard-title">${td.title}</div>
@@ -2573,26 +2510,6 @@ function filter(el,f){
     if(fs) fs.style.display='';
     return;
   }
-  if(f==='fav'){
-    // 즐겨찾기 필터: 즐겨찾기된 seq만 표시
-    document.querySelectorAll('[data-chsec]').forEach(s=>s.style.display='');
-    const ms3=document.getElementById('memo-section');if(ms3) ms3.style.display='none';
-    const fsf=document.getElementById('friend-section');if(fsf) fsf.style.display='';
-    document.querySelectorAll('.ecard').forEach(c=>{
-      c.classList.toggle('hidden', !favs.includes(parseInt(c.dataset.seq)));
-    });
-    document.querySelectorAll('.fcard').forEach(c=>{
-      c.classList.toggle('hidden', !favs.includes(parseInt(c.dataset.seq)));
-    });
-    // 빈 챕터 섹션 숨김
-    document.querySelectorAll('[data-chsec]').forEach(s=>{
-      const has=[...s.querySelectorAll('.ecard')].some(c=>!c.classList.contains('hidden'));
-      s.style.display=has?'':'none';
-    });
-    const hasFriend=[...document.querySelectorAll('.fcard')].some(c=>!c.classList.contains('hidden'));
-    if(fsf) fsf.style.display=hasFriend?'':'none';
-    return;
-  }
   const fs3=document.getElementById('friend-section');if(fs3) fs3.style.display='none';
   const ms3=document.getElementById('memo-section');if(ms3) ms3.style.display='none';
   
@@ -2654,14 +2571,7 @@ function renderEntry(seq){
   if(d.isFriend) html+=`<div class="e-friend">— 원문 보존 · 원작자의 글</div>`;
   
   const totalE=getTotalEntryCount();
-  const isFav=favs.includes(seq);
-  html+=`<div class="e-edit-bar">
-    <button class="e-edit-btn" onclick="quickEdit(${seq})">✎ 수정</button>
-    <button class="e-edit-btn del" onclick="quickDelete(${seq})">🗑 삭제</button>
-    <button class="e-fav-btn${isFav?' on':''}" id="e-fav-btn"
-      onclick="toggleFav(${seq},this)">★</button>
-  </div>
-  <div class="e-meta">
+  html+=`<div class="e-meta">
     <span class="e-tag">${d.tag}</span>
     <div class="e-nav">
       <button class="pnb" onclick="navEntry(${seq-1})"${seq===0?' disabled':''}>← 이전</button>
@@ -2959,34 +2869,6 @@ function saveEdit(){
   // 현재 읽고 있는 글이면 즉시 재렌더
   if(curView==='entry'&&curSeq===curMenuSeq) renderEntry(curSeq);
   showToastMsg('수정 사항이 저장되었습니다');
-}
-
-
-/* ══ 즐겨찾기 ══ */
-function toggleFav(seq, btnEl){
-  const idx = favs.indexOf(seq);
-  if(idx >= 0){
-    favs.splice(idx, 1);
-  } else {
-    favs.push(seq);
-  }
-  localStorage.setItem('hj_favs', JSON.stringify(favs));
-  const on = favs.includes(seq);
-  // 버튼 상태 업데이트
-  if(btnEl){
-    btnEl.classList.toggle('on', on);
-  }
-  // 카드 그리드 내 별표도 동기화
-  document.querySelectorAll(`.fav-star[onclick*="toggleFav(${seq},"]`).forEach(b=>{
-    b.classList.toggle('on', on);
-  });
-  // 즐겨찾기 필터 활성 중이면 리빌드
-  if(curFilter==='fav'){ archBuilt=false; buildArchive(); archBuilt=true; }
-  showToastMsg(on ? '즐겨찾기에 추가했습니다 ★' : '즐겨찾기를 해제했습니다');
-}
-
-function filterFav(el){
-  filter(el, 'fav');
 }
 
 /* 간단 토스트 */
