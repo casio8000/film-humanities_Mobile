@@ -560,7 +560,7 @@ textarea.s-input{resize:vertical;min-height:75px;line-height:1.7}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VERSION = 'v8';
+const APP_VERSION = 'v9';
 
 /* ══ 카테고리 & 감정 매핑 ════════════════════════ */
 const CAT = {
@@ -604,13 +604,15 @@ let currentEmo = null;  /* 현재 선택된 감정 */
 (function(){
   const deleted = new Set(JSON.parse(localStorage.getItem('wp2_deleted')||'[]'));
   QUOTES = QUOTES.filter(q=>!deleted.has(q.id));
-  const ids = new Set(QUOTES.map(q=>q.id));
+  /* 새로 추가된 항목은 맨 앞에, 수정된 항목은 제자리 업데이트 */
+  const newEntries = [];
   localQ.forEach(q=>{
     if(deleted.has(q.id)) return;
     const idx = QUOTES.findIndex(x=>x.id===q.id);
-    if(idx>=0){ QUOTES[idx]={...q}; }
-    else { QUOTES.push(q); }
+    if(idx>=0){ QUOTES[idx]={...q}; }          /* 수정: 제자리 업데이트 */
+    else { newEntries.push(q); }               /* 신규: 맨 앞에 모아두기 */
   });
+  QUOTES.unshift(...newEntries);               /* 신규 항목들을 배열 맨 앞에 삽입 */
 })();
 
 /* ══ INIT ════════════════════════════════════════ */
@@ -810,7 +812,7 @@ function saveMyQuote(){
   if(!quote){ showToast('문장을 입력해주세요'); return; }
   const newId=Math.max(...QUOTES.map(q=>q.id),0)+1;
   const newQ={ id:newId, quote, source:source||'나의 기록', category, isMyQuote:true };
-  QUOTES.push(newQ); localQ.push(newQ);
+  QUOTES.unshift(newQ); localQ.unshift(newQ);  /* 맨 앞에 추가 */
   localStorage.setItem('wp2_local',JSON.stringify(localQ));
   closeWriteModal();
   renderFilters(); renderGrid(); renderStats();
@@ -914,12 +916,12 @@ function addQuote(){
   if(!quote||!category){ showToast('명언과 카테고리를 입력해주세요'); return; }
   const newId=Math.max(...QUOTES.map(q=>q.id),0)+1;
   const newQ={id:newId,quote,source:source||'출처 불명',category};
-  QUOTES.push(newQ); localQ.push(newQ);
+  QUOTES.unshift(newQ); localQ.unshift(newQ);  /* 맨 앞에 추가 */
   localStorage.setItem('wp2_local',JSON.stringify(localQ));
   document.getElementById('new-quote').value='';
   document.getElementById('new-source').value='';
   document.getElementById('new-cat').value='';
-  renderFilters(); renderGrid(); showToast('명언이 추가되었습니다','ok');
+  renderFilters(); renderGrid(); showToast('명언이 추가되었습니다 ✨','ok');
 }
 function exportData(){
   const blob=new Blob([JSON.stringify({total:QUOTES.length,quotes:QUOTES,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
@@ -961,6 +963,7 @@ function clearLocal(){
 
 /* ══ HELP ════════════════════════════════════════ */
 const CHANGELOG=[
+  {ver:'v9',date:'2026-04',desc:'새 명언 추가 시 카드 맨 앞에 바로 표시'},
   {ver:'v8',date:'2026-04',desc:'감정 기반 명언 추천 · 내 문장 쓰기 · 모바일 설정 버튼 수정 · 첫 화면 개선'},
   {ver:'v7',date:'2026-04',desc:'오늘의 명언 팝업 · 모달 이전/다음 이동'},
   {ver:'v6',date:'2026-04',desc:'공유 딥링크 · 사용설명서 · 중복 필터링 강화'},
@@ -1062,7 +1065,7 @@ function addSharedQuote(){
   if(new Set(QUOTES.map(x=>x.quote.trim())).has(q.quote.trim())){ closeShareRecv(); showToast('이미 있는 명언입니다'); return; }
   const newId=Math.max(...QUOTES.map(x=>x.id),0)+1;
   const newQ={id:newId,quote:q.quote,source:q.source||'출처 불명',category:q.category||'기타'};
-  QUOTES.push(newQ); localQ.push(newQ);
+  QUOTES.unshift(newQ); localQ.unshift(newQ);  /* 맨 앞에 추가 */
   localStorage.setItem('wp2_local',JSON.stringify(localQ));
   renderFilters(); renderGrid(); renderStats();
   closeShareRecv(); showToast('명언이 추가되었습니다 ✨','ok');
