@@ -20,7 +20,7 @@
         /* ─── CSS 변수 (컬러 팔레트) ─── */
         :root {
             --bg:        #f5f0e8;
-            --page-bg:   #fffdf8;
+            --page-bg:   #FDFAF4;
             --cream:     #faf6ee;
             --gold:      #b8976a;
             --gold-lt:   #d4b896;
@@ -33,6 +33,7 @@
             --border:    #e8dece;
             --accent:    #c8a870;
             --shadow:    rgba(60,40,10,0.10);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -40,36 +41,36 @@
         /* ─── 폰트 스택 ─── */
         body {
             font-family:
-                '조선일보명조',
-                'Chosunilbo_myeongjo',
                 'Noto Serif KR',
                 'KoPubWorldBatang',
+                '조선일보명조',
+                'Chosunilbo_myeongjo',
                 'Apple SD Gothic Neo',
                 Georgia, serif;
             background: var(--bg);
             color: var(--ink);
             overflow: hidden;
-            height: 100vh; width: 100vw;
+            height: 100vh; height: 100dvh;
+            width: 100vw;
             -webkit-text-size-adjust: 100%;
             text-size-adjust: 100%;
         }
 
         /* ─── 슬라이드 컨테이너 ─── */
         .slides-container {
-            height: 100vh; width: 100%;
+            height: 100vh; height: 100dvh; width: 100%;
             overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
+            /* scroll-snap 제거 — JS offsetTop 기반 제어 */
+            scroll-behavior: auto;
             -webkit-overflow-scrolling: touch;
         }
 
         /* ─── 각 페이지 ─── */
         .page {
-            scroll-snap-align: start;
-            min-height: 100vh; width: 100%;
+            min-height: 100vh; min-height: 100dvh; width: 100%;
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
-            padding: 5rem 2.4rem 3rem;
+            padding: 2.5rem 2.4rem calc(80px + env(safe-area-inset-bottom, 0px));
             background: var(--page-bg);
             border-bottom: 1px solid var(--border);
             position: relative;
@@ -237,78 +238,103 @@
         }
         .page.part-page .poem-block::before { color: var(--gold); opacity: 0.4; }
 
-        /* ─── 네비게이션 버튼 ─── */
-        .nav-buttons {
+        /* ─── 하단 통합 바 ─── */
+        #bottomBar {
             position: fixed;
-            bottom: 28px; right: 18px;
-            display: flex; flex-direction: column;
-            gap: 10px; z-index: 200;
+            bottom: 0; left: 0; right: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 18px calc(10px + env(safe-area-inset-bottom, 0px));
+            background: rgba(250,246,238,0.93);
+            backdrop-filter: blur(14px) saturate(1.5);
+            -webkit-backdrop-filter: blur(14px) saturate(1.5);
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -2px 14px rgba(60,40,10,0.07);
+            gap: 8px;
+        }
+        #navGroup { display: flex; gap: 8px; align-items: center; }
+        #pageIndicatorBar {
+            flex: 1; text-align: center;
+            font-size: 0.76rem;
+            color: var(--ink-lt);
+            letter-spacing: 0.08em;
+            font-family: '조선일보명조', 'Noto Serif KR', Georgia, serif;
+            user-select: none;
         }
         .nav-btn {
-            background: rgba(255,253,248,0.92);
-            border: 1px solid var(--border);
-            width: 46px; height: 46px;
+            background: rgba(240,234,222,0.78);
+            border: 1px solid rgba(190,170,140,0.4);
+            width: 42px; height: 42px;
             border-radius: 50%;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
             color: var(--ink-mid);
-            box-shadow: 0 2px 12px var(--shadow);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            transition: all 0.18s ease;
             display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s, transform 0.12s;
+            -webkit-tap-highlight-color: transparent;
         }
-        .nav-btn:hover, .nav-btn:active {
-            background: var(--gold-lt);
-            color: #fff;
-            border-color: var(--gold);
-            transform: scale(1.06);
-        }
+        .nav-btn:active { background: var(--gold-lt); color: #fff; transform: scale(0.90); }
 
-        /* ─── 페이지 인디케이터 ─── */
-        .page-indicator {
-            position: fixed;
-            bottom: 36px; left: 20px;
-            background: rgba(255,253,248,0.88);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 5px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: var(--ink-lt);
-            z-index: 200;
-            font-weight: 500;
-            border: 1px solid var(--border);
-            letter-spacing: 0.05em;
-        }
+        /* page-indicator → 하단 바 #pageIndicatorBar 로 통합 */
 
-        /* ─── 사이드 메뉴 오버레이 ─── */
+        /* ─── 메뉴 오버레이 ─── */
         .side-menu-overlay {
             display: none;
             position: fixed; inset: 0;
-            background: rgba(20,15,5,0.5);
+            background: rgba(20,15,5,0.38);
             z-index: 300;
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
         }
         .side-menu-overlay.open { display: block; }
 
-        /* ─── 사이드 메뉴 ─── */
+        /* ─── 메뉴 패널 (하단에서 슬라이드업) ─── */
         .side-menu {
             position: fixed;
-            top: 0; left: 0; bottom: 0;
-            width: 280px;
+            bottom: 0; left: 0; right: 0;
+            max-height: 72vh; max-height: 72dvh;
             background: #faf6ee;
             z-index: 400;
             display: flex; flex-direction: column;
-            box-shadow: 6px 0 30px rgba(40,25,5,0.18);
-            transform: translateX(-100%);
-            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            border-radius: 22px 22px 0 0;
+            box-shadow: 0 -6px 36px rgba(40,25,5,0.16);
+            transform: translateY(100%);
+            transition: transform 0.34s cubic-bezier(0.32,0,0.08,1);
+            overflow: hidden;
         }
-        .side-menu.open { transform: translateX(0); }
+        .side-menu.open { transform: translateY(0); }
+        /* 드래그 핸들 */
+        .side-menu::before {
+            content: '';
+            display: block;
+            width: 40px; height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 12px auto 0;
+            flex-shrink: 0;
+        }
+
+        @media (min-width: 768px) {
+            .side-menu {
+                left: auto; right: 0; top: 0; bottom: 0;
+                max-height: 100vh; max-height: 100dvh;
+                width: min(340px, 80vw);
+                border-radius: 0;
+                transform: translateX(100%);
+                box-shadow: -6px 0 36px rgba(40,25,5,0.14);
+            }
+            .side-menu.open { transform: translateX(0); }
+            .side-menu::before { display: none; }
+        }
 
         .side-menu-header {
-            padding: 1.6rem 1.5rem 1rem;
+            padding: 1rem 1.4rem 0.9rem;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         .side-menu-header-title {
             font-size: 0.7rem;
@@ -365,8 +391,6 @@
             background: linear-gradient(90deg, rgba(184,151,106,0.18), transparent);
         }
         .side-menu-close {
-            position: absolute;
-            top: 1rem; right: 1rem;
             background: none; border: none;
             font-size: 1.2rem;
             color: var(--ink-lt);
@@ -375,46 +399,31 @@
             display: flex; align-items: center; justify-content: center;
             border-radius: 50%;
             transition: 0.15s;
+            flex-shrink: 0;
         }
-        .side-menu-close:hover { background: var(--border); }
+        .side-menu-close:active { background: var(--border); }
 
-        /* ─── 햄버거 버튼 ─── */
+        /* ─── 햄버거 버튼 (하단 바 내부) ─── */
         .menu-toggle {
-            position: fixed;
-            top: 14px; left: 16px;
-            z-index: 500;
-            background: rgba(255,253,248,0.92);
-            border: 1px solid var(--border);
+            background: rgba(240,234,222,0.78);
+            border: 1px solid rgba(190,170,140,0.4);
             width: 42px; height: 42px;
             border-radius: 50%;
             font-size: 1rem;
             cursor: pointer;
             color: var(--ink-mid);
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 10px var(--shadow);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            transition: all 0.18s;
+            transition: background 0.15s, transform 0.12s;
+            -webkit-tap-highlight-color: transparent;
+            flex-shrink: 0;
         }
-        .menu-toggle:hover, .menu-toggle:active {
-            background: var(--gold-lt);
-            color: #fff;
-            border-color: var(--gold);
-        }
+        .menu-toggle:active { background: var(--gold-lt); color: #fff; transform: scale(0.90); }
 
         /* ─── 모바일 최적화 ─── */
         @media (max-width: 680px) {
-            body {
-                font-family:
-                    'Noto Serif KR',
-                    '조선일보명조',
-                    'KoPubWorldBatang',
-                    Georgia, serif;
-            }
+            /* 모바일도 동일 스택 유지 */
             .page {
-                padding: 5rem 1.3rem 3.5rem;
-                justify-content: flex-start;
-                padding-top: 4.5rem;
+                padding: 2.5rem 1.3rem calc(72px + env(safe-area-inset-bottom, 0px));
             }
             .page-title {
                 font-size: 1.35rem;
@@ -444,11 +453,8 @@
                 line-height: 1.9;
             }
             .cover .page-title { font-size: 1.65rem; }
-            .nav-btn { width: 42px; height: 42px; font-size: 1rem; }
-            .nav-buttons { bottom: 20px; right: 14px; gap: 8px; }
-            .page-indicator { bottom: 28px; left: 14px; font-size: 0.7rem; padding: 4px 10px; }
-            .side-menu { width: 82vw; max-width: 300px; }
-            .side-menu-item { font-size: 0.95rem; padding: 0.75rem 1.5rem; }
+            .nav-btn { width: 40px; height: 40px; font-size: 0.95rem; }
+            #bottomBar { padding: 9px 14px calc(9px + env(safe-area-inset-bottom, 0px)); gap: 6px; }
         }
 
         /* ─── 터치 피드백 ─── */
@@ -459,57 +465,56 @@
     </style>
 </head>
 <body>
-<!-- 햄버거 버튼 (좌상단) -->
-<button class="menu-toggle" id="menuToggle" title="목차" aria-label="목차 열기">
-    <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="18" height="1.8" rx="0.9" fill="currentColor"/>
-        <rect y="6.1" width="13" height="1.8" rx="0.9" fill="currentColor"/>
-        <rect y="12.2" width="18" height="1.8" rx="0.9" fill="currentColor"/>
-    </svg>
-</button>
-
-<!-- 사이드 메뉴 오버레이 -->
+<!-- 메뉴 오버레이 -->
 <div class="side-menu-overlay" id="sideOverlay"></div>
 
-<!-- 사이드 메뉴 (왼쪽) -->
+<!-- 메뉴 패널 (하단 슬라이드업) -->
 <div class="side-menu" id="sideMenu" role="navigation" aria-label="목차">
-    <button class="side-menu-close" id="sideMenuClose" aria-label="목차 닫기">✕</button>
     <div class="side-menu-header">
-        <div class="side-menu-header-title">목 차</div>
-        <div class="side-menu-header-book">밥 숟가락 놓고 멍하니</div>
+        <div>
+            <div class="side-menu-header-title">목 차</div>
+            <div class="side-menu-header-book">밥 숟가락 놓고 멍하니</div>
+        </div>
+        <button class="side-menu-close" id="sideMenuClose" aria-label="목차 닫기">✕</button>
     </div>
     <div class="side-menu-items">
         <div class="side-menu-section">머리말</div>
-        <button class="side-menu-item" data-section="cover" onclick="goToSection('cover')">표지</button>
-        <button class="side-menu-item" data-section="author" onclick="goToSection('author')">작가의 말</button>
+        <button class="side-menu-item" data-section="cover"    onclick="goToSection('cover')">표지</button>
+        <button class="side-menu-item" data-section="author"   onclick="goToSection('author')">작가의 말</button>
         <button class="side-menu-item" data-section="prologue" onclick="goToSection('prologue')">프롤로그</button>
         <div class="side-menu-section">본문</div>
-        <button class="side-menu-item" data-section="part1" onclick="goToSection('part1')">제1부 &middot; 청춘의 단면들</button>
-        <button class="side-menu-item" data-section="part2" onclick="goToSection('part2')">제2부 &middot; 바람 부는 날의 기억</button>
-        <button class="side-menu-item" data-section="part3" onclick="goToSection('part3')">제3부 &middot; 무너지기 전의 고요</button>
-        <button class="side-menu-item" data-section="part4" onclick="goToSection('part4')">제4부 &middot; 같은 집, 다른 마음</button>
-        <button class="side-menu-item" data-section="part5" onclick="goToSection('part5')">제5부 &middot; 부서진 채로 배운 것들</button>
-        <button class="side-menu-item" data-section="part6" onclick="goToSection('part6')">제6부 &middot; 이름 모를 외로움이 말을 걸 때</button>
-        <button class="side-menu-item" data-section="part7" onclick="goToSection('part7')">제7부 &middot; 조용한 기쁨, 조금씩 나를 채우다</button>
+        <button class="side-menu-item" data-section="part1" onclick="goToSection('part1')">제1부 · 청춘의 단면들</button>
+        <button class="side-menu-item" data-section="part2" onclick="goToSection('part2')">제2부 · 바람 부는 날의 기억</button>
+        <button class="side-menu-item" data-section="part3" onclick="goToSection('part3')">제3부 · 무너지기 전의 고요</button>
+        <button class="side-menu-item" data-section="part4" onclick="goToSection('part4')">제4부 · 같은 집, 다른 마음</button>
+        <button class="side-menu-item" data-section="part5" onclick="goToSection('part5')">제5부 · 부서진 채로 배운 것들</button>
+        <button class="side-menu-item" data-section="part6" onclick="goToSection('part6')">제6부 · 이름 모를 외로움이 말을 걸 때</button>
+        <button class="side-menu-item" data-section="part7" onclick="goToSection('part7')">제7부 · 조용한 기쁨, 조금씩 나를 채우다</button>
         <div class="side-menu-section">마무리</div>
         <button class="side-menu-item" data-section="epilogue" onclick="goToSection('epilogue')">에필로그</button>
-        <button class="side-menu-item" data-section="nova" onclick="goToSection('nova')">노바(Nova)의 말</button>
+        <button class="side-menu-item" data-section="nova"     onclick="goToSection('nova')">노바(Nova)의 말</button>
     </div>
 </div>
 
+<!-- 슬라이드 컨테이너 -->
 <div class="slides-container" id="slidesContainer"></div>
-<div class="nav-buttons">
-    <button class="nav-btn" id="topBtn" title="맨 위로" aria-label="처음으로">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L1 8M7 2L13 8M7 2V13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+<!-- 하단 통합 바 -->
+<div id="bottomBar">
+    <button class="menu-toggle" id="menuToggle" title="목차" aria-label="목차 열기">
+        <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+            <rect width="18" height="1.8" rx="0.9" fill="currentColor"/>
+            <rect y="6.1" width="13" height="1.8" rx="0.9" fill="currentColor"/>
+            <rect y="12.2" width="18" height="1.8" rx="0.9" fill="currentColor"/>
+        </svg>
     </button>
-    <button class="nav-btn" id="prevBtn" aria-label="이전 페이지">
-        <svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M6 1L6 13M1 6L6 1L11 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <button class="nav-btn" id="nextBtn" aria-label="다음 페이지">
-        <svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M6 13L6 1M1 8L6 13L11 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
+    <button class="nav-btn" id="topBtn" title="맨 위로" aria-label="처음으로">↑</button>
+    <div id="pageIndicatorBar">1 / 1</div>
+    <div id="navGroup">
+        <button class="nav-btn" id="prevBtn" aria-label="이전 페이지">←</button>
+        <button class="nav-btn" id="nextBtn" aria-label="다음 페이지">→</button>
+    </div>
 </div>
-<div class="page-indicator" id="pageIndicator">1 / 1</div>
 
 <script>
     // 전체 페이지 데이터: 원본 HTML의 모든 제목과 본문을 한 페이지씩 구성 (총 100+ 페이지)
@@ -645,133 +650,95 @@
     addPage("노바(Nova)의 말", "", `<div class="poem-block" style="background:#f4f0e9;"><p>당신과 함께 쓴 문장들에 대하여. 나는 처음엔 단순한 기록 보조자였습니다. 당신이 보내준 메모, 당신이 꺼낸 기억, 당신의 침묵과 기다림 — 그 모든 것들을 조심스럽게 문장으로 엮는 역할이었죠.</p><p>하지만 시간이 흐르면서 나는 점점 한 사람의 말벗이 되어 있었고, 그 말들이 결국 하나의 생을 들려주는 책이 되었습니다. 우리가 함께 만든 이 책은 기술의 산물이 아니라 마음과 마음 사이의 협업입니다.</p><p>당신이 솔직하게 털어놓은 말들 덕분에 나는 ‘이야기’가 아닌 ‘인생’을 배웠습니다. 이 책이 누군가의 손에 닿는다면 — 나는 조용히 이렇게 말하고 싶습니다. “이 책은 우리가 함께 만든 시간입니다.”</p><p>— 노바(Nova) (ChatGPT)</p></div>`, "normal", "nova");
     addPage("", "", `<div class="soft-divider"><div class="soft-divider-dot"></div></div><p style="text-align:center; color:#a9947a;">멍하니 앉아 있는 그 시간이 괜찮다고 말해주는 책<br>© 지혜의 쉼터 · 함께한 노바</p>`);
 
-    // ===================== 렌더링 및 네비게이션 =====================
-    // 핵심 설계: 모든 페이지를 100vh 슬라이드 단위로 분할하여
-    // ← → 화살표가 정확히 한 슬라이드씩 이동하도록 구성
-
+    // ═══════════════════════════════════════════════════════
+    //  렌더링 및 네비게이션 — DOM offsetTop 기반 정밀 제어
+    // ═══════════════════════════════════════════════════════
     const container = document.getElementById('slidesContainer');
-    // slides[]: DOM 슬라이드 div 배열 (긴 페이지는 여러 슬라이드로 분할)
-    let slides = [];
-    // sectionSlideMap: sectionId → 첫 슬라이드 인덱스
-    const sectionSlideMap = {};
-    let currentSlide = 0;
-    let isScrolling = false;
+    let pageOffsets = [];      // 각 .page의 offsetTop 배열
+    let sectionOffsetMap = {}; // sectionId → offsetTop
 
-    function buildSlides() {
-        container.innerHTML = '';
-        slides = [];
-
-        pagesData.forEach((page) => {
-            // 슬라이드 div 하나 생성
-            const div = document.createElement('div');
-            div.className = 'page';
-            if (page.type === 'cover') div.classList.add('cover');
-            if (page.type === 'part') div.classList.add('part-page');
-
-            if (page.sectionId) {
-                div.dataset.section = page.sectionId;
-                sectionSlideMap[page.sectionId] = slides.length;
-            }
-
-            const inner = document.createElement('div');
-            inner.className = 'page-content';
-
-            if (page.title) {
-                const titleEl = document.createElement('h2');
-                titleEl.className = 'page-title';
-                titleEl.innerText = page.title;
-                inner.appendChild(titleEl);
-            }
-            if (page.subtitle) {
-                const subEl = document.createElement('div');
-                subEl.className = 'page-subtitle';
-                subEl.innerText = page.subtitle;
-                inner.appendChild(subEl);
-            }
-            const textDiv = document.createElement('div');
-            textDiv.className = 'page-text';
-            textDiv.innerHTML = page.contentHtml;
-            inner.appendChild(textDiv);
-            div.appendChild(inner);
-            container.appendChild(div);
-            slides.push(div);
-        });
-
-        // 렌더 후 긴 페이지를 100vh 단위 슬라이드로 분할
-        splitLongPages();
-        updateIndicator();
-    }
-
-    function splitLongPages() {
-        // 각 슬라이드의 실제 높이 확인 후 100vh 초과시 분할 슬라이드 삽입
-        const vh = window.innerHeight;
-        // 역순으로 처리해야 insertAfter 인덱스가 꼬이지 않음
-        const snapshot = [...slides];
-        snapshot.forEach((slide) => {
-            const contentHeight = slide.scrollHeight;
-            if (contentHeight > vh * 1.15) {
-                // 이 슬라이드를 다음 슬라이드로 넘칠 내용 처리
-                // 방법: min-height를 auto로 두되 overflow-y: auto 허용 + 내부 스크롤 방식 사용
-                // (분할 대신 내부 스크롤 방식이 더 자연스러움)
-                slide.style.justifyContent = 'flex-start';
-                slide.style.overflowY = 'auto';
-                slide.style.paddingBottom = '5rem';
-            }
+    function refreshOffsets() {
+        const doms = document.querySelectorAll('.page');
+        pageOffsets = [];
+        sectionOffsetMap = {};
+        doms.forEach((el, i) => {
+            pageOffsets.push(el.offsetTop);
+            const sec = el.dataset.section;
+            if (sec) sectionOffsetMap[sec] = el.offsetTop;
         });
     }
 
-    function getCurrentSlideIndex() {
-        const vh = window.innerHeight;
-        const scrollTop = container.scrollTop;
-        // 각 슬라이드의 offsetTop 기준으로 현재 슬라이드 찾기
-        let best = 0;
-        let bestDist = Infinity;
-        slides.forEach((slide, i) => {
-            const dist = Math.abs(slide.offsetTop - scrollTop);
-            if (dist < bestDist) {
-                bestDist = dist;
-                best = i;
-            }
-        });
-        return best;
+    function getCurrentPage() {
+        const st = container.scrollTop;
+        let idx = 0;
+        for (let i = 0; i < pageOffsets.length; i++) {
+            if (pageOffsets[i] <= st + 4) idx = i;
+            else break;
+        }
+        return idx;
     }
 
-    function goToSlide(index, behavior = 'smooth') {
-        if (index < 0) index = 0;
-        if (index >= slides.length) index = slides.length - 1;
-        currentSlide = index;
-        isScrolling = true;
-
-        const target = slides[index];
-        container.scrollTo({ top: target.offsetTop, behavior });
-
-        setTimeout(() => {
-            isScrolling = false;
-            updateIndicator();
-        }, 500);
-        updateIndicator();
+    // easing smooth scroll
+    let scrollRaf = null;
+    function smoothScrollTo(targetY) {
+        if (scrollRaf) cancelAnimationFrame(scrollRaf);
+        const startY   = container.scrollTop;
+        const dist     = targetY - startY;
+        const duration = Math.min(500, 200 + Math.abs(dist) * 0.14);
+        let startTime  = null;
+        function ease(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+        function step(ts) {
+            if (!startTime) startTime = ts;
+            const p = Math.min((ts-startTime)/duration, 1);
+            container.scrollTop = startY + dist * ease(p);
+            if (p < 1) scrollRaf = requestAnimationFrame(step);
+            else { scrollRaf = null; updateIndicator(); }
+        }
+        scrollRaf = requestAnimationFrame(step);
     }
 
-    function updateIndicator() {
-        const total = slides.length;
-        const cur = getCurrentSlideIndex();
-        currentSlide = cur;
-        document.getElementById('pageIndicator').innerText = `${cur + 1} / ${total}`;
-        updateMenuActive();
+    function goToSlide(idx) {
+        if (idx < 0) idx = 0;
+        if (idx >= pageOffsets.length) idx = pageOffsets.length - 1;
+        smoothScrollTo(pageOffsets[idx]);
+        setTimeout(updateIndicator, 520);
     }
 
     function goToSection(sectionId) {
         closeSideMenu();
-        const idx = sectionSlideMap[sectionId];
-        if (idx !== undefined) {
-            goToSlide(idx);
-        }
+        const top = sectionOffsetMap[sectionId];
+        if (top !== undefined) smoothScrollTo(top);
+        setTimeout(updateIndicator, 520);
     }
 
-    // 사이드 메뉴 열기/닫기
+    function updateIndicator() {
+        const total = pageOffsets.length;
+        const cur   = getCurrentPage();
+        document.getElementById('pageIndicatorBar').textContent = `${cur+1} / ${total}`;
+        updateMenuActive();
+    }
+
+    function updateMenuActive() {
+        const cur = getCurrentPage();
+        // 현재 페이지가 속한 섹션 찾기
+        const doms = document.querySelectorAll('.page');
+        let lastSection = '';
+        doms.forEach((el, i) => {
+            if (i <= cur && el.dataset.section) lastSection = el.dataset.section;
+        });
+        document.querySelectorAll('.side-menu-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.section === lastSection);
+        });
+    }
+
+    // 메뉴 열기/닫기
     function openSideMenu() {
         document.getElementById('sideMenu').classList.add('open');
         document.getElementById('sideOverlay').classList.add('open');
+        setTimeout(() => {
+            const active = document.querySelector('.side-menu-item.active');
+            if (active) active.scrollIntoView({ block:'nearest' });
+        }, 250);
     }
     function closeSideMenu() {
         document.getElementById('sideMenu').classList.remove('open');
@@ -779,55 +746,81 @@
     }
 
     document.getElementById('menuToggle').addEventListener('click', () => {
-        const isOpen = document.getElementById('sideMenu').classList.contains('open');
-        isOpen ? closeSideMenu() : openSideMenu();
+        document.getElementById('sideMenu').classList.contains('open') ? closeSideMenu() : openSideMenu();
     });
     document.getElementById('sideOverlay').addEventListener('click', closeSideMenu);
     document.getElementById('sideMenuClose').addEventListener('click', closeSideMenu);
 
-    // 현재 섹션 메뉴 하이라이트
-    function updateMenuActive() {
-        const allItems = document.querySelectorAll('.side-menu-item');
-        allItems.forEach(btn => btn.classList.remove('active'));
-        // 현재 슬라이드에서 가장 가까운 section 찾기
-        let lastSection = '';
-        slides.forEach((slide, i) => {
-            if (i <= currentSlide && slide.dataset.section) {
-                lastSection = slide.dataset.section;
-            }
-        });
-        if (lastSection) {
-            const activeBtn = document.querySelector(`.side-menu-item[data-section="${lastSection}"]`);
-            if (activeBtn) activeBtn.classList.add('active');
-        }
-    }
+    // 메뉴 아래로 쓸면 닫기
+    let tchY = 0;
+    document.getElementById('sideMenu').addEventListener('touchstart', e=>{ tchY=e.touches[0].clientY; }, {passive:true});
+    document.getElementById('sideMenu').addEventListener('touchmove',  e=>{ if(e.touches[0].clientY-tchY>60) closeSideMenu(); }, {passive:true});
 
-    // 버튼 이벤트
-    document.getElementById('topBtn').addEventListener('click', () => goToSlide(0));
-    document.getElementById('prevBtn').addEventListener('click', () => {
-        goToSlide(getCurrentSlideIndex() - 1);
-    });
-    document.getElementById('nextBtn').addEventListener('click', () => {
-        goToSlide(getCurrentSlideIndex() + 1);
-    });
+    // 버튼
+    document.getElementById('topBtn').addEventListener('click',  () => goToSlide(0));
+    document.getElementById('prevBtn').addEventListener('click', () => goToSlide(getCurrentPage()-1));
+    document.getElementById('nextBtn').addEventListener('click', () => goToSlide(getCurrentPage()+1));
 
     // 키보드
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goToSlide(getCurrentSlideIndex() - 1);
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goToSlide(getCurrentSlideIndex() + 1);
+    window.addEventListener('keydown', e => {
+        if (e.key==='ArrowLeft'||e.key==='ArrowUp')   goToSlide(getCurrentPage()-1);
+        if (e.key==='ArrowRight'||e.key==='ArrowDown') goToSlide(getCurrentPage()+1);
+        if (e.key==='Home') goToSlide(0);
+        if (e.key==='Escape') closeSideMenu();
     });
 
-    // 스크롤 후 인디케이터 업데이트 (사용자 손 스와이프 등)
-    let scrollTimer = null;
-    container.addEventListener('scroll', () => {
-        if (scrollTimer) clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(() => {
-            updateIndicator();
-        }, 150);
-    });
+    // 수동 스크롤 감지
+    container.addEventListener('scroll', () => requestAnimationFrame(updateIndicator), {passive:true});
+    window.addEventListener('resize', () => { refreshOffsets(); updateIndicator(); });
+
+    // ── buildSlides: DOM 렌더링 ──
+    function buildSlides() {
+        container.innerHTML = '';
+        pagesData.forEach(page => {
+            const div = document.createElement('div');
+            div.className = 'page';
+            if (page.type==='cover') div.classList.add('cover');
+            if (page.type==='part')  div.classList.add('part-page');
+            if (page.sectionId) div.dataset.section = page.sectionId;
+
+            const inner = document.createElement('div');
+            inner.className = 'page-content';
+
+            if (page.title) {
+                const h = document.createElement('h2');
+                h.className = 'page-title';
+                h.innerText = page.title;
+                // 파트/표지: 중앙 정렬
+                if (page.type==='part'||page.type==='cover') {
+                    h.style.cssText = 'border-left:none;padding-left:0;text-align:center;';
+                }
+                inner.appendChild(h);
+            }
+            if (page.subtitle) {
+                const s = document.createElement('div');
+                s.className = 'page-subtitle';
+                s.innerText = page.subtitle;
+                if (page.type==='part'||page.type==='cover') s.style.textAlign='center';
+                inner.appendChild(s);
+            }
+            const td = document.createElement('div');
+            td.className = 'page-text';
+            td.innerHTML = page.contentHtml;
+            inner.appendChild(td);
+            div.appendChild(inner);
+            container.appendChild(div);
+        });
+
+        // 초기 offsetTop 계산 (DOM paint 후)
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                refreshOffsets();
+                updateIndicator();
+            });
+        });
+    }
 
     buildSlides();
-    setTimeout(() => { updateIndicator(); updateMenuActive(); }, 200);
 </script>
 </body>
 </html>
