@@ -39,13 +39,13 @@
         * { margin:0; padding:0; box-sizing:border-box; }
 
         /* ─── 폰트 스택 ─── */
+        /* 모바일 기본: Noto Serif KR (Google 웹폰트, 아이폰 Safari 지원) */
         body {
             font-family:
                 'Noto Serif KR',
                 'KoPubWorldBatang',
                 '조선일보명조',
                 'Chosunilbo_myeongjo',
-                'Apple SD Gothic Neo',
                 Georgia, serif;
             background: var(--bg);
             color: var(--ink);
@@ -317,13 +317,28 @@
         }
 
         @media (min-width: 768px) {
+            /* 데스크탑: 조선일보명조 우선 */
+            body, .page-title, .page-subtitle, .page-text,
+            .poem-block, .question-block, .side-menu-item,
+            .side-menu-header-title, .side-menu-header-book,
+            .side-menu-section, #pageIndicatorBar, .menu-toggle {
+                font-family:
+                    '조선일보명조',
+                    'Chosunilbo_myeongjo',
+                    'ChosunilboMyeongjo',
+                    'Noto Serif KR',
+                    'KoPubWorldBatang',
+                    Georgia, serif !important;
+            }
+
+            /* 메뉴 패널: 우측 → 좌측 슬라이드인 */
             .side-menu {
-                left: auto; right: 0; top: 0; bottom: 0;
+                left: 0; right: auto; top: 0; bottom: 0;
                 max-height: 100vh; max-height: 100dvh;
-                width: min(340px, 80vw);
+                width: min(320px, 80vw);
                 border-radius: 0;
-                transform: translateX(100%);
-                box-shadow: -6px 0 36px rgba(40,25,5,0.14);
+                transform: translateX(-100%);
+                box-shadow: 6px 0 36px rgba(40,25,5,0.14);
             }
             .side-menu.open { transform: translateX(0); }
             .side-menu::before { display: none; }
@@ -421,7 +436,7 @@
 
         /* ─── 모바일 최적화 ─── */
         @media (max-width: 680px) {
-            /* 모바일도 동일 스택 유지 */
+
             .page {
                 padding: 2.5rem 1.3rem calc(72px + env(safe-area-inset-bottom, 0px));
             }

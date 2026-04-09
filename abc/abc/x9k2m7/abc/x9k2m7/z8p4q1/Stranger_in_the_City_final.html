@@ -448,6 +448,19 @@
            DESKTOP 보정 (768px+)
         ───────────────────────────── */
         @media (min-width: 768px) {
+            /* 데스크탑: 조선일보명조 우선 */
+            body, .page-title, .page-subtitle, .page-text,
+            .poem-lines, .block-quote, .menu-item,
+            .menu-header-title, .menu-section, #pageIndicator, .bar-btn {
+                font-family:
+                    '조선일보명조',
+                    'Chosunilbo_myeongjo',
+                    'ChosunilboMyeongjo',
+                    'Noto Serif KR',
+                    'KoPubWorldBatang',
+                    Georgia, serif !important;
+            }
+
             .page { padding: 5rem 3.5rem 6rem; }
             .page-title { font-size: 1.9rem; }
             .page-text  { font-size: 1.03rem; line-height: 2.05; }
@@ -456,10 +469,15 @@
             #bottomBar { padding: 12px 32px calc(12px + var(--safe-bottom)); }
             .bar-btn { width: 46px; height: 46px; font-size: 1.25rem; }
             #pageIndicator { font-size: 0.82rem; }
-            #menuPanel { left: auto; right: 0; top: 0; bottom: 0;
-                max-height: 100vh; max-height: 100dvh; width: min(360px, 85vw);
-                border-radius: 0; transform: translateX(100%);
-                box-shadow: -8px 0 40px rgba(60,40,10,0.15);
+
+            /* 데스크탑 메뉴: 좌측 슬라이드인 */
+            #menuPanel {
+                left: 0; right: auto; top: 0; bottom: 0;
+                max-height: 100vh; max-height: 100dvh;
+                width: min(320px, 80vw);
+                border-radius: 0;
+                transform: translateX(-100%);
+                box-shadow: 6px 0 36px rgba(60,40,10,0.15);
             }
             #menuPanel.open { transform: translateX(0); }
             .menu-handle { display: none; }
