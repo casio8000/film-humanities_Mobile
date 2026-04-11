@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>痕迹 흔적 — 스물여섯 해의 감정 기록</title>
+<title>痕迹 흔적 — 열여섯 해의 감정 기록</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="흔적">
@@ -1177,7 +1177,7 @@ button:focus-visible,
   color:var(--text-faint);text-transform:uppercase;margin-bottom:5px;
 }
 .em-input,.em-textarea,.em-select{
-  width:100%;background:rgba(255,255,255,.04);
+  width:100%;background:rgba(20,18,12,.85);
   border:1px solid rgba(255,255,255,.09);border-radius:8px;
   color:var(--text);font-family:'Noto Serif KR',serif;font-size:.88rem;
   padding:9px 12px;outline:none;transition:border-color .2s;
@@ -1375,7 +1375,7 @@ button:focus-visible,
   color:var(--text-faint);text-transform:uppercase;margin-bottom:6px;
 }
 .sp-input,.sp-textarea,.sp-select{
-  width:100%;background:rgba(255,255,255,.04);
+  width:100%;background:rgba(20,18,12,.85);
   border:1px solid rgba(255,255,255,.09);border-radius:7px;
   color:var(--text);font-family:'Noto Serif KR',serif;font-size:.92rem;
   padding:10px 13px;outline:none;transition:border-color .2s;
@@ -1559,11 +1559,29 @@ button:focus-visible,
 /* ── textarea 스크롤 격리 */
 .sp-textarea{touch-action:pan-y;}
 #sp-panel *{-webkit-overflow-scrolling:touch;}
-/* 각서 카테고리 필터 */
 
-/* ── textarea 스크롤 격리 */
-.sp-textarea{touch-action:pan-y;}
-#sp-panel *{-webkit-overflow-scrolling:touch;}
+/* ══ 즐겨찾기 별표 ══ */
+.fav-btn{
+  position:absolute;top:9px;right:9px;
+  width:26px;height:26px;border-radius:50%;
+  background:transparent;border:none;
+  color:rgba(255,255,255,.18);font-size:1rem;
+  cursor:pointer;z-index:3;line-height:1;
+  transition:color .2s,transform .15s;
+  display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;padding:0;
+}
+.fav-btn:hover{transform:scale(1.2);}
+.fav-btn.on{color:#f0c040;}
+/* ecard-num이 우상단에 있으므로, fav-btn을 그 바로 왼쪽에 배치 */
+.ecard .fav-btn{top:9px;right:38px;}
+.fcard .fav-btn{top:9px;right:9px;}
+.memo-card .fav-btn{top:9px;right:38px;}
+
+/* ── 즐겨찾기 네비 탭 ── */
+.gchip-fav{color:rgba(240,192,64,.7);}
+.gchip-fav.on{color:#f0c040;border-color:#f0c040;background:rgba(240,192,64,.1);}
+
 /* 각서 카테고리 필터 */
 .memo-filter-row{
   display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;
@@ -1577,6 +1595,20 @@ button:focus-visible,
 }
 .memo-filter-chip.on{
   color:#d2af64;border-color:#d2af64;background:rgba(210,175,100,.1);
+}
+
+/* 각서 카드 내 수정/삭제 */
+.memo-card .card-actions{
+  margin-top:10px;padding-top:8px;
+  border-top:1px solid rgba(210,175,100,.1);
+}
+
+/* ═══ 모바일 각서 2열 ═══ */
+@media(max-width:600px){
+  .memo-grid{grid-template-columns:repeat(2,1fr)!important;gap:8px!important;}
+  .memo-card{padding:14px 11px 12px!important;}
+  .memo-body{font-size:.78rem!important;line-height:1.9!important;}
+  .memo-num{font-size:1.2rem!important;top:7px!important;right:9px!important;}
 }
 
 </style>
@@ -1606,6 +1638,8 @@ button:focus-visible,
       <span class="gnav-sep">│</span>
       <button class="gchip gchip-soga" data-f="friend" onclick="filter(this,'friend')" data-tip="원문 보존 · 서정 산문">서가 書架</button>
       <button class="gchip gchip-gak" data-f="memo" onclick="filter(this,'memo')" data-tip="순간의 단상 · 삶의 언어">각서 覺書</button>
+      <span class="gnav-sep">│</span>
+      <button class="gchip gchip-fav" data-f="fav" onclick="filter(this,'fav')" data-tip="즐겨찾기 목록">★ 즐겨찾기</button>
     </div>
   </div>
   <!-- search -->
@@ -1630,6 +1664,7 @@ button:focus-visible,
     <button class="gchip gchip-tag" data-f="도시" onclick="filter(this,'도시')">도시</button>
     <button class="gchip gchip-soga" data-f="friend" onclick="filter(this,'friend')">서가</button>
     <button class="gchip gchip-gak" data-f="memo" onclick="filter(this,'memo')">각서</button>
+    <button class="gchip gchip-fav" data-f="fav" onclick="filter(this,'fav')">★ 즐겨찾기</button>
   </div>
   <!-- 항상 노출되는 검색바 -->
   <div class="mbn-row mbn-row-search">
@@ -1728,11 +1763,12 @@ button:focus-visible,
         그것이 이 기록이 지금도 살아있는 이유다.
       </p>
       <p>
-        2000년에서 2026년까지,<br/>
-        스물여섯 해에 걸쳐 쓰인 128편의 흔적.
+        2000년에서 2016년까지,<br/>
+        열여섯 해에 걸쳐 쓰인 127편의 흔적.<br/>
+        <em>그리고 이후의 흔적들은 — 지금 이 순간에도 새겨지고 있다.</em>
       </p>
     </div>
-    <p class="ld-eye">지혜의 쉼터 · 감정 기록 아카이브 · 2000—2026</p>
+    <p class="ld-eye">지혜의 쉼터 · 감정 기록 아카이브 · 2000—2016 그 이후</p>
     <div class="ld-chs">
       <div class="ch-pill ch-pill-link" onclick="goChapter('1')"><span class="ch-dot" style="background:var(--c1)"></span><span style="color:var(--c1)">Ⅰ</span>&nbsp;방황 · 2000–05<span class="ch-arr" style="color:var(--c1)">→</span></div>
       <div class="ch-pill ch-pill-link" onclick="goChapter('2')"><span class="ch-dot" style="background:var(--c2)"></span><span style="color:var(--c2)">Ⅱ</span>&nbsp;갈증 · 2006–10<span class="ch-arr" style="color:var(--c2)">→</span></div>
@@ -1820,13 +1856,16 @@ button:focus-visible,
       </div>
       <div class="sp-field">
         <div class="sp-label">감정 태그</div>
-        <select class="sp-select" id="sp-diary-tag">
-          <option value="고독">고독</option>
-          <option value="가족">가족</option>
-          <option value="시간">시간</option>
-          <option value="성찰" selected>성찰</option>
-          <option value="도시">도시</option>
-        </select>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <select class="sp-select" id="sp-diary-tag" style="flex:1">
+            <option value="고독">고독</option>
+            <option value="가족">가족</option>
+            <option value="시간">시간</option>
+            <option value="성찰" selected>성찰</option>
+            <option value="도시">도시</option>
+          </select>
+          <button class="sp-submit" style="width:auto;padding:10px 14px;flex-shrink:0;font-size:.6rem;" onclick="addNewTag('sp-diary-tag')">＋ 새 태그</button>
+        </div>
       </div>
       <div class="sp-field">
         <div class="sp-label">본문 (빈 줄로 연 구분)</div>
@@ -1851,13 +1890,16 @@ button:focus-visible,
       </div>
       <div class="sp-field">
         <div class="sp-label">태그</div>
-        <select class="sp-select" id="sp-soga-tag">
-          <option value="고독">고독</option>
-          <option value="가족">가족</option>
-          <option value="시간">시간</option>
-          <option value="성찰">성찰</option>
-          <option value="도시" selected>도시</option>
-        </select>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <select class="sp-select" id="sp-soga-tag" style="flex:1">
+            <option value="고독">고독</option>
+            <option value="가족">가족</option>
+            <option value="시간">시간</option>
+            <option value="성찰">성찰</option>
+            <option value="도시" selected>도시</option>
+          </select>
+          <button class="sp-submit" style="width:auto;padding:10px 14px;flex-shrink:0;font-size:.6rem;" onclick="addNewTag('sp-soga-tag')">＋ 새 태그</button>
+        </div>
       </div>
       <div class="sp-field">
         <div class="sp-label">본문 (빈 줄로 연 구분)</div>
@@ -1882,14 +1924,17 @@ button:focus-visible,
       </div>
       <div class="sp-field">
         <div class="sp-label">카테고리</div>
-        <select class="sp-select" id="sp-memo-tag">
-          <option value="성찰" selected>성찰</option>
-          <option value="고독">고독</option>
-          <option value="가족">가족</option>
-          <option value="시간">시간</option>
-          <option value="도시">도시</option>
-          <option value="기타">기타</option>
-        </select>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <select class="sp-select" id="sp-memo-tag" style="flex:1">
+            <option value="성찰" selected>성찰</option>
+            <option value="고독">고독</option>
+            <option value="가족">가족</option>
+            <option value="시간">시간</option>
+            <option value="도시">도시</option>
+            <option value="기타">기타</option>
+          </select>
+          <button class="sp-submit" style="width:auto;padding:10px 14px;flex-shrink:0;font-size:.6rem;" onclick="addNewTag('sp-memo-tag')">＋ 새 카테고리</button>
+        </div>
       </div>
       <button class="sp-submit" onclick="addUserMemo()">➕ 각서 추가</button>
     </div>
@@ -1968,13 +2013,16 @@ button:focus-visible,
       </div>
       <div class="em-field">
         <div class="em-label">태그</div>
-        <select class="em-select" id="em-tag">
-          <option value="고독">고독</option>
-          <option value="가족">가족</option>
-          <option value="시간">시간</option>
-          <option value="성찰">성찰</option>
-          <option value="도시">도시</option>
-        </select>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <select class="em-select" id="em-tag" style="flex:1">
+            <option value="고독">고독</option>
+            <option value="가족">가족</option>
+            <option value="시간">시간</option>
+            <option value="성찰">성찰</option>
+            <option value="도시">도시</option>
+          </select>
+          <button class="em-save" style="width:auto;padding:9px 12px;flex-shrink:0;font-size:.6rem;" onclick="addNewTag('em-tag')">＋ 새 태그</button>
+        </div>
       </div>
       <div class="em-field">
         <div class="em-label">본문 (연 구분은 빈 줄로)</div>
@@ -2319,22 +2367,23 @@ function showArchive(){
 function buildArchive(){
   const el=document.getElementById('archive');
   const au=getActiveUserEntries();
-  const allMain=[...DATA.filter(d=>!d.isFriend&&!userDeleted.includes(d.id)),
-                  ...au.filter(e=>!e.isFriend)];
-  const allFriends=[...DATA.filter(d=>d.isFriend&&!userDeleted.includes(d.id)),
-                     ...au.filter(e=>e.isFriend)];
+  // 사용자 추가 항목이 맨 앞에 오도록 (unshift)
+  const allMain=[...au.filter(e=>!e.isFriend).reverse(),
+                 ...DATA.filter(d=>!d.isFriend&&!userDeleted.includes(d.id))];
+  const allFriends=[...au.filter(e=>e.isFriend).reverse(),
+                    ...DATA.filter(d=>d.isFriend&&!userDeleted.includes(d.id))];
   const totalMemos=(window.MEMOS||MEMOS).length + userMemos.length;
   const mainN=allMain.length, sogaN=allFriends.length;
   
   let html=`
   <div class="arch-hero">
-    <div class="arch-hero-title">스물여섯 해의 감정 기록</div>
-    <div class="arch-hero-sub">2000 — 2026 · 지혜의 쉼터</div>
+    <div class="arch-hero-title">열여섯 해의 감정 기록 — 그리고 그 이후</div>
+    <div class="arch-hero-sub">2000 — 2016 그 이후 · 지혜의 쉼터</div>
     <div class="arch-stats">
       <div class="stat"><span>${mainN}</span>본문 수록</div>
       <div class="stat"><span>${sogaN}</span>서가 수록</div>
       <div class="stat"><span>5</span>개 챕터</div>
-      <div class="stat"><span>26</span>년 기록</div>
+      <div class="stat"><span>${userFavs.length}</span>즐겨찾기</div>
     </div>
   </div>`;
 
@@ -2362,15 +2411,17 @@ function buildArchive(){
       <div class="ch-preface" style="border-left:2px solid ${m.color};opacity:.55">${CH_PREFACE[chNum]}</div>
       <div class="ch-grid" id="grid-${chNum}">`;
     entries.forEach(d=>{
-      // 편집 적용
+      if(userDeleted.includes(d.id))return;
       const ed=userEdits[d.id];
       const td=ed?{...d,...ed}:d;
-      if(userDeleted.includes(d.id))return;
       const pre=td.lines.flat().join(' ').substring(0,68);
+      const favOn=isFav(td.seq)?'on':'';
       html+=`<div class="ecard" style="--cc:${td.cc}"
           data-ch="${td.ch}" data-tag="${td.tag}" data-seq="${td.seq}"
           onclick="openEntry(${td.seq})">
           <div class="ecard-num">${String(d.id+1).padStart(3,'0')}</div>
+          <button class="fav-btn ${favOn}" data-seq="${td.seq}" title="${favOn?'즐겨찾기 해제':'즐겨찾기 추가'}"
+            onclick="event.stopPropagation();toggleFav(${td.seq},this)">★</button>
           <div class="ecard-date">${td.date}</div>
           <div class="ecard-title">${td.title}</div>
           <div class="ecard-pre">${pre}…</div>
@@ -2397,11 +2448,15 @@ function buildArchive(){
     </div>
     <div class="friend-grid" id="friend-grid">`;
   allFriends.forEach(d=>{
+    if(userDeleted.includes(d.id))return;
     const ed=userEdits[d.id];
     const td=ed?{...d,...ed}:d;
     const pre=td.lines.flat().join(' ').substring(0,60);
+    const favOn=isFav(td.seq)?'on':'';
     html+=`<div class="fcard" data-seq="${td.seq}" onclick="openEntry(${td.seq})">
         <div class="fcard-badge">원문</div>
+        <button class="fav-btn ${favOn}" data-seq="${td.seq}" title="${favOn?'즐겨찾기 해제':'즐겨찾기 추가'}"
+          onclick="event.stopPropagation();toggleFav(${td.seq},this)">★</button>
         <div class="fcard-date">${td.date}</div>
         <div class="fcard-title">${td.title}</div>
         <div class="fcard-pre">${pre}…</div>
@@ -2413,10 +2468,15 @@ function buildArchive(){
   });
   html+=`<button class="section-add-btn" style="margin:14px 0 20px" onclick="openSpTab('soga')">＋ 서가 추가</button></div></div>`;
 
-  // Memo section (覺書) — 전체보기 맨 아래 노출
+  // Memo section (覺書)
   const memoTags=['전체','성찰','고독','가족','시간','도시','기타'];
+  // 사용자 추가 카테고리도 포함
+  const allMemoTags=[...memoTags];
+  [...(window.MEMOS||MEMOS),...userMemos].forEach(m=>{
+    if(m.tag&&!allMemoTags.includes(m.tag)) allMemoTags.push(m.tag);
+  });
   const memoFilterHtml=`<div class="memo-filter-row" id="memo-filter-row">${
-    memoTags.map(t=>`<button class="memo-filter-chip${t==='전체'?' on':''}" data-mt="${t}" onclick="filterMemo(this,'${t}')">${t}</button>`).join('')
+    allMemoTags.map(t=>`<button class="memo-filter-chip${t==='전체'?' on':''}" data-mt="${t}" onclick="filterMemo(this,'${t}')">${t}</button>`).join('')
   }</div>`;
   html+=`<div class="memo-section ch-section" id="memo-section">
     <div class="ch-banner" style="border-bottom-color:rgba(210,175,100,.2)">
@@ -2442,17 +2502,24 @@ function buildArchive(){
 function buildMemoGrid(filterTag){
   filterTag=filterTag||'전체';
   const baseMemos=(window.MEMOS||MEMOS);
-  const allM=[...baseMemos.map(m=>({...m,isUser:false})),
-              ...userMemos.map(m=>({...m,isUser:true}))];
+  const memoEdits=(userEdits['_memo'])||{};
+  const memoDeleted=(userEdits['_memoDeleted'])||[];
+  // 사용자 추가 각서 먼저 (최신순), 기본 각서 뒤에
+  const baseFiltered=baseMemos
+    .filter(m=>!memoDeleted.includes(String(m.num||m.id)))
+    .map(m=>{
+      const ed=memoEdits[String(m.num||m.id)];
+      return ed?{...m,...ed,isUser:false}:{...m,isUser:false};
+    });
+  const allM=[...userMemos.slice().reverse().map(m=>({...m,isUser:true})), ...baseFiltered];
   const filtered=filterTag==='전체'?allM:allM.filter(m=>m.tag===filterTag);
   return filtered.map((m,i)=>{
     const srcHtml = m.src ? `<div class="memo-src">— ${m.src}</div>` : '';
-    const editBtns = m.isUser
-      ? `<div class="card-actions" onclick="event.stopPropagation()">
-           <button class="card-act-btn" onclick="quickEditMemo('${m.id||m.num}')">✎ 수정</button>
-           <button class="card-act-btn del" onclick="quickDeleteMemo('${m.id||m.num}')">🗑 삭제</button>
-         </div>`
-      : '';
+    const memoId = m.id||String(m.num);
+    const editBtns = `<div class="card-actions" onclick="event.stopPropagation()">
+         <button class="card-act-btn" onclick="quickEditMemo('${memoId}',${!!m.isUser})">✎ 수정</button>
+         <button class="card-act-btn del" onclick="quickDeleteMemo('${memoId}',${!!m.isUser})">🗑 삭제</button>
+       </div>`;
     return `<div class="memo-card" data-mtag="${m.tag}">
       <div class="memo-num">${String(m.num||i+1).padStart(2,'0')}</div>
       <div class="memo-body">${m.content.replace(/\n/g,'<br>')}</div>
@@ -2497,6 +2564,29 @@ function filter(el,f){
   if(curView!=='archive'){showArchive();return;}
   
   if(f==='all'){showAllSections();return;}
+  if(f==='fav'){
+    // 즐겨찾기 필터: 즐겨찾기된 seq만 표시
+    document.querySelectorAll('[data-chsec]').forEach(s=>s.style.display='');
+    const fs2=document.getElementById('friend-section');if(fs2) fs2.style.display='';
+    const ms=document.getElementById('memo-section');if(ms) ms.style.display='none';
+    document.querySelectorAll('.ecard').forEach(c=>{
+      c.classList.toggle('hidden',!isFav(parseInt(c.dataset.seq)));
+    });
+    document.querySelectorAll('.fcard').forEach(c=>{
+      c.classList.toggle('hidden',!isFav(parseInt(c.dataset.seq)));
+    });
+    // 빈 챕터 섹션 숨김
+    document.querySelectorAll('[data-chsec]').forEach(s=>{
+      const hasE=[...s.querySelectorAll('.ecard')].some(c=>!c.classList.contains('hidden'));
+      s.style.display=hasE?'':'none';
+    });
+    const fs3=document.getElementById('friend-section');
+    if(fs3){
+      const hasF=[...fs3.querySelectorAll('.fcard')].some(c=>!c.classList.contains('hidden'));
+      fs3.style.display=hasF?'':'none';
+    }
+    return;
+  }
   if(f==='memo'){
     document.querySelectorAll('[data-chsec]').forEach(s=>s.style.display='none');
     const fs2=document.getElementById('friend-section');if(fs2) fs2.style.display='none';
@@ -2708,18 +2798,21 @@ function _doSearch(q){
   q=q.trim();
   if(!q){drop.classList.remove('open');drop.innerHTML='';return;}
   const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
-  const hits=DATA.filter(d=>
-    d.title.match(re)||d.lines.flat().join(' ').match(re)
-  ).slice(0,10);
+  // 기본 데이터 + 사용자 추가 항목 검색
+  const allEntries=[...DATA,...getActiveUserEntries()].filter(d=>!userDeleted.includes(d.id));
+  const hits=allEntries.filter(d=>{
+    const td=userEdits[d.id]?{...d,...userEdits[d.id]}:d;
+    return td.title.match(re)||td.lines.flat().join(' ').match(re);
+  }).slice(0,10);
   if(!hits.length){
     drop.innerHTML='<div class="snone">검색 결과 없음</div>';
     drop.classList.add('open');return;
   }
   const CH_COLORS_MAP={'방황':'var(--c1)','갈증':'var(--c2)','성찰':'var(--c3)','정착':'var(--c4)','회복':'var(--c5)'};
   drop.innerHTML=hits.map(d=>{
-    const ht=d.title.replace(re,m=>`<mark>${m}</mark>`);
-    // find a matching line for snippet
-    const bodyText=d.lines.flat().join(' ');
+    const td=userEdits[d.id]?{...d,...userEdits[d.id]}:d;
+    const ht=td.title.replace(re,m=>`<mark>${m}</mark>`);
+    const bodyText=td.lines.flat().join(' ');
     const bm=bodyText.match(re);
     let snippet='';
     if(bm){
@@ -2730,16 +2823,16 @@ function _doSearch(q){
       if(start>0) snippet='…'+snippet;
       snippet+='…';
     }
-    const chColor=d.isFriend?'rgba(200,168,216,.7)':(CH_COLORS_MAP[d.chName]||'var(--gold)');
+    const chColor=td.isFriend?'rgba(200,168,216,.7)':(CH_COLORS_MAP[td.chName]||'var(--gold)');
     return `<div class="sitem" role="option" tabindex="0"
-      onclick="openEntry(${d.seq});clearSearch()"
-      onkeydown="if(event.key==='Enter'){openEntry(${d.seq});clearSearch();}">
+      onclick="openEntry(${td.seq});clearSearch()"
+      onkeydown="if(event.key==='Enter'){openEntry(${td.seq});clearSearch();}">
       <div class="sitem-title">${ht}</div>
       ${snippet?`<div class="sitem-snippet">${snippet}</div>`:''}
       <div class="sitem-meta">
-        <span>${d.date}</span>
-        <span class="sitem-ch" style="color:${chColor}">${d.isFriend?'서가':d.chName}</span>
-        <span>${d.tag}</span>
+        <span>${td.date}</span>
+        <span class="sitem-ch" style="color:${chColor}">${td.isFriend?'서가':td.chName}</span>
+        <span>${td.tag}</span>
       </div>
     </div>`;
   }).join('');
@@ -2899,18 +2992,18 @@ function doMobSearch(q){
     q=q.trim();
     if(!q){drop.classList.remove('open');drop.innerHTML='';return;}
     const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
-    const hits=DATA.filter(d=>
-      !userDeleted.includes(d.id)&&
-      (d.title.match(re)||d.lines.flat().join(' ').match(re))
-    ).slice(0,8);
+    const allEntries=[...DATA,...getActiveUserEntries()].filter(d=>!userDeleted.includes(d.id));
+    const hits=allEntries.filter(d=>{
+      const td=userEdits[d.id]?{...d,...userEdits[d.id]}:d;
+      return td.title.match(re)||td.lines.flat().join(' ').match(re);
+    }).slice(0,8);
     const CM={'방황':'var(--c1)','갈증':'var(--c2)','성찰':'var(--c3)','정착':'var(--c4)','회복':'var(--c5)'};
     if(!hits.length){
       drop.innerHTML='<div class="snone">검색 결과 없음</div>';
       drop.classList.add('open');return;
     }
     drop.innerHTML=hits.map(d=>{
-      const ed=userEdits[d.id];
-      const td=ed?{...d,...ed}:d;
+      const td=userEdits[d.id]?{...d,...userEdits[d.id]}:d;
       const ht=td.title.replace(re,m=>`<mark>${m}</mark>`);
       const chColor=td.isFriend?'rgba(200,168,216,.7)':(CM[td.chName]||'var(--gold)');
       return `<div class="sitem"
@@ -3043,32 +3136,40 @@ function quickDelete(seq){
   curMenuSeq=seq;
   deleteCard();
 }
-function quickEditMemo(memoId){
+function quickEditMemo(memoId, isUser){
   curMemoMenuId=String(memoId);
-  const m=userMemos.find(x=>(x.id||String(x.num))===String(memoId));
+  // user memo or base memo
+  const baseMemos=(window.MEMOS||MEMOS);
+  const m = isUser
+    ? userMemos.find(x=>(x.id||String(x.num))===String(memoId))
+    : baseMemos.find(x=>String(x.num)===String(memoId)||String(x.id)===String(memoId));
   if(!m)return;
-  // 각서 수정: sp 패널 각서 탭에 내용 채우고 열기
   openSettings('memo');
   document.getElementById('sp-memo-content').value=m.content;
   document.getElementById('sp-memo-src').value=m.src||'';
   document.getElementById('sp-memo-tag').value=m.tag||'성찰';
-  // submit 버튼 텍스트 변경 + 동작 변경
   const btn=document.querySelector('#sp-pane-memo .sp-submit');
   if(btn){
     btn.textContent='💾 수정 저장';
-    btn.onclick=function(){saveMemoEdit(memoId);};
+    btn.onclick=function(){saveMemoEdit(memoId, isUser);};
   }
 }
-function saveMemoEdit(memoId){
+function saveMemoEdit(memoId, isUser){
   const content=document.getElementById('sp-memo-content').value.trim();
   const src=document.getElementById('sp-memo-src').value.trim();
   const tag=document.getElementById('sp-memo-tag').value;
   if(!content){showToastMsg('내용을 입력해주세요');return;}
-  const idx=userMemos.findIndex(m=>(m.id||String(m.num))===String(memoId));
-  if(idx<0)return;
-  userMemos[idx]={...userMemos[idx],content,src:src||null,tag};
-  localStorage.setItem('hj_umemos',JSON.stringify(userMemos));
-  // 버튼 원래대로
+  if(isUser){
+    const idx=userMemos.findIndex(m=>(m.id||String(m.num))===String(memoId));
+    if(idx<0)return;
+    userMemos[idx]={...userMemos[idx],content,src:src||null,tag};
+    localStorage.setItem('hj_umemos',JSON.stringify(userMemos));
+  } else {
+    // 기본 각서 편집: userEdits-memo 로 저장
+    if(!userEdits['_memo']) userEdits['_memo']={};
+    userEdits['_memo'][String(memoId)]={content,src:src||null,tag};
+    localStorage.setItem('hj_edits',JSON.stringify(userEdits));
+  }
   const btn=document.querySelector('#sp-pane-memo .sp-submit');
   if(btn){btn.textContent='➕ 각서 추가';btn.onclick=addUserMemo;}
   document.getElementById('sp-memo-content').value='';
@@ -3079,10 +3180,20 @@ function saveMemoEdit(memoId){
   showToastMsg('각서가 수정되었습니다');
   curMemoMenuId=null;
 }
-function quickDeleteMemo(memoId){
+function quickDeleteMemo(memoId, isUser){
   if(!confirm('이 각서를 삭제하시겠습니까?'))return;
-  userMemos=userMemos.filter(m=>(m.id||String(m.num))!==String(memoId));
-  localStorage.setItem('hj_umemos',JSON.stringify(userMemos));
+  if(isUser){
+    userMemos=userMemos.filter(m=>(m.id||String(m.num))!==String(memoId));
+    localStorage.setItem('hj_umemos',JSON.stringify(userMemos));
+  } else {
+    // 기본 각서 숨김 처리
+    if(!userEdits['_memo']) userEdits['_memo']={};
+    if(!userEdits['_memoDeleted']) userEdits['_memoDeleted']=[];
+    if(!userEdits['_memoDeleted'].includes(String(memoId))){
+      userEdits['_memoDeleted'].push(String(memoId));
+      localStorage.setItem('hj_edits',JSON.stringify(userEdits));
+    }
+  }
   archBuilt=false;
   if(curView==='archive'){buildArchive();archBuilt=true;}
   showToastMsg('각서가 삭제되었습니다');
@@ -3340,6 +3451,57 @@ function downloadCard(){
 
 /* ══ INIT ══ */
 updateLandingCounter();
+
+/* ══ 즐겨찾기 시스템 ══ */
+let userFavs = JSON.parse(localStorage.getItem('hj_favs')||'[]'); // seq array
+
+function isFav(seq){ return userFavs.includes(seq); }
+function toggleFav(seq, btn){
+  if(isFav(seq)){
+    userFavs = userFavs.filter(s=>s!==seq);
+    if(btn){ btn.classList.remove('on'); btn.title='즐겨찾기 추가'; }
+  } else {
+    userFavs.push(seq);
+    if(btn){ btn.classList.add('on'); btn.title='즐겨찾기 해제'; }
+  }
+  localStorage.setItem('hj_favs', JSON.stringify(userFavs));
+  // 다른 곳에 같은 seq의 fav-btn이 있으면 동기화
+  document.querySelectorAll(`.fav-btn[data-seq="${seq}"]`).forEach(b=>{
+    b.classList.toggle('on', isFav(seq));
+  });
+}
+
+/* ══ 새 카테고리 추가 ══ */
+function addNewTag(selectId){
+  const name = prompt('새 카테고리 이름을 입력하세요:');
+  if(!name || !name.trim()) return;
+  const val = name.trim();
+  // 모든 관련 select에 같은 옵션 추가
+  const selects = ['sp-diary-tag','sp-soga-tag','sp-memo-tag','em-tag'];
+  selects.forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    if([...sel.options].some(o=>o.value===val)) return;
+    const opt = document.createElement('option');
+    opt.value = val; opt.textContent = val;
+    sel.appendChild(opt);
+  });
+  // 각서 필터 칩에도 추가
+  const filterRow = document.getElementById('memo-filter-row');
+  if(filterRow && ![...filterRow.querySelectorAll('.memo-filter-chip')].some(c=>c.dataset.mt===val)){
+    const chip = document.createElement('button');
+    chip.className='memo-filter-chip';
+    chip.dataset.mt=val;
+    chip.textContent=val;
+    chip.onclick=function(){ filterMemo(this,val); };
+    filterRow.appendChild(chip);
+  }
+  // 선택된 select에서 새 값 선택
+  const target = document.getElementById(selectId);
+  if(target) target.value = val;
+  showToastMsg(`'${val}' 카테고리가 추가되었습니다`);
+}
+
 </script>
 
 <script src="https://w.soundcloud.com/player/api.js"></script>
