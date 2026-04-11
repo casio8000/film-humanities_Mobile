@@ -9,6 +9,20 @@
 <meta name="apple-mobile-web-app-title" content="문장의 숲">
 <meta name="theme-color" content="#1c1a16">
 <meta name="description" content="인류가 어둠 속에서 켜올린 불멸의 문장들 — 노벨 문학상 수상작과 세계 걸작 인문 가이드">
+<!-- Open Graph / SNS 공유 -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="문장의 숲 — 인류 필독 걸작 인문 가이드">
+<meta property="og:description" content="인류가 어둠 속에서 켜올린 불멸의 문장들 — 노벨 문학상 수상작과 세계 걸작 35편의 깊이 있는 인문 가이드">
+<meta property="og:image" content="https://casio8000.github.io/film-humanities_Mobile/images/main.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="문장의 숲">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="문장의 숲 — 인류 필독 걸작 인문 가이드">
+<meta name="twitter:description" content="인류가 어둠 속에서 켜올린 불멸의 문장들 — 노벨 문학상 수상작과 세계 걸작 35편">
+<meta name="twitter:image" content="https://casio8000.github.io/film-humanities_Mobile/images/main.png">
 <link rel="manifest" href="data:application/json,{%22name%22:%22문장의 숲%22,%22short_name%22:%22문장의숲%22,%22display%22:%22standalone%22,%22background_color%22:%22#1c1a16%22,%22theme_color%22:%22#1c1a16%22}">
 <!-- ★ PWA 앱 아이콘 — 절대 삭제 금지 ★ -->
 <link rel="apple-touch-icon" href="https://casio8000.github.io/film-humanities_Mobile/images/nobel_forest-icon.png">
@@ -192,6 +206,8 @@ body {
   background: rgba(247,244,238,0.96);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
+  /* iOS safe area */
+  padding-top: env(safe-area-inset-top);
 }
 .nav {
   max-width: none;
@@ -915,13 +931,14 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
   background: var(--cream2);
   min-height: 160px;
 }
-/* 모바일: 항상 폴백 카드 표시 (이미지 로드 불안정 대비) */
-.book-cover-fallback { display: none; }  /* 기본: 숨김 */
+/* 기본: img 표시, fallback 숨김 */
+.book-cover-fallback { display: none; }
+/* 모바일: img 완전히 숨기고 fallback 카드 항상 표시 */
 @media(max-width:900px){
   .book-cover { display: none !important; }
   .book-cover-fallback { display: flex !important; }
 }
-/* PC: onerror로 img 숨기면 fallback 자동 표시 */
+/* PC: onerror로 img 숨기면 fallback 자동 표시 (JS 처리) */
 
 @media(max-width:768px){
   /* 기본 레이아웃 */
@@ -1043,8 +1060,11 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(184,147,90,0.18);
   position: sticky;
-  top: 44px; /* nav 높이 */
+  top: var(--nav-total-height, 48px);
   z-index: 700;
+}
+@media(max-width:768px){
+  .filter-bar { top: var(--nav-total-height, 44px); }
 }
 .filter-bar-inner {
   max-width: 1300px;
@@ -1081,8 +1101,82 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
 .filter-sep { display: none; }
 
 /* ═══════════════════════════════════════════
-   KEYWORDS (섹션 상단 키워드)
+   SEARCH BAR
 ═══════════════════════════════════════════ */
+.search-bar {
+  background: rgba(247,244,238,0.98);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: var(--filter-total-height, 92px); /* nav + filter */
+  z-index: 600;
+  padding: 6px 16px;
+}
+@media(max-width:768px){
+  .search-bar { top: var(--filter-total-height, 84px); padding: 5px 12px; }
+}
+.search-bar-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+  max-width: 460px;
+}
+.search-input-wrap::before {
+  content: '🔍';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  pointer-events: none;
+  opacity: 0.5;
+}
+#searchInput {
+  width: 100%;
+  padding: 6px 10px 6px 32px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  color: var(--ink);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+#searchInput:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(184,147,90,0.12);
+}
+#searchInput::placeholder { color: var(--ink3); }
+.search-count {
+  font-size: 0.7rem;
+  color: var(--ink3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.search-count strong { color: var(--gold); }
+.no-results-msg {
+  display: none;
+  text-align: center;
+  padding: 60px 20px;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  color: var(--ink3);
+  font-style: italic;
+}
+.no-results-msg.show { display: block; }
+@media(max-width:768px){
+  .search-bar-inner { gap: 8px; }
+  #searchInput { font-size: 0.74rem; }
+  .search-count { display: none; }
+}
 .book-keywords {
   display: flex;
   gap: 8px;
@@ -1453,10 +1547,25 @@ function handleImgError(img) {
   </div>
 </div>
 
+<!-- ══ SEARCH BAR ════════════════════════════════════════════ -->
+<div class="search-bar" id="searchBar">
+  <div class="search-bar-inner">
+    <div class="search-input-wrap">
+      <input type="search" id="searchInput" placeholder="작품명, 작가명, 키워드로 검색..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="search-count" id="searchCount"></div>
+  </div>
+</div>
+
 <!-- ══ SCROLL TOP BTN ════════════════════════════════════════ -->
 <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="맨 위로">↑</button>
 
 <div class="page-body">
+
+<!-- ══ 검색 결과 없음 메시지 ══════════════════════════════════ -->
+<div class="no-results-msg" id="noResultsMsg">
+  찾으시는 작품이 없습니다. 다른 키워드로 검색해 보세요.
+</div>
 
 <!-- ══ 서문 ════════════════════════════════════════════ -->
 <div class="overture reveal">
@@ -3908,6 +4017,7 @@ function handleImgError(img) {
   </div>
 
   
+  <div class="citation-simple reveal">
     <span class="citation-label">원문 (Swedish Academy)</span>
     <p class="citation-text">"for her intense poetic prose that confronts historical traumas and exposes the fragility of human life."</p>
     <div class="citation-analysis">
@@ -6743,6 +6853,21 @@ function handleImgError(img) {
 </footer>
 
 <script>
+// ── Dynamic sticky position calculation (safe area 대응) ──
+function updateStickyHeights() {
+  const navWrap = document.querySelector('.nav-wrap');
+  const filterBar = document.getElementById('filterBar');
+  if (!navWrap) return;
+  const navH = navWrap.getBoundingClientRect().height;
+  document.documentElement.style.setProperty('--nav-total-height', navH + 'px');
+  if (filterBar) {
+    const filterH = filterBar.getBoundingClientRect().height;
+    document.documentElement.style.setProperty('--filter-total-height', (navH + filterH) + 'px');
+  }
+}
+updateStickyHeights();
+window.addEventListener('resize', updateStickyHeights);
+
 // ── Scroll reveal ──────────────────────────────────────────
 const reveals = document.querySelectorAll('.reveal');
 const io = new IntersectionObserver((entries) => {
@@ -6783,33 +6908,77 @@ window.addEventListener('scroll', () => {
 // ── Filter system ─────────────────────────────────────────
 const filterBtns = document.querySelectorAll('.filter-btn');
 const bookSections = document.querySelectorAll('.book-section');
+let currentFilter = 'all';
+let currentSearch = '';
+
+function applyFiltersAndSearch() {
+  let visibleCount = 0;
+  bookSections.forEach(sec => {
+    const era = sec.dataset.era || '';
+    const isNoble = !!sec.dataset.nobel;
+    // filter check
+    let passFilter = false;
+    if(currentFilter === 'all') passFilter = true;
+    else if(currentFilter === 'classic') passFilter = era === 'classic';
+    else if(currentFilter === 'modern')  passFilter = era === 'modern';
+    else if(currentFilter === 'nobel')   passFilter = isNoble;
+    // search check
+    let passSearch = true;
+    if(currentSearch.length > 0) {
+      const text = sec.textContent.toLowerCase();
+      passSearch = text.includes(currentSearch);
+    }
+    const show = passFilter && passSearch;
+    sec.classList.toggle('filtered-out', !show);
+    if(show) visibleCount++;
+  });
+  // update count
+  const countEl = document.getElementById('searchCount');
+  const noResultsEl = document.getElementById('noResultsMsg');
+  if(currentSearch.length > 0) {
+    countEl.innerHTML = `<strong>${visibleCount}</strong>편 검색됨`;
+    noResultsEl.classList.toggle('show', visibleCount === 0);
+  } else {
+    countEl.innerHTML = '';
+    noResultsEl.classList.remove('show');
+  }
+}
 
 filterBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     filterBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    const filter = btn.dataset.filter;
-
-    bookSections.forEach(sec => {
-      const era = sec.dataset.era || '';
-      const isNovel = !!sec.dataset.nobel;
-      let show = false;
-      if(filter === 'all')    show = true;
-      else if(filter === 'classic') show = era === 'classic';
-      else if(filter === 'modern')  show = era === 'modern';
-      else if(filter === 'nobel')   show = isNovel;
-      sec.classList.toggle('filtered-out', !show);
-    });
-
+    currentFilter = btn.dataset.filter;
+    applyFiltersAndSearch();
     const firstVisible = [...bookSections].find(s => !s.classList.contains('filtered-out'));
     if(firstVisible){
       setTimeout(() => {
-        const offset = firstVisible.getBoundingClientRect().top + window.scrollY - 100;
+        const offset = firstVisible.getBoundingClientRect().top + window.scrollY - 160;
         window.scrollTo({ top: offset, behavior: 'smooth' });
       }, 80);
     }
   });
 });
+
+// ── Search input ──────────────────────────────────────────
+const searchInput = document.getElementById('searchInput');
+if(searchInput) {
+  let searchTimer;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      currentSearch = searchInput.value.trim().toLowerCase();
+      applyFiltersAndSearch();
+    }, 150);
+  });
+  searchInput.addEventListener('keydown', e => {
+    if(e.key === 'Escape') {
+      searchInput.value = '';
+      currentSearch = '';
+      applyFiltersAndSearch();
+    }
+  });
+}
 
 // ── 책 표지 이미지 오류 처리 ─────────────────────────────
 function handleImgError(img) {
