@@ -2016,6 +2016,223 @@ footer em { font-style: italic; color: rgba(184,147,90,0.62); }
   pointer-events: none; opacity: 0; transition: opacity 0.3s; white-space: nowrap;
 }
 #bmFeedback.show { opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   도움말 모달
+═══════════════════════════════════════════ */
+#helpBtn {
+  position: fixed;
+  bottom: 36px;
+  left: 24px;
+  z-index: 900;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 1px solid rgba(184,147,90,0.35);
+  color: var(--gold);
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.72;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+  transition: all 0.25s;
+  font-family: var(--serif);
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+#helpBtn:hover { opacity: 1; transform: scale(1.08); box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+@media(max-width:480px){
+  #helpBtn { bottom: calc(20px + env(safe-area-inset-bottom)); left: 16px; width: 36px; height: 36px; font-size: 0.9rem; }
+}
+
+/* 오버레이 배경 */
+#helpOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  background: rgba(28,26,22,0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: helpFadeIn 0.25s ease;
+}
+#helpOverlay.open { display: flex; align-items: center; justify-content: center; padding: 20px; }
+@keyframes helpFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* 모달 박스 */
+.help-modal {
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+  max-width: 680px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: helpSlideUp 0.32s cubic-bezier(0.34,1.4,0.64,1);
+  -webkit-overflow-scrolling: touch;
+}
+@keyframes helpSlideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.help-modal::-webkit-scrollbar { width: 4px; }
+.help-modal::-webkit-scrollbar-thumb { background: var(--cream3); border-radius: 2px; }
+
+.help-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 28px 18px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--white);
+  z-index: 1;
+  border-radius: 16px 16px 0 0;
+}
+.help-header-title {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.help-header-title span { color: var(--gold); }
+.help-close {
+  background: none;
+  border: none;
+  color: var(--ink3);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.18s;
+  line-height: 1;
+}
+.help-close:hover { background: var(--cream2); color: var(--ink); }
+
+.help-body { padding: 8px 28px 28px; }
+
+/* 기능 카드 */
+.help-section {
+  margin-top: 24px;
+}
+.help-section-title {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.help-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--cream3);
+}
+
+.help-card {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--cream2);
+  align-items: start;
+}
+.help-card:last-child { border-bottom: none; }
+.help-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.hi-nav   { background: rgba(184,147,90,0.1); }
+.hi-term  { background: rgba(90,120,184,0.1); }
+.hi-yt    { background: rgba(255,68,68,0.1); }
+.hi-google{ background: rgba(66,133,244,0.1); }
+.hi-bm    { background: rgba(184,147,90,0.12); }
+.hi-pos   { background: rgba(50,150,100,0.1); }
+.hi-filter{ background: rgba(100,80,150,0.1); }
+.hi-top   { background: rgba(0,0,0,0.06); }
+
+.help-card-content {}
+.help-card-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.help-badge {
+  font-size: 0.62rem;
+  background: var(--cream2);
+  color: var(--ink3);
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+.help-card-desc {
+  font-size: 0.82rem;
+  color: var(--ink3);
+  line-height: 1.75;
+}
+.help-card-desc em {
+  color: var(--gold);
+  font-style: normal;
+  font-weight: 500;
+}
+.help-card-desc code {
+  background: var(--cream2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: monospace;
+  font-size: 0.8em;
+  color: var(--ink2);
+}
+
+.help-tip {
+  background: linear-gradient(135deg, rgba(184,147,90,0.06) 0%, rgba(184,147,90,0.02) 100%);
+  border: 1px solid rgba(184,147,90,0.2);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin-top: 20px;
+  font-size: 0.8rem;
+  color: var(--ink3);
+  line-height: 1.7;
+}
+.help-tip strong { color: var(--ink2); font-weight: 500; }
+
+@media(max-width:600px){
+  .help-header { padding: 18px 20px 14px; }
+  .help-body { padding: 6px 20px 24px; }
+  .help-card { grid-template-columns: 38px 1fr; gap: 10px; }
+  .help-icon { width: 38px; height: 38px; font-size: 1.1rem; border-radius: 10px; }
+}
+@media(max-width:420px){
+  .help-header { padding: 16px 16px 12px; }
+  .help-body { padding: 4px 16px 20px; }
+}
 </style>
 <script>
 function handleImgError(img) {
@@ -8820,6 +9037,19 @@ document.querySelectorAll('.book-cover').forEach(img => {
     document.addEventListener('DOMContentLoaded', init);
   } else { init(); }
 })();
+
+// ── 도움말 키보드 단축키 ─────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === '?') {
+    var ov = document.getElementById('helpOverlay');
+    if (ov) ov.classList.toggle('open');
+  }
+  if (e.key === 'Escape') {
+    var ov = document.getElementById('helpOverlay');
+    if (ov) ov.classList.remove('open');
+  }
+});
 </script>
 
 
@@ -8834,5 +9064,171 @@ document.querySelectorAll('.book-cover').forEach(img => {
   <button class="toast-close" id="toastClose" aria-label="닫기">✕</button>
 </div>
 <div id="bmFeedback"></div>
+
+<!-- ══ 도움말 버튼 ════════════════════════════════════════ -->
+<button id="helpBtn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="도움말" aria-label="도움말 열기">?</button>
+
+<!-- ══ 도움말 모달 ════════════════════════════════════════ -->
+<div id="helpOverlay" role="dialog" aria-modal="true" aria-label="문장의 숲 도움말"
+     onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="help-modal">
+
+    <div class="help-header">
+      <div class="help-header-title">
+        <span>✦</span> 문장의 숲 사용 안내
+      </div>
+      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')" aria-label="닫기">✕</button>
+    </div>
+
+    <div class="help-body">
+
+      <!-- 네비게이션 -->
+      <div class="help-section">
+        <div class="help-section-title">탐색</div>
+
+        <div class="help-card">
+          <div class="help-icon hi-nav">📚</div>
+          <div class="help-card-content">
+            <div class="help-card-name">목차 열기 <span class="help-badge">상단 버튼</span></div>
+            <div class="help-card-desc">
+              상단 <em>📚 목차 ▾</em> 버튼을 탭하면 수록된 50편의 작품 목록이 펼쳐집니다.
+              <em>고전 / 현대 / 노벨상 / 🔖 책갈피</em> 탭으로 분류해 볼 수 있습니다.
+              작품명을 클릭하면 해당 본문으로 바로 이동합니다.
+            </div>
+          </div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-icon hi-filter">🔍</div>
+          <div class="help-card-content">
+            <div class="help-card-name">작품·작가 검색 <span class="help-badge">실시간</span></div>
+            <div class="help-card-desc">
+              상단 검색창에 작품명이나 작가 이름 일부를 입력하면 즉시 필터링됩니다.
+              한글·영문·일문 모두 검색 가능합니다.
+              예) <code>카뮈</code>, <code>Kafka</code>, <code>한강</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-icon hi-nav">↑</div>
+          <div class="help-card-content">
+            <div class="help-card-name">맨 위로 <span class="help-badge">우하단 버튼</span></div>
+            <div class="help-card-desc">
+              화면 오른쪽 하단의 <em>↑</em> 버튼을 누르면 페이지 맨 위로 돌아갑니다.
+              스크롤을 어느 정도 내린 후에만 표시됩니다.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 본문 기능 -->
+      <div class="help-section">
+        <div class="help-section-title">본문 읽기</div>
+
+        <div class="help-card">
+          <div class="help-icon hi-term">↗</div>
+          <div class="help-card-content">
+            <div class="help-card-name">문학 용어 <span class="help-badge">밑줄 텍스트</span></div>
+            <div class="help-card-desc">
+              본문에 금색 밑줄과 <em>↗</em> 표시가 있는 단어는 <em>문학 전문 용어</em>입니다.
+              탭하면 위키백과 해설 페이지로 연결됩니다.
+              예) <em>빙산 이론↗</em>, <em>마술적 리얼리즘↗</em>
+            </div>
+          </div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-icon hi-yt">▶</div>
+          <div class="help-card-content">
+            <div class="help-card-name">YouTube 해설 검색 <span class="help-badge">각 작품 내</span></div>
+            <div class="help-card-desc">
+              각 작품 섹션의 <em>▶ YouTube 해설 검색</em> 버튼을 누르면
+              해당 작품의 줄거리·해설 영상을 YouTube에서 검색합니다.
+              강의·분석 영상을 통해 더 깊이 이해할 수 있습니다.
+            </div>
+          </div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-icon hi-google">🔍</div>
+          <div class="help-card-content">
+            <div class="help-card-name">Google 검색 <span class="help-badge">각 작품 내</span></div>
+            <div class="help-card-desc">
+              <em>🔍 Google 검색</em> 버튼은 <code>작품명 + 저자 + 문학 분석</code> 키워드로
+              구글 검색을 실행합니다. 학술 자료·평론·심층 분석 글을 찾는 데 활용하세요.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 책갈피 & 위치 -->
+      <div class="help-section">
+        <div class="help-section-title">책갈피 &amp; 읽던 위치</div>
+
+        <div class="help-card">
+          <div class="help-icon hi-bm">🔖</div>
+          <div class="help-card-content">
+            <div class="help-card-name">책갈피 <span class="help-badge">각 작품 우상단</span></div>
+            <div class="help-card-desc">
+              각 작품 섹션 오른쪽 상단의 <em>🔖</em> 버튼으로 즐겨찾기를 추가·제거할 수 있습니다.
+              추가된 작품은 목차의 <em>🔖 책갈피</em> 탭에서 모아볼 수 있으며,
+              목록에도 🔖 표시가 붙습니다. 브라우저를 닫아도 기록이 유지됩니다.
+            </div>
+          </div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-icon hi-pos">📖</div>
+          <div class="help-card-content">
+            <div class="help-card-name">이어 읽기 <span class="help-badge">자동 저장</span></div>
+            <div class="help-card-desc">
+              본문을 스크롤하면 현재 읽고 있는 작품이 자동으로 기록됩니다.
+              다음에 다시 방문하면 화면 하단에 <em>📖 마지막으로 읽던 곳</em> 안내가 나타납니다.
+              <em>이어 읽기 →</em>를 누르면 바로 이동합니다. (24시간 이내 기록 유지)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 인용 출처 -->
+      <div class="help-section">
+        <div class="help-section-title">인용 출처</div>
+
+        <div class="help-card">
+          <div class="help-icon hi-term">🏛</div>
+          <div class="help-card-content">
+            <div class="help-card-name">Nobel Citation</div>
+            <div class="help-card-desc">
+              노벨 문학상 수상작에는 <em>🏛 Nobel Citation · 공식 선정 사유</em>가 표시됩니다.
+              스웨덴 아카데미(Swedish Academy)가 발표한 원문 선정 이유를 그대로 수록했습니다.
+              출처: <code>NobelPrize.org</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-icon hi-term">💬</div>
+          <div class="help-card-content">
+            <div class="help-card-name">인용 문장</div>
+            <div class="help-card-desc">
+              각 작품의 <em>작품의 문장들</em> 섹션에 수록된 인용문은
+              국내외 번역본 및 원문에서 발췌한 것입니다.
+              번역 투에 따라 일부 차이가 있을 수 있으며,
+              정확한 원문은 해당 출판사 번역본을 참조하시기 바랍니다.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="help-tip">
+        <strong>💡 더 잘 활용하는 방법</strong><br>
+        관심 있는 작품을 🔖 책갈피로 모아두고, 목차의 책갈피 탭에서 나만의 독서 목록을 관리해보세요.
+        전문 용어 링크(↗)를 통해 배경 지식을 쌓은 뒤 YouTube 해설 영상으로 이해를 심화하는 순서를 추천합니다.
+      </div>
+
+    </div>
+  </div>
+</div>
 </body>
 </html>
