@@ -1103,40 +1103,54 @@ body {
    REFERENCES & FOOTER
 ═══════════════════════════════════════════ */
 .references {
-  background: var(--ink);
-  padding: 70px clamp(24px,5vw,80px);
+  background: #141210;
+  padding: 80px clamp(24px,5vw,100px) 64px;
   margin-top: 80px;
 }
-.ref-inner { max-width: 900px; margin: 0 auto; }
+.ref-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
 .references h2 {
   font-family: var(--serif);
-  font-size: 1.3rem;
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
   font-weight: 300;
-  color: rgba(240,230,210,0.7);
-  margin-bottom: 28px;
+  color: rgba(225, 215, 195, 0.9);
+  margin-bottom: 44px;
   text-align: center;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.13em;
+  line-height: 1.3;
 }
 .ref-list { list-style: none; }
 .ref-list li {
-  font-size: 0.8rem;
-  color: rgba(180,170,150,0.65);
-  padding: 7px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  line-height: 1.7;
+  font-size: 0.81rem;
+  color: rgba(170, 160, 140, 0.7);
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  line-height: 1.78;
+  letter-spacing: 0.01em;
+  font-family: var(--sans);
+  font-weight: 300;
+}
+.ref-list li:first-child {
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.ref-list li em {
+  font-style: italic;
+  color: rgba(205, 192, 165, 0.88);
 }
 .ref-list li:last-child { border-bottom: none; }
 
 footer {
-  background: var(--ink);
-  border-top: 1px solid rgba(255,255,255,0.07);
+  background: #141210;
+  border-top: 1px solid rgba(255,255,255,0.05);
   text-align: center;
-  padding: 36px;
+  padding: 40px 36px;
   font-size: 0.78rem;
-  color: rgba(160,150,130,0.55);
+  color: rgba(155,145,125,0.48);
   letter-spacing: 0.06em;
 }
-footer em { font-style: italic; color: rgba(184,147,90,0.6); }
+footer em { font-style: italic; color: rgba(184,147,90,0.62); }
 
 /* ═══════════════════════════════════════════
    SCROLL REVEAL
@@ -1251,8 +1265,8 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
   .overture-left h2 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
 
   /* 참고문헌 모바일 */
-  .references { padding: 50px 20px; }
-  .ref-list li { font-size: 0.75rem; }
+  .references { padding: 52px 20px 44px; }
+  .ref-list li { font-size: 0.76rem; padding: 11px 0; }
 
   /* 안전 영역 (노치/홈바) */
   body { padding-bottom: env(safe-area-inset-bottom); }
@@ -1549,10 +1563,23 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
 .nav-brand-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 46px;
-  padding: 0 20px;
+  gap: 10px;
+  height: auto;
+  min-height: 50px;
+  padding: 6px 20px;
   border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+/* nav 안에 임베드된 검색창 */
+.nav-search-embedded {
+  flex: 1;
+  min-width: 160px;
+  max-width: 340px;
+  margin-bottom: 0 !important;
+}
+@media(max-width:600px){
+  .nav-brand-bar { padding: 6px 14px; }
+  .nav-search-embedded { max-width: 100%; flex-basis: 100%; order: 3; }
 }
 .nav-toc-btn {
   background: var(--gold);
@@ -1687,14 +1714,17 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
 /* 목차 항목 그리드 */
 .toc-body {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 4px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+}
+@media(max-width:1100px){
+  .toc-body { grid-template-columns: repeat(3, 1fr); }
 }
 .toc-item {
   display: grid;
-  grid-template-columns: 28px 1fr auto;
-  align-items: baseline;
-  gap: 8px;
+  grid-template-columns: 26px 1fr;
+  align-items: center;
+  gap: 6px;
   padding: 9px 12px;
   border-radius: 6px;
   text-decoration: none;
@@ -1702,6 +1732,7 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
   border: 1px solid transparent;
   transition: all 0.15s;
   cursor: pointer;
+  min-height: 44px;
 }
 .toc-item:hover {
   background: rgba(184,147,90,0.08);
@@ -1712,31 +1743,28 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
 .toc-item:active { background: rgba(184,147,90,0.16); transform: none; }
 .toc-num {
   font-family: var(--serif);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   color: var(--gold);
   opacity: 0.7;
   text-align: right;
+  flex-shrink: 0;
 }
 .toc-title {
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   font-weight: 500;
   color: var(--ink);
-  line-height: 1.3;
+  line-height: 1.25;
   word-break: keep-all;
-}
-.toc-author {
-  font-size: 0.68rem;
-  color: var(--ink3);
-  font-style: italic;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 90px;
+}
+.toc-author {
+  display: none; /* 데스크탑에서도 숨김 — 깔끔한 2열 레이아웃 */
 }
 @media(max-width:768px){
   .toc-body { grid-template-columns: 1fr 1fr; gap: 3px; }
-  .toc-item { padding: 8px 10px; }
-  .toc-author { display: none; }
+  .toc-item { padding: 8px 10px; min-height: 40px; }
   .toc-search-wrap { max-width: 100%; }
 }
 @media(max-width:480px){
@@ -1755,35 +1783,6 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
   font-size: 0.9rem;
 }
 
-/* ── nav badges (고전/현대/노벨 수 표시) ── */
-.nav-badges {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  flex: 1;
-  padding: 0 10px;
-  flex-wrap: wrap;
-}
-.nav-badge {
-  font-size: 0.68rem;
-  padding: 3px 9px;
-  border-radius: 12px;
-  white-space: nowrap;
-  font-family: var(--sans);
-  font-weight: 400;
-  letter-spacing: 0.01em;
-}
-.nav-badge-classic { background: rgba(90,78,60,0.1); color: var(--ink3); border: 1px solid var(--border); }
-.nav-badge-modern  { background: rgba(184,147,90,0.1); color: var(--gold); border: 1px solid rgba(184,147,90,0.25); }
-.nav-badge-nobel   { background: rgba(184,147,90,0.18); color: var(--gold); border: 1px solid rgba(184,147,90,0.35); font-weight:500; }
-
-@media(max-width:600px){
-  .nav-badges { gap: 3px; }
-  .nav-badge { font-size: 0.62rem; padding: 2px 7px; }
-}
-@media(max-width:400px){
-  .nav-badges { display: none; }
-}
 
 /* ── nav TOC toggle button ── */
 .nav-toc-btn {
@@ -1833,13 +1832,16 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
 /* toc-body inside drawer */
 .nav-toc-drawer .toc-body {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 3px;
 }
-@media(max-width:600px){
+@media(max-width:1100px){
+  .nav-toc-drawer .toc-body { grid-template-columns: repeat(3, 1fr); }
+}
+@media(max-width:768px){
   .nav-toc-drawer .toc-body { grid-template-columns: 1fr 1fr; }
 }
-@media(max-width:400px){
+@media(max-width:480px){
   .nav-toc-drawer .toc-body { grid-template-columns: 1fr; }
 }
 
@@ -1878,33 +1880,25 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
 
 
 /* ── 히어로 제작자 크레딧 ── */
-.hero-creator {
-  position: absolute;
-  bottom: 100px;
-  left: 0; right: 0;
-  text-align: center;
+/* ── 히어로 인라인 제작자 크레딧 ── */
+.hero-creator-inline {
   font-family: var(--serif);
   font-size: 0.68rem;
   font-style: italic;
-  color: rgba(240,235,220,0.3);
-  letter-spacing: 0.12em;
-  z-index: 3;
-  pointer-events: none;
+  color: rgba(240,235,220,0.38);
+  letter-spacing: 0.14em;
+  margin-bottom: 28px;
+  animation: fadeSlideDown 1.2s 0.35s ease both;
+}
+.hero-creator-name {
+  color: #d4ad78; /* 앰버골드 */
+  font-style: italic;
+  font-weight: 400;
+  opacity: 1;
 }
 @media(max-width:768px){
-  .hero-creator { bottom: 80px; font-size: 0.62rem; }
+  .hero-creator-inline { font-size: 0.62rem; margin-bottom: 20px; }
 }
-
-/* ── 제작자 크레딧 ── */
-.creator-credit {
-  text-align: center;
-  padding: 14px 20px;
-  font-size: 0.72rem;
-  color: rgba(160,150,130,0.5);
-  letter-spacing: 0.06em;
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-.creator-credit em { font-style: italic; color: rgba(184,147,90,0.55); }
 </style>
 <script>
 function handleImgError(img) {
@@ -1926,13 +1920,11 @@ function handleImgError(img) {
     <p class="hero-eyebrow">문장의 숲 &nbsp;·&nbsp; The Forest of Words</p>
     <h1>인류가 어둠 속에서<br><em>켜올린 불멸의 문장들</em></h1>
     <div class="hero-rule"><div class="hero-rule-dot"></div></div>
+    <p class="hero-creator-inline">Co-created by <span class="hero-creator-name">지혜의 쉼터</span> with Claude · © 2026</p>
     <p class="hero-sub">
       문학은 설명하지 않는다. 그저 나란히 앉아,<br>
       당신이 혼자 걸어온 그 길을 이미 알고 있다고 말할 뿐이다.
     </p>
-  </div>
-  <div class="hero-creator">
-    <em>Co-created by 지혜의 쉼터(엠버골드) with Claude · © 2026</em>
   </div>
   <div class="hero-scroll">
     <div class="hero-scroll-bar"></div>
@@ -1944,10 +1936,11 @@ function handleImgError(img) {
 <div class="nav-wrap" id="navWrap">
   <div class="nav-brand-bar">
     <span class="nav-brand">문장의 숲</span>
-    <div class="nav-badges">
-      <span class="nav-badge nav-badge-classic">📜 고전 38</span>
-      <span class="nav-badge nav-badge-modern">✨ 현대 12</span>
-      <span class="nav-badge nav-badge-nobel">🏅 노벨 10</span>
+    <div class="toc-search-wrap nav-search-embedded">
+      <span class="toc-search-icon">🔍</span>
+      <input type="search" id="tocSearchInput" class="toc-search-input" placeholder="작품명·작가 검색..." autocomplete="off" autocorrect="off" spellcheck="false" style="font-size:16px;">
+      <span class="toc-search-count" id="tocSearchCount"></span>
+      <button class="toc-search-clear" id="tocSearchClear" style="display:none;">✕</button>
     </div>
     <button class="nav-toc-btn" id="navTocToggle" aria-expanded="false">
       <span class="nav-toc-btn-text">📚 목차</span>
@@ -1956,12 +1949,6 @@ function handleImgError(img) {
   </div>
   <!-- 접이식 목차 -->
   <div class="nav-toc-drawer" id="navTocDrawer" aria-hidden="true">
-    <div class="toc-search-wrap" style="margin:0 0 14px 0;max-width:100%;">
-      <span class="toc-search-icon">🔍</span>
-      <input type="search" id="tocSearchInput" class="toc-search-input" placeholder="작품명·작가 검색..." autocomplete="off" autocorrect="off" spellcheck="false" style="font-size:16px;">
-      <span class="toc-search-count" id="tocSearchCount"></span>
-      <button class="toc-search-clear" id="tocSearchClear" style="display:none;">✕</button>
-    </div>
     <div class="toc-tabs" style="margin-bottom:12px;">
       <button class="toc-tab active" data-filter="all">전체 <span class="toc-tab-cnt">50</span></button>
       <button class="toc-tab" data-filter="classic">📜 고전 <span class="toc-tab-cnt">38</span></button>
@@ -8027,7 +8014,7 @@ function handleImgError(img) {
   <div class="book-keywords"><span class="keyword-tag">#천재와괴물</span><span class="keyword-tag">#욕망</span><span class="keyword-tag">#존재의증명</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
-      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Perfume.jpg" alt="향수 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Perfume-The_Story_of_a_Murderer.jpg" alt="향수 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
       <div class="book-cover-fallback" style="background:linear-gradient(145deg,#4a2060,#1e0a2e);"><span class="fb-title">향수</span><span class="fb-author">Patrick Süskind</span></div>
       <div class="book-year-badge">1985</div>
     </div>
@@ -8087,7 +8074,7 @@ function handleImgError(img) {
   <div class="book-keywords"><span class="keyword-tag">#철학입문</span><span class="keyword-tag">#존재의문</span><span class="keyword-tag">#메타픽션</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
-      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Sophies_World.jpg" alt="소피의 세계 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Sophie's_World.jpg" alt="소피의 세계 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
       <div class="book-cover-fallback" style="background:linear-gradient(145deg,#1a3a5c,#0d1e30);"><span class="fb-title">소피의 세계</span><span class="fb-author">Jostein Gaarder</span></div>
       <div class="book-year-badge">1991</div>
     </div>
@@ -8177,7 +8164,7 @@ function handleImgError(img) {
   <div class="book-keywords"><span class="keyword-tag">#집착</span><span class="keyword-tag">#인간의한계</span><span class="keyword-tag">#운명과의지</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
-      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Moby_Dick.jpg" alt="모비딕 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Moby-Dick.jpg" alt="모비딕 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
       <div class="book-cover-fallback" style="background:linear-gradient(145deg,#1a2a3a,#0a141e);"><span class="fb-title">모비딕</span><span class="fb-author">Herman Melville</span></div>
       <div class="book-year-badge">1851</div>
     </div>
@@ -8262,6 +8249,8 @@ function handleImgError(img) {
 
 
 </div><!-- /page-body -->
+
+<div class="references">
   <div class="ref-inner">
     <h2>참고 문헌 및 출처</h2>
     <ul class="ref-list">
