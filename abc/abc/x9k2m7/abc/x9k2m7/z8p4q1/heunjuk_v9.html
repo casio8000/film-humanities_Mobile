@@ -717,7 +717,52 @@ body::after{
 .memo-body{
   font-family:'Noto Serif KR',serif;font-size:.92rem;
   color:rgba(220,212,198,.82);line-height:2.2;margin-bottom:14px;
+  /* 카드에서 일부만 표시 */
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;
+  overflow:hidden;max-height:calc(2.2rem * 4);
 }
+/* 각서 카드 클릭 커서 */
+.memo-card{cursor:pointer;}
+/* 각서 상세 모달 */
+#memo-detail-bg{
+  position:fixed;inset:0;z-index:900;
+  background:rgba(0,0,0,.72);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+#memo-detail-bg.open{opacity:1;pointer-events:all;}
+#memo-detail-modal{
+  background:#0d0b07;border:1px solid rgba(210,175,100,.22);
+  border-top:2px solid rgba(210,175,100,.45);
+  border-radius:12px;padding:32px 28px 24px;
+  width:min(520px,92vw);max-height:80vh;overflow-y:auto;
+  position:relative;
+}
+.mdm-num{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:3rem;color:rgba(210,175,100,.08);
+  position:absolute;top:14px;right:18px;line-height:1;
+}
+.mdm-body{
+  font-family:'Noto Serif KR',serif;font-size:.96rem;
+  color:rgba(220,212,198,.88);line-height:2.4;margin-bottom:18px;
+  white-space:pre-line;
+}
+.mdm-src{
+  font-family:'Montserrat',sans-serif;font-size:.58rem;
+  letter-spacing:1.5px;color:rgba(210,175,100,.55);margin-bottom:12px;
+}
+.mdm-tag{
+  font-family:'Montserrat',sans-serif;font-size:.54rem;
+  letter-spacing:1.5px;color:rgba(210,175,100,.35);text-transform:uppercase;
+}
+.mdm-close{
+  position:absolute;top:12px;left:16px;
+  font-size:.9rem;color:rgba(210,175,100,.5);cursor:pointer;
+  background:none;border:none;padding:4px 8px;
+  transition:color .15s;
+}
+.mdm-close:hover{color:#d2af64;}
 .memo-src{
   font-family:'Montserrat',sans-serif;font-size:.56rem;
   letter-spacing:1.5px;color:rgba(210,175,100,.5);
@@ -1605,7 +1650,7 @@ button:focus-visible,
 @media(max-width:600px){
   .memo-grid{grid-template-columns:repeat(2,1fr)!important;gap:8px!important;}
   .memo-card{padding:14px 11px 12px!important;}
-  .memo-body{font-size:.78rem!important;line-height:1.9!important;}
+  .memo-body{font-size:.78rem!important;line-height:1.9!important;max-height:calc(1.9rem * 4)!important;-webkit-line-clamp:4!important;}
   .memo-num{font-size:1.2rem!important;top:7px!important;right:9px!important;}
 }
 
@@ -3806,6 +3851,17 @@ button:focus-visible,
   </div><!-- /.sp-body -->
 </div><!-- /#sp-panel -->
 
+<!-- ══ 각서 상세 모달 ══ -->
+<div id="memo-detail-bg" onclick="if(event.target===this)closeMemoDetail()">
+  <div id="memo-detail-modal">
+    <button class="mdm-close" onclick="closeMemoDetail()">✕ 닫기</button>
+    <div class="mdm-num" id="mdm-num">01</div>
+    <div class="mdm-body" id="mdm-body"></div>
+    <div class="mdm-src" id="mdm-src"></div>
+    <div class="mdm-tag" id="mdm-tag"></div>
+  </div>
+</div>
+
 <!-- ── 백업 유도 배너 -->
 <div id="backup-prompt" class="">
   <div class="bp-title">💾 백업을 권장합니다</div>
@@ -4370,12 +4426,17 @@ function buildMemoGrid(filterTag){
   return filtered.map((m,i)=>{
     const srcHtml = m.src ? `<div class="memo-src">— ${m.src}</div>` : '';
     const memoId = m.id||String(m.num);
+    const numStr = String(m.num||i+1).padStart(2,'0');
+    // JSON 직렬화로 안전하게 전달
+    const safeContent = JSON.stringify(m.content);
+    const safeSrc = JSON.stringify(m.src||'');
+    const safeTag = JSON.stringify(m.tag);
     const editBtns = `<div class="card-actions" onclick="event.stopPropagation()">
          <button class="card-act-btn" onclick="quickEditMemo('${memoId}',${!!m.isUser})">✎ 수정</button>
          <button class="card-act-btn del" onclick="quickDeleteMemo('${memoId}',${!!m.isUser})">🗑 삭제</button>
        </div>`;
-    return `<div class="memo-card" data-mtag="${m.tag}">
-      <div class="memo-num">${String(m.num||i+1).padStart(2,'0')}</div>
+    return `<div class="memo-card" data-mtag="${m.tag}" onclick="openMemoDetail(${safeContent},${safeSrc},${safeTag},'${numStr}')">
+      <div class="memo-num">${numStr}</div>
       <div class="memo-body">${m.content.replace(/\n/g,'<br>')}</div>
       ${srcHtml}
       <div class="memo-tag">${m.tag}</div>
@@ -4415,8 +4476,14 @@ function filter(el,f){
   // 같은 data-f 값을 가진 모든 칩에 on 표시
   document.querySelectorAll(`.gchip[data-f="${f}"]`).forEach(c=>c.classList.add('on'));
   
-  if(curView!=='archive'){showArchive();return;}
-  
+  if(curView!=='archive'){showArchive();
+    // showArchive → resetFilter 호출을 막고 원하는 필터 적용
+    requestAnimationFrame(()=>requestAnimationFrame(()=>_applyFilter(f)));
+    return;
+  }
+  _applyFilter(f);
+}
+function _applyFilter(f){
   if(f==='all'){showAllSections();return;}
   if(f==='fav'){
     // 즐겨찾기 필터: 즐겨찾기된 seq만 표시
@@ -4900,6 +4967,14 @@ function closeSettings(){
   document.getElementById('sp-panel').classList.remove('open');
   document.getElementById('gnav-sp-btn').classList.remove('on');
   document.body.classList.remove('no-scroll');
+  // 각서 수정 모드였으면 버튼과 curMemoMenuId 리셋
+  if(curMemoMenuId){
+    curMemoMenuId=null;
+    const btn=document.querySelector('#sp-pane-memo .sp-submit');
+    if(btn){btn.textContent='➕ 각서 추가';btn.onclick=addUserMemo;}
+    document.getElementById('sp-memo-content').value='';
+    document.getElementById('sp-memo-src').value='';
+  }
 }
 function openSpTab(tab){
   openSettings(tab);
@@ -4963,9 +5038,24 @@ function addUserEntry(isFriend){
   updateLandingCounter();
   closeSettings();
   showToastMsg(`${isFriend?'서가':'감정기록'}이 추가되었습니다`);
+  // 추가 후 해당 섹션(서가/감정기록)으로 스크롤
+  requestAnimationFrame(()=>{
+    if(isFriend){
+      filter(document.querySelector('.gchip[data-f="friend"]'),'friend');
+      const fs=document.getElementById('friend-section');
+      if(fs) setTimeout(()=>fs.scrollIntoView({behavior:'smooth',block:'start'}),100);
+    } else {
+      const chNum2=parseInt(document.getElementById('sp-diary-ch')?.value)||1;
+      filter(document.querySelector(`.gchip[data-f="${chNum2}"]`)||document.querySelector('.gchip[data-f="all"]'), String(chNum2));
+      const sec=document.querySelector(`[data-chsec="${chNum2}"]`);
+      if(sec) setTimeout(()=>sec.scrollIntoView({behavior:'smooth',block:'start'}),100);
+    }
+  });
   maybePromptBackup();
 }
 function addUserMemo(){
+  // 수정 모드 중이면 새 카드 생성 방지 (saveMemoEdit으로 처리해야 함)
+  if(curMemoMenuId){showToastMsg('수정 중입니다. 수정 저장을 눌러주세요');return;}
   const content=document.getElementById('sp-memo-content').value.trim();
   const src=document.getElementById('sp-memo-src').value.trim();
   const tag=document.getElementById('sp-memo-tag').value;
@@ -4985,6 +5075,12 @@ function addUserMemo(){
   if(curView==='archive'){buildArchive();archBuilt=true;}
   closeSettings();
   showToastMsg('각서가 추가되었습니다');
+  // 추가 후 각서 섹션으로 이동 및 스크롤
+  requestAnimationFrame(()=>{
+    filter(document.querySelector('.gchip[data-f="memo"]'),'memo');
+    const ms=document.getElementById('memo-section');
+    if(ms) setTimeout(()=>ms.scrollIntoView({behavior:'smooth',block:'start'}),100);
+  });
   maybePromptBackup();
 }
 
@@ -5037,10 +5133,31 @@ function saveMemoEdit(memoId, isUser){
   document.getElementById('sp-memo-src').value='';
   archBuilt=false;
   if(curView==='archive'){buildArchive();archBuilt=true;}
+  curMemoMenuId=null;
   closeSettings();
   showToastMsg('각서가 수정되었습니다');
-  curMemoMenuId=null;
+  // 수정 후 각서 섹션 유지
+  requestAnimationFrame(()=>{
+    filter(document.querySelector('.gchip[data-f="memo"]'),'memo');
+    const ms=document.getElementById('memo-section');
+    if(ms) setTimeout(()=>ms.scrollIntoView({behavior:'smooth',block:'start'}),100);
+  });
 }
+/* ══ 각서 상세 모달 ══ */
+function openMemoDetail(content, src, tag, num){
+  document.getElementById('mdm-num').textContent=num;
+  document.getElementById('mdm-body').textContent=content;
+  document.getElementById('mdm-src').textContent=src ? '— '+src : '';
+  document.getElementById('mdm-src').style.display=src?'':'none';
+  document.getElementById('mdm-tag').textContent=tag;
+  document.getElementById('memo-detail-bg').classList.add('open');
+  document.body.classList.add('no-scroll');
+}
+function closeMemoDetail(){
+  document.getElementById('memo-detail-bg').classList.remove('open');
+  document.body.classList.remove('no-scroll');
+}
+
 function quickDeleteMemo(memoId, isUser){
   if(!confirm('이 각서를 삭제하시겠습니까?'))return;
   if(isUser){
