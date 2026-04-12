@@ -3636,8 +3636,8 @@ button:focus-visible,
 </div>
 
 <!-- ══ SETTINGS PANEL ══ -->
-<div id="sp-bg" onclick="if(event.target===this)closeSettings()" class="open"></div>
-<div id="sp-panel" class="open">
+<div id="sp-bg" onclick="if(event.target===this)closeSettings()"></div>
+<div id="sp-panel">
 
   <!-- 헤더 고정 -->
   <div class="sp-header">
@@ -4050,11 +4050,30 @@ let curView='landing', curSeq=0, mpOpen=false, mpLoaded=false, savedScrollY=0;
 const PLAYLIST_EMBED='https://www.producer.ai/embed/playlist/3d879bdf-04c7-4b6b-b529-b60d5ba4ed6f';
 let archBuilt=false;
 
-/* 편집/삭제/추가 상태 (localStorage 영속) */
+/* 편집/삭제/추가 상태 (localStorage 영속 + 임베디드 기본값) */
+(function(){
+  const _em=[{"id": "u_1775897567069", "seq": 128, "ch": 1, "chName": "방황", "cc": "var(--c1)", "date": "2026년 4월", "year": 2026, "tag": "성찰", "title": "추도사", "lines": [["죽음은 아무것도 아닙니다.", "전혀 중요하지 않습니다.", "나는 그저 옆방으로 건너갔을 뿐", "아무일도 일어나지 않았습니다.", "모든 것은 예전 그대로입니다.", "나는 나이고,  당신은 당신", "우리가 그토록 다정히", "함께 살아온 그 옛 삶은", "손대지 않은 채", "변함없이 남아 있습니다.", "우리가 서로에게 무엇이었든", "지금도 여전히 그렇습니다.", "늘 부르던 호칭으로", "나를 불러 주세요", "늘 그래왔듯 편안하게", "나를 말해 주세요", "말투를 바꾸지 말아요", "숙연함도 슬픔도", "억지로 꾸며 입지 말아요", "삶은 여전히", "예전과 같은 의미를 지닙니다.", "달라진 것은없습니다.", "내 무덤 곁에 서서", "흐느끼지 말아요", "나는 거기에 없으니", "나는 수천 갈래의 바람", "눈 위의 찬란한 설광", "황금 들판에 내리쬐는 햇살", "부드럽게 내리는 가을비", "아침의 고요속에서", "당신이 눈을 뜰 때", "나는 재빠른 비상", "원을 그리는 고요한 새들의 비행", "밤을 넘어 이어지는 낮", "내 무덤 곁에 서서", "울지 말아요", "나는 거기에 없으니", "나는 죽지 않았으니"]], "coda": null, "isFriend": true, "isUser": true, "addedAt": "2026-04-11"}];
+  const _mm=[{"id": "m_1775875157052", "num": 33, "content": "’연애 철학’\n만나고 \n길들이고\n차 버린다.", "src": "미드 러브스토리-존F.케네디 & 캐롤린 베셋 중에서", "tag": "기타", "isUser": true, "addedAt": "2026-04-11"}, {"id": "m_1775881792588", "num": 34, "content": "대중은 항상 한 손엔 꽃을\n한손엔 돌을 들고 있단다", "src": "[미드] 러브 스토리 존 F. 케네디 주니어 & 캐롤린 베셋 중에서", "tag": "성찰", "isUser": true, "addedAt": "2026-04-11"}, {"id": "m_1775968584989", "num": 35, "content": "두 분이 명확하게 \n결론 내리지 못하는 건\n지금 과도기적인 상태에\n 갇혀 있기 때문이에요\n 잠시 서로 연락을 끊어보면\n 명확히 떠오를겁니다\n 무엇이 그립고\n 서로가 없는 삶이\n 실제로 어떤 모습일지요\n\n 두 분은 함께하지도 못하고\n 그렇다고 서로 놓치도 못하죠\n 이를 악물고\n 결혼을 버티기만 하면서\n 추락하는 중이잖아요", "src": "[미드] 러브 스토리 존 F. 케네디 주니어 & 캐롤린 베셋 중에서", "tag": "부부, 결혼, 이혼", "isUser": true, "addedAt": "2026-04-12"}, {"id": "m_1775968701980", "num": 36, "content": "슬픔은 늘 거기에 있을 거란다\n하지만 슬픔을 다루는 방식은\n바꿀 수 있어\n어느 순간 그걸로\n무언가 할 수 있단 걸 깨닫지\n\n선택의 여지가 없으니까요\n\n아니 선택 여지가 없을 때\n오히려 선택할 수 있더라고\n더 깊이 숨어버리고 싶은 마음\n이해한다\n하지만 꼭꼭 숨는다고\n평안이 오지는 않아\n그랫다면 난 오래전에\n홀연히 사라졌겠지", "src": "[미드] 러브 스토리 존 F. 케네디 주니어 & 캐롤린 베셋 중에서", "tag": "슬픔, 상실", "isUser": true, "addedAt": "2026-04-12"}, {"id": "m_1775968855040", "num": 38, "content": "우리는 우리의 결단력과 독립심을\n자랑스럽게 여기지\n그래서 어떤 형태의 동정도\n유난히 못 견뎌해\n이 모든 상실을 \n견디는 것 만으로도 부족해서\n우리 삶이 거기에\n규정 당하지 않도록 애쓰지\n참 피곤하게도 산다", "src": "[미드] 러브 스토리 존 F. 케네디 주니어 & 캐롤린 베셋 중에서", "tag": "삶", "isUser": true, "addedAt": "2026-04-12"}, {"id": "m_1775968908429", "num": 38, "content": "네 운명은 정해져 있다고\n생각해 왔던 거 알아\n그렇다고 무엇도\n바꾸지 못한다는 건 아니야", "src": "[미드] 러브 스토리 존 F. 케네디 주니어 & 캐롤린 베셋 중에서", "tag": "삶", "isUser": true, "addedAt": "2026-04-12"}, {"id": "m_jfk_death", "num": 39, "content": "죽음은 아무것도 아닙니다.\n나는 그저 옆방으로 건너갔을 뿐\n모든 것은 예전 그대로입니다.\n\n늘 부르던 호칭으로 나를 불러 주세요\n말투를 바꾸지 말아요\n숙연함도 슬픔도 억지로 꾸며 입지 말아요\n\n나는 수천 갈래의 바람\n눈 위의 찬란한 설광\n황금 들판에 내리쬐는 햇살\n부드럽게 내리는 가을비\n\n내 무덤 곁에 서서 울지 말아요\n나는 거기에 없으니\n나는 죽지 않았으니", "src": "[미드] 러브 스토리 존 F. 케네디 주니어 & 캐롤린 베셋 (2026)", "tag": "상실", "isUser": true, "addedAt": "2026-04-12"}];
+  const _ed={"75": {"title": "119", "date": "2013년 07월", "tag": "가족", "lines": [["119에 와이프가 실려갔다.", "난 그때까지 아들과 문자를 주고 받았다.", "귀엔 이어폰을 끼고", "술한잔에 시름을 달래며 내 서글픈영혼과", "짠한 마음의 동요를 이해라도 해 달래듯", "알딸한 술기운에 뭔가 가슴속에", "울분을 토하며 음악을 듣고 있었다.", "아니 와이프의 울부짖음을 외면하고", "있었는지도 모른다.", "나도 힘들고 와이프의 답답함에", "진저리치고 있었는데..", "느닷없는 와이프의 돌발적 고통에", "체 놀랄 겨를없이 정말 얼떨결에 구급차에", "동승해 멀거니 침대 머리맡에 앉아", "링거를 바라보고 앉아았다.", "1시간반이 언제 지나갈까?", "밀려오는 술기운은 응급실의 위급함은", "저 멀리한체 그저 밀려오는 잠기운이 날 또 그리", "무기력한 사람으로 내닺는다.", "생전 듣도보도 못한 전해질 문제인가 싶다한다.", "난 아무것도 할 수가 할 수도 없다.", "그저 바라볼 뿐,,", "아픈것도 아니고 슬픈것도 아니다.", "다만 이 순간 어쩔수 없는 나약하고 힘없는", "자신이 왜그리 서글픈겐지...", "미안하다..", "사랑한다...", "네가 처한 형편 내 대신해줄 수 있는게라면", "나..그리 하리라..", "시간은 왜 그리도 더디게만 가는지...", "미안하다.. 사랑한다... — 응급실 링거 옆에서."]], "coda": null}, "u_1775897567069": {"title": "추도사", "date": "2026년 4월", "tag": "성찰", "lines": [["죽음은 아무것도 아닙니다.", "전혀 중요하지 않습니다.", "나는 그저 옆방으로 건너갔을 뿐", "아무일도 일어나지 않았습니다.", "모든 것은 예전 그대로입니다."], ["나는 나이고,  당신은 당신", "우리가 그토록 다정히", "함께 살아온 그 옛 삶은", "손대지 않은 채", "변함없이 남아 있습니다."], ["우리가 서로에게 무엇이었든", "지금도 여전히 그렇습니다.", "늘 부르던 호칭으로", "나를 불러 주세요", "늘 그래왔듯 편안하게", "나를 말해 주세요", "말투를 바꾸지 말아요", "숙연함도 슬픔도", "억지로 꾸며 입지 말아요", "삶은 여전히", "예전과 같은 의미를 지닙니다.", "달라진 것은 없습니다."], ["내 무덤 곁에 서서", "흐느끼지 말아요", "나는 거기에 없으니", "나는 수천 갈래의 바람", "눈 위의 찬란한 설광", "황금 들판에 내리쬐는 햇살", "부드럽게 내리는 가을비", "아침의 고요속에서", "당신이 눈을 뜰 때", "나는 재빠른 비상", "원을 그리는 고요한 새들의 비행", "밤을 넘어 이어지는 낮"], ["내 무덤 곁에 서서", "울지 말아요", "나는 거기에 없으니", "나는 죽지 않았으니"]], "coda": null}};
+  const _del=[207];
+  // localStorage에 없는 임베디드 항목을 병합해서 localStorage 갱신
+  const _se=JSON.parse(localStorage.getItem('hj_entries')||'[]');
+  const _sm=JSON.parse(localStorage.getItem('hj_umemos')||'[]');
+  const _sedits=JSON.parse(localStorage.getItem('hj_edits')||'{}');
+  const _sdel=JSON.parse(localStorage.getItem('hj_deleted')||'[]');
+  _em.forEach(e=>{if(!_se.find(x=>x.id===e.id))_se.push(e)});
+  _mm.forEach(m=>{if(!_sm.find(x=>x.id===m.id))_sm.push(m)});
+  Object.keys(_ed).forEach(k=>{if(!_sedits[k])_sedits[k]=_ed[k]});
+  _del.forEach(id=>{if(!_sdel.includes(id))_sdel.push(id)});
+  localStorage.setItem('hj_entries',JSON.stringify(_se));
+  localStorage.setItem('hj_umemos',JSON.stringify(_sm));
+  localStorage.setItem('hj_edits',JSON.stringify(_sedits));
+  localStorage.setItem('hj_deleted',JSON.stringify(_sdel));
+})();
 let userEdits    = JSON.parse(localStorage.getItem('hj_edits')    || '{}');
 let userDeleted  = JSON.parse(localStorage.getItem('hj_deleted')  || '[]');
-let userEntries  = JSON.parse(localStorage.getItem('hj_entries')  || '[]'); // 사용자 추가 감정기록/서가
-let userMemos    = JSON.parse(localStorage.getItem('hj_umemos')   || '[]'); // 사용자 추가 각서
+let userEntries  = JSON.parse(localStorage.getItem('hj_entries')  || '[]');
+let userMemos    = JSON.parse(localStorage.getItem('hj_umemos')   || '[]');
 let curMenuSeq   = -1;
 let curMenuIsUser = false;
 let curMemoMenuId = null;
@@ -4782,19 +4801,26 @@ function saveEdit(){
   const bodyRaw=document.getElementById('em-body').value;
   const codaRaw=document.getElementById('em-coda').value.trim();
   if(!title){alert('제목을 입력해주세요.');return;}
-  // 텍스트 → lines: 빈 줄로 연 구분, 각 연은 줄로 분리
   const lines=bodyRaw.split(/\n\s*\n/).map(st=>
     st.split('\n').map(l=>l.trim()).filter(Boolean)
   ).filter(st=>st.length>0);
   const edit={title,date,tag,lines,coda:codaRaw||null};
-  userEdits[raw.id]=edit;
-  localStorage.setItem('hj_edits',JSON.stringify(userEdits));
+  if(raw.isUser){
+    // 사용자가 직접 추가한 항목은 userEntries 배열을 직접 수정 (중복 카드 방지)
+    const idx=userEntries.findIndex(e=>e.id===raw.id);
+    if(idx!==-1){
+      userEntries[idx]={...userEntries[idx],...edit};
+      localStorage.setItem('hj_entries',JSON.stringify(userEntries));
+    }
+  } else {
+    // 기본 DATA 항목은 userEdits에 저장
+    userEdits[raw.id]=edit;
+    localStorage.setItem('hj_edits',JSON.stringify(userEdits));
+  }
   closeEditModal();
-  // 아카이브 리빌드
   archBuilt=false;
   buildArchive();
   archBuilt=true;
-  // 현재 읽고 있는 글이면 즉시 재렌더
   if(curView==='entry'&&curSeq===curMenuSeq) renderEntry(curSeq);
   showToastMsg('수정 사항이 저장되었습니다');
 }
@@ -5067,21 +5093,26 @@ function exportBackup(){
 }
 
 function exportHtmlWithData(){
-  // 현재 HTML에 사용자 데이터를 내장하여 저장
+  // 설정 패널을 먼저 닫고 outerHTML 캡처 (open 클래스가 저장 파일에 굳지 않도록)
+  closeSettings();
   const data={userEntries,userMemos,userEdits,userDeleted};
-  const inject=`\n/* ══ EMBEDDED USER DATA ══ */\n(function(){try{const d=JSON.parse(atob('${btoa(unescape(encodeURIComponent(JSON.stringify(data))))}'));if(d.userEntries)d.userEntries.forEach(e=>{if(!userEntries.find(x=>x.id===e.id))userEntries.push(e)});if(d.userMemos)d.userMemos.forEach(m=>{if(!userMemos.find(x=>x.id===m.id))userMemos.push(m)});if(d.userEdits)Object.assign(userEdits,d.userEdits);if(d.userDeleted)userDeleted=[...new Set([...userDeleted,...d.userDeleted])];localStorage.setItem('hj_entries',JSON.stringify(userEntries));localStorage.setItem('hj_umemos',JSON.stringify(userMemos));localStorage.setItem('hj_edits',JSON.stringify(userEdits));localStorage.setItem('hj_deleted',JSON.stringify(userDeleted));}catch(e){}})();`;
+  const b64=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  const inject=`/* ══ EMBEDDED USER DATA ══ */\n(function(){try{const d=JSON.parse(decodeURIComponent(escape(atob('`+b64+`'))));if(d.userEntries)d.userEntries.forEach(e=>{if(!userEntries.find(x=>x.id===e.id))userEntries.push(e)});if(d.userMemos)d.userMemos.forEach(m=>{if(!userMemos.find(x=>x.id===m.id))userMemos.push(m)});if(d.userEdits)Object.assign(userEdits,d.userEdits);if(d.userDeleted)userDeleted=[...new Set([...userDeleted,...d.userDeleted])];localStorage.setItem('hj_entries',JSON.stringify(userEntries));localStorage.setItem('hj_umemos',JSON.stringify(userMemos));localStorage.setItem('hj_edits',JSON.stringify(userEdits));localStorage.setItem('hj_deleted',JSON.stringify(userDeleted));}catch(e){}})();`;
   let pageHtml=document.documentElement.outerHTML;
-  pageHtml=pageHtml.replace('<script>
-/* ══ EMBEDDED USER DATA ══ */
-(function(){try{const d=JSON.parse(atob('eyJ1c2VyRW50cmllcyI6W3siaWQiOiJ1XzE3NzU4OTc1NjcwNjkiLCJzZXEiOjEyOCwiY2giOjEsImNoTmFtZSI6Iuuwqe2ZqSIsImNjIjoidmFyKC0tYzEpIiwiZGF0ZSI6IjIwMjbrhYQgNOyblCIsInllYXIiOjIwMjYsInRhZyI6IuyEseywsCIsInRpdGxlIjoi7LaU64+E7IKsIiwibGluZXMiOltbIuyjveydjOydgCDslYTrrLTqsoPrj4Qg7JWE64uZ64uI64ukLiIsIuyghO2YgCDspJHsmpTtlZjsp4Ag7JWK7Iq164uI64ukLiIsIuuCmOuKlCDqt7jsoIAg7JiG67Cp7Jy866GcIOqxtOuEiOqwlOydhCDrv5AiLCLslYTrrLTsnbzrj4Qg7J287Ja064KY7KeAIOyViuyVmOyKteuLiOuLpC4iLCLrqqjrk6Ag6rKD7J2AIOyYiOyghCDqt7jrjIDroZzsnoXri4jri6QuIiwi64KY64qUIOuCmOydtOqzoCwgIOuLueyLoOydgCDri7nsi6AiLCLsmrDrpqzqsIAg6re47Yag66GdIOuLpOygle2eiCIsIu2VqOq7mCDsgrTslYTsmKgg6re4IOyYmyDsgrbsnYAiLCLshpDrjIDsp4Ag7JWK7J2AIOyxhCIsIuuzgO2VqOyXhuydtCDrgqjslYQg7J6I7Iq164uI64ukLiIsIuyasOumrOqwgCDshJzroZzsl5Dqsowg66y07JeH7J207JeI65OgIiwi7KeA6riI64+EIOyXrOyghO2eiCDqt7jroIfsirXri4jri6QuIiwi64qYIOu2gOultOuNmCDtmLjsua3snLzroZwiLCLrgpjrpbwg67aI65+sIOyjvOyEuOyalCIsIuuKmCDqt7jrnpjsmZTrk68g7Y647JWI7ZWY6rKMIiwi64KY66W8IOunkO2VtCDso7zshLjsmpQiLCLrp5DtiKzrpbwg67CU6r647KeAIOunkOyVhOyalCIsIuyImeyXsO2VqOuPhCDsiqztlJTrj4QiLCLslrXsp4DroZwg6r6466mwIOyeheyngCDrp5DslYTsmpQiLCLsgrbsnYAg7Jes7KCE7Z6IIiwi7JiI7KCE6rO8IOqwmeydgCDsnZjrr7jrpbwg7KeA64uZ64uI64ukLiIsIuuLrOudvOynhCDqsoPsnYDsl4bsirXri4jri6QuIiwi64K0IOustOuNpCDqs4Hsl5Ag7ISc7IScIiwi7Z2Q64qQ64G87KeAIOunkOyVhOyalCIsIuuCmOuKlCDqsbDquLDsl5Ag7JeG7Jy864uIIiwi64KY64qUIOyImOyynCDqsIjrnpjsnZgg67CU656MIiwi64iIIOychOydmCDssKzrnoDtlZwg7ISk6rSRIiwi7Zmp6riIIOuTpO2MkOyXkCDrgrTrpqzsrJDripQg7ZaH7IK0Iiwi67aA65Oc65+96rKMIOuCtOumrOuKlCDqsIDsnYTruYQiLCLslYTsuajsnZgg6rOg7JqU7IaN7JeQ7IScIiwi64u57Iug7J20IOuIiOydhCDrnLAg65WMIiwi64KY64qUIOyerOu5oOuluCDruYTsg4EiLCLsm5DsnYQg6re466as64qUIOqzoOyalO2VnCDsg4jrk6TsnZgg67mE7ZaJIiwi67Ck7J2EIOuEmOyWtCDsnbTslrTsp4DripQg64KuIiwi64K0IOustOuNpCDqs4Hsl5Ag7ISc7IScIiwi7Jq47KeAIOunkOyVhOyalCIsIuuCmOuKlCDqsbDquLDsl5Ag7JeG7Jy864uIIiwi64KY64qUIOyjveyngCDslYrslZjsnLzri4giXV0sImNvZGEiOm51bGwsImlzRnJpZW5kIjp0cnVlLCJpc1VzZXIiOnRydWUsImFkZGVkQXQiOiIyMDI2LTA0LTExIn1dLCJ1c2VyTWVtb3MiOlt7ImlkIjoibV8xNzc1ODc1MTU3MDUyIiwibnVtIjozMywiY29udGVudCI6IuKAmeyXsOyVoCDssqDtlZnigJlcbuunjOuCmOqzoCBcbuq4uOuTpOydtOqzoFxu7LCoIOuyhOumsOuLpC4iLCJzcmMiOiLrr7jrk5wg65+s67iM7Iqk7Yag66asLeyhtEYu7LyA64Sk65SUICYg7LqQ66Gk66awIOuyoOyFiyDspJHsl5DshJwiLCJ0YWciOiLquLDtg4AiLCJpc1VzZXIiOnRydWUsImFkZGVkQXQiOiIyMDI2LTA0LTExIn0seyJpZCI6Im1fMTc3NTg4MTc5MjU4OCIsIm51bSI6MzQsImNvbnRlbnQiOiLrjIDspJHsnYAg7ZWt7IOBIO2VnCDshpDsl5Qg6r2D7J2EXG7tlZzshpDsl5Qg64+M7J2EIOuTpOqzoCDsnojri6jri6QiLCJzcmMiOiJb66+465OcXSDrn6zruIwg7Iqk7Yag66asIOyhtCBGLiDsvIDrhKTrlJQg7KO864uI7Ja0ICYg7LqQ66Gk66awIOuyoOyFiyDspJHsl5DshJwiLCJ0YWciOiLshLHssLAiLCJpc1VzZXIiOnRydWUsImFkZGVkQXQiOiIyMDI2LTA0LTExIn0seyJpZCI6Im1fMTc3NTk2ODU4NDk4OSIsIm51bSI6MzUsImNvbnRlbnQiOiLrkZAg67aE7J20IOuqhe2Zle2VmOqyjCBcbuqysOuhoCDrgrTrpqzsp4Ag66q77ZWY64qUIOqxtFxu7KeA6riIIOqzvOuPhOq4sOyggeyduCDsg4Htg5zsl5BcbiDqsIftmIAg7J6I6riwIOuVjOusuOydtOyXkOyalFxuIOyeoOyLnCDshJzroZwg7Jew65297J2EIOuBiuyWtOuztOuptFxuIOuqhe2Zle2eiCDrlqDsmKTrpbzqsoHri4jri6RcbiDrrLTsl4fsnbQg6re466a96rOgXG4g7ISc66Gc6rCAIOyXhuuKlCDsgrbsnbRcbiDsi6TsoJzroZwg7Ja065akIOuqqOyKteydvOyngOyalFxuXG4g65GQIOu2hOydgCDtlajqu5jtlZjsp4Drj4Qg66q77ZWY6rOgXG4g6re466CH64uk6rOgIOyEnOuhnCDrhpPsuZjrj4Qg66q77ZWY7KOgXG4g7J2066W8IOyVheusvOqzoFxuIOqysO2YvOydhCDrsoTti7DquLDrp4wg7ZWY66m07IScXG4g7LaU65297ZWY64qUIOykkeydtOyeluyVhOyalCIsInNyYyI6Ilvrr7jrk5xdIOufrOu4jCDsiqTthqDrpqwg7KG0IEYuIOy8gOuEpOuUlCDso7zri4jslrQgJiDsupDroaTrprAg67Kg7IWLIOykkeyXkOyEnCIsInRhZyI6Iuu2gOu2gCwg6rKw7Zi8LCDsnbTtmLwiLCJpc1VzZXIiOnRydWUsImFkZGVkQXQiOiIyMDI2LTA0LTEyIn0seyJpZCI6Im1fMTc3NTk2ODcwMTk4MCIsIm51bSI6MzYsImNvbnRlbnQiOiLsiqztlJTsnYAg64qYIOqxsOq4sOyXkCDsnojsnYQg6rGw656A64ukXG7tlZjsp4Drp4wg7Iqs7ZSU7J2EIOuLpOujqOuKlCDrsKnsi53snYBcbuuwlOq/gCDsiJgg7J6I7Ja0XG7slrTripAg7Iic6rCEIOq3uOqxuOuhnFxu66y07Ja46rCAIO2VoCDsiJgg7J6I64uoIOqxuCDquajri6vsp4Bcblxu7ISg7YOd7J2YIOyXrOyngOqwgCDsl4bsnLzri4jquYzsmpRcblxu7JWE64uIIOyEoO2DnSDsl6zsp4DqsIAg7JeG7J2EIOuVjFxu7Jik7Z6I66CkIOyEoO2Dne2VoCDsiJgg7J6I642U65286rOgXG7rjZQg6rmK7J20IOyIqOyWtOuyhOumrOqzoCDsi7bsnYAg66eI7J2MXG7snbTtlbTtlZzri6Rcbu2VmOyngOunjCDqvK3qvK0g7Iio64qU64uk6rOgXG7tj4nslYjsnbQg7Jik7KeA64qUIOyViuyVhFxu6re4656r64uk66m0IOuCnCDsmKTrnpjsoITsl5Bcbu2ZgOyXsO2eiCDsgqzrnbzsoYzqsqDsp4AiLCJzcmMiOiJb66+465OcXSDrn6zruIwg7Iqk7Yag66asIOyhtCBGLiDsvIDrhKTrlJQg7KO864uI7Ja0ICYg7LqQ66Gk66awIOuyoOyFiyDspJHsl5DshJwiLCJ0YWciOiLsiqztlJQsIOyDgeyLpCIsImlzVXNlciI6dHJ1ZSwiYWRkZWRBdCI6IjIwMjYtMDQtMTIifSx7ImlkIjoibV8xNzc1OTY4ODU1MDQwIiwibnVtIjozOCwiY29udGVudCI6IuyasOumrOuKlCDsmrDrpqzsnZgg6rKw64uo66Cl6rO8IOuPheumveyLrOydhFxu7J6Q656R7Iqk65+96rKMIOyXrOq4sOyngFxu6re4656Y7IScIOyWtOuWpCDtmJXtg5zsnZgg64+Z7KCV64+EXG7snKDrgpztnogg66q7IOqyrOuOjO2VtFxu7J20IOuqqOuToCDsg4Hsi6TsnYQgXG7qsqzrlJTripQg6rKDIOunjOycvOuhnOuPhCDrtoDsobHtlbTshJxcbuyasOumrCDsgrbsnbQg6rGw6riw7JeQXG7qt5zsoJUg64u57ZWY7KeAIOyViuuPhOuhnSDslaDsk7Dsp4BcbuywuCDtlLzqs6TtlZjqsozrj4Qg7IKw64ukIiwic3JjIjoiW+uvuOuTnF0g65+s67iMIOyKpO2GoOumrCDsobQgRi4g7LyA64Sk65SUIOyjvOuLiOyWtCAmIOy6kOuhpOumsCDrsqDshYsg7KSR7JeQ7IScIiwidGFnIjoi7IK2IiwiaXNVc2VyIjp0cnVlLCJhZGRlZEF0IjoiMjAyNi0wNC0xMiJ9LHsiaWQiOiJtXzE3NzU5Njg5MDg0MjkiLCJudW0iOjM4LCJjb250ZW50Ijoi64SkIOyatOuqheydgCDsoJXtlbTsoLgg7J6I64uk6rOgXG7sg53qsIHtlbQg7JmU642YIOqxsCDslYzslYRcbuq3uOugh+uLpOqzoCDrrLTsl4frj4RcbuuwlOq+uOyngCDrqrvtlZzri6TripQg6rG0IOyVhOuLiOyVvCIsInNyYyI6Ilvrr7jrk5xdIOufrOu4jCDsiqTthqDrpqwg7KG0IEYuIOy8gOuEpOuUlCDso7zri4jslrQgJiDsupDroaTrprAg67Kg7IWLIOykkeyXkOyEnCIsInRhZyI6IuyCtiIsImlzVXNlciI6dHJ1ZSwiYWRkZWRBdCI6IjIwMjYtMDQtMTIifV0sInVzZXJFZGl0cyI6eyI3NSI6eyJ0aXRsZSI6IjExOSIsImRhdGUiOiIyMDEz64WEIDA37JuUIiwidGFnIjoi6rCA7KGxIiwibGluZXMiOltbIjExOeyXkCDsmYDsnbTtlITqsIAg7Iuk66Ck6rCU64ukLiIsIuuCnCDqt7jrlYzquYzsp4Ag7JWE65Ok6rO8IOusuOyekOulvCDso7zqs6Ag67Cb7JWY64ukLiIsIuq3gOyXlCDsnbTslrTtj7DsnYQg64G86rOgIiwi7Iig7ZWc7J6U7JeQIOyLnOumhOydhCDri6zrnpjrqbAg64K0IOyEnOq4gO2UiOyYge2YvOqzvCIsIuynoO2VnCDrp4jsnYzsnZgg64+Z7JqU66W8IOydtO2VtOudvOuPhCDtlbQg64us656Y65OvIiwi7JWM65S47ZWcIOyIoOq4sOyatOyXkCDrrZTqsIAg6rCA7Iq07IaN7JeQIiwi7Jq467aE7J2EIO2GoO2VmOupsCDsnYzslYXsnYQg65Oj6rOgIOyeiOyXiOuLpC4iLCLslYTri4gg7JmA7J207ZSE7J2YIOyauOu2gOynluydjOydhCDsmbjrqbTtlZjqs6AiLCLsnojsl4jripTsp4Drj4Qg66qo66W464ukLiIsIuuCmOuPhCDtnpjrk6Tqs6Ag7JmA7J207ZSE7J2YIOuLteuLte2VqOyXkCIsIuynhOyggOumrOy5mOqzoCDsnojsl4jripTrjbAuLiIsIuuKkOuLt+yXhuuKlCDsmYDsnbTtlITsnZgg64+M67Cc7KCBIOqzoO2GteyXkCIsIuyytCDrhoDrnoQg6rKo66W87JeG7J20IOygleunkCDslrzrlqjqsrDsl5Ag6rWs6riJ7LCo7JeQIiwi64+Z7Iq57ZW0IOupgOqxsOuLiCDsuajrjIAg66i466as66eh7JeQIOyVieyVhCIsIuungeqxsOulvCDrsJTrnbzrs7Tqs6Ag7JWJ7JWE7JWY64ukLiIsIjHsi5zqsITrsJjsnbQg7Ja47KCcIOyngOuCmOqwiOq5jD8iLCLrsIDroKTsmKTripQg7Iig6riw7Jq07J2AIOydkeq4ieyLpOydmCDsnITquIntlajsnYAiLCLsoIAg66mA66as7ZWc7LK0IOq3uOyggCDrsIDroKTsmKTripQg7J6g6riw7Jq07J20IOuCoCDrmJAg6re466asIiwi66y06riw66Cl7ZWcIOyCrOuejOycvOuhnCDrgrTri7rripTri6QuIiwi7IOd7KCEIOuTo+uPhOuztOuPhCDrqrvtlZwg7KCE7ZW07KeIIOusuOygnOyduOqwgCDsi7bri6TtlZzri6QuIiwi64KcIOyVhOustOqyg+uPhCDtlaAg7IiY6rCAIO2VoCDsiJjrj4Qg7JeG64ukLiIsIuq3uOyggCDrsJTrnbzrs7wg67+QLCwiLCLslYTtlIjqsoPrj4Qg7JWE64uI6rOgIOyKrO2UiOqyg+uPhCDslYTri4jri6QuIiwi64uk66eMIOydtCDsiJzqsIQg7Ja07KmU7IiYIOyXhuuKlCDrgpjslb3tlZjqs6Ag7Z6Y7JeG64qUIiwi7J6Q7Iug7J20IOyZnOq3uOumrCDshJzquIDtlIjqspDsp4AuLi4iLCLrr7jslYjtlZjri6QuLiIsIuyCrOueke2VnOuLpC4uLiIsIuuEpOqwgCDsspjtlZwg7ZiV7Y64IOuCtCDrjIDsi6DtlbTspIQg7IiYIOyeiOuKlOqyjOudvOuptCIsIuuCmC4u6re466asIO2VmOumrOudvC4uIiwi7Iuc6rCE7J2AIOyZnCDqt7jrpqzrj4Qg642U65SU6rKM66eMIOqwgOuKlOyngC4uLiIsIuuvuOyViO2VmOuLpC4uIOyCrOueke2VnOuLpC4uLiDigJQg7J2R6riJ7IukIOungeqxsCDsmIbsl5DshJwuIl1dLCJjb2RhIjpudWxsfSwidV8xNzc1ODk3NTY3MDY5Ijp7InRpdGxlIjoi7LaU64+E7IKsIiwiZGF0ZSI6IjIwMjbrhYQgNOyblCIsInRhZyI6IuyEseywsCIsImxpbmVzIjpbWyLso73snYzsnYAg7JWE66y06rKD64+EIOyVhOuLmeuLiOuLpC4iLCLsoITtmIAg7KSR7JqU7ZWY7KeAIOyViuyKteuLiOuLpC4iLCLrgpjripQg6re47KCAIOyYhuuwqeycvOuhnCDqsbTrhIjqsJTsnYQg67+QIiwi7JWE66y07J2864+EIOydvOyWtOuCmOyngCDslYrslZjsirXri4jri6QuIiwi66qo65OgIOqyg+ydgCDsmIjsoIQg6re464yA66Gc7J6F64uI64ukLiJdLFsi64KY64qUIOuCmOydtOqzoCwgIOuLueyLoOydgCDri7nsi6AiLCLsmrDrpqzqsIAg6re47Yag66GdIOuLpOygle2eiCIsIu2VqOq7mCDsgrTslYTsmKgg6re4IOyYmyDsgrbsnYAiLCLshpDrjIDsp4Ag7JWK7J2AIOyxhCIsIuuzgO2VqOyXhuydtCDrgqjslYQg7J6I7Iq164uI64ukLiJdLFsi7Jqw66as6rCAIOyEnOuhnOyXkOqyjCDrrLTsl4fsnbTsl4jrk6AiLCLsp4DquIjrj4Qg7Jes7KCE7Z6IIOq3uOugh+yKteuLiOuLpC4iLCLripgg67aA66W0642YIO2YuOy5reycvOuhnCIsIuuCmOulvCDrtojrn6wg7KO87IS47JqUIiwi64qYIOq3uOuemOyZlOuTryDtjrjslYjtlZjqsowiLCLrgpjrpbwg66eQ7ZW0IOyjvOyEuOyalCIsIuunkO2IrOulvCDrsJTqvrjsp4Ag66eQ7JWE7JqUIiwi7IiZ7Jew7ZWo64+EIOyKrO2UlOuPhCIsIuyWteyngOuhnCDqvrjrqbAg7J6F7KeAIOunkOyVhOyalCIsIuyCtuydgCDsl6zsoITtnogiLCLsmIjsoITqs7wg6rCZ7J2AIOydmOuvuOulvCDsp4Dri5nri4jri6QuIiwi64us65287KeEIOqyg+ydgCDsl4bsirXri4jri6QuIl0sWyLrgrQg66y0642kIOqzgeyXkCDshJzshJwiLCLtnZDripDrgbzsp4Ag66eQ7JWE7JqUIiwi64KY64qUIOqxsOq4sOyXkCDsl4bsnLzri4giLCLrgpjripQg7IiY7LKcIOqwiOuemOydmCDrsJTrnowiLCLriIgg7JyE7J2YIOywrOuegO2VnCDshKTqtJEiLCLtmanquIgg65Ok7YyQ7JeQIOuCtOumrOyskOuKlCDtlofsgrQiLCLrtoDrk5zrn73qsowg64K066as64qUIOqwgOydhOu5hCIsIuyVhOy5qOydmCDqs6DsmpTsho3sl5DshJwiLCLri7nsi6DsnbQg64iI7J2EIOucsCDrlYwiLCLrgpjripQg7J6s67mg66W4IOu5hOyDgSIsIuybkOydhCDqt7jrpqzripQg6rOg7JqU7ZWcIOyDiOuTpOydmCDruYTtlokiLCLrsKTsnYQg64SY7Ja0IOydtOyWtOyngOuKlCDrgq4iXSxbIuuCtCDrrLTrjaQg6rOB7JeQIOyEnOyEnCIsIuyauOyngCDrp5DslYTsmpQiLCLrgpjripQg6rGw6riw7JeQIOyXhuycvOuLiCIsIuuCmOuKlCDso73sp4Ag7JWK7JWY7Jy864uIIl1dLCJjb2RhIjpudWxsfX0sInVzZXJEZWxldGVkIjpbMjA3XX0='));if(d.userEntries)d.userEntries.forEach(e=>{if(!userEntries.find(x=>x.id===e.id))userEntries.push(e)});if(d.userMemos)d.userMemos.forEach(m=>{if(!userMemos.find(x=>x.id===m.id))userMemos.push(m)});if(d.userEdits)Object.assign(userEdits,d.userEdits);if(d.userDeleted)userDeleted=[...new Set([...userDeleted,...d.userDeleted])];localStorage.setItem('hj_entries',JSON.stringify(userEntries));localStorage.setItem('hj_umemos',JSON.stringify(userMemos));localStorage.setItem('hj_edits',JSON.stringify(userEdits));localStorage.setItem('hj_deleted',JSON.stringify(userDeleted));}catch(e){}})();</script></body>','<script>'+inject+'</sc'+'ript></body>');
+  // 기존 임베디드 데이터 블록을 정규식으로 제거 후 새 데이터로 교체
+  pageHtml=pageHtml.replace(/<script>[\s\S]*?\/\* ══ EMBEDDED USER DATA ══ \*\/[\s\S]*?<\/script>\s*<\/body>/,'<script>\n'+inject+'\n<\/sc'+'ript>\n<\/body>');
+  // 교체가 안 됐으면 (최초 저장) </body> 바로 앞에 삽입
+  if(!pageHtml.includes('EMBEDDED USER DATA')){
+    pageHtml=pageHtml.replace('</body>','<script>\n'+inject+'\n<\/sc'+'ript>\n</body>');
+  }
   const blob=new Blob([pageHtml],{type:'text/html;charset=utf-8'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download='heunjuk_v9.html';
   a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
   showToastMsg('데이터 포함 HTML이 저장되었습니다 📄');
 }
-
 function importBackup(e){
   const file=e.target.files[0]; if(!file)return;
   const r=new FileReader();
