@@ -1295,7 +1295,8 @@ footer em { font-style: italic; color: rgba(184,147,90,0.62); }
   .q-card blockquote { font-size: 0.9rem; }
 
   /* 스크롤 버튼 */
-  .scroll-top-btn { bottom: 20px; right: 16px; width: 40px; height: 40px; font-size: 1rem; }
+  .scroll-top-btn { bottom: 20px; right: 16px; width: 44px; height: 44px; font-size: 1rem; }
+  #helpBtn { bottom: 20px; left: 16px; width: 44px; height: 44px; font-size: 1rem; opacity: 0.75; }
 
   /* 서문 모바일 */
   .overture { padding: 60px 0 50px; grid-template-columns: 1fr; gap: 28px; }
@@ -1310,6 +1311,7 @@ footer em { font-style: italic; color: rgba(184,147,90,0.62); }
   /* 안전 영역 (노치/홈바) */
   body { padding-bottom: env(safe-area-inset-bottom); }
   .scroll-top-btn { bottom: calc(20px + env(safe-area-inset-bottom)); }
+  #helpBtn { bottom: calc(20px + env(safe-area-inset-bottom)); }
 }
 
 @media(max-width:480px){
@@ -1327,7 +1329,7 @@ footer em { font-style: italic; color: rgba(184,147,90,0.62); }
     display: inline-flex;
     align-items: center;
   }
-  .scroll-top-btn { min-width: 44px; min-height: 44px; }
+  .scroll-top-btn, #helpBtn { min-width: 44px; min-height: 44px; }
 }
 
 
@@ -1519,6 +1521,7 @@ footer em { font-style: italic; color: rgba(184,147,90,0.62); }
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
+/* 두 버튼 공통 모바일 override는 아래에서 일괄 처리 */
 .scroll-top-btn.visible {
   opacity: 1;
   pointer-events: auto;
@@ -2023,31 +2026,28 @@ footer em { font-style: italic; color: rgba(184,147,90,0.62); }
 #helpBtn {
   position: fixed;
   bottom: 36px;
-  left: 24px;
+  left: 32px;
   z-index: 900;
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: var(--ink);
   border: 1px solid rgba(184,147,90,0.35);
   color: var(--gold);
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   opacity: 0.72;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   transition: all 0.25s;
   font-family: var(--serif);
   font-style: italic;
   letter-spacing: -0.02em;
 }
-#helpBtn:hover { opacity: 1; transform: scale(1.08); box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
-@media(max-width:480px){
-  #helpBtn { bottom: calc(20px + env(safe-area-inset-bottom)); left: 16px; width: 36px; height: 36px; font-size: 0.9rem; }
-}
+#helpBtn:hover { opacity: 1; transform: scale(1.08); box-shadow: 0 6px 28px rgba(184,147,90,0.35); }
 
 /* 오버레이 배경 */
 #helpOverlay {
