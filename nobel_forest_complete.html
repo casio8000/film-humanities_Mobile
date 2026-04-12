@@ -200,7 +200,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════
-   NAV WRAP — 드롭다운 통합 네비게이션
+   NAV WRAP — 두 줄 고정 네비게이션
 ═══════════════════════════════════════════ */
 .nav-wrap {
   position: sticky;
@@ -213,31 +213,38 @@ body {
   padding-top: env(safe-area-inset-top);
 }
 
-/* ── 작품 스크롤 네비바 ── */
+/* ── 1행: 브랜드 + 작품 스크롤바 ── */
+.nav-row1 {
+  display: flex;
+  align-items: stretch;
+  height: 40px;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
 .nav-book-bar {
-  border-top: 1px solid var(--border);
+  flex: 1;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(184,147,90,0.4) transparent;
+  scrollbar-color: rgba(184,147,90,0.45) transparent;
   -webkit-overflow-scrolling: touch;
   white-space: nowrap;
-  background: rgba(247,244,238,0.97);
+  min-width: 0;
 }
 .nav-book-bar::-webkit-scrollbar { height: 2px; }
 .nav-book-bar::-webkit-scrollbar-thumb { background: rgba(184,147,90,0.5); border-radius: 2px; }
 .nav-book-inner {
   display: inline-flex;
   align-items: center;
-  padding: 0 14px;
+  padding: 0 10px 0 2px;
   gap: 0;
-  height: 36px;
+  height: 40px;
 }
 .nav-book-link {
   font-size: 0.72rem;
   color: var(--ink3);
   text-decoration: none;
-  padding: 4px 9px;
+  padding: 3px 9px;
   border-radius: 16px;
   white-space: nowrap;
   flex-shrink: 0;
@@ -256,31 +263,45 @@ body {
   margin: 0 1px;
   display: inline-block;
 }
-@media(max-width:768px){
-  .nav-book-inner { height: 34px; padding: 0 10px; }
-  .nav-book-link { font-size: 0.68rem; padding: 3px 8px; }
-}
+
+/* ── 2행: 카테고리 + 검색 ── */
+.nav-top {
   display: flex;
   align-items: center;
-  height: 52px;
-  padding: 0 20px;
+  height: 46px;
+  padding: 0 16px;
   gap: 6px;
 }
+
 @media(max-width:768px){
-  .nav-top { height: 48px; padding: 0 14px; gap: 4px; }
+  .nav-row1 { height: 36px; }
+  .nav-book-inner { height: 36px; padding: 0 8px 0 2px; }
+  .nav-book-link { font-size: 0.68rem; padding: 3px 7px; }
+  .nav-top { height: 42px; padding: 0 12px; gap: 4px; }
 }
+@media(max-width:480px){
+  .nav-book-link { font-size: 0.65rem; padding: 2px 6px; }
+  .nav-top { height: 40px; padding: 0 10px; gap: 3px; }
+}
+
 
 .nav-brand {
   font-family: var(--serif);
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-style: italic;
   color: var(--gold);
   white-space: nowrap;
-  margin-right: 10px;
+  padding: 0 10px 0 16px;
   flex-shrink: 0;
   letter-spacing: 0.02em;
+  border-right: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
-@media(max-width:480px){ .nav-brand { display: none; } }
+@media(max-width:480px){
+  .nav-brand { font-size: 0.8rem; padding: 0 8px 0 10px; }
+}
 
 /* ── 카테고리 탭 그룹 ── */
 .nav-cats {
@@ -391,11 +412,12 @@ body {
   font-weight: 500;
 }
 @media(max-width:600px){
-  .nav-search-wrap { max-width: 130px; }
+  .nav-search-wrap { max-width: 120px; padding: 4px 10px 4px 8px; }
 }
-@media(max-width:380px){
-  .nav-search-wrap { max-width: 100px; }
-  .nav-search-input { font-size: 0.72rem; }
+@media(max-width:420px){
+  .nav-search-wrap { max-width: 88px; padding: 4px 8px 4px 7px; }
+  .nav-search-input { font-size: 0.7rem; }
+  .nav-search-icon { display: none; }
 }
 
 /* ═══════════════════════════════════════════
@@ -1555,10 +1577,18 @@ function handleImgError(img) {
 <!-- ══ NAV ═════════════════════════════════════════════ -->
 <div class="nav-wrap" id="navWrap">
 
-  <!-- 상단 바: 브랜드 + 카테고리 탭 + 검색 -->
-  <div class="nav-top">
+  <!-- 1행: 브랜드 + 작품 스크롤 네비바 -->
+  <div class="nav-row1">
     <span class="nav-brand">문장의 숲</span>
+    <div class="nav-book-bar" id="navBookBar">
+      <div class="nav-book-inner" id="navBookInner">
+        <a class="nav-book-link" href="#book1">노인과 바다</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book2">이방인</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book3">백년의 고독</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book4">벨러브드</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book5">채식주의자</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book6">죄와 벌</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book7">변신</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book8">설국</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book9">파친코</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book10">지상의 양식</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book11">데미안</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book12">위대한 개츠비</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book13">존재의 가벼움</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book14">안나 카레니나</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book15">1984</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book16">소년이 온다</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book17">아몬드</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book18">82년생 김지영</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book19">나미야 잡화점의 기적</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book20">어린 왕자</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book21">연금술사</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book22">카라마조프의 형제들</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book23">노르웨이의 숲</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book24">오만과 편견</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book25">미드나이트 라이브러리</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book26">모래의 여자</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book27">파우스트</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book28">그리스인 조르바</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book29">위험한 관계</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book30">해변의 카프카</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book31">앵무새 죽이기</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book32">보바리 부인</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book33">폭풍의 언덕</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book34">호밀밭의 파수꾼</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book35">제인 에어</a>
+      </div>
+    </div>
+  </div>
 
+  <!-- 2행: 카테고리 탭 + 검색 -->
+  <div class="nav-top">
     <div class="nav-cats">
       <button class="nav-cat-btn active" data-cat="classic">
         <span class="cat-icon">📜</span>
@@ -1655,46 +1685,7 @@ function handleImgError(img) {
   <!-- 외부 클릭 감지는 JS document.click으로 처리 -->
 </div>
 
-<!-- ══ 작품 스크롤 네비바 ═══════════════════════════════════ -->
-<div class="nav-book-bar" id="navBookBar">
-  <div class="nav-book-inner" id="navBookInner">
-    <a class="nav-book-link" href="#book1">노인과 바다</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book2">이방인</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book3">백년의 고독</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book4">벨러브드</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book5">채식주의자</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book6">죄와 벌</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book7">변신</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book8">설국</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book9">파친코</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book10">지상의 양식</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book11">데미안</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book12">위대한 개츠비</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book13">존재의 가벼움</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book14">안나 카레니나</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book15">1984</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book16">소년이 온다</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book17">아몬드</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book18">82년생 김지영</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book19">나미야 잡화점의 기적</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book20">어린 왕자</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book21">연금술사</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book22">카라마조프의 형제들</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book23">노르웨이의 숲</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book24">오만과 편견</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book25">미드나이트 라이브러리</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book26">모래의 여자</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book27">파우스트</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book28">그리스인 조르바</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book29">위험한 관계</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book30">해변의 카프카</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book31">앵무새 죽이기</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book32">보바리 부인</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book33">폭풍의 언덕</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book34">호밀밭의 파수꾼</a><span class="nav-book-sep">·</span>
-    <a class="nav-book-link" href="#book35">제인 에어</a>
-  </div>
-</div>
+
 
 <!-- ══ SCROLL TOP BTN ════════════════════════════════════════ -->
 <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="맨 위로">↑</button>
