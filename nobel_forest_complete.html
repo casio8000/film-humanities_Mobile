@@ -397,7 +397,7 @@ body {
   border: none;
   background: transparent;
   font-family: var(--sans);
-  font-size: 0.76rem;
+  font-size: 16px;
   color: var(--ink);
   outline: none;
   width: 100%;
@@ -411,29 +411,13 @@ body {
   flex-shrink: 0;
   font-weight: 500;
 }
-/* 모바일: 검색창을 카테고리 버튼 바로 옆으로, 텍스트 완전히 표시 */
-@media(max-width:768px){
-  .nav-top { flex-wrap: nowrap; }
-  .nav-search-wrap {
-    margin-left: 6px;
-    max-width: none;
-    flex: 1;
-    min-width: 0;
-    padding: 5px 10px 5px 9px;
-  }
-  .nav-search-input {
-    font-size: 0.73rem;
-    min-width: 0;
-    width: 100%;
-  }
+@media(max-width:600px){
+  .nav-search-wrap { max-width: 120px; padding: 4px 10px 4px 8px; }
 }
-@media(max-width:480px){
-  .nav-search-wrap {
-    margin-left: 4px;
-    padding: 4px 9px 4px 8px;
-  }
-  .nav-search-input { font-size: 0.71rem; }
-  .nav-search-icon { display: flex; }
+@media(max-width:420px){
+  .nav-search-wrap { max-width: 88px; padding: 4px 8px 4px 7px; }
+  .nav-search-input { font-size: 16px; }
+  .nav-search-icon { display: none; }
 }
 
 /* ═══════════════════════════════════════════
@@ -1558,6 +1542,369 @@ footer em { font-style: italic; color: rgba(184,147,90,0.6); }
   .hero-shelf-books { gap: 5px; }
 }
 
+
+/* ═══════════════════════════════════════════
+   NAV WRAP — 심플 브랜드바
+═══════════════════════════════════════════ */
+.nav-brand-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 46px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+}
+.nav-toc-btn {
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+.nav-toc-btn:hover { background: var(--gold2); transform: translateY(-1px); }
+@media(max-width:480px){
+  .nav-brand-bar { padding: 0 14px; height: 42px; }
+  .nav-toc-btn { font-size: 0.74rem; padding: 5px 13px; }
+}
+
+/* ═══════════════════════════════════════════
+   목차 (TOC)
+═══════════════════════════════════════════ */
+.toc-wrap {
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  border-bottom: 3px solid var(--gold3);
+  padding: 40px clamp(20px, 4vw, 60px);
+  max-width: 1300px;
+  margin: 0 auto 0;
+}
+.toc-header { margin-bottom: 22px; }
+.toc-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.toc-main-title {
+  font-family: var(--serif);
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 400;
+  color: var(--ink);
+}
+.toc-total {
+  font-size: 0.75rem;
+  color: var(--ink3);
+  letter-spacing: 0.06em;
+}
+.toc-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.toc-tab {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  color: var(--ink3);
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.toc-tab:hover { border-color: var(--gold); color: var(--gold); }
+.toc-tab.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+  font-weight: 500;
+}
+.toc-tab-cnt {
+  font-size: 0.7rem;
+  opacity: 0.75;
+  margin-left: 2px;
+}
+
+/* 목차 검색 */
+.toc-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cream2);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 8px 16px 8px 14px;
+  max-width: 360px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 24px;
+}
+.toc-search-wrap:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(184,147,90,0.12);
+  background: var(--white);
+}
+.toc-search-icon { font-size: 0.85rem; opacity: 0.5; flex-shrink: 0; }
+.toc-search-input {
+  border: none;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 16px; /* iOS 줌 방지 */
+  color: var(--ink);
+  outline: none;
+  flex: 1;
+  min-width: 0;
+}
+.toc-search-input::placeholder { color: var(--ink3); }
+.toc-search-count {
+  font-size: 0.72rem;
+  color: var(--gold);
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.toc-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink3);
+  font-size: 0.8rem;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.toc-search-clear:hover { opacity: 1; }
+
+/* 목차 항목 그리드 */
+.toc-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 4px;
+}
+.toc-item {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--ink2);
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.toc-item:hover {
+  background: rgba(184,147,90,0.08);
+  border-color: rgba(184,147,90,0.2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.toc-item:active { background: rgba(184,147,90,0.16); transform: none; }
+.toc-num {
+  font-family: var(--serif);
+  font-size: 0.68rem;
+  color: var(--gold);
+  opacity: 0.7;
+  text-align: right;
+}
+.toc-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.3;
+  word-break: keep-all;
+}
+.toc-author {
+  font-size: 0.68rem;
+  color: var(--ink3);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+}
+@media(max-width:768px){
+  .toc-body { grid-template-columns: 1fr 1fr; gap: 3px; }
+  .toc-item { padding: 8px 10px; }
+  .toc-author { display: none; }
+  .toc-search-wrap { max-width: 100%; }
+}
+@media(max-width:480px){
+  .toc-body { grid-template-columns: 1fr; }
+  .toc-tabs { gap: 4px; }
+  .toc-tab { font-size: 0.72rem; padding: 4px 11px; }
+}
+
+/* 검색 결과 없음 (목차 내) */
+.toc-no-result {
+  display: none;
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 32px;
+  color: var(--ink3);
+  font-size: 0.9rem;
+}
+
+/* ── nav badges (고전/현대/노벨 수 표시) ── */
+.nav-badges {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex: 1;
+  padding: 0 10px;
+  flex-wrap: wrap;
+}
+.nav-badge {
+  font-size: 0.68rem;
+  padding: 3px 9px;
+  border-radius: 12px;
+  white-space: nowrap;
+  font-family: var(--sans);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.nav-badge-classic { background: rgba(90,78,60,0.1); color: var(--ink3); border: 1px solid var(--border); }
+.nav-badge-modern  { background: rgba(184,147,90,0.1); color: var(--gold); border: 1px solid rgba(184,147,90,0.25); }
+.nav-badge-nobel   { background: rgba(184,147,90,0.18); color: var(--gold); border: 1px solid rgba(184,147,90,0.35); font-weight:500; }
+
+@media(max-width:600px){
+  .nav-badges { gap: 3px; }
+  .nav-badge { font-size: 0.62rem; padding: 2px 7px; }
+}
+@media(max-width:400px){
+  .nav-badges { display: none; }
+}
+
+/* ── nav TOC toggle button ── */
+.nav-toc-btn {
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-toc-btn:hover { background: var(--gold2); }
+.nav-toc-btn .nav-toc-btn-arrow {
+  font-size: 0.6rem;
+  transition: transform 0.25s;
+  display: inline-block;
+}
+.nav-toc-btn.open .nav-toc-btn-arrow { transform: rotate(180deg); }
+
+/* ── nav TOC drawer (접이식) ── */
+.nav-toc-drawer {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1);
+  background: var(--white);
+  border-top: 0px solid var(--border);
+}
+.nav-toc-drawer.open {
+  max-height: 480px;
+  border-top-width: 1px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 20px 20px;
+}
+@media(max-width:768px){
+  .nav-toc-drawer.open { max-height: 360px; padding: 12px 14px 16px; }
+}
+
+/* toc-body inside drawer */
+.nav-toc-drawer .toc-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 3px;
+}
+@media(max-width:600px){
+  .nav-toc-drawer .toc-body { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width:400px){
+  .nav-toc-drawer .toc-body { grid-template-columns: 1fr; }
+}
+
+/* ── hero-scroll 모바일 중앙정렬 완전 수정 ── */
+.hero-scroll {
+  position: absolute;
+  bottom: 36px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  color: rgba(240,235,220,0.4);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  animation: fadeSlideDown 1.2s 0.8s ease both;
+  z-index: 3;
+  white-space: nowrap;
+  width: 100%;
+  transform: none;
+  pointer-events: none;
+}
+/* 기존 left:50%; transform:translateX(-50%) 오버라이드 */
+@media(max-width:768px){
+  .hero-scroll {
+    bottom: 20px;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+  }
+}
+
+
+/* ── 히어로 제작자 크레딧 ── */
+.hero-creator {
+  position: absolute;
+  bottom: 100px;
+  left: 0; right: 0;
+  text-align: center;
+  font-family: var(--serif);
+  font-size: 0.68rem;
+  font-style: italic;
+  color: rgba(240,235,220,0.3);
+  letter-spacing: 0.12em;
+  z-index: 3;
+  pointer-events: none;
+}
+@media(max-width:768px){
+  .hero-creator { bottom: 80px; font-size: 0.62rem; }
+}
+
+/* ── 제작자 크레딧 ── */
+.creator-credit {
+  text-align: center;
+  padding: 14px 20px;
+  font-size: 0.72rem;
+  color: rgba(160,150,130,0.5);
+  letter-spacing: 0.06em;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.creator-credit em { font-style: italic; color: rgba(184,147,90,0.55); }
 </style>
 <script>
 function handleImgError(img) {
@@ -1584,6 +1931,9 @@ function handleImgError(img) {
       당신이 혼자 걸어온 그 길을 이미 알고 있다고 말할 뿐이다.
     </p>
   </div>
+  <div class="hero-creator">
+    <em>Co-created by 지혜의 쉼터(엠버골드) with Claude · © 2026</em>
+  </div>
   <div class="hero-scroll">
     <div class="hero-scroll-bar"></div>
     내려가기
@@ -1592,113 +1942,85 @@ function handleImgError(img) {
 
 <!-- ══ NAV ═════════════════════════════════════════════ -->
 <div class="nav-wrap" id="navWrap">
-
-  <!-- 1행: 브랜드 + 작품 스크롤 네비바 -->
-  <div class="nav-row1">
+  <div class="nav-brand-bar">
     <span class="nav-brand">문장의 숲</span>
-    <div class="nav-book-bar" id="navBookBar">
-      <div class="nav-book-inner" id="navBookInner">
-        <a class="nav-book-link" href="#book1">노인과 바다</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book2">이방인</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book3">백년의 고독</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book4">벨러브드</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book5">채식주의자</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book6">죄와 벌</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book7">변신</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book8">설국</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book9">파친코</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book10">지상의 양식</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book11">데미안</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book12">위대한 개츠비</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book13">존재의 가벼움</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book14">안나 카레니나</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book15">1984</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book16">소년이 온다</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book17">아몬드</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book18">82년생 김지영</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book19">나미야 잡화점의 기적</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book20">어린 왕자</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book21">연금술사</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book22">카라마조프의 형제들</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book23">노르웨이의 숲</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book24">오만과 편견</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book25">미드나이트 라이브러리</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book26">모래의 여자</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book27">파우스트</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book28">그리스인 조르바</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book29">위험한 관계</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book30">해변의 카프카</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book31">앵무새 죽이기</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book32">보바리 부인</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book33">폭풍의 언덕</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book34">호밀밭의 파수꾼</a><span class="nav-book-sep">·</span><a class="nav-book-link" href="#book35">제인 에어</a>
-      </div>
+    <div class="nav-badges">
+      <span class="nav-badge nav-badge-classic">📜 고전 38</span>
+      <span class="nav-badge nav-badge-modern">✨ 현대 12</span>
+      <span class="nav-badge nav-badge-nobel">🏅 노벨 10</span>
+    </div>
+    <button class="nav-toc-btn" id="navTocToggle" aria-expanded="false">
+      <span class="nav-toc-btn-text">📚 목차</span>
+      <span class="nav-toc-btn-arrow">▾</span>
+    </button>
+  </div>
+  <!-- 접이식 목차 -->
+  <div class="nav-toc-drawer" id="navTocDrawer" aria-hidden="true">
+    <div class="toc-search-wrap" style="margin:0 0 14px 0;max-width:100%;">
+      <span class="toc-search-icon">🔍</span>
+      <input type="search" id="tocSearchInput" class="toc-search-input" placeholder="작품명·작가 검색..." autocomplete="off" autocorrect="off" spellcheck="false" style="font-size:16px;">
+      <span class="toc-search-count" id="tocSearchCount"></span>
+      <button class="toc-search-clear" id="tocSearchClear" style="display:none;">✕</button>
+    </div>
+    <div class="toc-tabs" style="margin-bottom:12px;">
+      <button class="toc-tab active" data-filter="all">전체 <span class="toc-tab-cnt">50</span></button>
+      <button class="toc-tab" data-filter="classic">📜 고전 <span class="toc-tab-cnt">38</span></button>
+      <button class="toc-tab" data-filter="modern">✨ 현대 <span class="toc-tab-cnt">12</span></button>
+      <button class="toc-tab" data-filter="nobel">🏅 노벨 <span class="toc-tab-cnt">10</span></button>
+    </div>
+    <div class="toc-body" id="tocBody">
+    <a class="toc-item" href="#book15" data-era="classic" data-nobel="false"><span class="toc-num">15</span><span class="toc-title">1984</span><span class="toc-author">Nineteen Eighty-Four</span></a>
+    <a class="toc-item" href="#book18" data-era="modern" data-nobel="false"><span class="toc-num">18</span><span class="toc-title">82년생 김지영</span><span class="toc-author">Kim Jiyoung</span></a>
+    <a class="toc-item" href="#book50" data-era="modern" data-nobel="false"><span class="toc-num">50</span><span class="toc-title">갈매기의 꿈</span><span class="toc-author">Jonathan Livingston Seagull</span></a>
+    <a class="toc-item" href="#book28" data-era="classic" data-nobel="false"><span class="toc-num">28</span><span class="toc-title">그리스인 조르바</span><span class="toc-author">Zorba the Greek</span></a>
+    <a class="toc-item" href="#book19" data-era="modern" data-nobel="false"><span class="toc-num">19</span><span class="toc-title">나미야 잡화점의기적</span><span class="toc-author">Miracles of the Namiya General Store</span></a>
+    <a class="toc-item" href="#book23" data-era="modern" data-nobel="false"><span class="toc-num">23</span><span class="toc-title">노르웨이의 숲</span><span class="toc-author">ノルウェイの森</span></a>
+    <a class="toc-item" href="#book1" data-era="classic" data-nobel="true"><span class="toc-num">01</span><span class="toc-title">노인과 바다 🏅</span><span class="toc-author">The Old Man and the Sea</span></a>
+    <a class="toc-item" href="#book36" data-era="classic" data-nobel="true"><span class="toc-num">36</span><span class="toc-title">눈먼 자들의도시 🏅</span><span class="toc-author">Ensaio sobre a Cegueira</span></a>
+    <a class="toc-item" href="#book11" data-era="classic" data-nobel="false"><span class="toc-num">11</span><span class="toc-title">데미안</span><span class="toc-author">Demian</span></a>
+    <a class="toc-item" href="#book47" data-era="classic" data-nobel="false"><span class="toc-num">47</span><span class="toc-title">돈키호테</span><span class="toc-author">Don Quijote de la Mancha</span></a>
+    <a class="toc-item" href="#book42" data-era="classic" data-nobel="false"><span class="toc-num">42</span><span class="toc-title">동물농장</span><span class="toc-author">Animal Farm</span></a>
+    <a class="toc-item" href="#book49" data-era="classic" data-nobel="false"><span class="toc-num">49</span><span class="toc-title">멋진 신세계</span><span class="toc-author">Brave New World</span></a>
+    <a class="toc-item" href="#book26" data-era="classic" data-nobel="false"><span class="toc-num">26</span><span class="toc-title">모래의 여자</span><span class="toc-author">砂の女</span></a>
+    <a class="toc-item" href="#book48" data-era="classic" data-nobel="false"><span class="toc-num">48</span><span class="toc-title">모비딕</span><span class="toc-author">Moby-Dick; or</span></a>
+    <a class="toc-item" href="#book25" data-era="modern" data-nobel="false"><span class="toc-num">25</span><span class="toc-title">미드나이트라이브러리</span><span class="toc-author">The Midnight Library</span></a>
+    <a class="toc-item" href="#book3" data-era="classic" data-nobel="true"><span class="toc-num">03</span><span class="toc-title">백년 동안의고독 🏅</span><span class="toc-author">Cien años de soledad</span></a>
+    <a class="toc-item" href="#book4" data-era="classic" data-nobel="true"><span class="toc-num">04</span><span class="toc-title">벨러브드 🏅</span><span class="toc-author">Beloved</span></a>
+    <a class="toc-item" href="#book7" data-era="classic" data-nobel="false"><span class="toc-num">07</span><span class="toc-title">변신</span><span class="toc-author">Die Verwandlung</span></a>
+    <a class="toc-item" href="#book32" data-era="classic" data-nobel="false"><span class="toc-num">32</span><span class="toc-title">보바리 부인</span><span class="toc-author">Madame Bovary</span></a>
+    <a class="toc-item" href="#book8" data-era="classic" data-nobel="true"><span class="toc-num">08</span><span class="toc-title">설국 🏅</span><span class="toc-author">雪国</span></a>
+    <a class="toc-item" href="#book16" data-era="modern" data-nobel="false"><span class="toc-num">16</span><span class="toc-title">소년이 온다</span><span class="toc-author">Human Acts</span></a>
+    <a class="toc-item" href="#book45" data-era="modern" data-nobel="false"><span class="toc-num">45</span><span class="toc-title">소피의 세계</span><span class="toc-author">Sofies verden</span></a>
+    <a class="toc-item" href="#book40" data-era="classic" data-nobel="true"><span class="toc-num">40</span><span class="toc-title">숨그네 🏅</span><span class="toc-author">Atemschaukel</span></a>
+    <a class="toc-item" href="#book17" data-era="modern" data-nobel="false"><span class="toc-num">17</span><span class="toc-title">아몬드</span><span class="toc-author">Almond</span></a>
+    <a class="toc-item" href="#book39" data-era="classic" data-nobel="false"><span class="toc-num">39</span><span class="toc-title">아무도 대령에게편지하지 않다</span><span class="toc-author">El coronel no tiene quien le escriba</span></a>
+    <a class="toc-item" href="#book14" data-era="classic" data-nobel="false"><span class="toc-num">14</span><span class="toc-title">안나 카레니나</span><span class="toc-author">Анна Каренина</span></a>
+    <a class="toc-item" href="#book31" data-era="classic" data-nobel="false"><span class="toc-num">31</span><span class="toc-title">앵무새 죽이기</span><span class="toc-author">To Kill a Mockingbird</span></a>
+    <a class="toc-item" href="#book37" data-era="classic" data-nobel="true"><span class="toc-num">37</span><span class="toc-title">양철북 🏅</span><span class="toc-author">Die Blechtrommel</span></a>
+    <a class="toc-item" href="#book20" data-era="classic" data-nobel="false"><span class="toc-num">20</span><span class="toc-title">어린 왕자</span><span class="toc-author">Le Petit Prince</span></a>
+    <a class="toc-item" href="#book21" data-era="modern" data-nobel="false"><span class="toc-num">21</span><span class="toc-title">연금술사</span><span class="toc-author">O Alquimista</span></a>
+    <a class="toc-item" href="#book24" data-era="classic" data-nobel="false"><span class="toc-num">24</span><span class="toc-title">오만과 편견</span><span class="toc-author">Pride and Prejudice</span></a>
+    <a class="toc-item" href="#book12" data-era="classic" data-nobel="false"><span class="toc-num">12</span><span class="toc-title">위대한 개츠비</span><span class="toc-author">The Great Gatsby</span></a>
+    <a class="toc-item" href="#book46" data-era="classic" data-nobel="false"><span class="toc-num">46</span><span class="toc-title">위대한 유산</span><span class="toc-author">Great Expectations</span></a>
+    <a class="toc-item" href="#book29" data-era="classic" data-nobel="false"><span class="toc-num">29</span><span class="toc-title">위험한 관계</span><span class="toc-author">Les Liaisons dangereuses</span></a>
+    <a class="toc-item" href="#book2" data-era="classic" data-nobel="true"><span class="toc-num">02</span><span class="toc-title">이방인 🏅</span><span class="toc-author">L'Étranger</span></a>
+    <a class="toc-item" href="#book41" data-era="classic" data-nobel="false"><span class="toc-num">41</span><span class="toc-title">인간 실격</span><span class="toc-author">人間失格</span></a>
+    <a class="toc-item" href="#book35" data-era="classic" data-nobel="false"><span class="toc-num">35</span><span class="toc-title">제인 에어</span><span class="toc-author">Jane Eyre</span></a>
+    <a class="toc-item" href="#book6" data-era="classic" data-nobel="false"><span class="toc-num">06</span><span class="toc-title">죄와 벌</span><span class="toc-author">Преступление и наказание</span></a>
+    <a class="toc-item" href="#book10" data-era="classic" data-nobel="true"><span class="toc-num">10</span><span class="toc-title">지상의 양식 🏅</span><span class="toc-author">Les Nourritures terrestres</span></a>
+    <a class="toc-item" href="#book13" data-era="classic" data-nobel="false"><span class="toc-num">13</span><span class="toc-title">참을 수 없는존재의 가벼움</span><span class="toc-author">Nesnesitelná lehkost bytí</span></a>
+    <a class="toc-item" href="#book5" data-era="classic" data-nobel="true"><span class="toc-num">05</span><span class="toc-title">채식주의자 🏅</span><span class="toc-author">채식주의자</span></a>
+    <a class="toc-item" href="#book22" data-era="classic" data-nobel="false"><span class="toc-num">22</span><span class="toc-title">카라마조프의형제들</span><span class="toc-author">Братья Карамазовы</span></a>
+    <a class="toc-item" href="#book27" data-era="classic" data-nobel="false"><span class="toc-num">27</span><span class="toc-title">파우스트</span><span class="toc-author">Faust</span></a>
+    <a class="toc-item" href="#book44" data-era="modern" data-nobel="false"><span class="toc-num">44</span><span class="toc-title">파이 이야기</span><span class="toc-author">Life of Pi</span></a>
+    <a class="toc-item" href="#book9" data-era="classic" data-nobel="false"><span class="toc-num">09</span><span class="toc-title">파친코</span><span class="toc-author">Pachinko</span></a>
+    <a class="toc-item" href="#book38" data-era="modern" data-nobel="false"><span class="toc-num">38</span><span class="toc-title">편의점 인간</span><span class="toc-author">コンビニ人間</span></a>
+    <a class="toc-item" href="#book33" data-era="classic" data-nobel="false"><span class="toc-num">33</span><span class="toc-title">폭풍의 언덕</span><span class="toc-author">Wuthering Heights</span></a>
+    <a class="toc-item" href="#book30" data-era="modern" data-nobel="false"><span class="toc-num">30</span><span class="toc-title">해변의 카프카</span><span class="toc-author">海辺のカフカ</span></a>
+    <a class="toc-item" href="#book43" data-era="classic" data-nobel="false"><span class="toc-num">43</span><span class="toc-title">향수</span><span class="toc-author">Das Parfum</span></a>
+    <a class="toc-item" href="#book34" data-era="classic" data-nobel="false"><span class="toc-num">34</span><span class="toc-title">호밀밭의파수꾼</span><span class="toc-author">The Catcher in the Rye</span></a>
     </div>
   </div>
-
-  <!-- 2행: 카테고리 탭 + 검색 -->
-  <div class="nav-top">
-    <div class="nav-cats">
-      <button class="nav-cat-btn active" data-cat="classic">
-        <span class="cat-icon">📜</span>
-        <span class="cat-label">고전</span>
-        <span class="cat-count">22</span>
-        <span class="cat-arrow">▾</span>
-      </button>
-      <button class="nav-cat-btn" data-cat="modern">
-        <span class="cat-icon">✨</span>
-        <span class="cat-label">현대</span>
-        <span class="cat-count">13</span>
-        <span class="cat-arrow">▾</span>
-      </button>
-      <button class="nav-cat-btn" data-cat="nobel">
-        <span class="cat-icon">🏅</span>
-        <span class="cat-label">노벨상</span>
-        <span class="cat-count">9</span>
-        <span class="cat-arrow">▾</span>
-      </button>
-    </div>
-
-    <div class="nav-search-wrap">
-      <span class="nav-search-icon">🔍</span>
-      <input type="search" id="searchInput" class="nav-search-input" placeholder="작품·작가 검색..." autocomplete="off" autocorrect="off" spellcheck="false">
-      <span class="search-count" id="searchCount"></span>
-    </div>
-  </div>
-
-  <!-- 드롭다운 패널 -->
-  <div class="nav-dropdown" id="navDropdown">
-    <!-- 고전 -->
-    <div class="drop-panel" id="panel-classic">
-      <div class="drop-grid">
-        <a class="drop-item" href="#book1"><span class="di-num">01</span><span class="di-title">노인과 바다</span><span class="di-author">Hemingway</span></a>
-        <a class="drop-item" href="#book2"><span class="di-num">02</span><span class="di-title">이방인</span><span class="di-author">Camus</span></a>
-        <a class="drop-item" href="#book3"><span class="di-num">03</span><span class="di-title">백년의 고독</span><span class="di-author">García Márquez</span></a>
-        <a class="drop-item" href="#book4"><span class="di-num">04</span><span class="di-title">벨러브드</span><span class="di-author">Morrison</span></a>
-        <a class="drop-item" href="#book5"><span class="di-num">05</span><span class="di-title">채식주의자</span><span class="di-author">한강</span></a>
-        <a class="drop-item" href="#book6"><span class="di-num">06</span><span class="di-title">죄와 벌</span><span class="di-author">Dostoyevsky</span></a>
-        <a class="drop-item" href="#book7"><span class="di-num">07</span><span class="di-title">변신</span><span class="di-author">Kafka</span></a>
-        <a class="drop-item" href="#book8"><span class="di-num">08</span><span class="di-title">설국</span><span class="di-author">가와바타</span></a>
-        <a class="drop-item" href="#book10"><span class="di-num">10</span><span class="di-title">지상의 양식</span><span class="di-author">Gide</span></a>
-        <a class="drop-item" href="#book11"><span class="di-num">11</span><span class="di-title">데미안</span><span class="di-author">Hesse</span></a>
-        <a class="drop-item" href="#book12"><span class="di-num">12</span><span class="di-title">위대한 개츠비</span><span class="di-author">Fitzgerald</span></a>
-        <a class="drop-item" href="#book13"><span class="di-num">13</span><span class="di-title">존재의 가벼움</span><span class="di-author">Kundera</span></a>
-        <a class="drop-item" href="#book14"><span class="di-num">14</span><span class="di-title">안나 카레니나</span><span class="di-author">Tolstoy</span></a>
-        <a class="drop-item" href="#book15"><span class="di-num">15</span><span class="di-title">1984</span><span class="di-author">Orwell</span></a>
-        <a class="drop-item" href="#book20"><span class="di-num">20</span><span class="di-title">어린 왕자</span><span class="di-author">Saint-Exupéry</span></a>
-        <a class="drop-item" href="#book22"><span class="di-num">22</span><span class="di-title">카라마조프의 형제들</span><span class="di-author">Dostoyevsky</span></a>
-        <a class="drop-item" href="#book24"><span class="di-num">24</span><span class="di-title">오만과 편견</span><span class="di-author">Austen</span></a>
-        <a class="drop-item" href="#book26"><span class="di-num">26</span><span class="di-title">모래의 여자</span><span class="di-author">아베 코보</span></a>
-        <a class="drop-item" href="#book27"><span class="di-num">27</span><span class="di-title">파우스트</span><span class="di-author">Goethe</span></a>
-        <a class="drop-item" href="#book31"><span class="di-num">31</span><span class="di-title">앵무새 죽이기</span><span class="di-author">Harper Lee</span></a>
-        <a class="drop-item" href="#book32"><span class="di-num">32</span><span class="di-title">보바리 부인</span><span class="di-author">Flaubert</span></a>
-        <a class="drop-item" href="#book33"><span class="di-num">33</span><span class="di-title">폭풍의 언덕</span><span class="di-author">E. Brontë</span></a>
-        <a class="drop-item" href="#book34"><span class="di-num">34</span><span class="di-title">호밀밭의 파수꾼</span><span class="di-author">Salinger</span></a>
-        <a class="drop-item" href="#book35"><span class="di-num">35</span><span class="di-title">제인 에어</span><span class="di-author">C. Brontë</span></a>
-      </div>
-    </div>
-
-    <!-- 현대 -->
-    <div class="drop-panel hidden" id="panel-modern">
-      <div class="drop-grid">
-        <a class="drop-item" href="#book9"><span class="di-num">09</span><span class="di-title">파친코</span><span class="di-author">이민진</span></a>
-        <a class="drop-item" href="#book16"><span class="di-num">16</span><span class="di-title">소년이 온다</span><span class="di-author">한강</span></a>
-        <a class="drop-item" href="#book17"><span class="di-num">17</span><span class="di-title">아몬드</span><span class="di-author">손원평</span></a>
-        <a class="drop-item" href="#book18"><span class="di-num">18</span><span class="di-title">82년생 김지영</span><span class="di-author">조남주</span></a>
-        <a class="drop-item" href="#book19"><span class="di-num">19</span><span class="di-title">나미야 잡화점의 기적</span><span class="di-author">히가시노</span></a>
-        <a class="drop-item" href="#book21"><span class="di-num">21</span><span class="di-title">연금술사</span><span class="di-author">Coelho</span></a>
-        <a class="drop-item" href="#book23"><span class="di-num">23</span><span class="di-title">노르웨이의 숲</span><span class="di-author">무라카미</span></a>
-        <a class="drop-item" href="#book25"><span class="di-num">25</span><span class="di-title">미드나이트 라이브러리</span><span class="di-author">Matt Haig</span></a>
-        <a class="drop-item" href="#book28"><span class="di-num">28</span><span class="di-title">그리스인 조르바</span><span class="di-author">Kazantzakis</span></a>
-        <a class="drop-item" href="#book29"><span class="di-num">29</span><span class="di-title">위험한 관계</span><span class="di-author">Laclos</span></a>
-        <a class="drop-item" href="#book30"><span class="di-num">30</span><span class="di-title">해변의 카프카</span><span class="di-author">무라카미</span></a>
-      </div>
-    </div>
-
-    <!-- 노벨상 -->
-    <div class="drop-panel hidden" id="panel-nobel">
-      <div class="drop-grid">
-        <a class="drop-item nobel-mark" href="#book1"><span class="di-num">01</span><span class="di-title">노인과 바다</span><span class="di-author">Hemingway · 1954</span></a>
-        <a class="drop-item nobel-mark" href="#book2"><span class="di-num">02</span><span class="di-title">이방인</span><span class="di-author">Camus · 1957</span></a>
-        <a class="drop-item nobel-mark" href="#book3"><span class="di-num">03</span><span class="di-title">백년의 고독</span><span class="di-author">Márquez · 1982</span></a>
-        <a class="drop-item nobel-mark" href="#book4"><span class="di-num">04</span><span class="di-title">벨러브드</span><span class="di-author">Morrison · 1993</span></a>
-        <a class="drop-item nobel-mark" href="#book5"><span class="di-num">05</span><span class="di-title">채식주의자</span><span class="di-author">한강 · 2024</span></a>
-        <a class="drop-item nobel-mark" href="#book8"><span class="di-num">08</span><span class="di-title">설국</span><span class="di-author">가와바타 · 1968</span></a>
-        <a class="drop-item nobel-mark" href="#book10"><span class="di-num">10</span><span class="di-title">지상의 양식</span><span class="di-author">Gide · 1947</span></a>
-        <a class="drop-item nobel-mark" href="#book11"><span class="di-num">11</span><span class="di-title">데미안</span><span class="di-author">Hesse · 1946</span></a>
-        <a class="drop-item nobel-mark" href="#book16"><span class="di-num">16</span><span class="di-title">소년이 온다</span><span class="di-author">한강 · 2024</span></a>
-      </div>
-    </div>
-  </div>
-
-  <!-- 외부 클릭 감지는 JS document.click으로 처리 -->
 </div>
 
 
@@ -1707,11 +2029,6 @@ function handleImgError(img) {
 <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="맨 위로">↑</button>
 
 <div class="page-body">
-
-<!-- ══ 검색 결과 없음 메시지 ══════════════════════════════════ -->
-<div class="no-results-msg" id="noResultsMsg">
-  찾으시는 작품이 없습니다. 다른 키워드로 검색해 보세요.
-</div>
 
 <!-- ══ 서문 ════════════════════════════════════════════ -->
 <div class="overture reveal">
@@ -1735,7 +2052,12 @@ function handleImgError(img) {
       이 작품들은 인류가 어둠 속에서 켜올린 불꽃들이다.
       노벨 문학상과 세계 문학의 정점을 이루는 이 작품들을,
       우리는 지식으로서가 아니라 <strong>삶의 동행자로서</strong> 만나려 한다.
-      단순히 '어떤 책인가'가 아니라, '이 책이 지금 나에게 무엇을 말하는가'를 묻는 것이다. 이 서재는 계속 성장한다 — 인류가 남긴 가장 위대한 문장들과 함께.
+      단순히 '어떤 책인가'가 아니라, '이 책이 지금 나에게 무엇을 말하는가'를 묻는 것이다.
+    </p>
+    <p>
+      이 서재에는 고전 38편, 현대 12편, 노벨 문학상 수상작 10편을 포함하여 총 <strong>50편의 인류 필독 문학작품</strong>이 수록되어 있다.
+      각 작품 안에서 길을 잃어도 좋다 — 그 길 끝에는 반드시 당신에게 건네는 한 문장이 기다리고 있을 것이다.
+      세대를 넘어 인간의 가장 깊은 곳을 건드린 이 지혜의 목소리들이, 지금 이 순간 당신의 삶에 조용한 등불이 되기를 바란다.
     </p>
     <p>
       책장을 천천히 넘겨보라. 어느 페이지에선가,
@@ -1747,6 +2069,8 @@ function handleImgError(img) {
 <!-- ═══════════════════════════════════════════════════════════
      BOOK 1 — 노인과 바다
 ═══════════════════════════════════════════════════════════ -->
+
+
 <section class="book-section reveal" id="book1" data-num="01" data-era="classic" data-themes="theme-loneliness theme-resistance" data-nobel="true">
 
   <!-- 키워드 -->
@@ -6955,13 +7279,993 @@ function handleImgError(img) {
   </div>
 </section>
 
-</div><!-- /page-body -->
 
-<div class="references">
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 36 — 눈먼 자들의 도시 (사라마구)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book36" data-num="36" data-era="classic" data-themes="theme-society theme-absurd theme-resistance" data-nobel="true">
+  <div class="book-keywords">
+    <span class="keyword-tag">#전체주의</span>
+    <span class="keyword-tag">#인간성</span>
+    <span class="keyword-tag">#실명의우화</span>
+  </div>
+
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover"
+           src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Blindness.jpg"
+           alt="눈먼 자들의 도시 표지"
+           loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#e8e0cc,#b0a080);">
+        <span class="fb-title">눈먼 자들의 도시</span>
+        <span class="fb-author">José Saramago</span>
+      </div>
+      <div class="book-year-badge">Nobel 1998</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 36 · José Saramago</div>
+      <h2 class="book-title">눈먼 자들의<br>도시</h2>
+      <div class="book-author">Ensaio sobre a Cegueira, 1995</div>
+      <p class="book-desc">
+        어느 날 갑자기 한 도시 전체가 '백색 실명'에 걸린다. 원인도 치료법도 없다. 정부는 감염자들을 폐쇄 정신병원에 격리한다. 유일하게 눈이 보이는 한 여자가 맹인 남편을 따라 자진 입소한다. 포르투갈 출신 주제 사라마구는 1998년 노벨 문학상 수상 시, 스웨덴 한림원으로부터 "비유와 상상력으로 파악하기 힘든 현실을 이해할 수 있게 해준 작가"라는 찬사를 받았다. 이 소설은 인간이 '보는 능력'을 잃었을 때 무엇을 잃는지, 그리고 무엇은 끝까지 잃지 않는지를 묻는다. 코로나19 이후 이 소설을 읽는 독자들은 격리와 공포, 연대와 붕괴의 냄새를 더 실감나게 맡는다.
+      </p>
+    </div>
+  </div>
+
+  <div class="hero-quote reveal">
+    <p>"우리가 눈이 멀었기 때문이 아니라, 눈이 멀었으면서도 볼 수 있다고 믿기 때문이다."</p>
+    <span class="hero-quote-attr">— 눈이 보이는 의사의 아내 / 소설의 핵심 역설</span>
+  </div>
+
+  <div class="citation-simple reveal">
+    <div class="citation-label-row">
+      <span class="citation-label">🏛 Nobel Citation · 공식 선정 사유 (1998)</span>
+    </div>
+    <p class="citation-text">"who with parables sustained by imagination, compassion and irony continually enables us to apprehend an elusory reality."</p>
+    <div class="citation-analysis">José Saramago · 1998 Nobel Prize in Literature</div>
+  </div>
+
+  <div class="innovation reveal">
+    <h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3>
+    <ul>
+      <li><strong>문장 부호 혁파</strong> — 사라마구는 대화에 따옴표도, 줄바꿈도 사용하지 않는다. 수십 명이 동시에 말하는 혼돈의 소리가 마치 읽는 이를 백색의 흐름 속으로 끌어들인다. 이 형식 자체가 소설의 주제다 — 경계가 사라지면 혼돈이 온다.</li>
+      <li><strong>우화적 리얼리즘</strong> — 실명이라는 초현실적 설정 안에서 인간 집단의 심리를 가장 사실주의적으로 해부한다. 음식 통제, 성폭력, 집단 지배의 출현 — 문명이 얼마나 얇은 껍데기인지를 드러낸다.</li>
+    </ul>
+  </div>
+
+  <div class="ext-links reveal">
+    <div class="ext-links-label">더 깊이 들어가기</div>
+    <a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EB%88%88%EB%A8%BC+%EC%9E%90%EB%93%A4%EC%9D%98+%EB%8F%84%EC%8B%9C+%EC%82%AC%EB%9D%BC%EB%A7%88%EA%B5%AC+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener">
+      <span class="ext-icon">▶</span> YouTube 해설 검색
+    </a>
+    <a class="ext-btn lec" href="https://www.google.com/search?q=%EB%88%88%EB%A8%BC+%EC%9E%90%EB%93%A4%EC%9D%98+%EB%8F%84%EC%8B%9C+%EC%82%AC%EB%9D%BC%EB%A7%88%EA%B5%AC+%EB%AC%B8%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener">
+      <span class="ext-icon">🔍</span> Google 검색
+    </a>
+  </div>
+
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">줄거리와 장면</div>
+        <h3 class="step-title">이야기의 전개</h3>
+        <div class="step-body">
+          <p>신호등 앞에서 갑자기 눈이 먼 남자. 그를 집에 데려다준 이웃도 눈이 먼다. 안과 의사도, 그 환자들도 차례로 실명한다. 정부는 감염 우려로 이들을 폐쇄된 구(舊) 정신병원에 격리한다. 의사의 아내는 눈이 보이지만, 남편 곁에 있기 위해 보인다는 사실을 숨기고 자진 입소한다.</p>
+          <div class="scene">
+            <p>처음에 격리소는 질서를 유지한다. 그러나 새로운 맹인들이 계속 쏟아져 들어오자 식량은 부족해지고, 한 집단이 음식을 독점하기 시작하며, 폭력이 자연스러운 통화가 된다.</p>
+            <span class="scene-attr">— 문명의 붕괴가 얼마나 빠른지를 보여주는 핵심 전개</span>
+          </div>
+          <p>의사의 아내는 볼 수 있는 유일한 사람으로서 무리를 이끌고, 마침내 도시 밖으로 탈출한다. 도시 전체도 이미 실명 상태다. 그리고 어느 날, 아무 이유 없이 사람들의 눈이 다시 돌아오기 시작한다. 처음 눈이 멀었던 남자가 가장 먼저 시력을 되찾는다 — 이유도, 설명도 없이.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">상징과 철학</div>
+        <h3 class="step-title">숨겨진 의미와 상징</h3>
+        <div class="step-body">
+          <p>'백색 실명(white blindness)'은 역설이다. 어둠이 아니라 눈부신 하얀 빛 속에서 아무것도 보지 못하는 것 — 이것은 정보 과잉 시대의 우리를 정확히 가리킨다. 우리는 보이는 것이 너무 많아서 정작 중요한 것을 보지 못한다.</p>
+          <div class="scene">
+            <p>"우리가 눈이 멀었기 때문이 아니라, 눈이 멀었으면서도 볼 수 있다고 믿기 때문이다." — 소설의 마지막 문장에 가까운 이 구절은 독자를 향해 직접 발화된다. 당신도 지금 백색 실명 상태인지 모른다.</p>
+            <span class="scene-attr">— 의사의 아내 / 소설의 핵심 고발</span>
+          </div>
+          <p>눈이 보이는 의사의 아내는 구원자이지만, 그녀 또한 고통받는다 — 오직 그녀만이 모든 추악함을 목격해야 하기 때문이다. '진실을 보는 자'의 고독이다. 그것은 예언자의 저주이자 증인의 책임이다. 사라마구는 묻는다 — 당신이 진실을 볼 수 있다면, 당신은 그것을 감당할 책임이 있는가?</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">오늘날의 울림</div>
+        <h3 class="step-title">지금 우리에게 주는 메시지</h3>
+        <div class="step-body">
+          <p>2020년 팬데믹이 시작되었을 때, 이 소설은 전 세계 베스트셀러 목록에 다시 올랐다. 격리, 식량 불안, 권력의 폭주, 그리고 그 속에서 빛나는 연대 — 사라마구가 1995년에 쓴 것들이 현실이 되었기 때문이다.</p>
+          <div class="scene">
+            <p>그러나 이 소설의 진짜 경고는 팬데믹에 관한 것이 아니다. 그것은 '우리가 매일 얼마나 많은 것을 보지 않으려 하는가'에 관한 것이다. 노숙인을 지나치는 것, 뉴스를 끄는 것, 불편한 진실 앞에서 눈을 돌리는 것 — 그것이 바로 백색 실명이다.</p>
+          </div>
+          <p>시력이 돌아온 후에도 도시는 완전히 예전으로 돌아가지 않는다. 일단 보았던 것은 보지 않았던 것으로 돌아갈 수 없다. 이 소설을 읽은 독자 역시 그렇다 — 당신은 이제 '눈을 뜨고도 보지 못하는 것'이 무엇인지 알고 있다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quotes-gallery reveal">
+    <div class="quotes-gallery-label">작품의 문장들</div>
+    <div class="quotes-grid">
+      <div class="q-card">
+        <blockquote>"눈이 먼 사람을 인도하는 것은 또 다른 눈먼 사람이다. 그리고 어떤 때는 그것이 최선이다."</blockquote>
+        <cite>— 서술자 / 인간 연대의 역설</cite>
+      </div>
+      <div class="q-card">
+        <blockquote>"사람들이 서로를 볼 수 없을 때, 그들은 서로를 다시 발견한다 — 촉각으로, 소리로, 냄새로."</blockquote>
+        <cite>— 서술자 / 감각의 재발견</cite>
+      </div>
+      <div class="q-card">
+        <blockquote>"문명은 우리가 생각하는 것보다 훨씬 얇은 껍데기다. 음식을 잃으면 그 껍데기는 하루 만에 벗겨진다."</blockquote>
+        <cite>— 서술자 / 문명의 취약성에 대한 고발</cite>
+      </div>
+    </div>
+  </div>
+
+  <div class="closing-q reveal">
+    <div class="closing-q-icon">✦</div>
+    <div>
+      <div class="closing-q-label">당신에게 던지는 질문</div>
+      <p>당신이 오늘 '보지 않으려' 선택한 것은 무엇인가요?<br>그 백색의 편안함 너머에, 당신이 감당해야 할 진실이 있지는 않나요?</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 37 — 양철북 (귄터 그라스)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book37" data-num="37" data-era="classic" data-themes="theme-society theme-identity theme-resistance" data-nobel="true">
+  <div class="book-keywords">
+    <span class="keyword-tag">#성장거부</span>
+    <span class="keyword-tag">#전쟁의기억</span>
+    <span class="keyword-tag">#그로테스크</span>
+  </div>
+
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover"
+           src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/The_Tin_Drum.jpg"
+           alt="양철북 표지"
+           loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#7a1a1a,#3d0d0d);">
+        <span class="fb-title">양철북</span>
+        <span class="fb-author">Günter Grass</span>
+      </div>
+      <div class="book-year-badge">Nobel 1999</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 37 · Günter Grass</div>
+      <h2 class="book-title">양철북</h2>
+      <div class="book-author">Die Blechtrommel, 1959</div>
+      <p class="book-desc">
+        세 살 때 스스로 성장을 멈추기로 결심한 오스카르 마체라트. 그는 양철북을 치며 나치 독일의 흥망과 전후 서독의 혼란을 목격한다. 귄터 그라스는 1999년 노벨 문학상을 수상하며, 전후 독일 문학의 가장 용기 있는 목소리로 평가받았다. 출판 당시 이 소설은 독일 사회의 금기 — 전쟁 범죄에 대한 집단적 기억 상실 — 를 정면으로 건드렸다. 성장하지 않는 아이의 눈으로 보는 세계는, 성인들이 만들어 낸 광기를 더욱 선명하게 드러낸다. 어른들의 세계는 합리적이고 정상적으로 보이지만, 그 안을 들여다보면 오스카르의 왜소한 몸만큼이나 기괴하다.
+      </p>
+    </div>
+  </div>
+
+  <div class="hero-quote reveal">
+    <p>"나는 북을 치겠다. 나는 성장하지 않겠다. 나는 어른들의 세계에 합류하는 것을 거부한다."</p>
+    <span class="hero-quote-attr">— 오스카르 마체라트의 결심 / 문명 거부의 선언</span>
+  </div>
+
+  <div class="citation-simple reveal">
+    <div class="citation-label-row">
+      <span class="citation-label">🏛 Nobel Citation · 공식 선정 사유 (1999)</span>
+    </div>
+    <p class="citation-text">"whose frolicsome black fables portray the forgotten face of history."</p>
+    <div class="citation-analysis">Günter Grass · 1999 Nobel Prize in Literature</div>
+  </div>
+
+  <div class="innovation reveal">
+    <h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3>
+    <ul>
+      <li><strong>신뢰할 수 없는 화자(Unreliable Narrator)의 극대화</strong> — 오스카르는 정신병원에서 자신의 이야기를 쓴다. 그는 스스로 "나는 거짓말을 하기도 한다"고 고백한다. 독자는 무엇이 진실인지 영원히 알 수 없다 — 그리고 그 불확실성이 곧 역사를 바라보는 올바른 태도임을 시사한다.</li>
+      <li><strong>그로테스크 리얼리즘</strong> — 오스카르는 고음으로 유리를 깨는 능력이 있다. 이 초현실적 요소가 나치즘이라는 초현실적 현실을 묘사하는 데 더 정확한 도구가 된다. 리얼리즘만으로는 담을 수 없는 역사의 광기가 있다.</li>
+    </ul>
+  </div>
+
+  <div class="ext-links reveal">
+    <div class="ext-links-label">더 깊이 들어가기</div>
+    <a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EC%96%91%EC%B2%A0%EB%B6%81+%EA%B7%84%ED%84%B0+%EA%B7%B8%EB%9D%BC%EC%8A%A4+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener">
+      <span class="ext-icon">▶</span> YouTube 해설 검색
+    </a>
+    <a class="ext-btn lec" href="https://www.google.com/search?q=%EC%96%91%EC%B2%A0%EB%B6%81+%EA%B7%84%ED%84%B0+%EA%B7%B8%EB%9D%BC%EC%8A%A4+%EB%AC%B8%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener">
+      <span class="ext-icon">🔍</span> Google 검색
+    </a>
+  </div>
+
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">줄거리와 장면</div>
+        <h3 class="step-title">이야기의 전개</h3>
+        <div class="step-body">
+          <p>1924년 단치히(현 폴란드 그단스크). 오스카르 마체라트는 태어나자마자 어른들의 위선과 광기를 간파한다. 세 살 생일, 그는 계단에서 떨어지는 사고를 위장해 스스로 성장을 멈춘다. 그리고 생일 선물로 받은 양철북을 두드리기 시작한다 — 북소리는 그가 세계와 맺는 유일한 소통 방식이자, 세상에 대한 저항의 언어다.</p>
+          <div class="scene">
+            <p>나치 집회 현장에서 오스카르는 군중석 아래 숨어 양철북으로 왈츠 리듬을 쳐댄다. 하일 히틀러를 외치려던 군중이 자신도 모르게 춤을 추기 시작한다. 광기의 행진이 왈츠로 해체되는 순간 — 예술의 가장 근본적인 저항.</p>
+            <span class="scene-attr">— 나치 집회 장면 / 예술의 저항력</span>
+          </div>
+          <p>전쟁이 끝나고 독일이 분단된다. 오스카르는 서독으로 이주해 재즈 밴드의 북 연주자로 성공한다. 그러나 결국 살인 혐의로 정신병원에 수감되고, 거기서 지난 삶의 기록을 쓰기 시작한다. 소설은 이 회고록의 형태를 취한다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">상징과 철학</div>
+        <h3 class="step-title">숨겨진 의미와 상징</h3>
+        <div class="step-body">
+          <p>오스카르의 '성장 거부'는 20세기 독일 시민들이 행한 '도덕적 성장 거부'의 알레고리다. 어른이 된다는 것은 책임을 진다는 것이다. 그러나 나치 시대의 독일인 대부분은 "몰랐다", "어쩔 수 없었다"는 아이의 언어로 책임을 회피했다. 오스카르는 그 회피를 문자 그대로 몸으로 살아낸다.</p>
+          <div class="scene">
+            <p>"나는 결코 성장하지 않을 것이다. 왜냐하면 성장은 곧 어른들의 세계에 공모하는 것이기 때문이다. 내 북소리는 그 세계에 대한 나의 고발장이다."</p>
+            <span class="scene-attr">— 오스카르의 독백 / 저항과 공모 사이에서</span>
+          </div>
+          <p>양철북 소리는 진실의 소리다. 어른들이 조용히 묻어버리려는 것들 — 전쟁의 기억, 죄책감, 공모 — 을 오스카르의 북소리는 계속해서 끄집어낸다. 북소리가 멈추지 않는 한, 망각은 완성되지 않는다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">오늘날의 울림</div>
+        <h3 class="step-title">지금 우리에게 주는 메시지</h3>
+        <div class="step-body">
+          <p>모든 사회에는 오스카르가 필요하다. 어른들이 집단적으로 외면하거나 합리화하는 것들을 — 혐오, 부패, 전쟁의 기억 — 끝없이 두드리며 소환하는 존재. 그것은 불편하고, 귀에 거슬리고, 때로는 기괴하게 보인다. 그러나 그 소리가 없다면 우리는 망각 속에 편안히 잠들 것이다.</p>
+          <div class="scene">
+            <p>오스카르는 '정상'을 거부했기 때문에 정신병원에 갇혔다. 그러나 이 소설을 읽는 독자는 알게 된다 — 오스카르를 가둔 세계가 훨씬 더 정신병적이었다는 것을.</p>
+          </div>
+          <p>우리 시대의 '양철북'은 무엇인가. 외면하고 싶은 진실을 계속해서 두드려 깨우는 목소리들 — 그 소리를 불편하다고 외면하는 순간, 우리는 오스카르를 가둔 어른들과 같아진다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quotes-gallery reveal">
+    <div class="quotes-gallery-label">작품의 문장들</div>
+    <div class="quotes-grid">
+      <div class="q-card">
+        <blockquote>"어른들의 세계는 언제나 나를 실망시켰다. 그래서 나는 성장을 거부했다. 그것이 내가 할 수 있는 유일한 저항이었다."</blockquote>
+        <cite>— 오스카르 마체라트 / 저항의 방식</cite>
+      </div>
+      <div class="q-card">
+        <blockquote>"북을 치는 것은 잊지 않겠다는 맹세다. 나의 두 손이 기억을 살아있게 한다."</blockquote>
+        <cite>— 오스카르 / 예술과 기억의 관계</cite>
+      </div>
+      <div class="q-card">
+        <blockquote>"역사는 합리적인 척 위장하지만, 그 안을 들여다보면 그로테스크하다. 나는 그저 그 사실을 솔직하게 말할 뿐이다."</blockquote>
+        <cite>— 오스카르 / 역사 인식의 본질</cite>
+      </div>
+    </div>
+  </div>
+
+  <div class="closing-q reveal">
+    <div class="closing-q-icon">✦</div>
+    <div>
+      <div class="closing-q-label">당신에게 던지는 질문</div>
+      <p>당신이 속한 사회에서 집단적으로 외면하고 있는 '불편한 진실'은 무엇인가요?<br>당신의 '양철북'은 무엇이며, 그것을 계속 칠 용기가 있나요?</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 38 — 편의점 인간 (무라타 사야카)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book38" data-num="38" data-era="modern" data-themes="theme-identity theme-society theme-absurd">
+  <div class="book-keywords">
+    <span class="keyword-tag">#정상성의폭력</span>
+    <span class="keyword-tag">#자기정의</span>
+    <span class="keyword-tag">#현대인의소외</span>
+  </div>
+
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover"
+           src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Convenience_Store_Woman.jpg"
+           alt="편의점 인간 표지"
+           loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#1a6b8a,#0d3d52);">
+        <span class="fb-title">편의점 인간</span>
+        <span class="fb-author">村田沙耶香</span>
+      </div>
+      <div class="book-year-badge">芥川賞 2016</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 38 · 무라타 사야카 (村田沙耶香)</div>
+      <h2 class="book-title">편의점 인간</h2>
+      <div class="book-author">コンビニ人間, 2016</div>
+      <p class="book-desc">
+        36세 독신 여성 후루쿠라 게이코는 18년째 편의점 아르바이트를 하고 있다. 결혼도 정규직도 없는 그녀를 사회는 '비정상'으로 취급한다. 2016년 아쿠타가와상을 수상한 이 107쪽짜리 소설은 일본에서 170만 부 이상, 전 세계 40개 언어로 번역되며 현대인의 보편적 불안을 건드렸다. 무라타 사야카 본인도 소설 집필 당시 편의점 아르바이트를 병행했다. 이 소설의 진짜 질문은 이것이다 — '정상'이란 누가 정하는가? 그리고 그 기준에 맞추어 사는 삶은 과연 더 행복한가?
+      </p>
+    </div>
+  </div>
+
+  <div class="hero-quote reveal">
+    <p>"편의점은 내가 처음으로 세계의 부품이 될 수 있었던 장소다. 나는 거기서 처음으로 사람이 되었다."</p>
+    <span class="hero-quote-attr">— 후루쿠라 게이코 / 소속감과 정체성</span>
+  </div>
+
+  <div class="innovation reveal">
+    <h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3>
+    <ul>
+      <li><strong>'정상성'의 해부</strong> — 소설은 독자가 당연하게 여기는 결혼·취직·사회적 역할이라는 규범이 얼마나 폭력적으로 개인에게 강요되는지를 게이코의 무덤덤한 1인칭 서술로 드러낸다. 독자가 분노하는 대상이 게이코인지, 아니면 그녀를 압박하는 사회인지 경계가 흐려진다.</li>
+      <li><strong>자폐 스펙트럼 문학의 새 지평</strong> — 게이코는 직접 진단되지 않지만, 그녀의 감각 과부하 회피, 규칙에 대한 집착, 감정 이해의 어려움은 신경다양성(neurodiversity) 서사로 읽힌다. 이 관점에서 이 소설은 '다름'을 '결함'으로 보는 사회에 대한 정확한 반론이다.</li>
+    </ul>
+  </div>
+
+  <div class="ext-links reveal">
+    <div class="ext-links-label">더 깊이 들어가기</div>
+    <a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%ED%8E%B8%EC%9D%98%EC%A0%90+%EC%9D%B8%EA%B0%84+%EB%AC%B4%EB%9D%BC%ED%83%80+%EC%82%AC%EC%95%BC%EC%B9%B4+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener">
+      <span class="ext-icon">▶</span> YouTube 해설 검색
+    </a>
+    <a class="ext-btn lec" href="https://www.google.com/search?q=%ED%8E%B8%EC%9D%98%EC%A0%90+%EC%9D%B8%EA%B0%84+%EB%AC%B4%EB%9D%BC%ED%83%80+%EC%82%AC%EC%95%BC%EC%B9%B4+%EB%AC%B8%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener">
+      <span class="ext-icon">🔍</span> Google 검색
+    </a>
+  </div>
+
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">줄거리와 장면</div>
+        <h3 class="step-title">이야기의 전개</h3>
+        <div class="step-body">
+          <p>어릴 때부터 게이코는 '이상하다'는 소리를 들어왔다. 죽은 새를 보고 "구워서 먹으면 어때요"라고 말하고, 싸우는 아이를 말리려 삽으로 때리고, 우는 친구에게 왜 우는지 이해하지 못한다. 세상의 작동 방식이 그녀에게는 외계어처럼 느껴진다. 그러나 18세 때 편의점에 취직하는 순간 모든 것이 바뀐다 — 여기서는 모든 것이 매뉴얼로 되어 있다. 어떻게 웃어야 하는지, 어떻게 말해야 하는지, 어떻게 움직여야 하는지 — 규칙이 그녀에게 인간이 되는 법을 가르친다.</p>
+          <div class="scene">
+            <p>18년이 지났다. 36세 게이코는 여전히 편의점 아르바이트생이다. 가족과 친구들은 걱정한다 — 결혼은? 정규직은? 그녀는 이해하지 못한다. 왜 편의점에서 일하는 것이 문제인가? 그녀는 지금 완벽하게 기능하고 있는데.</p>
+            <span class="scene-attr">— '정상'의 기준을 묻는 장면</span>
+          </div>
+          <p>그녀는 사회적 압박을 피하기 위해 백수 히라타를 동거인으로 받아들인다. '남자친구가 있다'는 것을 보여주기 위해. 그러나 새로운 편의점에서 일하게 된 게이코는 결국 자신의 본질로 돌아간다 — 편의점의 소리를 듣고, 무엇이 필요한지를 직감적으로 파악하며, 그 세계에서만 온전히 살아있음을 느낀다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">상징과 철학</div>
+        <h3 class="step-title">숨겨진 의미와 상징</h3>
+        <div class="step-body">
+          <p>편의점의 매뉴얼은 역설적으로 게이코에게 자유를 준다. '정상적인 사회'는 암묵적이고 변화무쌍한 규칙들로 가득하지만, 편의점은 모든 것이 명문화되어 있다. 그 투명함이 게이코에게 안전지대다. 이것은 단지 자폐 스펙트럼의 이야기가 아니다 — 우리 모두는 어느 정도 이 세계의 암묵적 규칙들 앞에서 무력감을 느낀다.</p>
+          <div class="scene">
+            <p>"편의점은 내가 완전한 인간이 되는 유일한 장소다. 여기서 나는 사회의 정상적인 부품이다." — 그녀의 이 말은 섬뜩하면서도 쓸쓸하다. 사회가 요구하는 '완전한 인간'이란 개성이 아니라 기능성이기 때문이다.</p>
+            <span class="scene-attr">— 게이코의 독백 / 소속감의 의미</span>
+          </div>
+          <p>히라타는 현대 사회의 '패자'이지만 그 패배를 사회 탓으로 돌린다. 게이코는 사회의 기준에 맞지 않지만 그것을 문제라 느끼지 않는다. 두 사람은 서로를 이용하지만, 결국 게이코만이 자기 자신을 찾는다. 진정한 자기 수용은 히라타처럼 분노하는 것도, 사회에 맞추려 억지로 노력하는 것도 아니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">오늘날의 울림</div>
+        <h3 class="step-title">지금 우리에게 주는 메시지</h3>
+        <div class="step-body">
+          <p>'정상 가족', '정규직', '결혼 적령기' — 한국 사회도 일본만큼이나 이 기준들이 강하다. 그리고 그 기준에서 벗어나면 주변에서는 걱정이라는 이름으로 압박이 시작된다. 게이코를 바라보는 가족과 친구들의 시선 — 그것이 혹시 우리가 누군가에게 향하는 시선이기도 하지 않은가?</p>
+          <div class="scene">
+            <p>이 소설의 결말은 개선이나 변화가 없다. 게이코는 사회가 원하는 방향으로 성장하지 않는다. 그러나 그것이 실패가 아니다 — 그녀는 자신이 진정으로 살아있음을 느끼는 방식을 알고 있고, 그것을 선택한다. 그 선택이 '정상'인가의 여부는 독자가 판단할 일이 아닐지 모른다.</p>
+          </div>
+          <p>당신이 타인의 삶을 향해 "왜 아직도 결혼 안 했어요?", "왜 그 일을 계속해요?"라고 물을 때 — 그 질문에는 어떤 전제가 깔려 있는지 한번쯤 돌아볼 필요가 있다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quotes-gallery reveal">
+    <div class="quotes-gallery-label">작품의 문장들</div>
+    <div class="quotes-grid">
+      <div class="q-card">
+        <blockquote>"정상이란 무엇인가? 나는 아직도 모른다. 다만 내가 편의점에 있을 때만큼은, 나는 완전히 존재한다."</blockquote>
+        <cite>— 후루쿠라 게이코 / 자기 존재의 확인</cite>
+      </div>
+      <div class="q-card">
+        <blockquote>"사람들은 내게 행복하냐고 묻는다. 나는 편의점 개점 준비가 끝났을 때의 그 느낌보다 행복한 것을 아직 찾지 못했다."</blockquote>
+        <cite>— 게이코 / 행복의 정의</cite>
+      </div>
+      <div class="q-card">
+        <blockquote>"나는 항상 이상했다. 그러나 이상한 것은 죄가 아니다. 단지 그들의 규칙이 내게 맞지 않을 뿐이다."</blockquote>
+        <cite>— 게이코 / 정상성에 대한 저항</cite>
+      </div>
+    </div>
+  </div>
+
+  <div class="closing-q reveal">
+    <div class="closing-q-icon">✦</div>
+    <div>
+      <div class="closing-q-label">당신에게 던지는 질문</div>
+      <p>당신이 진정으로 '살아있다'고 느끼는 순간은 언제인가요?<br>그 순간이 사회의 기준과 다르다면, 당신은 어느 쪽을 선택하겠습니까?</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 39 — 아무도 대령에게 편지하지 않다 (마르케스)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book39" data-num="39" data-era="classic" data-themes="theme-resistance theme-loneliness theme-society">
+  <div class="book-keywords">
+    <span class="keyword-tag">#기다림</span>
+    <span class="keyword-tag">#존엄</span>
+    <span class="keyword-tag">#희망의역설</span>
+  </div>
+
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover"
+           src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/No_One_Writes_to_the_Colonel.jpg"
+           alt="아무도 대령에게 편지하지 않다 표지"
+           loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#2e4a1e,#1a2d0f);">
+        <span class="fb-title">아무도 대령에게 편지하지 않다</span>
+        <span class="fb-author">García Márquez</span>
+      </div>
+      <div class="book-year-badge">1961</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 39 · Gabriel García Márquez</div>
+      <h2 class="book-title">아무도 대령에게<br>편지하지 않다</h2>
+      <div class="book-author">El coronel no tiene quien le escriba, 1961</div>
+      <p class="book-desc">
+        77세의 이름 없는 대령이 15년째 매주 금요일 우체국에 간다. 내전 중 전사한 아들의 연금 수령 통보를 받기 위해. 편지는 오지 않는다. 아내는 천식으로 죽어간다. 집에는 먹을 것도 없다. 그러나 그는 아들이 남긴 싸움닭을 판매하지 않는다 — 그 닭이 이길 것이라는 믿음으로. 마르케스 자신이 "『백년의 고독』보다 더 완벽한 소설"이라 고백한 이 89쪽의 중편은, 인간이 절망 속에서도 존엄을 지키는 방식에 대한 가장 압축된 보고서다.
+      </p>
+    </div>
+  </div>
+
+  <div class="hero-quote reveal">
+    <p>"우리는 이 닭이 이길 것이다." "만약 지면?" "그래도 이길 것이다."</p>
+    <span class="hero-quote-attr">— 대령과 아내의 대화 / 논리 너머의 믿음</span>
+  </div>
+
+  <div class="innovation reveal">
+    <h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3>
+    <ul>
+      <li><strong>침묵의 서사</strong> — 대령의 감정은 거의 서술되지 않는다. 15년의 기다림, 빈곤, 아들의 죽음 — 이 모든 것이 표면에 등장하지 않는다. 그러나 독자는 그 침묵의 무게를 온몸으로 받는다. 헤밍웨이의 빙산 이론을 라틴 아메리카 방식으로 구현한 작품이다.</li>
+      <li><strong>일상의 영웅주의</strong> — 마르케스는 이 소설에서 마술적 리얼리즘을 의도적으로 배제했다. 한없이 사실적이고 일상적인 언어로 쓰인 이 이야기가 오히려 더 보편적 감동을 만든다. 위대함이란 특별한 사건이 아니라 매일의 존엄에서 온다.</li>
+    </ul>
+  </div>
+
+  <div class="ext-links reveal">
+    <div class="ext-links-label">더 깊이 들어가기</div>
+    <a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EC%95%84%EB%AC%B4%EB%8F%84+%EB%8C%80%EB%A0%B9%EC%97%90%EA%B2%8C+%ED%8E%B8%EC%A7%80%ED%95%98%EC%A7%80+%EC%95%8A%EB%8B%A4+%EB%A7%88%EB%A5%B4%EC%BC%80%EC%8A%A4" target="_blank" rel="noopener">
+      <span class="ext-icon">▶</span> YouTube 해설 검색
+    </a>
+    <a class="ext-btn lec" href="https://www.google.com/search?q=%EC%95%84%EB%AC%B4%EB%8F%84+%EB%8C%80%EB%A0%B9%EC%97%90%EA%B2%8C+%ED%8E%B8%EC%A7%80%ED%95%98%EC%A7%80+%EC%95%8A%EB%8B%A4+%EB%AC%B8%ED%95%99" target="_blank" rel="noopener">
+      <span class="ext-icon">🔍</span> Google 검색
+    </a>
+  </div>
+
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">줄거리와 장면</div>
+        <h3 class="step-title">이야기의 전개</h3>
+        <div class="step-body">
+          <p>10월 말, 비가 내리는 콜롬비아의 작은 마을. 77세의 대령은 관 운반에 쓸 식용유 빈 통을 들고 아들의 장례식에서 돌아온다. 아들은 정부의 복권 밀수 정보를 나눠주다 공개 처형당했다. 이제 집에는 대령과 천식에 걸린 아내만 남았다.</p>
+          <div class="scene">
+            <p>매주 금요일, 그는 우체국에 간다. 우편물 배달부 선장에게 묻는다. "저를 위한 편지가 있나요?" 선장이 돌아본다. "아무것도 없습니다, 대령님." 대령은 고개를 끄덕인다. 그리고 다음 금요일에 다시 간다. 15년째.</p>
+            <span class="scene-attr">— 반복되는 기다림의 장면 / 소설의 핵심 리듬</span>
+          </div>
+          <p>집에는 아들이 남긴 싸움닭이 있다. 마을 사람들은 이 닭이 다음 대회에서 이길 것이라 확신한다. 아내는 닭을 팔아 먹을 것을 사자고 애원한다. 대령은 거부한다. 소설은 겨울 내내 두 사람의 이 싸움 — 팔자, 말자 — 과 함께 흘러간다. 그리고 마지막 문장에 이른다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">상징과 철학</div>
+        <h3 class="step-title">숨겨진 의미와 상징</h3>
+        <div class="step-body">
+          <p>싸움닭은 단순한 동물이 아니다. 그것은 대령에게 남은 유일한 미래다. 아들의 유산이고, 마을의 희망이며, 그가 아직 살아있다는 증거다. 닭을 팔면 먹을 수 있지만, 그것은 미래를 현재의 배고픔으로 교환하는 것이다. 대령은 절대로 그 교환을 받아들이지 않는다.</p>
+          <div class="scene">
+            <p>소설의 마지막 장면. 아내가 다시 묻는다 — "그럼 우리는 뭘 먹고 살 거예요?" 대령은 잠시 75년의 삶 — 전쟁, 배신, 기다림, 굶주림 — 을 떠올린다. 그리고 말한다. "똥이지(Mierda)." 마르케스의 소설에서 가장 유명한 마지막 단어다.</p>
+            <span class="scene-attr">— 소설의 마지막 문장 / 존엄한 절망 혹은 절망적 존엄</span>
+          </div>
+          <p>이 한 단어에 모든 것이 담겨 있다 — 분노, 체념, 그러나 결코 굴복하지 않겠다는 의지. 대령은 패배하지 않는다. 그는 그저 현실을 그 이름 그대로 부른다. 그것이 그의 마지막 존엄이다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">오늘날의 울림</div>
+        <h3 class="step-title">지금 우리에게 주는 메시지</h3>
+        <div class="step-body">
+          <p>우리는 모두 어떤 의미에서 대령이다. 오지 않는 편지를 기다리며 — 취직 통보, 합격 소식, 사랑하는 사람의 연락, 상황이 나아지리라는 신호. 그 기다림이 15년이 되면 우리는 포기할까, 아니면 계속 우체국에 갈까?</p>
+          <div class="scene">
+            <p>대령의 위대함은 희망을 잃지 않는다는 것이 아니다. 그는 아마 희망이 없다는 것을 안다. 그럼에도 매주 금요일 우체국에 가는 것 — 그것은 희망이 아니라 존엄의 행위다. 인간으로서의 의식(ritual)이다. 그 의식이 그를 살게 한다.</p>
+          </div>
+          <p>삶이 당신에게 아무 편지도 보내지 않는 시기가 있다. 그때 당신은 어떻게 하는가 — 닭을 팔아버리고 하루를 연명하는가, 아니면 닭을 지키며 다음 금요일을 기다리는가. 마르케스는 답을 주지 않는다. 다만 대령은 닭을 팔지 않았다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quotes-gallery reveal">
+    <div class="quotes-gallery-label">작품의 문장들</div>
+    <div class="quotes-grid">
+      <div class="q-card">
+        <blockquote>"15년 동안 기다렸다. 한 번 더 기다리는 것은 어렵지 않다."</blockquote>
+        <cite>— 대령 / 기다림의 철학</cite>
+      </div>
+      <div class="q-card">
+        <blockquote>"그는 자신의 내장이 비어있다는 것을 느꼈다. 그러나 싸움닭을 팔지 않았다 — 그것은 미래이기 때문이다."</blockquote>
+        <cite>— 서술자 / 현재와 미래 사이의 선택</cite>
+      </div>
+      <div class="q-card">
+        <blockquote>"똥이지(Mierda)." — 소설의 마지막 단어. 75년의 삶을 압축한 두 음절. 이것은 패배가 아니라, 모든 것을 안 채로 선택하는 인간의 목소리다.</blockquote>
+        <cite>— 대령 / 소설의 마지막 문장</cite>
+      </div>
+    </div>
+  </div>
+
+  <div class="closing-q reveal">
+    <div class="closing-q-icon">✦</div>
+    <div>
+      <div class="closing-q-label">당신에게 던지는 질문</div>
+      <p>당신이 지금도 놓지 않고 지키고 있는 '싸움닭'은 무엇인가요?<br>그리고 그것이 언젠가 이길 것이라는 믿음은 아직 남아 있나요?</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 40 — 헤르타 뮐러 — 숨그네
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book40" data-num="40" data-era="classic" data-themes="theme-resistance theme-loneliness theme-identity" data-nobel="true">
+  <div class="book-keywords">
+    <span class="keyword-tag">#강제수용소</span>
+    <span class="keyword-tag">#언어와생존</span>
+    <span class="keyword-tag">#기억의윤리</span>
+  </div>
+
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover"
+           src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Atemschaukel.jpg"
+           alt="숨그네 표지"
+           loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#1a1a2e,#16213e);">
+        <span class="fb-title">숨그네</span>
+        <span class="fb-author">Herta Müller</span>
+      </div>
+      <div class="book-year-badge">Nobel 2009</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 40 · Herta Müller</div>
+      <h2 class="book-title">숨그네</h2>
+      <div class="book-author">Atemschaukel, 2009</div>
+      <p class="book-desc">
+        1945년, 17세의 루마니아계 독일인 레오 아우베르크는 소련 강제수용소로 끌려간다. 5년간의 수용소 생활 — 굶주림, 혹독한 노동, 동료들의 죽음. 헤르타 뮐러는 루마니아 차우셰스쿠 독재 치하에서 비밀경찰의 탄압을 받았고, 독일 망명 후 이 소설을 썼다. 수용소 생존자이자 시인인 오스카르 파스티오르의 증언을 바탕으로 한 이 작품은, 2009년 노벨 문학상 수상작이다. 한림원은 뮐러를 "시의 응집성과 산문의 솔직함으로 박탈당한 자들의 풍경을 묘사한 작가"로 칭했다. 이 소설은 역사의 가장 어두운 곳에서 언어가 어떻게 생존의 도구가 되는지를 보여준다.
+      </p>
+    </div>
+  </div>
+
+  <div class="hero-quote reveal">
+    <p>"나는 배가 고프다는 것을 알고 있다. 하지만 그것을 말로 표현할 수 있는 한, 나는 아직 인간이다."</p>
+    <span class="hero-quote-attr">— 레오 아우베르크 / 언어와 존엄의 관계</span>
+  </div>
+
+  <div class="citation-simple reveal">
+    <div class="citation-label-row">
+      <span class="citation-label">🏛 Nobel Citation · 공식 선정 사유 (2009)</span>
+    </div>
+    <p class="citation-text">"who, with the concentration of poetry and the frankness of prose, depicts the landscape of the dispossessed."</p>
+    <div class="citation-analysis">Herta Müller · 2009 Nobel Prize in Literature</div>
+  </div>
+
+  <div class="innovation reveal">
+    <h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3>
+    <ul>
+      <li><strong>언어의 물질성</strong> — 뮐러는 단어를 마치 물체처럼 다룬다. "배고픔의 천사(Der Hunger-Engel)"라는 그녀의 고유한 표현은 추상적 고통을 구체적 형상으로 만든다. 극한의 상황에서 언어가 어떻게 새로운 의미를 생성하는지를 보여준다.</li>
+      <li><strong>트라우마 서사의 새 형식</strong> — 일직선적 시간 순서를 따르지 않고, 기억이 습격하는 방식 그대로 서술된다. 이 형식 자체가 트라우마의 본질 — 비선형적이고, 반복적이며, 예고 없이 현재를 침범하는 — 을 담는다.</li>
+    </ul>
+  </div>
+
+  <div class="ext-links reveal">
+    <div class="ext-links-label">더 깊이 들어가기</div>
+    <a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%ED%97%A4%EB%A5%B4%ED%83%80+%EB%AE%AC%EB%9F%AC+%EC%88%A8%EA%B7%B8%EB%84%A4+%EB%85%B8%EB%B2%A8+%EB%AC%B8%ED%95%99%EC%83%81" target="_blank" rel="noopener">
+      <span class="ext-icon">▶</span> YouTube 해설 검색
+    </a>
+    <a class="ext-btn lec" href="https://www.google.com/search?q=%ED%97%A4%EB%A5%B4%ED%83%80+%EB%AE%AC%EB%9F%AC+%EC%88%A8%EA%B7%B8%EB%84%A4+%EB%AC%B8%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener">
+      <span class="ext-icon">🔍</span> Google 검색
+    </a>
+  </div>
+
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">줄거리와 장면</div>
+        <h3 class="step-title">이야기의 전개</h3>
+        <div class="step-body">
+          <p>1945년 1월 새벽. 17세 레오는 소련군 트럭에 실려 우크라이나 수용소로 끌려간다. 그는 그곳에서 5년을 보낸다. 소설은 그 5년을 선형적으로 서술하지 않는다 — 대신 '배고픔의 천사', '삽', '시멘트', '눈(雪)' 같은 수용소의 사물들이 각각 장(章)의 제목이 되고, 기억이 그 사물들을 중심으로 소용돌이친다.</p>
+          <div class="scene">
+            <p>수용소에서 가장 큰 공포는 폭력이 아니라 굶주림이다. 레오는 생존을 위해 무엇이든 먹는다 — 눈, 풀, 석탄 조각. 그러나 그가 끝까지 포기하지 않은 것은 언어다. 그는 속으로 단어를 만들고, 문장을 조립하고, 보이지 않는 시를 쓴다.</p>
+            <span class="scene-attr">— 언어가 생존 도구가 되는 장면</span>
+          </div>
+          <p>5년 후 레오는 살아서 돌아온다. 그러나 귀환 후의 삶은 수용소보다 어떤 면에서 더 힘들다 — 아무도 묻지 않는다. 아무도 듣고 싶어하지 않는다. 그는 60년을 침묵으로 살다가, 뮐러를 만나 비로소 말을 시작한다. 이 소설이 그 말의 기록이다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">상징과 철학</div>
+        <h3 class="step-title">숨겨진 의미와 상징</h3>
+        <div class="step-body">
+          <p>'숨그네(Atemschaukel, Breath-swing)'는 뮐러가 만든 조어다 — 숨을 쉴 때마다 몸이 그네처럼 흔들리는 극도의 굶주림 상태. 이 단어 하나가 언어로 표현할 수 없는 고통에 이름을 붙임으로써, 그 고통을 현실의 것으로 만든다. 언어가 없으면 고통은 공유될 수 없고, 공유될 수 없으면 역사가 되지 못한다.</p>
+          <div class="scene">
+            <p>"배고픔의 천사는 내 안에 살았다. 그것은 나를 먹으면서 나를 살렸다." — 이 역설이 극한 상황의 본질이다. 살아남으려는 의지가 자신을 갉아먹으면서 동시에 자신을 붙들어 준다.</p>
+            <span class="scene-attr">— 레오의 독백 / 생존의 역설</span>
+          </div>
+          <p>소설 전체에 흐르는 질문은 이것이다 — 역사의 가장 어두운 곳에서 인간성을 지키는 것은 무엇인가? 뮐러의 답은 언어다. 고통에 이름을 붙이는 능력, 그것이 마지막 인간성이다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div>
+      <div class="step-content">
+        <div class="step-badge">오늘날의 울림</div>
+        <h3 class="step-title">지금 우리에게 주는 메시지</h3>
+        <div class="step-body">
+          <p>레오 아우베르크의 이야기는 60년 동안 아무도 듣지 않았다. 역사의 피해자들이 침묵 속에 사라지는 것은, 학살이나 억압보다 더 조용하고 더 지속적인 폭력이다. '우리는 기억하겠다'는 말은 실제로 '우리는 듣겠다'는 의지를 동반해야 한다.</p>
+          <div class="scene">
+            <p>뮐러가 파스티오르를 만나 그의 이야기를 소설로 만들기까지 오랜 시간이 걸렸다. 그 과정에서 파스티오르는 세상을 떠났다. 뮐러는 혼자 완성했다. 이 소설은 한 사람의 이야기가 사라지지 않도록 지키려는 작가의 윤리적 결단의 산물이다.</p>
+          </div>
+          <p>지금 이 순간에도 말해지지 않은 이야기들이 있다. 노인의 기억 속에, 난민의 침묵 속에, 사회가 외면하는 곳에. 문학은 그 이야기들을 받아 적는 가장 오래된 방식이다. 그리고 그 방식은 지금도 유효하다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quotes-gallery reveal">
+    <div class="quotes-gallery-label">작품의 문장들</div>
+    <div class="quotes-grid">
+      <div class="q-card">
+        <blockquote>"배고픔의 천사는 천사가 아니다. 그것은 내 안에서 나를 먹으며 사는 것이다. 그러나 그것이 없었다면 나도 없었을 것이다."</blockquote>
+        <cite>— 레오 아우베르크 / 생존의 역설</cite>
+      </div>
+      <div class="q-card">
+        <blockquote>"고통에 이름을 붙일 수 있는 한, 나는 아직 그 고통의 주인이다. 이름이 없으면 고통이 나를 소유한다."</blockquote>
+        <cite>— 레오 / 언어와 존엄의 관계</cite>
+      </div>
+      <div class="q-card">
+        <blockquote>"나는 집으로 돌아왔다. 그러나 집은 내가 돌아온 것을 몰랐다. 그리고 나도 내가 돌아온 건지 알지 못했다."</blockquote>
+        <cite>— 레오 / 귀환 후의 소외</cite>
+      </div>
+    </div>
+  </div>
+
+  <div class="closing-q reveal">
+    <div class="closing-q-icon">✦</div>
+    <div>
+      <div class="closing-q-label">당신에게 던지는 질문</div>
+      <p>당신 주변에 아직 말해지지 않은 채 사라져가는 이야기가 있나요?<br>그 이야기를 듣는 것, 혹은 기억하는 것 — 그것이 당신이 할 수 있는 가장 작은 윤리적 행위가 아닐까요?</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 41 — 인간 실격 (다자이 오사무)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book41" data-num="41" data-era="classic" data-themes="theme-identity theme-loneliness theme-absurd">
+  <div class="book-keywords"><span class="keyword-tag">#자기혐오</span><span class="keyword-tag">#가면</span><span class="keyword-tag">#실존의붕괴</span></div>
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/No_Longer_Human.jpg" alt="인간 실격 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#1a1a2e,#0d0d1a);"><span class="fb-title">인간 실격</span><span class="fb-author">太宰治</span></div>
+      <div class="book-year-badge">1948</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 41 · 다자이 오사무 (太宰治)</div>
+      <h2 class="book-title">인간 실격</h2>
+      <div class="book-author">人間失格, 1948</div>
+      <p class="book-desc">다자이 오사무가 죽기 직전 완성한 자전적 고백 소설. 주인공 오바 요조는 태어날 때부터 인간의 감정을 이해하지 못해, 평생 익살과 가면으로 세상을 속이며 살아간다. 1948년 출간 직후 다자이는 스스로 생을 마감했다. BBC 선정 세계 100대 소설에 포함되었으며 일본에서만 1000만 부 이상 팔렸다. 이 소설은 '정상적인 사람'이 되지 못한다는 두려움, 사랑받기 위해 자신을 속여야 한다는 고통을 가장 솔직한 언어로 담았다. 지금 이 순간에도 수많은 사람들이 이 소설을 읽으며 "나의 이야기"라고 느낀다.</p>
+    </div>
+  </div>
+  <div class="hero-quote reveal"><p>"저는 인간을 두려워합니다. 그러면서도 인간을 떠날 수 없습니다. 그것이 제가 광대가 된 이유입니다."</p><span class="hero-quote-attr">— 오바 요조 / 가면의 탄생</span></div>
+  <div class="innovation reveal"><h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3><ul><li><strong>자기 혐오의 언어화</strong> — 다자이는 수치심과 자기혐오를 문학적 소재로 정면에 세웠다. 그 감정이 개인의 결함이 아니라 보편적 인간 조건임을 보여주었다.</li><li><strong>가면의 서사학</strong> — 오바 요조는 끊임없이 '연기'한다. 그 정교한 가면이 오히려 독자로 하여금 자신의 사회적 가면을 돌아보게 만드는 페르소나 문학의 결정판이다.</li></ul></div>
+  <div class="ext-links reveal"><div class="ext-links-label">더 깊이 들어가기</div><a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EC%9D%B8%EA%B0%84+%EC%8B%A4%EA%B2%A9+%EB%8B%A4%EC%9E%90%EC%9D%B4+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener"><span class="ext-icon">▶</span> YouTube 해설 검색</a><a class="ext-btn lec" href="https://www.google.com/search?q=%EC%9D%B8%EA%B0%84+%EC%8B%A4%EA%B2%A9+%EB%8B%A4%EC%9E%90%EC%9D%B4+%EB%AC%B8%ED%95%99" target="_blank" rel="noopener"><span class="ext-icon">🔍</span> Google 검색</a></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">줄거리와 장면</div><h3 class="step-title">이야기의 전개</h3><div class="step-body"><p>소설은 세 권의 수기로 구성된다. 어린 시절부터 오바 요조는 인간의 감정 체계를 이해하지 못한다. 그는 광대 짓으로 이 불이해를 감추며 살아간다. 도쿄의 미술학교에 진학한 요조는 술, 마약, 여자에 빠지며 스스로를 파괴한다. 선한 사람들이 그를 구하려 하지만, 그는 그 선의조차 감당하지 못한다.</p><div class="scene"><p>"저는 행복한 척하는 데 익숙합니다. 아니, 행복한 척 말고는 살아가는 방법을 모릅니다."</p><span class="scene-attr">— 오바 요조 / 가면의 고백</span></div><p>세 번의 자살 시도. 요조는 결국 정신병원에 수용된다. 소설의 서두에 등장한 '나'가 요조의 사진을 바라보며 독자에게 전하는 말이 소설의 첫이자 마지막 프레임이다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">상징과 철학</div><h3 class="step-title">숨겨진 의미와 상징</h3><div class="step-body"><p>'인간 실격'이라는 제목은 요조 자신이 내린 판정이다. 그러나 소설을 읽으면서 독자는 묻게 된다 — 과연 누가 그를 실격시켰는가? 그를 이용한 여자들인가, 그의 진심을 알아채지 못한 사회인가, 아니면 그 자신의 자기혐오인가?</p><div class="scene"><p>"신은 있습니까? 저는 알 수 없습니다. 그러나 벌은 있습니다. 저는 지금 그것을 받고 있습니다."</p><span class="scene-attr">— 요조의 독백 / 존재에 대한 가장 고독한 질문</span></div><p>광대의 가면은 인간관계의 윤활제이지만, 동시에 진짜 자신을 영원히 숨기는 감옥이다. 요조의 비극은 그 가면을 벗는 법을 끝내 배우지 못한 것이다. 혹은 — 벗었을 때 사랑받지 못할까봐 끝내 벗지 않은 것이다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">오늘날의 울림</div><h3 class="step-title">지금 우리에게 주는 메시지</h3><div class="step-body"><p>SNS 시대의 우리는 모두 어느 정도 요조다. '좋아요'를 받기 위한 게시물, 칭찬받기 위한 발언, 관계를 유지하기 위한 동의 — 우리는 매일 정도의 차이만 있을 뿐 가면을 쓴다.</p><div class="scene"><p>이 소설을 읽은 후 많은 사람들이 처음으로 자신의 '가면 쓰기'를 인식한다고 말한다. 인식이 변화의 첫걸음이다. 다자이는 그 첫걸음을 선물하고 떠났다.</p></div><p>당신이 지금 쓰고 있는 가면은 무엇인가. 그리고 그 가면 아래의 얼굴을 마지막으로 누군가에게 보여준 것은 언제인가.</p></div></div></div>
+  </div>
+  <div class="quotes-gallery reveal"><div class="quotes-gallery-label">작품의 문장들</div><div class="quotes-grid"><div class="q-card"><blockquote>"저는 인간을 사랑합니다. 그러나 그 사랑이 두렵습니다. 그래서 저는 광대가 됩니다."</blockquote><cite>— 오바 요조 / 사랑과 공포의 역설</cite></div><div class="q-card"><blockquote>"수치는 삶을 갉아먹습니다. 그러나 수치가 없다면, 나는 무엇으로 인간임을 증명하겠습니까."</blockquote><cite>— 요조 / 수치심의 이중성</cite></div><div class="q-card"><blockquote>"저는 이 세상의 이방인입니다. 그러나 이 세상을 떠날 수도 없습니다. 그것이 제 지옥입니다."</blockquote><cite>— 요조 / 소속과 소외 사이에서</cite></div></div></div>
+  <div class="closing-q reveal"><div class="closing-q-icon">✦</div><div><div class="closing-q-label">당신에게 던지는 질문</div><p>당신이 매일 쓰는 '광대의 가면'은 무엇인가요?<br>그 가면 없이도 사랑받을 수 있다는 것을, 당신은 믿나요?</p></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 42 — 동물농장 (조지 오웰)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book42" data-num="42" data-era="classic" data-themes="theme-society theme-resistance theme-absurd">
+  <div class="book-keywords"><span class="keyword-tag">#전체주의</span><span class="keyword-tag">#권력부패</span><span class="keyword-tag">#우화</span></div>
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Animal_Farm.jpg" alt="동물농장 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#2e5a1e,#1a3410);"><span class="fb-title">동물농장</span><span class="fb-author">George Orwell</span></div>
+      <div class="book-year-badge">1945</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 42 · George Orwell</div>
+      <h2 class="book-title">동물농장</h2>
+      <div class="book-author">Animal Farm, 1945</div>
+      <p class="book-desc">농장의 동물들이 인간 농장주를 몰아내고 스스로 농장을 운영한다. "모든 동물은 평등하다"는 구호로 시작된 혁명은, 돼지들이 권력을 장악하면서 "어떤 동물은 더 평등하다"는 방향으로 변질된다. 100쪽이 안 되는 이 우화는 타임·BBC 등 전세계 언론의 필독 목록 최상위에 자리한다. 권력이 어떻게 이상을 배신하는지를 보편적으로 설명한다. 출간 당시 수십 곳의 출판사가 거절했다는 사실 자체가 이 소설의 힘을 증명한다.</p>
+    </div>
+  </div>
+  <div class="hero-quote reveal"><p>"모든 동물은 평등하다. 그러나 어떤 동물은 다른 동물보다 더 평등하다."</p><span class="hero-quote-attr">— 수정된 계명 / 권력 부패의 본질을 담은 한 문장</span></div>
+  <div class="innovation reveal"><h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3><ul><li><strong>정치 우화의 완성형</strong> — 동물이라는 우회로를 통해 독자는 경계를 내리고 정치적 진실을 받아들인다. 이 소설 이후 '정치 우화'는 문학의 정당한 장르가 되었다.</li><li><strong>언어의 정치학</strong> — 지배자들이 역사를 다시 쓰고 구호를 바꾸는 과정이 정교하게 묘사된다. 언어가 어떻게 진실을 은폐하고 대중을 통제하는 도구가 되는지에 대한 가장 날카로운 교과서다.</li></ul></div>
+  <div class="ext-links reveal"><div class="ext-links-label">더 깊이 들어가기</div><a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EB%8F%99%EB%AC%BC%EB%86%8D%EC%9E%A5+%EC%98%A4%EC%9B%B0+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener"><span class="ext-icon">▶</span> YouTube 해설 검색</a><a class="ext-btn lec" href="https://www.google.com/search?q=%EB%8F%99%EB%AC%BC%EB%86%8D%EC%9E%A5+%EC%98%A4%EC%9B%B0+%EB%AC%B8%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener"><span class="ext-icon">🔍</span> Google 검색</a></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">줄거리와 장면</div><h3 class="step-title">이야기의 전개</h3><div class="step-body"><p>늙은 돼지 메이저가 죽기 전 설파한다 — "인간이 문제다. 인간을 몰아내면 우리는 자유롭다." 혁명이 성공한다. 일곱 가지 계명이 헛간 벽에 새겨진다. "모든 동물은 평등하다." 그러나 나폴레옹이 권력을 독점하면서 계명이 하나씩 수정된다.</p><div class="scene"><p>말 복서는 "나폴레옹 동지는 항상 옳다"와 "내가 더 열심히 일하겠다"를 신조로 삼는다. 그리고 쓸모가 없어지자 도살장으로 팔린다. 아무도 막지 않는다. 아무도 기억하지 않으려 한다.</p><span class="scene-attr">— 복서의 최후 / 순진한 충성의 비극</span></div><p>소설 말미, 돼지들은 두 발로 걷고 채찍을 든다. 인간과 돼지가 함께 카드놀이를 하는 장면을 바라보던 다른 동물들은 인간과 돼지 중 누가 누구인지 알 수 없게 된다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">상징과 철학</div><h3 class="step-title">숨겨진 의미와 상징</h3><div class="step-body"><p>오웰이 보여주는 권력 부패의 경로는 보편적이다. 혁명의 이상 → 소수 엘리트의 독점 → 역사 수정 → 언어 통제 → 반대파 숙청 → 대중의 망각. 이 경로는 역사의 수많은 정권에서 반복되어 왔고, 지금도 반복된다.</p><div class="scene"><p>"네 발은 좋고, 두 발은 나쁘다"가 어느 순간 "네 발은 좋고, 두 발은 더 좋다"로 바뀐다. 그들은 처음부터 그랬는지도 모른다고 '교육'받기 때문이다.</p><span class="scene-attr">— 변형된 계명 / 역사 수정과 대중 세뇌</span></div><p>구호는 복잡한 현실을 단순화하고, 단순화된 현실은 지배자에게 유리하다. 오웰은 이것을 '뉴스피크(Newspeak)'라 불렀고, 지금 우리는 그것을 '프레이밍'이라 부른다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">오늘날의 울림</div><h3 class="step-title">지금 우리에게 주는 메시지</h3><div class="step-body"><p>민주주의도, 혁신도, 스타트업도 — 어떤 조직이든 초기의 이상이 권력과 만나면 변질의 유혹을 받는다. 동물농장의 경고는 특정 이념에만 적용되지 않는다. 그것은 인간 집단의 보편적 경향에 관한 경고다.</p><div class="scene"><p>복서를 기억하라. 가장 열심히 일하고, 가장 충성스러웠으며, 가장 비참하게 버려진 말. 조직이 당신에게 '더 열심히'만을 요구할 때 — 그 조직이 당신을 어떻게 볼지 돌아볼 필요가 있다.</p></div><p>오웰이 묻는다 — 지금 당신이 따르는 '계명'은 처음과 같은가? 그것이 언제, 어떻게 바뀌었는지 당신은 기억하는가?</p></div></div></div>
+  </div>
+  <div class="quotes-gallery reveal"><div class="quotes-gallery-label">작품의 문장들</div><div class="quotes-grid"><div class="q-card"><blockquote>"모든 동물은 평등하다. 그러나 어떤 동물은 다른 동물보다 더 평등하다."</blockquote><cite>— 수정된 마지막 계명 / 권력의 자기모순</cite></div><div class="q-card"><blockquote>"혁명의 적은 외부에 없다. 그것은 혁명 안에서 자란다."</blockquote><cite>— 서술자 / 부패의 내부성</cite></div><div class="q-card"><blockquote>"과거를 지배하는 자가 미래를 지배한다. 현재를 지배하는 자가 과거를 지배한다."</blockquote><cite>— 오웰의 정치 철학 / 역사와 권력</cite></div></div></div>
+  <div class="closing-q reveal"><div class="closing-q-icon">✦</div><div><div class="closing-q-label">당신에게 던지는 질문</div><p>당신이 속한 집단에서 처음과 달라진 '계명'은 무엇인가요?<br>그 변화를 알아채지 못한 이유는 무엇이었나요?</p></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 43 — 향수 (파트리크 쥐스킨트)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book43" data-num="43" data-era="classic" data-themes="theme-identity theme-absurd theme-society">
+  <div class="book-keywords"><span class="keyword-tag">#천재와괴물</span><span class="keyword-tag">#욕망</span><span class="keyword-tag">#존재의증명</span></div>
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Perfume.jpg" alt="향수 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#4a2060,#1e0a2e);"><span class="fb-title">향수</span><span class="fb-author">Patrick Süskind</span></div>
+      <div class="book-year-badge">1985</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 43 · 파트리크 쥐스킨트 (Patrick Süskind)</div>
+      <h2 class="book-title">향수</h2>
+      <div class="book-author">Das Parfum, 1985</div>
+      <p class="book-desc">18세기 파리. 자신의 체취가 없는 남자 장-바티스트 그르누이는 역사상 가장 탁월한 후각을 갖고 태어났지만, 세상 모든 냄새를 맡을 수 있는 그에게 단 하나의 냄새가 없다 — 그 자신의 냄새. 그는 존재의 증거를 찾기 위해 살인을 저지른다. 45개 언어로 번역되고 2000만 부 이상 팔렸다. 가디언, 타임 모두 필독 소설로 선정했다. 후각이라는 가장 원시적인 감각을 통해 인간의 가장 심층적인 욕망 — 존재를 인정받고 싶다는 욕망 — 을 탐구한다.</p>
+    </div>
+  </div>
+  <div class="hero-quote reveal"><p>"그는 세상의 모든 냄새를 알았다. 단 하나, 그 자신의 냄새만 빼고."</p><span class="hero-quote-attr">— 서술자 / 그르누이의 존재론적 결핍</span></div>
+  <div class="innovation reveal"><h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3><ul><li><strong>감각의 서사화</strong> — 쥐스킨트는 후각을 주된 서사 도구로 삼아, 냄새로 세계와 감정을 묘사하는 완전히 새로운 문학적 감각을 열었다.</li><li><strong>공감 불가능한 괴물의 서사</strong> — 그르누이는 독자가 동일시할 수 없는 연쇄 살인마다. 그러나 소설은 그를 악마가 아닌 비극적 인물로 그린다. 이 '공감 없는 이해'가 독자에게 더 깊은 성찰을 남긴다.</li></ul></div>
+  <div class="ext-links reveal"><div class="ext-links-label">더 깊이 들어가기</div><a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%ED%96%A5%EC%88%98+%EC%A5%90%EC%8A%A4%ED%82%A8%ED%8A%B8+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener"><span class="ext-icon">▶</span> YouTube 해설 검색</a><a class="ext-btn lec" href="https://www.google.com/search?q=%ED%96%A5%EC%88%98+%EC%A5%90%EC%8A%A4%ED%82%A8%ED%8A%B8+%EB%AC%B8%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener"><span class="ext-icon">🔍</span> Google 검색</a></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">줄거리와 장면</div><h3 class="step-title">이야기의 전개</h3><div class="step-body"><p>1738년 파리의 생선 시장. 악취 속에서 태어난 그르누이는 어릴 때부터 범접할 수 없는 후각을 지닌다. 향수 제조업자에게 발탁된 그는 기술을 습득하며 자신만의 목표를 세운다 — 세상에서 가장 아름다운 향수를 만드는 것. 그 원료는 순결한 처녀들의 체향이다.</p><div class="scene"><p>완성된 향수를 몸에 뿌리자 처형장의 군중이 광란의 도취에 빠진다. 그러나 그르누이는 공허하다 — 그 모든 사랑은 향수에 대한 것이지, 그 자신에 대한 것이 아니기 때문이다.</p><span class="scene-attr">— 처형장 장면 / 사랑받지 못하는 자의 비극</span></div><p>그는 결국 파리의 빈민가로 돌아가 남은 향수를 자신의 몸에 모두 뿌린다. 군중이 몰려들어 그를 먹어치운다 — 그가 바라던 '사랑받음'이 실현되는 그로테스크한 결말.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">상징과 철학</div><h3 class="step-title">숨겨진 의미와 상징</h3><div class="step-body"><p>그르누이의 체취 부재는 '자아의 부재'를 상징한다. 그는 존재하지만, 아무도 그의 존재를 느끼지 못한다. '나는 누군가에게 중요한 존재인가'라는 물음은 인간의 가장 원초적인 불안이다.</p><div class="scene"><p>"그는 모든 것을 원했다. 사랑받기를, 존재하기를, 느껴지기를. 그러나 향수를 통해 얻은 사랑은 공허했다 — 그것은 그가 아닌 냄새를 향한 것이었기 때문이다."</p><span class="scene-attr">— 서술자 / 가장 그로테스크한 형태의 인정 욕구</span></div><p>그르누이가 범죄로 나아간 이유는 악의가 아니라 결핍이다. 욕망의 끝에 무엇이 있는지를 보여주는 가장 극단적인 우화다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">오늘날의 울림</div><h3 class="step-title">지금 우리에게 주는 메시지</h3><div class="step-body"><p>SNS의 '좋아요', 구독자 수, 타인의 인정 — 우리 시대의 그르누이들은 디지털 향수를 만든다. 그렇게 모은 인정이 결국 '자기 자신'이 아닌 '자기가 만든 이미지'를 향한 것임을 깨달을 때의 공허함 — 그르누이는 그것을 이미 알았다.</p><div class="scene"><p>가장 유명한 향수를 만들고도 공허한 그르누이. 가장 많은 팔로워를 갖고도 외로운 인플루언서. 그 두 사람 사이에 얼마나 큰 차이가 있는가.</p></div><p>이 소설이 묻는 것은 이것이다 — 당신이 원하는 '인정'은 진짜 당신을 향한 것인가, 아니면 당신이 만든 향수를 향한 것인가?</p></div></div></div>
+  </div>
+  <div class="quotes-gallery reveal"><div class="quotes-gallery-label">작품의 문장들</div><div class="quotes-grid"><div class="q-card"><blockquote>"그는 세상의 모든 냄새를 기억할 수 있었다. 단 하나, 자신의 냄새만 빼고. 그것이 그의 저주였다."</blockquote><cite>— 서술자 / 존재의 역설</cite></div><div class="q-card"><blockquote>"사랑은 만들어질 수 있다. 그러나 만들어진 사랑은 진짜가 아니다."</blockquote><cite>— 서술자 / 조작된 감정의 공허</cite></div><div class="q-card"><blockquote>"천재와 괴물은 같은 씨앗에서 자란다. 그것이 꽃이 되느냐 독초가 되느냐는 토양의 문제다."</blockquote><cite>— 서술자 / 천재성의 양면</cite></div></div></div>
+  <div class="closing-q reveal"><div class="closing-q-icon">✦</div><div><div class="closing-q-label">당신에게 던지는 질문</div><p>당신이 받고 싶은 인정은 '진짜 당신'을 향한 것인가요,<br>아니면 당신이 만들어낸 이미지를 향한 것인가요?</p></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 44 — 파이 이야기 (얀 마텔)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book44" data-num="44" data-era="modern" data-themes="theme-resistance theme-loneliness theme-identity">
+  <div class="book-keywords"><span class="keyword-tag">#생존</span><span class="keyword-tag">#이야기의힘</span><span class="keyword-tag">#신과인간</span></div>
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Life_of_Pi.jpg" alt="파이 이야기 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#0a3d5c,#061e2e);"><span class="fb-title">파이 이야기</span><span class="fb-author">Yann Martel</span></div>
+      <div class="book-year-badge">Man Booker 2002</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 44 · 얀 마텔 (Yann Martel)</div>
+      <h2 class="book-title">파이 이야기</h2>
+      <div class="book-author">Life of Pi, 2001</div>
+      <p class="book-desc">인도 소년 파이 파텔이 태평양 한가운데 구명보트에서 벵골 호랑이 리처드 파커와 227일을 버틴다. 2002년 맨 부커상을 수상했고 40개 이상의 언어로 번역되어 1200만 부 이상 팔렸다. 타임·가디언·뉴욕타임스 모두 필독 목록에 올린 소설이다. 이 소설은 두 가지 이야기를 동시에 들려준다 — 소년과 호랑이의 이야기, 그리고 견딜 수 없는 진실의 이야기. 마지막에 독자는 어떤 이야기를 선택할지 결정해야 한다. 그 선택이 곧 이 소설의 주제다.</p>
+    </div>
+  </div>
+  <div class="hero-quote reveal"><p>"이야기가 없다면 현실은 너무 잔인하다. 우리에게 이야기가 필요한 이유가 거기 있다."</p><span class="hero-quote-attr">— 파이 파텔 / 이야기와 생존의 관계</span></div>
+  <div class="innovation reveal"><h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3><ul><li><strong>메타픽션과 신앙의 결합</strong> — 소설은 "당신을 신을 믿게 할 이야기"를 들려주겠다고 선언하며 시작한다. 그리고 마지막에 독자 스스로 무엇을 '믿을지' 선택하게 한다. 독자 참여형 신학 문학의 독보적인 성취다.</li><li><strong>상징으로서의 동물</strong> — 리처드 파커는 파이의 생존 본능과 두려움이 외화된 존재다. 둘이 함께 살아남는다는 것은 인간의 내면 야성을 공존으로 다스려야 한다는 의미다.</li></ul></div>
+  <div class="ext-links reveal"><div class="ext-links-label">더 깊이 들어가기</div><a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%ED%8C%8C%EC%9D%B4+%EC%9D%B4%EC%95%BC%EA%B8%B0+%EC%96%80+%EB%A7%88%ED%85%94+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener"><span class="ext-icon">▶</span> YouTube 해설 검색</a><a class="ext-btn lec" href="https://www.google.com/search?q=%ED%8C%8C%EC%9D%B4+%EC%9D%B4%EC%95%BC%EA%B8%B0+%EB%AC%B8%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener"><span class="ext-icon">🔍</span> Google 검색</a></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">줄거리와 장면</div><h3 class="step-title">이야기의 전개</h3><div class="step-body"><p>인도 폰디체리의 동물원 주인 아들 파이는 힌두교·기독교·이슬람교를 동시에 믿는 소년이다. 가족이 캐나다로 이민을 떠나던 중 배가 침몰한다. 파이만이 구명보트에서 살아남고, 거기에는 하이에나·오랑우탄·얼룩말, 그리고 벵골 호랑이 리처드 파커가 함께 탄다.</p><div class="scene"><p>파이는 호랑이를 죽이는 대신 길들이기로 결심한다. 물고기를 잡아 먹이고, 공간을 나누고, 규칙을 세운다. 호랑이가 살아야 자신도 살아있음을 느낄 수 있기 때문이다 — 공포가 그를 깨어있게 한다.</p><span class="scene-attr">— 파이의 생존 전략 / 공포와의 공존</span></div><p>227일 후 멕시코 해안에 표착한다. 리처드 파커는 돌아보지 않고 정글로 사라진다. 그리고 조사관에게 또 다른 이야기 — 호랑이가 아닌, 인간이 등장하는 이야기를 들려준다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">상징과 철학</div><h3 class="step-title">숨겨진 의미와 상징</h3><div class="step-body"><p>두 번째 이야기에서 하이에나는 요리사, 오랑우탄은 어머니, 리처드 파커는 파이 자신이다. 파이는 살기 위해 그 폭력에 가담했고, 그것을 견딜 수 있도록 동물의 이야기로 바꾸었다.</p><div class="scene"><p>"어느 이야기가 더 좋은 이야기입니까?" 파이가 조사관에게 묻는다. "호랑이가 있는 이야기요." "그렇다면, 신도 그렇습니다."</p><span class="scene-attr">— 소설의 핵심 대화 / 이야기와 신앙</span></div><p>현실은 때로 너무 가혹해서 직시할 수 없다. 이야기는 그것을 견딜 수 있는 형태로 변환해 준다. 그것이 문학의, 신앙의, 그리고 인간 마음의 가장 오래된 기능이다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">오늘날의 울림</div><h3 class="step-title">지금 우리에게 주는 메시지</h3><div class="step-body"><p>우리는 모두 자신의 삶에 이야기를 입힌다. 상처를 '성장의 계기'로, 실패를 '교훈'으로 재해석하는 것 — 이것이 인간이 트라우마를 견디는 방식이다.</p><div class="scene"><p>중요한 것은 어느 이야기가 '사실'이냐가 아니라, 어느 이야기가 당신을 살아있게 하느냐다. 그리고 그 이야기를 선택하는 것이 당신의 자유이자 책임이다.</p></div><p>당신은 지금 자신의 삶에 어떤 이야기를 입히고 있는가. 그 이야기가 당신을 살게 하는가, 아니면 옥죄고 있는가?</p></div></div></div>
+  </div>
+  <div class="quotes-gallery reveal"><div class="quotes-gallery-label">작품의 문장들</div><div class="quotes-grid"><div class="q-card"><blockquote>"공포는 삶의 첫 번째 기억이자 마지막 안식처다. 공포가 없다면, 우리는 살아있다고 느끼지 못한다."</blockquote><cite>— 파이 / 공포와 생존</cite></div><div class="q-card"><blockquote>"신앙은 도약이다. 이유가 없는 곳에서 뛰어오르는 것. 그 도약이 인간을 인간이게 한다."</blockquote><cite>— 파이 / 신앙의 본질</cite></div><div class="q-card"><blockquote>"호랑이와 나는 서로가 필요했다. 그가 없었다면 나는 살아남지 못했을 것이다."</blockquote><cite>— 파이 / 생존의 아이러니</cite></div></div></div>
+  <div class="closing-q reveal"><div class="closing-q-icon">✦</div><div><div class="closing-q-label">당신에게 던지는 질문</div><p>당신의 삶에서 가장 힘들었던 시간에 당신을 살게 한 '이야기'는 무엇이었나요?<br>그 이야기는 지금도 유효한가요?</p></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 45 — 소피의 세계 (요슈타인 가아더)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book45" data-num="45" data-era="modern" data-themes="theme-identity theme-absurd theme-society">
+  <div class="book-keywords"><span class="keyword-tag">#철학입문</span><span class="keyword-tag">#존재의문</span><span class="keyword-tag">#메타픽션</span></div>
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Sophies_World.jpg" alt="소피의 세계 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#1a3a5c,#0d1e30);"><span class="fb-title">소피의 세계</span><span class="fb-author">Jostein Gaarder</span></div>
+      <div class="book-year-badge">1991</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 45 · 요슈타인 가아더 (Jostein Gaarder)</div>
+      <h2 class="book-title">소피의 세계</h2>
+      <div class="book-author">Sofies verden, 1991</div>
+      <p class="book-desc">14세 소피 아문센에게 두 가지 질문이 적힌 편지가 도착한다. "당신은 누구입니까?" "세계는 어디서 왔습니까?" 신비의 철학 교사 알베르토 크녹스와의 서신 교환이 시작된다. 소크라테스부터 사르트르까지 서양 철학 전체를 소설의 형식으로 풀어낸 이 책은 전세계 3000만 부 이상 팔렸고 BBC·가디언 등의 필독 목록에 올랐다. 가장 거대한 질문을 가장 흥미롭게 담은 소설이자, 소설 자체가 철학적 논증이 되는 역작이다.</p>
+    </div>
+  </div>
+  <div class="hero-quote reveal"><p>"철학자와 어린이의 차이는 단 하나다. 어린이는 당연한 것에 놀라고, 철학자는 그 놀라움을 잃지 않는다."</p><span class="hero-quote-attr">— 알베르토 크녹스 / 철학의 본질</span></div>
+  <div class="innovation reveal"><h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3><ul><li><strong>철학 소설의 대중화</strong> — 2500년 서양 철학사를 한 소녀의 성장 이야기와 결합해 대중에게 전달하는 데 성공했다. '어려운 것을 쉽게'가 아니라 '깊은 것을 흥미롭게'가 이 소설의 성취다.</li><li><strong>소설 속 소설의 실존적 전복</strong> — 후반부에 소피는 자신이 소설 속 인물임을 알게 된다. 독자로 하여금 '나 역시 누군가의 이야기 속 인물이 아닌가'를 진지하게 묻게 만든다.</li></ul></div>
+  <div class="ext-links reveal"><div class="ext-links-label">더 깊이 들어가기</div><a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EC%86%8C%ED%94%BC%EC%9D%98+%EC%84%B8%EA%B3%84+%EA%B0%80%EC%95%84%EB%8D%94+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener"><span class="ext-icon">▶</span> YouTube 해설 검색</a><a class="ext-btn lec" href="https://www.google.com/search?q=%EC%86%8C%ED%94%BC%EC%9D%98+%EC%84%B8%EA%B3%84+%EC%B2%A0%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener"><span class="ext-icon">🔍</span> Google 검색</a></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">줄거리와 장면</div><h3 class="step-title">이야기의 전개</h3><div class="step-body"><p>노르웨이 소녀 소피는 우편함에서 편지를 발견한다. "당신은 누구입니까?" 신원을 알 수 없는 철학 교사 알베르토 크녹스가 소크라테스·플라톤·칸트·헤겔·마르크스·사르트르를 차례로 가르친다.</p><div class="scene"><p>소피는 동시에 다른 편지들을 받는다 — 레바논 주둔 유엔군 아버지가 딸 힐데에게 보내는 편지들. 그 속에서 소피와 알베르토는 힐데를 위한 철학 이야기의 등장인물로 묘사된다. 소피는 깨닫는다 — 자신이 소설 속 인물이라는 것을.</p><span class="scene-attr">— 소설의 반전 / 존재의 층위</span></div><p>소피와 알베르토는 자신들을 쓰고 있는 작가의 통제를 벗어나려 한다. 그들은 파티 현장에서 탈출해 독자에게 보이지 않는 세계로 간다 — 자유의지와 운명에 관한 가장 기발한 문학적 구현.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">상징과 철학</div><h3 class="step-title">숨겨진 의미와 상징</h3><div class="step-body"><p>소피가 자신이 소설 속 인물임을 발견하는 것은 — 우리가 자신의 삶이 '이야기'로 구성되어 있음을 깨닫는 것의 알레고리다. 우리의 정체성은 부모·사회·문화·언어에 의해 '쓰여진' 것이다. 진정한 자유는 그것을 인식한 후에 가능하다.</p><div class="scene"><p>"우리가 토끼털 속에서 태어났다고 상상해보라. 대부분은 털 속 따뜻한 곳에 머물며 살아간다. 그러나 철학자는 그 털 끝까지 기어올라 마술사의 얼굴을 보려 한다."</p><span class="scene-attr">— 알베르토의 비유 / 철학자의 사명</span></div><p>이 소설은 '어째서 우리는 이 모든 것을 당연하게 받아들이는가'를 묻는 소설이다. 그 질문 자체가 이미 철학이다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">오늘날의 울림</div><h3 class="step-title">지금 우리에게 주는 메시지</h3><div class="step-body"><p>우리는 매일 수백 가지를 당연하게 받아들인다. 소피의 세계는 묻는다 — 당신이 마지막으로 '왜?'라는 질문을 한 것은 언제인가?</p><div class="scene"><p>아이들은 태어나면서 모든 것에 '왜?'를 묻는다. 어른이 되면서 우리는 그 질문을 잃는다. 소피의 세계가 오래도록 읽히는 이유는, 그 잃어버린 '왜?'를 되돌려주기 때문이다.</p></div><p>가장 기초적인 철학적 질문들 — "나는 누구인가", "어떻게 살 것인가" — 은 어른이 된다고 해결되지 않는다. 이 소설은 그 질문들을 다시 시작할 용기를 준다.</p></div></div></div>
+  </div>
+  <div class="quotes-gallery reveal"><div class="quotes-gallery-label">작품의 문장들</div><div class="quotes-grid"><div class="q-card"><blockquote>"당신이 마지막으로 '이게 왜 이렇지?'라고 물은 것은 언제인가? 철학은 바로 그 질문에서 시작한다."</blockquote><cite>— 알베르토 크녹스 / 철학의 출발점</cite></div><div class="q-card"><blockquote>"우리는 모두 거대한 우주의 토끼털 속에 산다. 철학자는 그 털 끝까지 기어올라 마술사의 눈을 보려 한다."</blockquote><cite>— 알베르토 / 철학의 비유</cite></div><div class="q-card"><blockquote>"존재한다는 것 자체가 가장 큰 기적이다. 우리가 그것을 잊고 살 뿐이다."</blockquote><cite>— 소피 / 존재에 대한 각성</cite></div></div></div>
+  <div class="closing-q reveal"><div class="closing-q-icon">✦</div><div><div class="closing-q-label">당신에게 던지는 질문</div><p>당신이 오늘 당연하게 여긴 것들 중 — 진짜로 '왜 그런지' 생각해본 것이 있나요?<br>당신이 지금 살고 있는 이 이야기는, 누가 쓴 것인가요?</p></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 46 — 위대한 유산 (찰스 디킨스)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book46" data-num="46" data-era="classic" data-themes="theme-identity theme-love theme-society">
+  <div class="book-keywords"><span class="keyword-tag">#계급</span><span class="keyword-tag">#성장</span><span class="keyword-tag">#진짜유산</span></div>
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Great_Expectations.jpg" alt="위대한 유산 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#3a2010,#1e1008);"><span class="fb-title">위대한 유산</span><span class="fb-author">Charles Dickens</span></div>
+      <div class="book-year-badge">1861</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 46 · 찰스 디킨스 (Charles Dickens)</div>
+      <h2 class="book-title">위대한 유산</h2>
+      <div class="book-author">Great Expectations, 1861</div>
+      <p class="book-desc">고아 소년 핍은 탈옥수를 도운 인연으로 익명의 후원자로부터 막대한 재산을 받는다. 그는 신사가 되기 위해 런던으로 상경하고, 아름답지만 냉정한 에스텔라에게 사랑에 빠진다. 진정한 '위대한 유산'이 돈과 지위가 아닌 곳에 있음을 깨닫기까지 긴 여정이 필요하다. BBC 선정 최고의 소설, 타임 필독 목록 고전 부문 최상위에 자리하는 디킨스의 대표작이다. 19세기 영국 계급 사회에 대한 가장 날카로운 풍자이자 성장 소설의 완성형.</p>
+    </div>
+  </div>
+  <div class="hero-quote reveal"><p>"나는 당신을 사랑합니다. 사랑하지 않으려 해도 사랑합니다. 다만 당신을 사랑한다는 것을 알아주기를 바랄 뿐입니다."</p><span class="hero-quote-attr">— 핍이 에스텔라에게 / 보답 없는 사랑의 고백</span></div>
+  <div class="innovation reveal"><h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3><ul><li><strong>계급과 자기기만의 해부</strong> — 핍이 자신의 뿌리를 부끄러워하며 상류층을 동경하는 과정이 정교하게 묘사된다. 디킨스는 이 자기기만이 계급 사회가 만들어낸 구조적 산물임을 보여준다.</li><li><strong>빅토리아 시대 소설의 완성</strong> — 복잡한 플롯·풍자적 캐릭터·사회 비판이 완벽하게 균형 잡혀 있다. 미스 해비셤·매그위치·에스텔라 — 영문학 역사에서 가장 기억되는 인물들이다.</li></ul></div>
+  <div class="ext-links reveal"><div class="ext-links-label">더 깊이 들어가기</div><a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EC%9C%84%EB%8C%80%ED%95%9C+%EC%9C%A0%EC%82%B0+%EB%94%94%ED%82%A8%EC%8A%A4+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener"><span class="ext-icon">▶</span> YouTube 해설 검색</a><a class="ext-btn lec" href="https://www.google.com/search?q=%EC%9C%84%EB%8C%80%ED%95%9C+%EC%9C%A0%EC%82%B0+%EB%94%94%ED%82%A8%EC%8A%A4+%EB%AC%B8%ED%95%99" target="_blank" rel="noopener"><span class="ext-icon">🔍</span> Google 검색</a></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">줄거리와 장면</div><h3 class="step-title">이야기의 전개</h3><div class="step-body"><p>영국 켄트 주 늪지대. 고아 소년 핍은 탈옥수 매그위치에게 빵과 줄칼을 구해준다. 이후 미스 해비셤의 저택에 초청받아 그녀의 양녀 에스텔라를 만나고 사랑에 빠진다. "당신 같은 신분으로는 나를 사랑할 자격이 없다." 핍은 신사가 되겠다고 결심한다.</p><div class="scene"><p>런던 생활 중 핍은 자신의 은인이 매그위치 — 그 탈옥수 — 임을 알게 된다. 기대했던 미스 해비셤이 아니었다. 한 번도 감사하지 않았던 사람이 전부를 바쳐 자신을 키웠다는 사실 앞에서 핍은 무너진다.</p><span class="scene-attr">— 반전의 순간 / 진짜 은인의 발견</span></div><p>에스텔라는 미스 해비셤이 남자에게 복수하기 위해 '사랑을 느끼지 못하도록' 키운 존재였다. 핍은 모든 것을 잃고서야 진정한 가치 — 조의 충성스러운 우정 — 가 어디 있었는지를 깨닫는다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">상징과 철학</div><h3 class="step-title">숨겨진 의미와 상징</h3><div class="step-body"><p>미스 해비셤은 결혼식 당일 버림받은 후 시간을 멈춘 여자다 — 웨딩드레스를 입은 채, 썩은 케이크 앞에서. 과거의 상처에서 벗어나지 못하는 인간의 비극이자, 그 상처를 타인에게 전이시키는 폭력의 알레고리다.</p><div class="scene"><p>'위대한 유산(Great Expectations)'이라는 제목 자체가 반어다. 핍이 기대한 위대한 유산(돈·지위·에스텔라)은 모두 환상이었고, 진짜 유산은 — 조의 변함없는 사랑, 매그위치의 헌신 — 처음부터 그의 곁에 있었다.</p><span class="scene-attr">— 제목의 역설 / 진짜 유산의 의미</span></div><p>에스텔라도 미스 해비셤의 복수의 희생자였다. 결국 두 사람 모두 타인의 상처가 만들어낸 비극 속에 살아온 것이다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">오늘날의 울림</div><h3 class="step-title">지금 우리에게 주는 메시지</h3><div class="step-body"><p>우리는 모두 어느 정도 핍이다 — 더 좋은 학교, 더 좋은 직장, 더 화려한 관계를 쫓으며 지금 곁에 있는 사람들의 가치를 보지 못하는. 그리고 그것을 잃고 나서야 돌아보는.</p><div class="scene"><p>조는 핍이 자신을 부끄러워해도 변함없이 그를 사랑했다. 핍이 가장 어려울 때 아무 말 없이 빚을 갚아주고 떠난다. '위대함'은 결국 이런 것이 아닐까 — 아무것도 요구하지 않고 변하지 않는 사랑.</p></div><p>지금 당신이 당연하게 여기는 곁의 사람들 — 그들이 사실 당신의 진짜 '위대한 유산'이지 않을까요?</p></div></div></div>
+  </div>
+  <div class="quotes-gallery reveal"><div class="quotes-gallery-label">작품의 문장들</div><div class="quotes-grid"><div class="q-card"><blockquote>"위대한 기대는 때로 우리를 위대하게 만들고, 때로 우리를 망친다. 그 차이는 무엇을 기대하느냐에 달려 있다."</blockquote><cite>— 핍 / 기대의 양면</cite></div><div class="q-card"><blockquote>"내가 가진 최고의 것들은 항상 내가 알아채지 못한 채 곁에 있었다."</blockquote><cite>— 핍 / 깨달음의 순간</cite></div><div class="q-card"><blockquote>"과거의 상처에서 벗어나지 못하는 것은 죽은 사람의 시간 속에 산 채로 갇히는 것이다."</blockquote><cite>— 서술자 / 미스 해비셤에 대한 묘사</cite></div></div></div>
+  <div class="closing-q reveal"><div class="closing-q-icon">✦</div><div><div class="closing-q-label">당신에게 던지는 질문</div><p>지금 당신이 쫓고 있는 '위대한 기대'는 무엇인가요?<br>그것을 쫓는 동안 당신 곁에서 조용히 기다리고 있는 사람은 누구인가요?</p></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 47 — 돈키호테 (세르반테스)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book47" data-num="47" data-era="classic" data-themes="theme-identity theme-absurd theme-resistance">
+  <div class="book-keywords"><span class="keyword-tag">#이상과현실</span><span class="keyword-tag">#광기와용기</span><span class="keyword-tag">#최초의근대소설</span></div>
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Don_Quixote.jpg" alt="돈키호테 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#5a3a10,#2e1c08);"><span class="fb-title">돈키호테</span><span class="fb-author">Cervantes</span></div>
+      <div class="book-year-badge">1605 · 1615</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 47 · 미겔 데 세르반테스 (Miguel de Cervantes)</div>
+      <h2 class="book-title">돈키호테</h2>
+      <div class="book-author">Don Quijote de la Mancha, 1605</div>
+      <p class="book-desc">기사 소설에 빠진 늙은 시골 귀족 알론소 키하다가 스스로를 돈키호테 데 라 만차라 칭하고 기사 여행을 떠난다. 풍차를 거인으로, 여관을 성으로 착각하며 세상을 누빈다. 노벨 위원회가 "역사상 최고의 소설"로 선정했고 BBC·타임·가디언 모두 필독 1위에 올린 작품이다. 쓰여진 지 400년이 넘었지만 이상과 현실 사이에서 분열하는 인간의 조건은 변하지 않기 때문에 여전히 현재다.</p>
+    </div>
+  </div>
+  <div class="hero-quote reveal"><p>"나는 무엇이 현실인지 안다. 그러나 그것이 꿈일지라도, 나는 그것이 아름답기를 원한다."</p><span class="hero-quote-attr">— 돈키호테 / 이상주의의 핵심</span></div>
+  <div class="innovation reveal"><h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3><ul><li><strong>최초의 근대 소설</strong> — 세르반테스는 소설이라는 장르가 정립되기 전에 이미 그 모든 요소 — 복잡한 캐릭터, 내면의 갈등, 현실과 허구의 경계 — 를 완성했다. 근대 이후의 모든 소설은 이 작품의 자손이다.</li><li><strong>이중성의 문학화</strong> — 돈키호테는 미쳤는가, 현명한가? 소설은 이 이분법을 끝까지 거부한다. 우리는 두 인물 모두에게서 자신을 발견한다.</li></ul></div>
+  <div class="ext-links reveal"><div class="ext-links-label">더 깊이 들어가기</div><a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EB%8F%88%ED%82%A4%ED%98%B8%ED%85%8C+%EC%84%B8%EB%A5%B4%EB%B0%98%ED%85%8C%EC%8A%A4+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener"><span class="ext-icon">▶</span> YouTube 해설 검색</a><a class="ext-btn lec" href="https://www.google.com/search?q=%EB%8F%88%ED%82%A4%ED%98%B8%ED%85%8C+%EB%AC%B8%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener"><span class="ext-icon">🔍</span> Google 검색</a></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">줄거리와 장면</div><h3 class="step-title">이야기의 전개</h3><div class="step-body"><p>50세의 가난한 시골 귀족은 기사 소설을 읽다가 이성을 잃는다. 그는 낡은 갑옷을 입고 비쩍 마른 말 로시난테를 타고 이웃 농부 산초 판사를 종자로 삼아 모험을 떠난다. 바람에 돌아가는 풍차를 보고 거인이라며 돌진한다 — 이 장면이 인류 문화사에서 가장 유명한 장면 중 하나다.</p><div class="scene"><p>"산초, 봐라! 저기 거인들이 있다." "저것은 거인이 아니라 풍차입니다, 나리." "자네는 겁쟁이라서 못 보는 게야!"</p><span class="scene-attr">— 풍차 장면 / 이상과 현실의 충돌</span></div><p>무수한 모험과 실패 끝에 집으로 돌아온다. 죽기 직전 이성을 되찾고 말한다 — "나는 이제 제정신이다. 그것이 슬프다." 광기 속에서 더 살아있었던 한 인간의 마지막 말.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">상징과 철학</div><h3 class="step-title">숨겨진 의미와 상징</h3><div class="step-body"><p>풍차와 거인 — 이것은 이상주의자가 세상을 보는 방식의 은유다. 그 믿음이 없으면 삶에 의미가 없다. 그래서 그는 풍차에서 거인을 본다 — 그것이 더 나은 세계를 만들기 위한 필요한 환상이기 때문이다.</p><div class="scene"><p>소설이 진행되면서 돈키호테와 산초 판사는 서로를 닮아간다 — 돈키호테는 점점 현실적이 되고, 산초는 점점 이상적이 된다. 이상과 현실은 고정된 게 아니라 서로 영향을 주고받는다.</p><span class="scene-attr">— 두 인물의 변화 / 이상과 현실의 상호침투</span></div><p>세르반테스는 묻는다 — 현실이 이상과 다르다는 것을 알면서도 그 이상을 향해 돌진해야 하는가? 그 질문은 400년이 지나도 답이 없다. 그래서 이 소설은 영원하다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">오늘날의 울림</div><h3 class="step-title">지금 우리에게 주는 메시지</h3><div class="step-body"><p>우리 시대는 돈키호테를 비웃는다. 현실적이 되라, 기대를 낮춰라, 데이터를 봐라. 그 현실주의 안에서 우리는 점점 풍차를 거인으로 보는 능력을 잃는다 — 즉, 불가능해 보이는 것에 도전하는 능력을.</p><div class="scene"><p>"나는 미쳤기 때문에 용감한 게 아니다. 그것이 옳은 일이기 때문에 용감한 것이다." 세상의 모든 변화는 처음에 누군가가 풍차를 거인으로 '착각'하는 데서 시작했다.</p></div><p>당신의 삶에서 아직 돌진해야 할 '풍차'가 있는가? 주변이 모두 "그건 그냥 풍차야"라고 말할 때 — 그것이 거인이라는 당신의 믿음을 지킬 수 있는가?</p></div></div></div>
+  </div>
+  <div class="quotes-gallery reveal"><div class="quotes-gallery-label">작품의 문장들</div><div class="quotes-grid"><div class="q-card"><blockquote>"길을 잃는 것도 방법이다. 지도에 없는 곳에서만 발견할 수 있는 것들이 있다."</blockquote><cite>— 돈키호테 / 모험의 의미</cite></div><div class="q-card"><blockquote>"이성을 되찾은 나는 지금 죽어가고 있다. 광기 속에서 나는 살아있었다."</blockquote><cite>— 임종의 돈키호테 / 이상의 역설</cite></div><div class="q-card"><blockquote>"나를 위해 불가능한 꿈을 꿔라. 이길 수 없는 적과 싸워라. 견딜 수 없는 슬픔을 견뎌라."</blockquote><cite>— 돈키호테 / 이상주의의 선언</cite></div></div></div>
+  <div class="closing-q reveal"><div class="closing-q-icon">✦</div><div><div class="closing-q-label">당신에게 던지는 질문</div><p>당신 삶의 '풍차'는 무엇인가요? 세상이 그냥 풍차라고 해도,<br>당신에게는 여전히 거인으로 보이는 것이 있나요?</p></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 48 — 모비딕 (허먼 멜빌)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book48" data-num="48" data-era="classic" data-themes="theme-resistance theme-loneliness theme-absurd">
+  <div class="book-keywords"><span class="keyword-tag">#집착</span><span class="keyword-tag">#인간의한계</span><span class="keyword-tag">#운명과의지</span></div>
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Moby_Dick.jpg" alt="모비딕 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#1a2a3a,#0a141e);"><span class="fb-title">모비딕</span><span class="fb-author">Herman Melville</span></div>
+      <div class="book-year-badge">1851</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 48 · 허먼 멜빌 (Herman Melville)</div>
+      <h2 class="book-title">모비딕</h2>
+      <div class="book-author">Moby-Dick; or, The Whale, 1851</div>
+      <p class="book-desc">한쪽 다리를 잃은 에이허브 선장이 흰 고래 모비딕을 향해 맹목적으로 복수를 추구하는 이야기. 화자 이스마엘의 시선으로 고래잡이 배 피쿼드 호의 항해를 따라간다. 출간 당시에는 실패했지만 사후에 재평가되어 지금은 미국 문학 최고의 걸작으로 꼽힌다. BBC·타임·가디언 모두 필독 목록 최상위에 올린 작품이다. 에이허브의 집착은 인간이 우주 앞에서 얼마나 작은 존재인지, 그러면서도 얼마나 위대하게 싸우는지를 동시에 보여준다.</p>
+    </div>
+  </div>
+  <div class="hero-quote reveal"><p>"나는 그 고래에게서 내가 증오하는 모든 것을 본다. 나는 그것이 악이든 아니든, 그것을 향해 돌진할 것이다."</p><span class="hero-quote-attr">— 에이허브 선장 / 집착의 본질</span></div>
+  <div class="innovation reveal"><h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3><ul><li><strong>백과사전적 소설의 탄생</strong> — 고래잡이에 관한 모든 기술적 정보, 신화, 철학, 성경 인용이 소설과 뒤섞인다. 이 혼합이 현대 소설의 가장 야심찬 서사 전략의 원형이 되었다.</li><li><strong>집착의 심리학</strong> — 에이허브의 고래 사냥은 인간의 가장 보편적인 충동 — 무언가에 모든 것을 바치는 것 — 의 극단적 형상화다. 그리고 그 결말이 보여주는 것은 자연의 무관심 앞에서 인간의 집착이 얼마나 무력한가이다.</li></ul></div>
+  <div class="ext-links reveal"><div class="ext-links-label">더 깊이 들어가기</div><a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EB%AA%A8%EB%B9%84%EB%94%95+%EB%A9%9C%EB%B9%8C+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener"><span class="ext-icon">▶</span> YouTube 해설 검색</a><a class="ext-btn lec" href="https://www.google.com/search?q=%EB%AA%A8%EB%B9%84%EB%94%95+%EB%A9%9C%EB%B9%8C+%EB%AC%B8%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener"><span class="ext-icon">🔍</span> Google 검색</a></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">줄거리와 장면</div><h3 class="step-title">이야기의 전개</h3><div class="step-body"><p>"나를 이스마엘이라 불러라." 소설의 첫 문장. 이스마엘은 바다로 나가 포경선 피쿼드 호에 승선한다. 선장 에이허브는 어느 날 갑판에 등장해 외친다 — "흰 고래를 잡는 자에게 금화를 주겠다!" 그 흰 고래가 그의 한쪽 다리를 앗아간 모비딕이다.</p><div class="scene"><p>항해 중 다른 포경선들이 모비딕을 목격했다는 소식이 들어올 때마다 에이허브의 집착은 깊어진다. 그는 어떤 상업적 이익도, 선원들의 안전도, 심지어 자신의 생명도 고려하지 않는다. 오직 고래만이 있다.</p><span class="scene-attr">— 에이허브의 집착 / 목적 없는 목적</span></div><p>사흘간의 추격 끝에 모비딕은 배를 침몰시킨다. 이스마엘만이 살아남는다. 고래는 사라진다. 아무것도 해결되지 않는다. 바다는 조용하다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">상징과 철학</div><h3 class="step-title">숨겨진 의미와 상징</h3><div class="step-body"><p>흰 고래 모비딕은 무엇인가 — 신인가, 악인가, 무관심한 자연인가, 에이허브 자신의 내면인가? 멜빌은 답을 주지 않는다. 흰색은 순수이기도 하고 공포이기도 하며 공허이기도 하다. 모비딕은 인간이 투영하는 모든 것의 스크린이다.</p><div class="scene"><p>"나는 너를 미워한다고 사랑이라 부르지 않겠다. 나는 너를 두려워한다고 경외라 부르지 않겠다. 나는 그냥 너를 쫓는다." — 에이허브의 독백은 인간의 집착이 얼마나 논리 이전의 것인지를 보여준다.</p><span class="scene-attr">— 에이허브 / 집착의 비논리성</span></div><p>이스마엘이 혼자 살아남는다는 것 — 집착하지 않은 자, 관찰하고 기록하는 자만이 살아남는다는 의미다. 그것은 예술가의 역할이자 생존 전략이다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">오늘날의 울림</div><h3 class="step-title">지금 우리에게 주는 메시지</h3><div class="step-body"><p>우리는 모두 각자의 흰 고래를 쫓는다 — 성공, 인정, 복수, 사랑, 완벽함. 그 추구 자체는 인간적이다. 그러나 에이허브처럼 그것이 다른 모든 것을 삼켜버릴 때, 우리는 배와 함께 가라앉는다.</p><div class="scene"><p>당신의 흰 고래는 무엇인가. 그것을 쫓는 것이 당신을 살게 하는가, 아니면 주변의 모든 것을 침몰시키고 있는가. 그 경계를 아는 것이 지혜이고, 그 경계를 인정하는 것이 용기다.</p></div><p>멜빌이 말하는 것은 포기가 아니다. 이스마엘은 고래를 쫓지 않았기에 이야기를 남겼다. 당신이 남기고 싶은 이야기는 무엇인가.</p></div></div></div>
+  </div>
+  <div class="quotes-gallery reveal"><div class="quotes-gallery-label">작품의 문장들</div><div class="quotes-grid"><div class="q-card"><blockquote>"나를 이스마엘이라 불러라." — 문학사에서 가장 유명한 첫 문장 중 하나. 이름 없는 방랑자의 이야기가 시작된다.</blockquote><cite>— 이스마엘 / 소설의 첫 문장</cite></div><div class="q-card"><blockquote>"바다는 아무것도 숨기지 않는다. 모든 것을 드러낸다. 그래서 인간은 바다를 두려워한다."</blockquote><cite>— 이스마엘 / 바다의 상징</cite></div><div class="q-card"><blockquote>"집착은 가장 순수한 형태의 사랑이다. 그리고 가장 위험한 형태의 광기다."</blockquote><cite>— 서술자 / 에이허브에 대한 묘사</cite></div></div></div>
+  <div class="closing-q reveal"><div class="closing-q-icon">✦</div><div><div class="closing-q-label">당신에게 던지는 질문</div><p>당신의 '흰 고래'는 무엇인가요?<br>그 추구가 당신을 살게 하는지, 아니면 주변을 침몰시키고 있는지 — 지금 돌아볼 수 있나요?</p></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 49 — 멋진 신세계 (올더스 헉슬리)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book49" data-num="49" data-era="classic" data-themes="theme-society theme-resistance theme-absurd">
+  <div class="book-keywords"><span class="keyword-tag">#디스토피아</span><span class="keyword-tag">#행복의역설</span><span class="keyword-tag">#자유의대가</span></div>
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Brave_New_World.jpg" alt="멋진 신세계 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#1e3a4a,#0d1e26);"><span class="fb-title">멋진 신세계</span><span class="fb-author">Aldous Huxley</span></div>
+      <div class="book-year-badge">1932</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 49 · 올더스 헉슬리 (Aldous Huxley)</div>
+      <h2 class="book-title">멋진 신세계</h2>
+      <div class="book-author">Brave New World, 1932</div>
+      <p class="book-desc">서기 2540년 '세계국가'. 인간은 태어나기 전부터 계급이 정해지고, 소마라는 행복약으로 고통 없이 살아간다. 전쟁도, 질병도, 슬픔도 없다. 단 하나 — 자유도 없다. 오웰의 『1984』가 공포로 통제하는 디스토피아라면, 헉슬리의 이 소설은 쾌락으로 통제하는 디스토피아다. BBC·타임 등 모든 필독 목록에 오른 이 소설은 1984보다 더 현재적이라는 평을 받는다 — 우리 시대의 통제는 공포가 아니라 오락과 편안함이기 때문이다.</p>
+    </div>
+  </div>
+  <div class="hero-quote reveal"><p>"나는 행복을 원하지 않는다. 나는 신을 원하고, 시를 원하고, 진짜 위험을 원하고, 자유를 원하고, 선을 원한다. 나는 죄를 원한다."</p><span class="hero-quote-attr">— 야만인 존 / 인간의 진정한 욕구에 대한 선언</span></div>
+  <div class="innovation reveal"><h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3><ul><li><strong>쾌락 독재의 예언</strong> — 1984가 고통으로 인간을 지배하는 미래를 그렸다면, 헉슬리는 쾌락으로 지배하는 미래를 그렸다. 스마트폰·SNS·넷플릭스로 가득한 지금 — 어느 쪽이 더 정확한 예언인지는 명확하다.</li><li><strong>행복의 역설</strong> — "고통 없는 행복이 진짜 행복인가"라는 질문은 오늘날의 우울증 치료·감정 조절 약물·AI 알고리즘 큐레이션에 관한 철학적 논쟁과 직결된다.</li></ul></div>
+  <div class="ext-links reveal"><div class="ext-links-label">더 깊이 들어가기</div><a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EB%A9%8B%EC%A7%84+%EC%8B%A0%EC%84%B8%EA%B3%84+%ED%97%89%EC%8A%AC%EB%A6%AC+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener"><span class="ext-icon">▶</span> YouTube 해설 검색</a><a class="ext-btn lec" href="https://www.google.com/search?q=%EB%A9%8B%EC%A7%84+%EC%8B%A0%EC%84%B8%EA%B3%84+%ED%97%89%EC%8A%AC%EB%A6%AC+%EB%AC%B8%ED%95%99+%EB%B6%84%EC%84%9D" target="_blank" rel="noopener"><span class="ext-icon">🔍</span> Google 검색</a></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">줄거리와 장면</div><h3 class="step-title">이야기의 전개</h3><div class="step-body"><p>세계국가는 완벽하다. 인간은 공장에서 대량 생산되고, 알파부터 엡실론까지 계급으로 분류되며, 각 계급에 맞는 행복감을 갖도록 조건화된다. 소마를 먹으면 즉시 행복해진다. 성은 자유롭고, 소비는 미덕이다. 고통은 제거되었다.</p><div class="scene"><p>세계국가 밖 '야만인 보호구역'에서 자란 존이 런던으로 온다. 그는 셰익스피어를 읽으며 자랐고, 사랑과 고통과 신을 안다. 완벽한 세계를 보고 그는 말한다 — "이것은 문명이 아니라 잘 꾸며진 감옥이다."</p><span class="scene-attr">— 존의 첫 반응 / 외부자의 시선</span></div><p>존은 통제자 무스타파 몬드와 대화한다. 몬드는 동의한다 — 예술·신·진짜 과학은 억압되어 있다고. 그러나 그것이 행복을 위해 필요한 희생이라고. 존은 거부한다. "나는 행복하지 않을 권리를 원한다." 그리고 스스로를 고립시키다 결국 자살한다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">상징과 철학</div><h3 class="step-title">숨겨진 의미와 상징</h3><div class="step-body"><p>소마는 오늘날의 스마트폰·소셜미디어·간편한 엔터테인먼트다. 우리는 불편함을 느끼면 즉시 스크롤을 내린다. 슬픔이 오기 전에 유튜브를 켠다. 고통을 처리하는 대신 회피한다. 헉슬리는 이 행동 패턴이 자유의 포기임을 보여준다.</p><div class="scene"><p>"당신들은 안정을 위해 예술을 포기했고, 행복을 위해 진실을 포기했으며, 쾌락을 위해 인간성을 포기했습니다." — 존의 이 고발은 2026년에 더 날카롭다.</p><span class="scene-attr">— 존이 몬드에게 / 문명의 교환</span></div><p>헉슬리가 가장 두려워한 것은 폭정이 아니었다. 그것은 사람들이 스스로 자유를 포기하는 것이었다 — 편안함과 행복을 그 대가로 기꺼이 지불하며.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">오늘날의 울림</div><h3 class="step-title">지금 우리에게 주는 메시지</h3><div class="step-body"><p>알고리즘은 우리가 좋아할 것을 예측해 보여준다. AI는 우리의 불편함을 제거해 준다. 플랫폼은 마찰 없는 경험을 설계한다. 이것이 바로 헉슬리가 상상한 소마다 — 자발적으로 섭취하는 무통의 행복.</p><div class="scene"><p>존이 원한 것 — 고통, 위험, 자유, 죄, 신 — 이것들이 제거된 세계가 정말 좋은 세계인가? 인간이 인간인 이유가 이 불편하고 위험한 요소들에 있다면?</p></div><p>당신이 오늘 피한 불편함 중 — 사실은 당신을 성장시켰을 것들이 있지 않은가? 편안함을 선택할 때마다 우리는 무엇을 포기하는가. 헉슬리는 그 질문을 1932년에 던졌다. 2026년, 답이 더 급해졌다.</p></div></div></div>
+  </div>
+  <div class="quotes-gallery reveal"><div class="quotes-gallery-label">작품의 문장들</div><div class="quotes-grid"><div class="q-card"><blockquote>"나는 행복하지 않을 권리를 원한다. 늙고 추하고 무력해질 권리를, 매독과 암에 걸릴 권리를 원한다."</blockquote><cite>— 야만인 존 / 인간으로서의 자유 선언</cite></div><div class="q-card"><blockquote>"사람들은 행복을 원하지 않는다. 그들은 단지 불행을 두려워할 뿐이다. 소마는 그 공포를 제거한다."</blockquote><cite>— 무스타파 몬드 / 행복의 정체</cite></div><div class="q-card"><blockquote>"가장 무서운 독재는 편안함으로 온다. 사람들이 자발적으로 자유를 내놓을 때."</blockquote><cite>— 헉슬리의 핵심 경고</cite></div></div></div>
+  <div class="closing-q reveal"><div class="closing-q-icon">✦</div><div><div class="closing-q-label">당신에게 던지는 질문</div><p>당신이 오늘 선택한 '편안함' 중 — 사실은 무언가 중요한 것을 포기한 선택은 없었나요?<br>당신이 진정 원하는 것은 행복인가요, 아니면 자유인가요?</p></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOK 50 — 갈매기의 꿈 (리처드 바크)
+═══════════════════════════════════════════════════════════ -->
+<section class="book-section reveal" id="book50" data-num="50" data-era="modern" data-themes="theme-resistance theme-identity theme-loneliness">
+  <div class="book-keywords"><span class="keyword-tag">#자기초월</span><span class="keyword-tag">#소명</span><span class="keyword-tag">#사회와개인</span></div>
+  <div class="book-header">
+    <div class="book-cover-wrap">
+      <img class="book-cover" src="https://casio8000.github.io/film-humanities_Mobile/images/book_cover/Jonathan_Livingston_Seagull.jpg" alt="갈매기의 꿈 표지" loading="lazy" onerror="this.style.display='none';var fb=this.nextElementSibling;if(fb){fb.style.display='flex';}">
+      <div class="book-cover-fallback" style="background:linear-gradient(145deg,#1a3a5a,#0d1e2e);"><span class="fb-title">갈매기의 꿈</span><span class="fb-author">Richard Bach</span></div>
+      <div class="book-year-badge">1970</div>
+    </div>
+    <div class="book-meta">
+      <div class="book-label">Book 50 · 리처드 바크 (Richard Bach)</div>
+      <h2 class="book-title">갈매기의 꿈</h2>
+      <div class="book-author">Jonathan Livingston Seagull, 1970</div>
+      <p class="book-desc">갈매기 조나단 리빙스턴은 무리와 다르다. 다른 갈매기들이 먹이를 위해 나는 동안, 그는 나는 것 자체에 완벽을 추구한다. 군집에서 추방당하고도 포기하지 않는다. 출간 당시 18개월 동안 뉴욕타임스 베스트셀러 1위를 지켰고 전세계 4000만 부 이상 팔렸다. 타임·가디언 등 필독 목록에 오른 이 100쪽짜리 우화는 '자기초월'과 '소명'에 관한 가장 순수한 이야기다. 세상의 기준이 아닌 자신의 기준으로 살고자 하는 모든 사람의 교과서.</p>
+    </div>
+  </div>
+  <div class="hero-quote reveal"><p>"당신의 온 몸으로 날아라. 한계는 하늘에 없다. 한계는 당신의 마음속에 있다."</p><span class="hero-quote-attr">— 설리번 / 자기 한계를 넘는 방법</span></div>
+  <div class="innovation reveal"><h3 class="innovation-title">이 작품이 문학을 바꾼 이유</h3><ul><li><strong>우화의 현대적 재발명</strong> — 동물 우화라는 고대 형식에 실존주의적 메시지를 결합해 20세기 가장 영향력 있는 자기계발 문학이자 문학 작품으로 만들었다. 장르의 경계를 허문 혁신적 작품이다.</li><li><strong>소명(Calling)의 서사화</strong> — 먹고사는 문제를 넘어 '왜 나는 이것을 해야 하는가'를 묻는 서사는, 산업화 이후 인간이 직면한 가장 중요한 질문이다.</li></ul></div>
+  <div class="ext-links reveal"><div class="ext-links-label">더 깊이 들어가기</div><a class="ext-btn yt" href="https://www.youtube.com/results?search_query=%EA%B0%88%EB%A7%A4%EA%B8%B0%EC%9D%98+%EA%BF%88+%EB%A6%AC%EC%B2%98%EB%93%9C+%EB%B0%94%ED%81%AC+%ED%95%B4%EC%84%A4" target="_blank" rel="noopener"><span class="ext-icon">▶</span> YouTube 해설 검색</a><a class="ext-btn lec" href="https://www.google.com/search?q=%EA%B0%88%EB%A7%A4%EA%B8%B0%EC%9D%98+%EA%BF%88+%EB%A6%AC%EC%B2%98%EB%93%9C+%EB%B0%94%ED%81%AC+%EB%AC%B8%ED%95%99" target="_blank" rel="noopener"><span class="ext-icon">🔍</span> Google 검색</a></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">1</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">줄거리와 장면</div><h3 class="step-title">이야기의 전개</h3><div class="step-body"><p>갈매기 무리에게 나는 것은 먹이를 얻기 위한 수단이다. 그러나 조나단 리빙스턴에게 나는 것은 그 자체가 목적이다. 그는 매일 새벽 혼자 연습한다 — 더 빠르게, 더 정확하게, 더 높게. 무리는 그를 이해하지 못하고 추방한다.</p><div class="scene"><p>"조나단, 우리 갈매기의 삶에서 가장 중요한 것은 먹는 것이다." 조나단은 고개를 끄덕인다. 그리고 다음 날 새벽, 다시 혼자 날아오른다. 세상의 기준이 자신의 소명보다 옳다고 믿지 않기 때문에.</p><span class="scene-attr">— 추방 직전 / 소명과 사회 규범의 충돌</span></div><p>천상의 갈매기 무리를 만난 조나단은 '한계는 마음속에 있다'는 것을 배운다. 완전히 자유로워진 그는 지상으로 돌아와, 사회에서 버려진 어린 갈매기들을 가르친다. 그것이 그의 진정한 소명이었다 — 혼자 완벽해지는 것이 아니라, 다른 이들도 날 수 있음을 보여주는 것.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">2</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">상징과 철학</div><h3 class="step-title">숨겨진 의미와 상징</h3><div class="step-body"><p>먹이를 위해 나는 갈매기 = 생존만을 위해 사는 인간. 날기 위해 나는 조나단 = 소명을 따르는 인간. 이 이분법은 단순해 보이지만 깊다 — 우리 대부분은 이 둘 사이 어딘가에 있고, 조나단 쪽으로 나아가는 것이 얼마나 어려운지를 안다.</p><div class="scene"><p>"완벽이란 규칙이 없는 것이 아니다. 완벽이란 규칙 너머로 가는 것이다." 조나단이 발견한 이 진리는 모든 예술가·과학자·스포츠인이 경험하는 '몰입(Flow)'의 상태다.</p><span class="scene-attr">— 조나단 / 완벽에 대한 정의</span></div><p>추방은 비극이 아니다 — 그것은 조나단이 자신의 길을 온전히 갈 수 있게 해준 해방이다. 사회의 승인이 없어도 자신의 방향이 옳음을 아는 것, 그것이 이 소설이 말하는 자유다.</p></div></div></div>
+    <div class="step reveal"><div class="step-num-col"><div class="step-num">3</div><div class="step-num-line"></div></div><div class="step-content"><div class="step-badge">오늘날의 울림</div><h3 class="step-title">지금 우리에게 주는 메시지</h3><div class="step-body"><p>취업 시장, 스펙 쌓기, 연봉 협상 — 우리 시대는 '먹이를 위해 나는 갈매기'를 이상으로 제시한다. 그 안에서 조나단처럼 '날기 위해 나는' 선택은 무모하고 위험하게 보인다. 그러나 역사의 모든 변화는 그 무모한 선택을 한 사람들로부터 왔다.</p><div class="scene"><p>조나단이 가르치는 어린 갈매기들은 처음에 믿지 못한다 — 내가 그렇게 빠르게 날 수 있을까? 조나단은 말한다. "시작하라. 믿음은 나중에 온다." 행동이 먼저고, 확신은 그 뒤에 온다.</p></div><p>당신이 먹이가 아닌 '나는 것 자체'를 위해 하고 싶은 일은 무엇인가. 그 일을 위해 군집에서 추방될 용기가 있는가. 그리고 그 추방이 사실은 해방일 수 있다는 것을 — 지금 이 소설이 말한다.</p></div></div></div>
+  </div>
+  <div class="quotes-gallery reveal"><div class="quotes-gallery-label">작품의 문장들</div><div class="quotes-grid"><div class="q-card"><blockquote>"완벽은 한 번의 도달이 아니다. 그것은 매일 아침 다시 시작하는 것이다."</blockquote><cite>— 조나단 리빙스턴 / 완벽의 정의</cite></div><div class="q-card"><blockquote>"무리는 나를 추방했다. 그러나 하늘은 나를 추방하지 않았다. 그것으로 충분했다."</blockquote><cite>— 조나단 / 추방과 자유</cite></div><div class="q-card"><blockquote>"당신이 사랑하는 것을 하라. 그것이 당신이 할 수 있는 가장 용기 있는 일이다."</blockquote><cite>— 조나단 / 소명의 선택</cite></div></div></div>
+  <div class="closing-q reveal"><div class="closing-q-icon">✦</div><div><div class="closing-q-label">당신에게 던지는 질문</div><p>당신은 지금 '먹이를 위해 날고' 있나요, 아니면 '날기 위해 날고' 있나요?<br>그 차이를 알면서도 바꾸지 못하는 이유는 무엇인가요?</p></div></div>
+</section>
+
+
+</div><!-- /page-body -->
   <div class="ref-inner">
     <h2>참고 문헌 및 출처</h2>
     <ul class="ref-list">
-      <li>[1] NobelPrize.org — Official Citations (Hemingway 1954, Camus 1957, Márquez 1982, Morrison 1993, Han Kang 2024, Kawabata 1968, Gide 1947)</li>
+      <li>[1] NobelPrize.org — Official Citations (Hemingway 1954, Camus 1957, Márquez 1982, Morrison 1993, Han Kang 2024, Kawabata 1968, Gide 1947, Saramago 1998, Grass 1999, Müller 2009)</li>
       <li>[2] Hemingway, E. (1952). <em>The Old Man and the Sea</em>. Scribner.</li>
       <li>[3] Camus, A. (1942). <em>L'Étranger</em>. Gallimard.</li>
       <li>[4] Márquez, G. G. (1967). <em>Cien años de soledad</em>. Editorial Sudamericana. / Nobel Lecture (1982): <em>The Solitude of Latin America</em>.</li>
@@ -6988,13 +8292,31 @@ function handleImgError(img) {
       <li>[28] Kazantzakis, N. (1946). <em>Zorba the Greek</em>. / 그리스인 조르바, 이윤기 역, 열린책들.</li>
       <li>[29] Laclos, P.C. (1782). <em>Les Liaisons dangereuses</em>. / 위험한 관계, 이형식 역, 민음사.</li>
       <li>[30] Murakami, H. (2002). <em>海辺のカフカ</em>. / 해변의 카프카, 김춘미 역, 문학사상.</li>
+      <li>[36] Saramago, J. (1995). <em>Ensaio sobre a Cegueira</em>. Caminho. / 눈먼 자들의 도시, 정영목 역, 해냄. · Nobel Prize 1998.</li>
+      <li>[37] Grass, G. (1959). <em>Die Blechtrommel</em>. Luchterhand. / 양철북, 장희창 역, 민음사. · Nobel Prize 1999.</li>
+      <li>[38] Murata, S. (2016). <em>コンビニ人間</em>. 文藝春秋. / 편의점 인간, 김석희 역, 살림. · 芥川賞 2016.</li>
+      <li>[39] García Márquez, G. (1961). <em>El coronel no tiene quien le escriba</em>. Aguirre. / 아무도 대령에게 편지하지 않다, 조구호 역, 민음사.</li>
+      <li>[40] Müller, H. (2009). <em>Atemschaukel</em>. Carl Hanser. / 숨그네, 박경희 역, 문학동네. · Nobel Prize 2009.</li>
+      <li>[41] Dazai, O. (1948). <em>人間失格 (No Longer Human)</em>. 筑摩書房. / 인간 실격, 김춘미 역, 민음사.</li>
+      <li>[42] Orwell, G. (1945). <em>Animal Farm</em>. Secker &amp; Warburg. / 동물농장, 도정일 역, 민음사.</li>
+      <li>[43] Süskind, P. (1985). <em>Das Parfum</em>. Diogenes. / 향수, 강명순 역, 열린책들.</li>
+      <li>[44] Martel, Y. (2001). <em>Life of Pi</em>. Knopf Canada. / 파이 이야기, 공경희 역, 작가정신. · Man Booker Prize 2002.</li>
+      <li>[45] Gaarder, J. (1991). <em>Sofies verden</em>. H. Aschehoug &amp; Co. / 소피의 세계, 장영은 역, 현암사.</li>
+      <li>[46] Dickens, C. (1861). <em>Great Expectations</em>. Chapman &amp; Hall. / 위대한 유산, 이인규 역, 민음사.</li>
+      <li>[47] Cervantes, M. (1605/1615). <em>Don Quijote de la Mancha</em>. / 돈키호테, 박철 역, 시공사.</li>
+      <li>[48] Melville, H. (1851). <em>Moby-Dick; or, The Whale</em>. Harper &amp; Brothers. / 모비딕, 김석희 역, 작가정신.</li>
+      <li>[49] Huxley, A. (1932). <em>Brave New World</em>. Chatto &amp; Windus. / 멋진 신세계, 안정효 역, 소담출판사.</li>
+      <li>[50] Bach, R. (1970). <em>Jonathan Livingston Seagull</em>. Macmillan. / 갈매기의 꿈, 류시화 역, 현문미디어.</li>
     </ul>
   </div>
 </div>
 
 <footer>
   <em>문장의 숲 — The Forest of Words</em><br>
-  © 2026 · 문장의 숲 인문 가이드 · Created for the deep explorers of human soul
+  © 2026 · 문장의 숲 인문 가이드 · Created for the deep explorers of human soul<br>
+  <span style="font-size:0.72rem;opacity:0.6;display:block;margin-top:8px;letter-spacing:0.04em;">
+    Co-created by <em style="color:rgba(184,147,90,0.7);font-style:italic;">지혜의 쉼터(엠버골드)</em> with Claude &nbsp;·&nbsp; © 2026
+  </span>
 </footer>
 
 <script>
@@ -7007,118 +8329,100 @@ function updateStickyHeights() {
 updateStickyHeights();
 window.addEventListener('resize', updateStickyHeights);
 
-// ── 드롭다운 네비게이션 ────────────────────────────────────
-const catBtns  = document.querySelectorAll('.nav-cat-btn');
-const dropdown = document.getElementById('navDropdown');
-const panels   = {
-  classic: document.getElementById('panel-classic'),
-  modern:  document.getElementById('panel-modern'),
-  nobel:   document.getElementById('panel-nobel')
-};
-let openCat = null;
+// ── 목차 토글 ──────────────────────────────────────────────
+const navTocToggle = document.getElementById('navTocToggle');
+const navTocDrawer = document.getElementById('navTocDrawer');
 
-function openDropdown(cat) {
-  Object.entries(panels).forEach(([k, p]) => {
-    if (!p) return;
-    p.classList.toggle('visible', k === cat);
-    p.classList.toggle('hidden',  k !== cat);
+if (navTocToggle && navTocDrawer) {
+  navTocToggle.addEventListener('click', () => {
+    const isOpen = navTocDrawer.classList.contains('open');
+    navTocDrawer.classList.toggle('open', !isOpen);
+    navTocToggle.classList.toggle('open', !isOpen);
+    navTocToggle.setAttribute('aria-expanded', String(!isOpen));
+    navTocDrawer.setAttribute('aria-hidden', String(isOpen));
+    setTimeout(updateStickyHeights, 420);
   });
-  catBtns.forEach(b => {
-    b.classList.toggle('open', b.dataset.cat === cat);
-    b.classList.remove('active');
+  // 외부 클릭 시 닫기
+  document.addEventListener('click', e => {
+    const navWrap = document.getElementById('navWrap');
+    if (navWrap && !navWrap.contains(e.target)) {
+      navTocDrawer.classList.remove('open');
+      navTocToggle.classList.remove('open');
+      navTocToggle.setAttribute('aria-expanded', 'false');
+      setTimeout(updateStickyHeights, 420);
+    }
   });
-  dropdown.classList.add('open');
-  openCat = cat;
-  setTimeout(updateStickyHeights, 420);
 }
 
-function closeDropdown() {
-  catBtns.forEach(b => b.classList.remove('open'));
-  dropdown.classList.remove('open');
-  openCat = null;
-  setTimeout(updateStickyHeights, 420);
-}
-
-// 카테고리 탭 클릭
-catBtns.forEach(btn => {
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
-    const cat = btn.dataset.cat;
-    openCat === cat ? closeDropdown() : openDropdown(cat);
-  });
-});
-
-// 외부 클릭 감지 — document에 붙여서 overlay 없이 처리
-document.addEventListener('click', e => {
-  if (!openCat) return;
-  const navWrap = document.getElementById('navWrap');
-  if (navWrap && !navWrap.contains(e.target)) {
-    closeDropdown();
-  }
-});
-
-// ESC 키로 닫기
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && openCat) closeDropdown();
-});
-
-// 드롭다운 링크 클릭 → 닫기 + 스크롤 이동
-document.querySelectorAll('.drop-item').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    e.stopPropagation();
-    const href = a.getAttribute('href');
-    closeDropdown();
-    setTimeout(() => {
-      const target = document.querySelector(href);
-      if (!target) return;
-      const navH = document.getElementById('navWrap')?.getBoundingClientRect().height || 60;
-      const top = target.getBoundingClientRect().top + window.scrollY - navH - 16;
-      window.scrollTo({ top, behavior: 'smooth' });
-    }, 60);
-  });
-});
-
-// ── 검색 ──────────────────────────────────────────────────
-const searchInput   = document.getElementById('searchInput');
-const searchCount   = document.getElementById('searchCount');
-const noResultsMsg  = document.getElementById('noResultsMsg');
-const bookSections  = document.querySelectorAll('.book-section');
+// ── 검색 (목차 기반) ─────────────────────────────────────
+const tocSearch    = document.getElementById('tocSearchInput');
+const tocCount     = document.getElementById('tocSearchCount');
+const tocClear     = document.getElementById('tocSearchClear');
+const tocItems     = document.querySelectorAll('.toc-item');
+const bookSections = document.querySelectorAll('.book-section');
+let activeFilter   = 'all';
 let searchTimer;
 
-function doSearch() {
-  const q = searchInput ? searchInput.value.trim().toLowerCase() : '';
-  if (!q) {
-    bookSections.forEach(s => s.classList.remove('filtered-out'));
-    if (searchCount) searchCount.textContent = '';
-    if (noResultsMsg) noResultsMsg.classList.remove('show');
-    return;
-  }
-  let count = 0;
-  bookSections.forEach(sec => {
-    const text = (sec.querySelector('.book-title')?.textContent || '') +
-                 (sec.querySelector('.book-author')?.textContent || '') +
-                 (sec.querySelector('.book-label')?.textContent || '') +
-                 (sec.querySelector('.book-desc')?.textContent || '');
-    const match = text.toLowerCase().includes(q);
-    sec.classList.toggle('filtered-out', !match);
-    if (match) count++;
+function applyTocFilter() {
+  const q = tocSearch ? tocSearch.value.trim().toLowerCase() : '';
+  let visible = 0;
+  tocItems.forEach(item => {
+    const era   = item.dataset.era;
+    const nobel = item.dataset.nobel === 'true';
+    const text  = item.textContent.toLowerCase();
+    const matchFilter =
+      activeFilter === 'all' ||
+      (activeFilter === 'classic' && era === 'classic') ||
+      (activeFilter === 'modern'  && era === 'modern')  ||
+      (activeFilter === 'nobel'   && nobel);
+    const matchSearch = !q || text.includes(q);
+    const show = matchFilter && matchSearch;
+    item.style.display = show ? '' : 'none';
+    if (show) visible++;
   });
-  if (searchCount) searchCount.textContent = count + '편';
-  if (noResultsMsg) noResultsMsg.classList.toggle('show', count === 0);
+  if (tocCount) tocCount.textContent = q ? visible + '편' : '';
+  if (tocClear) tocClear.style.display = q ? '' : 'none';
 }
 
-if (searchInput) {
-  searchInput.addEventListener('input', () => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(doSearch, 150);
-    // 검색 중이면 드롭다운 닫기
-    if (searchInput.value.trim().length > 0 && openCat) closeDropdown();
+// 탭 필터
+document.querySelectorAll('.toc-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.toc-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    applyTocFilter();
   });
-  searchInput.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { searchInput.value = ''; doSearch(); }
+});
+
+// 검색 입력
+if (tocSearch) {
+  tocSearch.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(applyTocFilter, 120);
+  });
+  tocSearch.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { tocSearch.value = ''; applyTocFilter(); }
   });
 }
+if (tocClear) {
+  tocClear.addEventListener('click', () => { tocSearch.value = ''; applyTocFilter(); tocSearch.focus(); });
+}
+
+// 목차 링크 클릭 → 해당 섹션으로 스크롤
+document.querySelectorAll('.toc-item').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (!target) return;
+
+    // 클릭 후 서랍 닫기
+    const drawer = document.getElementById('navTocDrawer');
+    const toggle = document.getElementById('navTocToggle');
+    if (drawer) { drawer.classList.remove('open'); toggle?.classList.remove('open'); setTimeout(updateStickyHeights,420); }
+    const navH = document.getElementById('navWrap')?.getBoundingClientRect().height || 52;
+    window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - navH - 16, behavior: 'smooth' });
+  });
+});
 
 // ── Scroll reveal ──────────────────────────────────────────
 const reveals = document.querySelectorAll('.reveal');
@@ -7157,67 +8461,6 @@ document.querySelectorAll('.book-cover').forEach(img => {
   testImg.src = 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=100&q=10';
 })();
 
-// ── 작품 네비바 — 스크롤 하이라이트 + 드래그 ─────────────
-(function(){
-  const bar     = document.getElementById('navBookBar');
-  const links   = document.querySelectorAll('.nav-book-link');
-  const sections = document.querySelectorAll('[id^="book"]');
-  if (!bar || !links.length) return;
-
-  // 현재 섹션 하이라이트 + 네비바 중앙 스크롤
-  function setActive(id) {
-    links.forEach(a => a.classList.remove('nb-active'));
-    const active = document.querySelector(`.nav-book-link[href="#${id}"]`);
-    if (!active) return;
-    active.classList.add('nb-active');
-    // 네비바 내에서 중앙 위치로 스크롤
-    const inner = document.getElementById('navBookInner');
-    if (inner) {
-      const linkLeft = active.offsetLeft;
-      const linkW    = active.offsetWidth;
-      const barW     = bar.clientWidth;
-      bar.scrollTo({ left: linkLeft - barW / 2 + linkW / 2, behavior: 'smooth' });
-    }
-  }
-
-  const navIO = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
-  }, { rootMargin: '-35% 0px -60% 0px', threshold: 0 });
-  sections.forEach(s => navIO.observe(s));
-
-  // 네비바 링크 클릭 — 오프셋 보정 스크롤
-  links.forEach(a => {
-    a.addEventListener('click', e => {
-      e.preventDefault();
-      const target = document.querySelector(a.getAttribute('href'));
-      if (!target) return;
-      const navH = (document.getElementById('navWrap')?.getBoundingClientRect().height || 52)
-                 + (bar?.getBoundingClientRect().height || 36);
-      window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - navH - 8, behavior: 'smooth' });
-    });
-  });
-
-  // 드래그 스크롤 (마우스)
-  let isDrag = false, startX = 0, startScroll = 0;
-  bar.addEventListener('mousedown', e => {
-    isDrag = true; startX = e.clientX; startScroll = bar.scrollLeft; e.preventDefault();
-  });
-  document.addEventListener('mouseup', () => { isDrag = false; });
-  document.addEventListener('mousemove', e => {
-    if (!isDrag) return;
-    bar.scrollLeft = startScroll - (e.clientX - startX);
-  });
-  bar.querySelectorAll('a').forEach(a => a.addEventListener('mousedown', e => e.stopPropagation()));
-
-  // 터치 스크롤
-  let tStartX = 0, tStartScroll = 0;
-  bar.addEventListener('touchstart', e => {
-    tStartX = e.touches[0].clientX; tStartScroll = bar.scrollLeft;
-  }, { passive: true });
-  bar.addEventListener('touchmove', e => {
-    bar.scrollLeft = tStartScroll - (e.touches[0].clientX - tStartX);
-  }, { passive: true });
-})();
 
 </script>
 
