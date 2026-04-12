@@ -1603,39 +1603,43 @@ footer em { font-style: italic; color: rgba(184,147,90,0.62); }
   display: flex;
   align-items: center;
   gap: 10px;
-  height: auto;
-  min-height: 50px;
-  padding: 6px 20px;
+  height: 50px;
+  padding: 0 20px;
   border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 /* nav 안에 임베드된 검색창 */
 .nav-search-embedded {
-  flex: 1;
-  min-width: 160px;
+  flex: 1 1 0;
+  min-width: 0;
   max-width: 340px;
   margin-bottom: 0 !important;
 }
 @media(max-width:600px){
-  .nav-brand-bar { padding: 6px 14px; }
-  .nav-search-embedded { max-width: 100%; flex-basis: 100%; order: 3; }
+  .nav-brand-bar { padding: 0 12px; gap: 7px; height: 46px; }
+  .nav-search-embedded { max-width: none; }
+}
+@media(max-width:420px){
+  .nav-brand-bar { padding: 0 10px; gap: 5px; height: 44px; }
 }
 .nav-toc-btn {
   background: var(--gold);
   color: var(--ink);
   border: none;
   border-radius: 20px;
-  padding: 6px 16px;
+  padding: 6px 14px;
   font-family: var(--sans);
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .nav-toc-btn:hover { background: var(--gold2); transform: translateY(-1px); }
 @media(max-width:480px){
-  .nav-brand-bar { padding: 0 14px; height: 42px; }
+  .nav-brand-bar { padding: 0 10px; height: 44px; }
   .nav-toc-btn { font-size: 0.74rem; padding: 5px 13px; }
 }
 
@@ -1938,6 +1942,80 @@ footer em { font-style: italic; color: rgba(184,147,90,0.62); }
 @media(max-width:768px){
   .hero-creator-inline { font-size: 0.62rem; margin-bottom: 20px; }
 }
+
+/* ═══════════════════════════════════════════
+   북마크 & 마지막 읽은 위치 기능
+═══════════════════════════════════════════ */
+#lastReadToast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9100;
+  background: var(--ink);
+  color: var(--gold2);
+  border: 1px solid rgba(184,147,90,0.4);
+  border-radius: 28px;
+  padding: 12px 20px 12px 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  display: none;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  max-width: calc(100vw - 32px);
+  white-space: nowrap;
+}
+#lastReadToast.show { display: flex; animation: toastSlideUp 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes toastSlideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+.toast-text { flex: 1; min-width: 0; }
+.toast-label { font-size: 0.65rem; color: rgba(212,173,120,0.55); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2px; }
+.toast-title { font-weight: 500; color: var(--gold2); overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+.toast-goto {
+  background: var(--gold); color: var(--ink); border: none; border-radius: 18px;
+  padding: 5px 14px; font-family: var(--sans); font-size: 0.76rem; font-weight: 600;
+  cursor: pointer; flex-shrink: 0; transition: background 0.18s;
+}
+.toast-goto:hover { background: var(--gold2); }
+.toast-close {
+  color: rgba(212,173,120,0.5); background: none; border: none; font-size: 1rem;
+  cursor: pointer; padding: 2px 4px; flex-shrink: 0; line-height: 1;
+}
+.toast-close:hover { color: var(--gold2); }
+@media(max-width:480px){
+  #lastReadToast { font-size: 0.74rem; padding: 9px 12px 9px 12px; gap: 8px; bottom: 80px; }
+  .toast-goto { padding: 4px 10px; font-size: 0.68rem; }
+  .toast-title { max-width: 100px; }
+}
+.book-bookmark-btn {
+  position: absolute; top: 18px; right: 18px; z-index: 10;
+  background: rgba(247,244,238,0.85); border: 1.5px solid var(--border);
+  border-radius: 50%; width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 1rem; color: var(--ink3);
+  transition: all 0.22s; opacity: 0.5;
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+.book-bookmark-btn:hover { opacity: 1; border-color: var(--gold); color: var(--gold); transform: scale(1.08); }
+.book-bookmark-btn.bookmarked { opacity: 1; border-color: var(--gold); color: var(--gold); background: rgba(184,147,90,0.15); }
+@media(max-width:768px){
+  .book-bookmark-btn { top: 10px; right: 10px; width: 30px; height: 30px; font-size: 0.82rem; }
+}
+.toc-item.is-bookmarked .toc-title::after { content: ' 🔖'; font-size: 0.7em; }
+.toc-tab[data-filter="bookmark"] .toc-bm-cnt {
+  font-size: 0.65rem; background: rgba(184,147,90,0.2); border-radius: 8px; padding: 1px 5px; margin-left: 3px;
+}
+#bmFeedback {
+  position: fixed; bottom: 150px; left: 50%; transform: translateX(-50%);
+  z-index: 9200; background: var(--ink2); color: var(--cream);
+  border-radius: 20px; padding: 7px 18px; font-size: 0.78rem; font-family: var(--sans);
+  pointer-events: none; opacity: 0; transition: opacity 0.3s; white-space: nowrap;
+}
+#bmFeedback.show { opacity: 1; }
 </style>
 <script>
 function handleImgError(img) {
@@ -1993,6 +2071,7 @@ function handleImgError(img) {
       <button class="toc-tab" data-filter="classic">📜 고전 <span class="toc-tab-cnt">38</span></button>
       <button class="toc-tab" data-filter="modern">✨ 현대 <span class="toc-tab-cnt">12</span></button>
       <button class="toc-tab" data-filter="nobel">🏅 노벨 <span class="toc-tab-cnt">10</span></button>
+      <button class="toc-tab" data-filter="bookmark">🔖 책갈피 <span class="toc-bm-cnt" id="tocBmCnt">0</span></button>
     </div>
     <div class="toc-body" id="tocBody">
     <a class="toc-item" href="#book15" data-era="classic" data-nobel="false"><span class="toc-num">15</span><span class="toc-title">1984</span><span class="toc-author">Nineteen Eighty-Four</span></a>
@@ -2098,6 +2177,7 @@ function handleImgError(img) {
 
 
 <section class="book-section reveal" id="book1" data-num="01" data-era="classic" data-themes="theme-loneliness theme-resistance" data-nobel="true">
+  <button class="book-bookmark-btn" id="bm-book1" data-book="book1" onclick="toggleBookmark('book1')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <!-- 키워드 -->
   <div class="book-keywords">
@@ -2268,6 +2348,7 @@ function handleImgError(img) {
      BOOK 2 — 이방인
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book2" data-num="02" data-era="classic" data-themes="theme-absurd theme-identity theme-society" data-nobel="true">
+  <button class="book-bookmark-btn" id="bm-book2" data-book="book2" onclick="toggleBookmark('book2')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <!-- 키워드 -->
   <div class="book-keywords">
@@ -2438,6 +2519,7 @@ function handleImgError(img) {
      BOOK 3 — 백년 동안의 고독
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book3" data-num="03" data-era="classic" data-themes="theme-loneliness theme-love theme-society" data-nobel="true">
+  <button class="book-bookmark-btn" id="bm-book3" data-book="book3" onclick="toggleBookmark('book3')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <!-- 키워드 -->
   <div class="book-keywords">
@@ -2602,6 +2684,7 @@ function handleImgError(img) {
      BOOK 4 — 벨러브드
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book4" data-num="04" data-era="classic" data-themes="theme-identity theme-resistance theme-society" data-nobel="true">
+  <button class="book-bookmark-btn" id="bm-book4" data-book="book4" onclick="toggleBookmark('book4')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <!-- 키워드 -->
   <div class="book-keywords">
@@ -2766,6 +2849,7 @@ function handleImgError(img) {
      BOOK 5 — 채식주의자
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book5" data-num="05" data-era="classic" data-themes="theme-identity theme-resistance theme-society" data-nobel="true">
+  <button class="book-bookmark-btn" id="bm-book5" data-book="book5" onclick="toggleBookmark('book5')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#폭력</span>
@@ -2928,6 +3012,7 @@ function handleImgError(img) {
      BOOK 6 — 죄와 벌
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book6" data-num="06" data-era="classic" data-themes="theme-identity theme-resistance theme-absurd">
+  <button class="book-bookmark-btn" id="bm-book6" data-book="book6" onclick="toggleBookmark('book6')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#죄책감</span>
@@ -3083,6 +3168,7 @@ function handleImgError(img) {
      BOOK 7 — 변신
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book7" data-num="07" data-era="classic" data-themes="theme-identity theme-loneliness theme-absurd">
+  <button class="book-bookmark-btn" id="bm-book7" data-book="book7" onclick="toggleBookmark('book7')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#소외</span>
@@ -3232,6 +3318,7 @@ function handleImgError(img) {
      BOOK 8 — 설국
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book8" data-num="08" data-era="classic" data-themes="theme-love theme-loneliness" data-nobel="true">
+  <button class="book-bookmark-btn" id="bm-book8" data-book="book8" onclick="toggleBookmark('book8')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#허무</span>
@@ -3382,6 +3469,7 @@ function handleImgError(img) {
      BOOK 9 — 파친코
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book9" data-num="09" data-era="classic" data-themes="theme-identity theme-resistance theme-society">
+  <button class="book-bookmark-btn" id="bm-book9" data-book="book9" onclick="toggleBookmark('book9')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#디아스포라</span>
@@ -3533,6 +3621,7 @@ function handleImgError(img) {
      BOOK 10 — 지상의 양식
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book10" data-num="10" data-era="classic" data-themes="theme-identity theme-love" data-nobel="true">
+  <button class="book-bookmark-btn" id="bm-book10" data-book="book10" onclick="toggleBookmark('book10')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#욕망</span>
@@ -3697,6 +3786,7 @@ function handleImgError(img) {
      BOOK 11 — 데미안
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book11" data-num="11" data-era="classic" data-themes="theme-identity theme-loneliness">
+  <button class="book-bookmark-btn" id="bm-book11" data-book="book11" onclick="toggleBookmark('book11')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#자아</span>
@@ -3854,6 +3944,7 @@ function handleImgError(img) {
      BOOK 12 — 위대한 개츠비
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book12" data-num="12" data-era="classic" data-themes="theme-love theme-loneliness theme-society">
+  <button class="book-bookmark-btn" id="bm-book12" data-book="book12" onclick="toggleBookmark('book12')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#꿈</span>
@@ -4011,6 +4102,7 @@ function handleImgError(img) {
      BOOK 13 — 참을 수 없는 존재의 가벼움
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book13" data-num="13" data-era="classic" data-themes="theme-love theme-identity theme-absurd">
+  <button class="book-bookmark-btn" id="bm-book13" data-book="book13" onclick="toggleBookmark('book13')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#무거움</span>
@@ -4165,6 +4257,7 @@ function handleImgError(img) {
      BOOK 14 — 안나 카레니나
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book14" data-num="14" data-era="classic" data-themes="theme-love theme-society theme-resistance">
+  <button class="book-bookmark-btn" id="bm-book14" data-book="book14" onclick="toggleBookmark('book14')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#사랑</span>
@@ -4322,6 +4415,7 @@ function handleImgError(img) {
      BOOK 15 — 1984
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book15" data-num="15" data-era="classic" data-themes="theme-resistance theme-society theme-identity">
+  <button class="book-bookmark-btn" id="bm-book15" data-book="book15" onclick="toggleBookmark('book15')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#감시</span>
@@ -4493,6 +4587,7 @@ function handleImgError(img) {
      BOOK 16 — 파친코 (이민진 리)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book16" data-num="16" data-era="modern" data-themes="theme-identity theme-resistance theme-society">
+  <button class="book-bookmark-btn" id="bm-book16" data-book="book16" onclick="toggleBookmark('book16')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#디아스포라</span>
@@ -4634,6 +4729,7 @@ function handleImgError(img) {
      BOOK 18 — 아몬드 (손원평)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book17" data-num="17" data-era="modern" data-themes="theme-identity theme-love theme-loneliness">
+  <button class="book-bookmark-btn" id="bm-book17" data-book="book17" onclick="toggleBookmark('book17')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#감정결여</span>
@@ -4776,6 +4872,7 @@ function handleImgError(img) {
      BOOK 19 — 82년생 김지영 (조남주)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book18" data-num="18" data-era="modern" data-themes="theme-identity theme-resistance theme-society">
+  <button class="book-bookmark-btn" id="bm-book18" data-book="book18" onclick="toggleBookmark('book18')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#젠더</span>
@@ -4917,6 +5014,7 @@ function handleImgError(img) {
      BOOK 20 — 나미야 잡화점의 기적 (히가시노 게이고)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book19" data-num="19" data-era="modern" data-themes="theme-love theme-loneliness theme-identity">
+  <button class="book-bookmark-btn" id="bm-book19" data-book="book19" onclick="toggleBookmark('book19')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#연결</span>
@@ -5062,6 +5160,7 @@ function handleImgError(img) {
      BOOK 20 — 어린 왕자 (생텍쥐페리)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book20" data-num="20" data-era="classic" data-themes="theme-love theme-identity theme-loneliness">
+  <button class="book-bookmark-btn" id="bm-book20" data-book="book20" onclick="toggleBookmark('book20')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#순수</span>
@@ -5203,6 +5302,7 @@ function handleImgError(img) {
      BOOK 21 — 연금술사 (파울로 코엘료)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book21" data-num="21" data-era="modern" data-themes="theme-identity theme-loneliness theme-love">
+  <button class="book-bookmark-btn" id="bm-book21" data-book="book21" onclick="toggleBookmark('book21')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#운명</span>
@@ -5344,6 +5444,7 @@ function handleImgError(img) {
      BOOK 22 — 카라마조프의 형제들 (도스토예프스키)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book22" data-num="22" data-era="classic" data-themes="theme-identity theme-resistance theme-absurd">
+  <button class="book-bookmark-btn" id="bm-book22" data-book="book22" onclick="toggleBookmark('book22')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#신과인간</span>
@@ -5485,6 +5586,7 @@ function handleImgError(img) {
      BOOK 23 — 노르웨이의 숲 (무라카미 하루키)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book23" data-num="23" data-era="modern" data-themes="theme-love theme-loneliness theme-identity">
+  <button class="book-bookmark-btn" id="bm-book23" data-book="book23" onclick="toggleBookmark('book23')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#상실</span>
@@ -5628,6 +5730,7 @@ function handleImgError(img) {
      BOOK 24 — 오만과 편견 (제인 오스틴)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book24" data-num="24" data-era="classic" data-themes="theme-love theme-society theme-identity">
+  <button class="book-bookmark-btn" id="bm-book24" data-book="book24" onclick="toggleBookmark('book24')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#오만</span>
     <span class="keyword-tag">#편견</span>
@@ -5768,6 +5871,7 @@ function handleImgError(img) {
      BOOK 25 — 미드나이트 라이브러리 (맷 헤이그)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book25" data-num="25" data-era="modern" data-themes="theme-identity theme-loneliness theme-love">
+  <button class="book-bookmark-btn" id="bm-book25" data-book="book25" onclick="toggleBookmark('book25')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#선택</span>
     <span class="keyword-tag">#후회</span>
@@ -5908,6 +6012,7 @@ function handleImgError(img) {
      BOOK 26 — 모래의 여자 (아베 코보)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book26" data-num="26" data-era="classic" data-themes="theme-identity theme-absurd theme-loneliness">
+  <button class="book-bookmark-btn" id="bm-book26" data-book="book26" onclick="toggleBookmark('book26')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#갇힘</span>
     <span class="keyword-tag">#본능</span>
@@ -6053,6 +6158,7 @@ function handleImgError(img) {
      BOOK 27 — 파우스트
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book27" data-num="27" data-era="classic" data-themes="theme-identity theme-absurd theme-resistance">
+  <button class="book-bookmark-btn" id="bm-book27" data-book="book27" onclick="toggleBookmark('book27')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#거래</span>
@@ -6195,6 +6301,7 @@ function handleImgError(img) {
      BOOK 28 — 그리스인 조르바
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book28" data-num="28" data-era="classic" data-themes="theme-identity theme-love theme-loneliness">
+  <button class="book-bookmark-btn" id="bm-book28" data-book="book28" onclick="toggleBookmark('book28')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#열정</span>
@@ -6337,6 +6444,7 @@ function handleImgError(img) {
      BOOK 29 — 위험한 관계
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book29" data-num="29" data-era="classic" data-themes="theme-love theme-society theme-resistance">
+  <button class="book-bookmark-btn" id="bm-book29" data-book="book29" onclick="toggleBookmark('book29')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#유혹</span>
@@ -6479,6 +6587,7 @@ function handleImgError(img) {
      BOOK 30 — 해변의 카프카
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book30" data-num="30" data-era="modern" data-themes="theme-identity theme-loneliness theme-absurd">
+  <button class="book-bookmark-btn" id="bm-book30" data-book="book30" onclick="toggleBookmark('book30')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
 
   <div class="book-keywords">
     <span class="keyword-tag">#운명</span>
@@ -6619,6 +6728,7 @@ function handleImgError(img) {
 
 
 <section class="book-section reveal" id="book31" data-num="31" data-era="classic" data-themes="theme-identity theme-resistance theme-society">
+  <button class="book-bookmark-btn" id="bm-book31" data-book="book31" onclick="toggleBookmark('book31')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#정의</span>
     <span class="keyword-tag">#인종차별</span>
@@ -6765,6 +6875,7 @@ function handleImgError(img) {
 </section>
 
 <section class="book-section reveal" id="book32" data-num="32" data-era="classic" data-themes="theme-love theme-identity theme-society">
+  <button class="book-bookmark-btn" id="bm-book32" data-book="book32" onclick="toggleBookmark('book32')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#낭만주의</span>
     <span class="keyword-tag">#환상과현실</span>
@@ -6909,6 +7020,7 @@ function handleImgError(img) {
 </section>
 
 <section class="book-section reveal" id="book33" data-num="33" data-era="classic" data-themes="theme-love theme-resistance theme-loneliness">
+  <button class="book-bookmark-btn" id="bm-book33" data-book="book33" onclick="toggleBookmark('book33')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#집착</span>
     <span class="keyword-tag">#복수</span>
@@ -7053,6 +7165,7 @@ function handleImgError(img) {
 </section>
 
 <section class="book-section reveal" id="book34" data-num="34" data-era="classic" data-themes="theme-identity theme-loneliness theme-resistance">
+  <button class="book-bookmark-btn" id="bm-book34" data-book="book34" onclick="toggleBookmark('book34')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#청춘</span>
     <span class="keyword-tag">#위선</span>
@@ -7197,6 +7310,7 @@ function handleImgError(img) {
 </section>
 
 <section class="book-section reveal" id="book35" data-num="35" data-era="classic" data-themes="theme-identity theme-resistance theme-love">
+  <button class="book-bookmark-btn" id="bm-book35" data-book="book35" onclick="toggleBookmark('book35')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#자존감</span>
     <span class="keyword-tag">#독립</span>
@@ -7345,6 +7459,7 @@ function handleImgError(img) {
      BOOK 36 — 눈먼 자들의 도시 (사라마구)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book36" data-num="36" data-era="classic" data-themes="theme-society theme-absurd theme-resistance" data-nobel="true">
+  <button class="book-bookmark-btn" id="bm-book36" data-book="book36" onclick="toggleBookmark('book36')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#전체주의</span>
     <span class="keyword-tag">#인간성</span>
@@ -7485,6 +7600,7 @@ function handleImgError(img) {
      BOOK 37 — 양철북 (귄터 그라스)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book37" data-num="37" data-era="classic" data-themes="theme-society theme-identity theme-resistance" data-nobel="true">
+  <button class="book-bookmark-btn" id="bm-book37" data-book="book37" onclick="toggleBookmark('book37')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#성장거부</span>
     <span class="keyword-tag">#전쟁의기억</span>
@@ -7625,6 +7741,7 @@ function handleImgError(img) {
      BOOK 38 — 편의점 인간 (무라타 사야카)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book38" data-num="38" data-era="modern" data-themes="theme-identity theme-society theme-absurd">
+  <button class="book-bookmark-btn" id="bm-book38" data-book="book38" onclick="toggleBookmark('book38')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#정상성의폭력</span>
     <span class="keyword-tag">#자기정의</span>
@@ -7757,6 +7874,7 @@ function handleImgError(img) {
      BOOK 39 — 아무도 대령에게 편지하지 않다 (마르케스)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book39" data-num="39" data-era="classic" data-themes="theme-resistance theme-loneliness theme-society">
+  <button class="book-bookmark-btn" id="bm-book39" data-book="book39" onclick="toggleBookmark('book39')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#기다림</span>
     <span class="keyword-tag">#존엄</span>
@@ -7889,6 +8007,7 @@ function handleImgError(img) {
      BOOK 40 — 헤르타 뮐러 — 숨그네
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book40" data-num="40" data-era="classic" data-themes="theme-resistance theme-loneliness theme-identity" data-nobel="true">
+  <button class="book-bookmark-btn" id="bm-book40" data-book="book40" onclick="toggleBookmark('book40')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords">
     <span class="keyword-tag">#강제수용소</span>
     <span class="keyword-tag">#언어와생존</span>
@@ -8030,6 +8149,7 @@ function handleImgError(img) {
      BOOK 41 — 인간 실격 (다자이 오사무)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book41" data-num="41" data-era="classic" data-themes="theme-identity theme-loneliness theme-absurd">
+  <button class="book-bookmark-btn" id="bm-book41" data-book="book41" onclick="toggleBookmark('book41')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords"><span class="keyword-tag">#자기혐오</span><span class="keyword-tag">#가면</span><span class="keyword-tag">#실존의붕괴</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
@@ -8061,6 +8181,7 @@ function handleImgError(img) {
      BOOK 42 — 동물농장 (조지 오웰)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book42" data-num="42" data-era="classic" data-themes="theme-society theme-resistance theme-absurd">
+  <button class="book-bookmark-btn" id="bm-book42" data-book="book42" onclick="toggleBookmark('book42')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords"><span class="keyword-tag">#전체주의</span><span class="keyword-tag">#권력부패</span><span class="keyword-tag">#우화</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
@@ -8092,6 +8213,7 @@ function handleImgError(img) {
      BOOK 43 — 향수 (파트리크 쥐스킨트)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book43" data-num="43" data-era="classic" data-themes="theme-identity theme-absurd theme-society">
+  <button class="book-bookmark-btn" id="bm-book43" data-book="book43" onclick="toggleBookmark('book43')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords"><span class="keyword-tag">#천재와괴물</span><span class="keyword-tag">#욕망</span><span class="keyword-tag">#존재의증명</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
@@ -8123,6 +8245,7 @@ function handleImgError(img) {
      BOOK 44 — 파이 이야기 (얀 마텔)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book44" data-num="44" data-era="modern" data-themes="theme-resistance theme-loneliness theme-identity">
+  <button class="book-bookmark-btn" id="bm-book44" data-book="book44" onclick="toggleBookmark('book44')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords"><span class="keyword-tag">#생존</span><span class="keyword-tag">#이야기의힘</span><span class="keyword-tag">#신과인간</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
@@ -8154,6 +8277,7 @@ function handleImgError(img) {
      BOOK 45 — 소피의 세계 (요슈타인 가아더)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book45" data-num="45" data-era="modern" data-themes="theme-identity theme-absurd theme-society">
+  <button class="book-bookmark-btn" id="bm-book45" data-book="book45" onclick="toggleBookmark('book45')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords"><span class="keyword-tag">#철학입문</span><span class="keyword-tag">#존재의문</span><span class="keyword-tag">#메타픽션</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
@@ -8185,6 +8309,7 @@ function handleImgError(img) {
      BOOK 46 — 위대한 유산 (찰스 디킨스)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book46" data-num="46" data-era="classic" data-themes="theme-identity theme-love theme-society">
+  <button class="book-bookmark-btn" id="bm-book46" data-book="book46" onclick="toggleBookmark('book46')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords"><span class="keyword-tag">#계급</span><span class="keyword-tag">#성장</span><span class="keyword-tag">#진짜유산</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
@@ -8216,6 +8341,7 @@ function handleImgError(img) {
      BOOK 47 — 돈키호테 (세르반테스)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book47" data-num="47" data-era="classic" data-themes="theme-identity theme-absurd theme-resistance">
+  <button class="book-bookmark-btn" id="bm-book47" data-book="book47" onclick="toggleBookmark('book47')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords"><span class="keyword-tag">#이상과현실</span><span class="keyword-tag">#광기와용기</span><span class="keyword-tag">#최초의근대소설</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
@@ -8247,6 +8373,7 @@ function handleImgError(img) {
      BOOK 48 — 모비딕 (허먼 멜빌)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book48" data-num="48" data-era="classic" data-themes="theme-resistance theme-loneliness theme-absurd">
+  <button class="book-bookmark-btn" id="bm-book48" data-book="book48" onclick="toggleBookmark('book48')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords"><span class="keyword-tag">#집착</span><span class="keyword-tag">#인간의한계</span><span class="keyword-tag">#운명과의지</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
@@ -8278,6 +8405,7 @@ function handleImgError(img) {
      BOOK 49 — 멋진 신세계 (올더스 헉슬리)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book49" data-num="49" data-era="classic" data-themes="theme-society theme-resistance theme-absurd">
+  <button class="book-bookmark-btn" id="bm-book49" data-book="book49" onclick="toggleBookmark('book49')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords"><span class="keyword-tag">#디스토피아</span><span class="keyword-tag">#행복의역설</span><span class="keyword-tag">#자유의대가</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
@@ -8309,6 +8437,7 @@ function handleImgError(img) {
      BOOK 50 — 갈매기의 꿈 (리처드 바크)
 ═══════════════════════════════════════════════════════════ -->
 <section class="book-section reveal" id="book50" data-num="50" data-era="modern" data-themes="theme-resistance theme-identity theme-loneliness">
+  <button class="book-bookmark-btn" id="bm-book50" data-book="book50" onclick="toggleBookmark('book50')" title="책갈피" aria-label="책갈피 추가"><span>🔖</span></button>
   <div class="book-keywords"><span class="keyword-tag">#자기초월</span><span class="keyword-tag">#소명</span><span class="keyword-tag">#사회와개인</span></div>
   <div class="book-header">
     <div class="book-cover-wrap">
@@ -8571,7 +8700,139 @@ document.querySelectorAll('.book-cover').forEach(img => {
 })();
 
 
+
+// ══════════════════════════════════════════════════════════
+// 마지막으로 읽던 위치 & 북마크 기능
+// ══════════════════════════════════════════════════════════
+(function() {
+  var LAST_KEY = 'munjang_lastRead';
+  var BM_KEY   = 'munjang_bookmarks';
+
+  function loadBM() {
+    try { return JSON.parse(localStorage.getItem(BM_KEY) || '[]'); } catch(e) { return []; }
+  }
+  function saveBM(arr) { try { localStorage.setItem(BM_KEY, JSON.stringify(arr)); } catch(e) {} }
+
+  window.toggleBookmark = function(bid) {
+    var bms = loadBM();
+    var added = bms.indexOf(bid) < 0;
+    bms = added ? bms.concat(bid) : bms.filter(function(id){ return id !== bid; });
+    saveBM(bms);
+    renderBmUI(bms);
+    showFeedback(added ? '🔖 책갈피에 추가했습니다' : '책갈피에서 제거했습니다');
+  };
+
+  function renderBmUI(bms) {
+    document.querySelectorAll('.book-bookmark-btn').forEach(function(btn) {
+      var bid = btn.dataset.book;
+      var on = bms.indexOf(bid) >= 0;
+      btn.classList.toggle('bookmarked', on);
+      btn.title = on ? '책갈피 제거' : '책갈피 추가';
+    });
+    document.querySelectorAll('.toc-item').forEach(function(item) {
+      var bid = (item.getAttribute('href') || '').replace('#','');
+      item.classList.toggle('is-bookmarked', bms.indexOf(bid) >= 0);
+    });
+    var cnt = document.getElementById('tocBmCnt');
+    if (cnt) cnt.textContent = bms.length;
+  }
+
+  // 책갈피 탭
+  document.querySelectorAll('.toc-tab').forEach(function(btn) {
+    if (btn.dataset.filter !== 'bookmark') return;
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.toc-tab').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var bms = loadBM();
+      document.querySelectorAll('.toc-item').forEach(function(item) {
+        var bid = (item.getAttribute('href') || '').replace('#','');
+        item.style.display = bms.indexOf(bid) >= 0 ? '' : 'none';
+      });
+      var cnt = document.getElementById('tocBmCnt');
+      if (cnt) cnt.textContent = bms.length;
+    });
+  });
+
+  var fbTimer;
+  function showFeedback(msg) {
+    var el = document.getElementById('bmFeedback');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(fbTimer);
+    fbTimer = setTimeout(function(){ el.classList.remove('show'); }, 2200);
+  }
+
+  // 읽던 위치 저장 (스크롤할 때마다)
+  var posTimer;
+  window.addEventListener('scroll', function() {
+    clearTimeout(posTimer);
+    posTimer = setTimeout(function() {
+      var best = null, bestVis = 0;
+      var vH = window.innerHeight;
+      var navH = (document.getElementById('navWrap') || {getBoundingClientRect:function(){return {height:90};}}).getBoundingClientRect().height;
+      document.querySelectorAll('.book-section').forEach(function(sec) {
+        var r = sec.getBoundingClientRect();
+        if (r.bottom < navH || r.top > vH) return;
+        var vis = Math.min(r.bottom, vH) - Math.max(r.top, navH);
+        if (vis > bestVis) { bestVis = vis; best = sec; }
+      });
+      if (!best) return;
+      var titleEl = best.querySelector('.book-title');
+      var title = titleEl ? titleEl.textContent.trim().replace(/\s+/g,' ') : best.id;
+      try {
+        localStorage.setItem(LAST_KEY, JSON.stringify({id:best.id, title:title, y:window.scrollY, ts:Date.now()}));
+      } catch(e) {}
+    }, 800);
+  }, {passive:true});
+
+  // 토스트 표시
+  function showLastReadToast() {
+    var data;
+    try { data = JSON.parse(localStorage.getItem(LAST_KEY)); } catch(e) { return; }
+    if (!data || !data.id || data.y < 300) return;
+    if (Date.now() - data.ts > 86400000) return;
+    if (!document.getElementById(data.id)) return;
+    var toast = document.getElementById('lastReadToast');
+    if (!toast) return;
+    var tEl = document.getElementById('toastTitle');
+    if (tEl) tEl.textContent = data.title || data.id;
+    toast.classList.add('show');
+    var gBtn = document.getElementById('toastGoto');
+    if (gBtn) gBtn.onclick = function() {
+      toast.classList.remove('show');
+      var tgt = document.getElementById(data.id);
+      if (tgt) {
+        var navH = (document.getElementById('navWrap') || {getBoundingClientRect:function(){return {height:90};}}).getBoundingClientRect().height;
+        window.scrollTo({top: tgt.getBoundingClientRect().top + window.scrollY - navH - 20, behavior:'smooth'});
+      }
+    };
+    var cBtn = document.getElementById('toastClose');
+    if (cBtn) cBtn.onclick = function() { toast.classList.remove('show'); };
+    setTimeout(function(){ toast.classList.remove('show'); }, 9000);
+  }
+
+  function init() {
+    renderBmUI(loadBM());
+    setTimeout(showLastReadToast, 1800);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else { init(); }
+})();
 </script>
 
+
+<!-- ── 마지막으로 읽던 곳 토스트 ── -->
+<div id="lastReadToast" role="status">
+  <span class="toast-icon">📖</span>
+  <div class="toast-text">
+    <div class="toast-label">마지막으로 읽던 곳</div>
+    <div class="toast-title" id="toastTitle">—</div>
+  </div>
+  <button class="toast-goto" id="toastGoto">이어 읽기 →</button>
+  <button class="toast-close" id="toastClose" aria-label="닫기">✕</button>
+</div>
+<div id="bmFeedback"></div>
 </body>
 </html>
