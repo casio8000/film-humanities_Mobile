@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title>🎬 영화/드라마 DB v21</title>
+<title>🎬 영화/드라마 DB v22</title>
 <!-- PWA 설정 -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,6 +20,8 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e2e8f0;min-height:100vh;padding-bottom:5rem}
+/* ── safe-area 지원 (iPhone notch/Dynamic Island) ── */
+@supports(padding:max(0px)){body{padding-bottom:max(5rem,calc(3.5rem + env(safe-area-inset-bottom)))}}
 
 /* ── 상단 고정 헤더 ── */
 .sticky-header{position:sticky;top:0;z-index:200;background:#0d1117}
@@ -260,7 +262,50 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
   .search-wrap{min-width:unset}
   .fav-panel{width:100%}
 }
-@media(max-width:400px){.grid-container{grid-template-columns:repeat(2,1fr);gap:.38rem}}
+@media(max-width:480px){.grid-container{grid-template-columns:repeat(3,1fr)!important;gap:.35rem}}
+
+/* ── 모바일 전용 레이아웃 ── */
+@media(max-width:680px){
+  /* 상단 헤더 compact */
+  .main-nav{padding:.4rem .75rem}
+  .logo h1{font-size:.82rem}
+  .stats-badge{font-size:.55rem;padding:.06rem .38rem}
+  .nav-btn{padding:.22rem .52rem;font-size:.67rem}
+  .fav-nav-btn{padding:.22rem .52rem;font-size:.67rem}
+  .search-bar{padding:.4rem .75rem}
+  .search-wrap input{font-size:.76rem}
+  .sort-select{font-size:.68rem;min-width:unset;padding:.35rem .5rem}
+
+  /* 툴바: 데스크탑 전용 버튼 숨김 */
+  .mobile-hide{display:none!important}
+
+  /* 카드 정보 크기 축소 */
+  .card-title{font-size:.68rem}
+  .card-meta{font-size:.6rem}
+  .card-genre{font-size:.52rem}
+  .card-htag{font-size:.48rem}
+  .card-actions{padding:.15rem .25rem .2rem}
+  .icon-btn{font-size:.58rem;padding:.1rem .28rem}
+
+  /* 즐겨찾기 패널 전체 너비 */
+  .fav-panel{width:100%}
+
+  /* 필터바 간격 줄이기 */
+  .filter-bar{padding:.25rem .75rem;margin-top:.25rem}
+  .hashtag-bar{padding:.2rem .75rem;margin-top:.15rem}
+  .chip{font-size:.6rem;padding:.12rem .42rem}
+  .htag{font-size:.58rem;padding:.1rem .38rem}
+
+  /* 진행 패널 하단 safe-area */
+  .progress-panel{padding-bottom:max(.48rem, calc(.48rem + env(safe-area-inset-bottom)))}
+
+  /* 맨위로 버튼 위치 — 하단 fixed 요소 위 */
+  .scroll-top-btn{bottom:max(3.5rem, calc(3.5rem + env(safe-area-inset-bottom)));right:.8rem;width:2.1rem;height:2.1rem;font-size:.9rem}
+}
+@media(max-width:360px){
+  .nav-btn{padding:.18rem .38rem;font-size:.62rem}
+  .grid-container{gap:.28rem}
+}
 </style>
 </head>
 <body>
@@ -269,6 +314,7 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 <div class="fav-panel" id="favPanel">
   <div class="fav-panel-header">
     <h3>⭐ 즐겨찾기</h3>
+    <button id="favShareBtn" title="즐겨찾기 목록 SNS 공유" style="background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;font-size:.65rem;padding:.18rem .55rem;border-radius:10px;cursor:pointer;font-family:inherit;margin-right:.3rem">📤 공유</button>
     <button class="fav-close" id="favClose">✕</button>
   </div>
   <div class="fav-cat-bar" id="favCatBar"></div>
@@ -280,7 +326,7 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
   <div class="main-nav">
     <div class="nav-inner">
       <div class="logo">
-        <h1>🎬 영화/드라마 DB v21 <span id="totalStats" class="stats-badge">로딩중…</span></h1>
+        <h1>🎬 영화/드라마 DB v22 <span id="totalStats" class="stats-badge">로딩중…</span></h1>
       </div>
       <div class="nav-links">
         <button class="nav-btn active" data-category="all">전체</button>
@@ -354,14 +400,14 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 
 <!-- 툴바 -->
 <div class="toolbar">
-  <label class="tbtn gold">📂 엑셀 업로드<input type="file" id="importExcel" accept=".xlsx,.xls" style="display:none"></label>
-  <button class="tbtn" id="btnGithubSync" style="background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.25);color:#6ee7b7" title="GitHub에서 최신 엑셀 파일 자동 로드">🔄 GitHub 동기화</button>
-  <button class="tbtn green" id="btnSelectFolder2">📁 이미지 폴더 선택</button>
+  <label class="tbtn gold mobile-hide">📂 엑셀 업로드<input type="file" id="importExcel" accept=".xlsx,.xls" style="display:none"></label>
+  <button class="tbtn mobile-hide" id="btnGithubSync" style="background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.25);color:#6ee7b7" title="GitHub에서 최신 엑셀 파일 자동 로드">🔄 GitHub 동기화</button>
+  <button class="tbtn green mobile-hide" id="btnSelectFolder2">📁 이미지 폴더 선택</button>
   <button class="tbtn gold" id="fullBackupBtn">💾 백업</button>
   <label class="tbtn slate">📂 복원<input type="file" id="fullRestoreZip" accept=".json" style="display:none"></label>
   <button class="tbtn" id="btnStats">📊 통계</button>
   <button class="tbtn" id="btnAutoTag">🤖 태그 자동분류</button>
-  <button class="tbtn" id="btnExport">📥 CSV 내보내기</button>
+  <button class="tbtn mobile-hide" id="btnExport">📥 CSV 내보내기</button>
   <button class="tbtn" id="refreshBtn">↺ 새로고침</button>
   <button class="tbtn" id="btnAddNew" style="background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.3);color:#6ee7b7;font-weight:700">➕ 작품 추가</button>
   <button class="tbtn" id="btnOst" style="background:rgba(232,160,32,.1);border-color:rgba(232,160,32,.25);color:#fbbf24">🎵 명작 OST</button>
@@ -369,7 +415,7 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 </div>
 
 <!-- 설정 배너 -->
-<div class="setup-banner" id="setupBanner">
+<div class="setup-banner mobile-hide" id="setupBanner">
   <div class="setup-card">
     <div class="sc-text">
       <h3>📁 이미지 폴더를 선택해 주세요</h3>
@@ -1189,6 +1235,95 @@ async function renderFavList(){
 
 function openFavPanel(){showingFav=true;favPanel.classList.add('open');}
 function closeFavPanel(){showingFav=false;favPanel.classList.remove('open');}
+
+// 즐겨찾기 SNS 공유
+async function shareFavList(){
+  await loadFavs();
+  const items=await loadAllItems();
+  const itemMap=new Map(items.map(i=>[i.id,i]));
+  const favItems=[];
+  Object.entries(favData).forEach(([idStr,favs])=>{
+    if(favs.length>0){const it=itemMap.get(parseInt(idStr));if(it)favItems.push(it);}
+  });
+  if(!favItems.length){showToast('즐겨찾기가 비어있습니다.','warn',2500);return;}
+  const dateStr=new Date().toLocaleDateString('ko-KR');
+  const cardHtmlArr=[];
+  for(const i of favItems.slice(0,60)){
+    const bUrl=await getCachedImgUrl(i.excelNo);
+    let imgTag='<div class="no-img">🎬</div>';
+    if(bUrl){
+      try{
+        const resp=await fetch(bUrl);
+        const blob2=await resp.blob();
+        const b64=await new Promise(r=>{const fr=new FileReader();fr.onload=ev=>r(ev.target.result);fr.readAsDataURL(blob2);});
+        imgTag='<img src="'+b64+'" alt="'+esc(i.title)+'" loading="lazy">';
+      }catch(e){}
+    }
+    const naverUrl='https://search.naver.com/search.naver?query='+encodeURIComponent(i.title+' '+(i.year||'')+' 영화');
+    const note=i.humNote?'<div class="note">"'+esc(i.humNote)+'"</div>':'';
+    const tags=(i.hashTags||[]).map(t=>'<span class="tag">'+esc(t)+'</span>').join('');
+    cardHtmlArr.push(
+      '<a class="card" href="'+naverUrl+'" target="_blank" rel="noopener">'
+      +'<div class="poster">'+imgTag+'</div>'
+      +'<div class="info">'
+      +'<div class="title">'+esc(i.title)+'</div>'
+      +'<div class="meta"><span class="rating">★'+(i.rating!=='?'?i.rating:'?')+'</span>'+(i.year?' · '+i.year:'')+(i.country?' · '+esc(i.country):'')+'</div>'
+      +'<div class="tags">'+tags+'</div>'
+      +note+'</div></a>'
+    );
+  }
+  const pageTitle='⭐ 나의 즐겨찾기 영화 '+favItems.length+'편';
+  const pageDesc='개인 관람 기록에서 선별한 즐겨찾기 작품 모음입니다.';
+  const stJs=pageTitle.replace(/'/g,"\\'");
+  const css='*{box-sizing:border-box;margin:0;padding:0}'
+    +' body{font-family:system-ui,sans-serif;background:#0d1117;color:#e2e8f0;padding:1.5rem 1rem 5rem}'
+    +' .header{text-align:center;margin-bottom:1.8rem}'
+    +' .header h1{font-size:1.2rem;font-weight:800;color:#fbbf24;margin-bottom:.3rem}'
+    +' .header p{font-size:.72rem;color:rgba(255,255,255,.35)}'
+    +' .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.7rem;max-width:1200px;margin:0 auto}'
+    +' @media(max-width:480px){.grid{grid-template-columns:repeat(3,1fr);gap:.45rem}}'
+    +' .card{background:#131b2c;border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:transform .15s}'
+    +' .card:hover,.card:active{transform:translateY(-2px);border-color:rgba(251,191,36,.35)}'
+    +' .poster{aspect-ratio:2/3;overflow:hidden;background:#0c1320;display:flex;align-items:center;justify-content:center}'
+    +' .poster img{width:100%;height:100%;object-fit:cover}'
+    +' .poster .no-img{font-size:1.8rem;opacity:.2}'
+    +' .info{padding:.45rem .48rem .38rem;flex:1}'
+    +' .title{font-size:.73rem;font-weight:700;color:#dde8f8;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:.15rem}'
+    +' .meta{font-size:.62rem;color:rgba(255,255,255,.4)}'
+    +' .rating{color:#fbbf24;font-weight:700}'
+    +' .tags{display:flex;flex-wrap:wrap;gap:.12rem;margin-top:.15rem}'
+    +' .tag{font-size:.55rem;background:rgba(251,191,36,.12);color:#fbbf24;border-radius:4px;padding:.02rem .26rem}'
+    +' .note{font-size:.62rem;color:rgba(255,200,100,.6);margin-top:.25rem;font-style:italic;line-height:1.5}'
+    +' .share-bar{position:fixed;bottom:0;left:0;right:0;background:#131b2c;border-top:1px solid rgba(255,255,255,.07);padding:.55rem 1rem;display:flex;gap:.5rem;justify-content:center;z-index:100}'
+    +' .share-btn{background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.35);color:#fbbf24;padding:.38rem 1rem;border-radius:18px;cursor:pointer;font-size:.75rem;font-weight:700;font-family:inherit}'
+    +' .footer{text-align:center;margin-top:1.5rem;margin-bottom:4rem;font-size:.6rem;color:rgba(255,255,255,.18)}'
+    +' @media print{.share-bar{display:none}}';
+  const html='<!DOCTYPE html><html lang="ko"><head>'
+    +'<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">'
+    +'<title>'+pageTitle+'</title>'
+    +'<meta property="og:type" content="website">'
+    +'<meta property="og:title" content="'+pageTitle+'">'
+    +'<meta property="og:description" content="'+pageDesc+'">'
+    +'<meta name="twitter:card" content="summary_large_image">'
+    +'<style>'+css+'</style>'
+    +'</head><body>'
+    +'<div class="header"><h1>⭐ 나의 즐겨찾기</h1><p>'+pageDesc+' ('+dateStr+')</p></div>'
+    +'<div class="grid">'+cardHtmlArr.join('')+'</div>'
+    +'<div class="footer">개인 영화 관람 기록 DB · '+dateStr+'</div>'
+    +'<div class="share-bar"><button class="share-btn" id="sb">📤 공유하기</button></div>'
+    +'<script>(function(){var b=document.getElementById("sb");'
+    +'if(navigator.share){b.onclick=function(){navigator.share({title:\''+stJs+'\',url:window.location.href});};}'
+    +'else{b.textContent="🔗 URL 복사";b.onclick=function(){navigator.clipboard.writeText(window.location.href).then(function(){b.textContent="✅ 복사됨";setTimeout(function(){b.textContent="🔗 URL 복사";},1500);});};}'
+    +'})();<\/script>'
+    +'</body></html>';
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='즐겨찾기_'+new Date().toISOString().slice(0,10)+'.html';
+  a.click();
+  showToast('즐겨찾기 HTML 저장 완료 — '+favItems.length+'편','success',4000);
+}
+
 function scrollToCard(itemId){
   const el=document.querySelector(`[data-item-id="${itemId}"]`);
   if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
@@ -1226,6 +1361,7 @@ function applySort(items,mode){
 // 데이터 새로고침
 // ══════════════════════════════════════════════════════════════
 async function refreshData(){
+  _simIdxBase=0; // 유사작 인덱스 무효화
   rawItems=await loadAllItems();
   await loadImgDateMap(); // 이미지 날짜 맵 로드
   allItems=applySort(rawItems,curSort); // rawItems 기준으로 정렬
@@ -1358,18 +1494,38 @@ async function render(){
 // ══════════════════════════════════════════════════════════════
 // 유사작 추천 (장르 + 감정태그 기반)
 // ══════════════════════════════════════════════════════════════
+// 유사작 인덱스 캐시 (장르별·태그별 역인덱스 — 전체 순회 없이 빠른 조회)
+let _simGenreIdx=null, _simTagIdx=null, _simIdxBase=0;
+function _buildSimIdx(){
+  if(_simIdxBase===rawItems.length) return; // 변경 없으면 스킵
+  _simGenreIdx=new Map(); _simTagIdx=new Map();
+  rawItems.forEach(i=>{
+    (i.genreList||[]).forEach(g=>{if(g!=='기타'){if(!_simGenreIdx.has(g))_simGenreIdx.set(g,[]);_simGenreIdx.get(g).push(i);}});
+    (i.hashTags||[]).forEach(t=>{if(!_simTagIdx.has(t))_simTagIdx.set(t,[]);_simTagIdx.get(t).push(i);});
+  });
+  _simIdxBase=rawItems.length;
+}
 function getSimilarItems(item, n=5){
-  const genres=new Set((item.genreList||[]).filter(g=>g!=='기타'));
-  const tags=new Set(item.hashTags||[]);
-  if(!genres.size&&!tags.size) return [];
-  return rawItems
-    .filter(i=>i.id!==item.id)
-    .map(i=>{
-      let score=0;
-      (i.genreList||[]).forEach(g=>{ if(genres.has(g)) score+=2; });
-      (i.hashTags||[]).forEach(t=>{ if(tags.has(t)) score+=1; });
-      return {item:i, score};
-    })
+  _buildSimIdx();
+  const genres=(item.genreList||[]).filter(g=>g!=='기타');
+  const tags=item.hashTags||[];
+  if(!genres.length&&!tags.length) return [];
+  const scoreMap=new Map();
+  genres.forEach(g=>{
+    (_simGenreIdx.get(g)||[]).forEach(i=>{
+      if(i.id===item.id)return;
+      scoreMap.set(i.id,(scoreMap.get(i.id)||{item:i,score:0}));
+      scoreMap.get(i.id).score+=2;
+    });
+  });
+  tags.forEach(t=>{
+    (_simTagIdx.get(t)||[]).forEach(i=>{
+      if(i.id===item.id)return;
+      if(!scoreMap.has(i.id))scoreMap.set(i.id,{item:i,score:0});
+      scoreMap.get(i.id).score+=1;
+    });
+  });
+  return [...scoreMap.values()]
     .filter(x=>x.score>0)
     .sort((a,b)=>b.score-a.score||(parseFloat(b.item.rating)||0)-(parseFloat(a.item.rating)||0))
     .slice(0,n)
@@ -1400,7 +1556,7 @@ async function renderCards(filtered){
     const bUrl=await getCachedImgUrl(item.excelNo);
     if(bUrl){
       const img=document.createElement('img');img.className='poster-img';img.alt=item.title;
-      img.loading='lazy'; // 레이지 로딩
+      img.loading='eager'; // 모바일 첫 화면 포스터 즉시 로드
       img.src=bUrl;
       img.onerror=()=>{pd.innerHTML=`<div class="poster-placeholder"><span class="ph-icon">🎬</span><span>오류</span></div>`;};
       pd.appendChild(img);
@@ -1762,7 +1918,7 @@ async function openExportHtmlModal(){
     </div>
     <div class="rec-results" id="recResults"></div>
     <div id="recExportRow" style="display:none;margin-top:.8rem;gap:.5rem;flex-wrap:wrap">
-      <button id="recExportBtn" style="background:#8b5cf6;border:none;color:#fff;padding:.46rem 1.1rem;border-radius:9px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.8rem">📄 HTML로 내보내기</button>
+      <button id="recExportBtn" style="background:#8b5cf6;border:none;color:#fff;padding:.5rem 1.2rem;border-radius:9px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.82rem;min-width:160px">📄 HTML로 내보내기</button>
       <span style="font-size:.67rem;color:rgba(255,255,255,.3);align-self:center">선택된 태그로 개인 큐레이션 페이지를 생성합니다</span>
     </div>
   </div>`;
@@ -1811,6 +1967,7 @@ async function openExportHtmlModal(){
     headerRow.style.display='flex';
     countEl.textContent=`${matched.length}편 중 상위 ${currentTop.length}편`;
     exportRow.style.display=currentTop.length?'flex':'none';
+    if(currentTop.length){exportRow.style.flexDirection='column';exportRow.style.gap='.4rem';}
     if(!currentTop.length){
       resultsEl.innerHTML='<p style="color:rgba(255,255,255,.25);font-size:.75rem;padding:1rem;grid-column:1/-1">해당 태그 작품 없음. 🤖 태그 자동분류를 먼저 실행하세요.</p>';
       return;
@@ -2003,7 +2160,7 @@ function openHelpModal(){
   const modal=document.createElement('div');modal.className='modal';
   modal.innerHTML=`<div class="modal-box help-modal-box">
     <button class="modal-close">&times;</button>
-    <h3>❓ 영화/드라마 DB v21 사용 도움말</h3>
+    <h3>❓ 영화/드라마 DB v22 사용 도움말</h3>
 
     <div class="help-section">
       <h4>📋 처음 시작하기</h4>
@@ -2059,11 +2216,26 @@ function openHelpModal(){
     </div>
 
     <div class="help-section">
-      <h4>📱 GitHub Pages 모바일 앱</h4>
-      <div class="help-row"><span class="help-key">홈 화면 추가</span><span class="help-desc">iOS Safari: 공유 → 홈 화면에 추가 / Android Chrome: 메뉴 → 앱 설치 → 앱 아이콘으로 실행</span></div>
-      <div class="help-row"><span class="help-key">엑셀 자동 로드</span><span class="help-desc">GitHub에 엑셀 업로드 후 앱의 🔄 동기화 버튼 → 어느 기기에서나 최신 데이터 유지</span></div>
-      <div class="help-row"><span class="help-key">이미지 저장</span><span class="help-desc">이미지는 기기 IndexedDB에 저장 → 한 번 로드 후 오프라인에서도 표시</span></div>
-      <div class="help-tip">💡 PWA manifest가 포함되어 있어 홈 화면에 추가 시 전체화면 앱처럼 실행됩니다.</div>
+      <h4>📱 모바일 앱 (v22 개선)</h4>
+      <div class="help-row"><span class="help-key">홈 화면 추가</span><span class="help-desc">iOS Safari: 공유 → 홈 화면에 추가 / Android Chrome: 메뉴 → 앱 설치</span></div>
+      <div class="help-row"><span class="help-key">자동 준비</span><span class="help-desc">앱 실행 시 태그 없는 작품은 자동분류, 관람일 최신순으로 즉시 표시. 별도 설정 불필요</span></div>
+      <div class="help-row"><span class="help-key">3열 그리드</span><span class="help-desc">모바일에서 카드가 3열로 표시되어 더 많은 포스터를 한 화면에 확인 가능</span></div>
+      <div class="help-row"><span class="help-key">화면 겹침</span><span class="help-desc">iPhone Notch/Dynamic Island, 하단 홈바와의 겹침을 safe-area로 자동 처리</span></div>
+      <div class="help-row"><span class="help-key">포스터 표시</span><span class="help-desc">IndexedDB에 저장된 이미지를 모바일에서도 즉시 표시. 한 번 로드 후 오프라인도 유지</span></div>
+      <div class="help-tip">💡 모바일에서는 엑셀 업로드·이미지 폴더 선택·CSV 내보내기 등 데스크탑 전용 버튼이 자동으로 숨겨집니다.</div>
+    </div>
+
+    <div class="help-section">
+      <h4>📤 SNS 공유 (v22 신기능)</h4>
+      <div class="help-row"><span class="help-key">감정추천 공유</span><span class="help-desc">💜 감정추천 내보내기 → 태그 선택 → 📄 HTML로 내보내기 → 저장 파일의 📤 공유하기 버튼으로 카카오·인스타·문자 등 공유</span></div>
+      <div class="help-row"><span class="help-key">즐겨찾기 공유</span><span class="help-desc">즐겨찾기 패널 상단 📤 공유 버튼 → 즐겨찾기 전체 목록을 포스터 포함 HTML 파일로 저장·공유</span></div>
+      <div class="help-row"><span class="help-key">SNS 공유 방법</span><span class="help-desc">저장된 HTML 파일을 웹 서버(GitHub Pages 등)에 올리면 카카오·슬랙·트위터 공유 시 포스터 미리보기 자동 표시</span></div>
+    </div>
+
+    <div class="help-section">
+      <h4>🎬 유사작 추천 (v22 성능 개선)</h4>
+      <div class="help-row"><span class="help-key">빠른 응답</span><span class="help-desc">역인덱스 캐시 방식으로 변경 — 3,000편 DB에서도 클릭 즉시 결과 표시. 브라우저 멈춤 현상 해결</span></div>
+      <div class="help-row"><span class="help-key">장르+태그</span><span class="help-desc">장르 일치(×2) + 감정태그 일치(×1) 점수 합산 → 상위 5편 추천</span></div>
     </div>
 
     <div class="help-section">
@@ -2764,6 +2936,7 @@ searchInput.addEventListener('input',()=>{clearTimeout(sTimer);sTimer=setTimeout
 
 closeProgBtn.onclick=()=>{progressPanel.style.display='none';};
 document.getElementById('favClose').onclick=closeFavPanel;
+document.getElementById('favShareBtn').onclick=()=>shareFavList();
 document.getElementById('btnAddNew').onclick = () => openAddNewModal();
 document.getElementById('btnStats').onclick=openStatsModal;
 document.getElementById('btnExport').onclick=exportToExcel;
@@ -2795,8 +2968,22 @@ scrollTopBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
     await loadExcelFromGithub(false);
   }
 
+  // 2) 태그 없는 항목 자동분류 (별도 실행 불필요)
+  const _untagged=rawItems.filter(i=>!(i.hashTags&&i.hashTags.length));
+  if(_untagged.length>0){
+    debug('태그 자동분류 실행중… ('+_untagged.length+'개)');
+    await autoTagAll(false);
+    await refreshData();
+  }
 
-  debug('영화/드라마 DB v21 준비 완료');
+  // 3) 초기 정렬: 관람일 최신순 (연번순 fallback)
+  if(curSort!=='fileDateDesc'){
+    curSort='fileDateDesc'; sortSelect.value='fileDateDesc';
+    allItems=applySort(rawItems,curSort);
+    await render();
+  }
+
+  debug('영화/드라마 DB v22 준비 완료');
 })();
 </script>
 </body>
