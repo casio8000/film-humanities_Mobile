@@ -20,7 +20,7 @@
 2. 왼쪽 메뉴 **Pages** 클릭
 3. Source: **Deploy from a branch**
 4. Branch: **main** / **/ (root)** 선택 → **Save**
-5. 잠시 후 `https://[계정명].github.io/[저장소명]/` 주소 생성
+5. 잠시 후 `https://casio8000.github.io/film-humanities_Mobile/` 주소 생성
 
 ---
 
@@ -75,7 +75,7 @@ git push
 
 | 파일 | 역할 |
 |------|------|
-| `movie_db_v20.html` | 메인 앱 |
+| `movie_db_v23.html` | 메인 앱 |
 | `manifest.json` | PWA (홈 화면 앱) 설정 |
 | `movie_list_complete.xlsx` | 영화 데이터 (앱이 자동 로드) |
 
