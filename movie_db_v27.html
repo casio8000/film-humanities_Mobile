@@ -477,29 +477,85 @@ async function diagnosGithub(){
 }
 
 // 이미지 일괄 동기화 — GitHub에서 없는 이미지만 다운로드
-// CORS 정책 준수: no-store 캐시, cors 모드, 확장자 복수 시도
-async function fetchGithubImageWithFallback(no){
-  // jpg → png → webp 순으로 시도
-  const exts=['jpg','png','webp'];
+// ══════════════════════════════════════════════════════════════
+// GitHub 이미지 로드 — 3단계 폴백 전략
+// A) fetch CORS → B) Canvas 캡처 → C) img.src 직접 표시
+// ══════════════════════════════════════════════════════════════
+
+function getGithubImgUrls(no){
+  // no 번호에 맞는 폴더별 url 목록 반환 (jpg/png/webp)
   const base=getGithubBase();
   let folder;
   if(no<=1000)      folder='images/movie';
   else if(no<=2000) folder='images/movie_2';
   else if(no<=3000) folder='images/movie_3';
   else              folder='images/movie_4';
-  for(const ext of exts){
-    const url=base+'/'+folder+'/'+no+'.'+ext;
-    try{
-      const resp=await fetch(url,{
-        cache:'no-store',          // force-cache 제거 — CORS 캐시 문제 해결
-        mode:'cors',               // 명시적 CORS
-        signal:AbortSignal.timeout(10000)
-      });
-      if(!resp.ok) continue;
-      const blob=await resp.blob();
-      if(!blob||!blob.size) continue;
-      return blob;
-    }catch(e){ continue; }
+  return ['jpg','png','webp'].map(ext=>base+'/'+folder+'/'+no+'.'+ext);
+}
+
+// 방법 A: fetch() CORS — GitHub Pages가 CORS 헤더를 보낼 때만 성공
+async function tryFetchCors(url){
+  try{
+    const resp=await fetch(url,{
+      cache:'no-store',
+      mode:'cors',
+      credentials:'omit',
+      signal:AbortSignal.timeout(12000)
+    });
+    if(!resp.ok) return null;
+    const blob=await resp.blob();
+    return (blob&&blob.size>0)?blob:null;
+  }catch(e){ return null; }
+}
+
+// 방법 B: HTMLImageElement + Canvas — crossOrigin 설정으로 Blob 변환 시도
+// (GitHub Pages가 Access-Control-Allow-Origin:* 를 보내면 작동)
+function tryImgCanvas(url){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=()=>{
+      try{
+        const c=document.createElement('canvas');
+        c.width=img.naturalWidth||img.width;
+        c.height=img.naturalHeight||img.height;
+        c.getContext('2d').drawImage(img,0,0);
+        c.toBlob(blob=>resolve(blob&&blob.size>0?blob:null),'image/jpeg',0.85);
+      }catch(e){ resolve(null); } // tainted canvas (CORS 없을 때)
+    };
+    img.onerror=()=>resolve(null);
+    // cache-busting 없이 — 브라우저 캐시 활용
+    img.src=url;
+    setTimeout(()=>resolve(null),15000);
+  });
+}
+
+// 방법 C: img.src만 저장 — IDB 저장 불가, 화면 표시만 가능
+// 반환값: {url, idbSaved:false} 형태
+function tryImgDirect(url){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>resolve(url);
+    img.onerror=()=>resolve(null);
+    img.src=url;
+    setTimeout(()=>resolve(null),12000);
+  });
+}
+
+async function fetchGithubImageWithFallback(no){
+  const urls=getGithubImgUrls(no);
+  for(const url of urls){
+    // A) fetch CORS 시도
+    const blobA=await tryFetchCors(url);
+    if(blobA) return {blob:blobA, url, method:'fetch'};
+
+    // B) Canvas 캡처 시도 (CORS 허용 서버라면 가능)
+    const blobB=await tryImgCanvas(url);
+    if(blobB) return {blob:blobB, url, method:'canvas'};
+
+    // C) 직접 img.src 로드 (CORS 없어도 화면에 표시, IDB 저장 불가)
+    const directUrl=await tryImgDirect(url);
+    if(directUrl) return {blob:null, url:directUrl, method:'direct'};
   }
   return null;
 }
@@ -521,12 +577,18 @@ async function syncImagesFromGithub(items, onProgress){
     const batch=missing.slice(i,i+BATCH);
     await Promise.allSettled(batch.map(async item=>{
       try{
-        const blob=await fetchGithubImageWithFallback(item.excelNo);
-        if(!blob){ failed++; return; }
-        const resized=await resizeBlob(blob,300).catch(()=>blob);
-        await saveImageByNo(item.excelNo,resized,null);
-        const objUrl=URL.createObjectURL(resized);
-        imgUrlCache.set(item.excelNo,objUrl);
+        const result=await fetchGithubImageWithFallback(item.excelNo);
+        if(!result){ failed++; return; }
+        if(result.blob){
+          // A/B: blob 있음 → IDB 저장 + ObjectURL 캐시
+          const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
+          await saveImageByNo(item.excelNo,resized,null);
+          const objUrl=URL.createObjectURL(resized);
+          imgUrlCache.set(item.excelNo,objUrl);
+        } else {
+          // C: direct URL만 — 메모리 캐시에 직접 URL 저장 (세션 내만 유효)
+          imgUrlCache.set(item.excelNo,result.url);
+        }
         done++;
       }catch(e){ failed++; }
     }));
@@ -609,7 +671,36 @@ async function loadExcelFromGithub(force=false){
   const excelUrl=getGithubExcelUrl();
   showToast('GitHub 엑셀 다운로드 중…', 'info', 0);
   try{
-    const resp=await fetch(excelUrl,{cache:'no-store',mode:'cors'});
+    // CORS 시도 → 실패 시 no-cors (opaque) → 실패 시 XMLHttpRequest 사용
+    let resp;
+    try{
+      resp=await fetch(excelUrl,{cache:'no-store',mode:'cors',credentials:'omit'});
+    }catch(corsErr){
+      // XMLHttpRequest 폴백 — file:// 환경에서도 작동
+      try{
+        const buf=await new Promise((res,rej)=>{
+          const xhr=new XMLHttpRequest();
+          xhr.open('GET',excelUrl,true);
+          xhr.responseType='arraybuffer';
+          xhr.timeout=30000;
+          xhr.onload=()=>xhr.status>=200&&xhr.status<300?res(xhr.response):rej(new Error('HTTP '+xhr.status));
+          xhr.onerror=()=>rej(new Error('네트워크 오류 (XHR)'));
+          xhr.ontimeout=()=>rej(new Error('타임아웃'));
+          xhr.send();
+        });
+        const n=await importFromExcel(buf);
+        showToast('✅ '+n.toLocaleString()+'개 작품 로드 완료 (XHR)', 'success', 4000);
+        await refreshData();
+        const loaded2=await loadAllItems();
+        const noTagCount2=loaded2.filter(i=>!(i.hashTags&&i.hashTags.length)).length;
+        if(noTagCount2>0){ await autoTagAll(false); await refreshData(); }
+        return true;
+      }catch(xhrErr){
+        showToast('❌ 로드 실패: '+xhrErr.message+'\n→ 브라우저에서 직접 엑셀 URL 접근 후 앱 새로고침', 'error', 12000);
+        console.error('Excel XHR error:', xhrErr, excelUrl);
+        return false;
+      }
+    }
     if(!resp.ok){
       let hint='';
       if(resp.status===404) hint='\n→ 저장소 루트에 movie_list_complete.xlsx 업로드 필요';
@@ -1109,17 +1200,24 @@ function clearImgCache(){
   imgUrlCache.clear();
 }
 
-// ── GitHub 이미지 fetch & IndexedDB 캐시 저장 (확장자 복수 시도) ──
+// ── GitHub 이미지 fetch & IndexedDB 캐시 저장 ──
 async function fetchAndCacheGithubImage(no){
   if(!no) return null;
   try{
-    const blob=await fetchGithubImageWithFallback(no);
-    if(!blob) return null;
-    const resized=await resizeBlob(blob,300).catch(()=>blob);
-    await saveImageByNo(no,resized,null);
-    const objUrl=URL.createObjectURL(resized);
-    imgUrlCache.set(no,objUrl);
-    return objUrl;
+    const result=await fetchGithubImageWithFallback(no);
+    if(!result) return null;
+    if(result.blob){
+      // blob 있음: IDB 저장 + ObjectURL
+      const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
+      await saveImageByNo(no,resized,null);
+      const objUrl=URL.createObjectURL(resized);
+      imgUrlCache.set(no,objUrl);
+      return objUrl;
+    } else {
+      // direct URL: 메모리 캐시만 (세션 유효)
+      imgUrlCache.set(no,result.url);
+      return result.url;
+    }
   }catch(e){ return null; }
 }
 
@@ -1129,7 +1227,7 @@ async function getCachedImgUrl(no){
   if(imgUrlCache.has(no)){
     const cached=imgUrlCache.get(no);
     // ObjectURL이 만료되면 null이나 빈 문자열일 수 있음 — 재확인
-    if(cached&&cached.startsWith('blob:')) return cached;
+    if(cached&&(cached.startsWith('blob:')||cached.startsWith('http'))) return cached;
     imgUrlCache.delete(no); // 만료된 캐시 제거
   }
   // 2. IndexedDB 확인
@@ -2353,6 +2451,14 @@ function openHelpModal(){
       <div class="help-row"><span class="help-key">유사작</span><span class="help-desc">카드 하단 버튼 → 장르·태그 기반 유사 5편. 비동기 처리로 브라우저 멈춤 없음</span></div>
       <div class="help-row"><span class="help-key">📊 통계</span><span class="help-desc">국가별·장르별·연도별·카테고리·감정태그 막대 차트</span></div>
       <div class="help-tip">💡 Chrome/Edge 권장. 데스크탑에서 이미지 폴더 선택 후 IndexedDB 저장 → 모바일은 GitHub images 폴더에서 자동 로드.</div>
+      <div class="help-tip" style="background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.2);color:rgba(249,168,168,.9)">
+        ⚠️ <b>이미지 로드 실패 시 체크리스트:</b><br>
+        1. GitHub Pages 활성화 확인 (Settings → Pages → main/root)<br>
+        2. 이미지 파일명 확인: <code>images/movie/1.jpg</code> ~ <code>images/movie_4/3423.jpg</code><br>
+        3. 파일명이 <b>숫자.jpg</b> 형식인지 확인 (1_제목.jpg 형식 불가)<br>
+        4. 브라우저에서 직접 URL 접근 후 <b>🖼️ 이미지 동기화</b> 재시도<br>
+        5. 그래도 실패 시: <b>연결 진단</b> 버튼으로 원인 확인
+      </div>
     </div>
   </div>`;
   document.body.appendChild(modal);
@@ -3112,7 +3218,7 @@ scrollTopBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
     }
   }
 
-  debug('영화/드라마 DB v27 준비 완료');
+  debug('영화/드라마 DB v27b 준비 완료');
 })();
 </script>
 </body>
