@@ -4,7 +4,7 @@
 
 ```
 📁 GitHub 저장소 루트
-├── movie_db_v25.html          ← 메인 앱
+├── movie_db_v26.html          ← 메인 앱
 ├── manifest.json              ← PWA 설정
 ├── icon-192.png               ← 앱 아이콘
 ├── icon-512.png               ← 앱 아이콘 (고해상도)
@@ -75,7 +75,7 @@ git push
 
 | 파일 | 역할 |
 |------|------|
-| `movie_db_v25.html` | 메인 앱 |
+| `movie_db_v26.html` | 메인 앱 |
 | `manifest.json` | PWA (홈 화면 앱) 설정 |
 | `movie_list_complete.xlsx` | 영화 데이터 (앱이 자동 로드) |
 
