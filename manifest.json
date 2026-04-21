@@ -2,7 +2,7 @@
   "name": "영화/드라마 DB",
   "short_name": "영화DB",
   "description": "개인 영화 관람 기록 · 감정별 추천 · 인문학 노트",
-  "start_url": "movie_db_v24.html",
+  "start_url": "movie_db_v25.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
