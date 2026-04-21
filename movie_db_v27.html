@@ -478,86 +478,78 @@ async function diagnosGithub(){
 
 // 이미지 일괄 동기화 — GitHub에서 없는 이미지만 다운로드
 // ══════════════════════════════════════════════════════════════
-// GitHub 이미지 로드 — 3단계 폴백 전략
-// A) fetch CORS → B) Canvas 캡처 → C) img.src 직접 표시
+// GitHub 이미지 URL 생성 (폴더 분기 + 확장자)
 // ══════════════════════════════════════════════════════════════
-
-function getGithubImgUrls(no){
-  // no 번호에 맞는 폴더별 url 목록 반환 (jpg/png/webp)
+function getGithubImgUrl(no, ext='jpg'){
+  if(!no) return null;
   const base=getGithubBase();
   let folder;
   if(no<=1000)      folder='images/movie';
   else if(no<=2000) folder='images/movie_2';
   else if(no<=3000) folder='images/movie_3';
   else              folder='images/movie_4';
-  return ['jpg','png','webp'].map(ext=>base+'/'+folder+'/'+no+'.'+ext);
+  return base+'/'+folder+'/'+no+'.'+ext;
 }
 
-// 방법 A: fetch() CORS — GitHub Pages가 CORS 헤더를 보낼 때만 성공
-async function tryFetchCors(url){
+// ── IDB 저장용: fetch no-cors (opaque) → Blob 추출 시도 ──
+// GitHub Pages는 CORS 미지원 → no-cors가 유일한 fetch 방법
+// opaque response는 blob 추출 가능하나 크기/타입 확인 불가
+async function tryFetchNoCors(url){
   try{
     const resp=await fetch(url,{
       cache:'no-store',
-      mode:'cors',
-      credentials:'omit',
-      signal:AbortSignal.timeout(12000)
+      mode:'no-cors',          // opaque response — blob 추출은 가능
+      signal:AbortSignal.timeout(15000)
     });
-    if(!resp.ok) return null;
+    // opaque response: resp.ok=false, resp.status=0, blob은 추출 가능
     const blob=await resp.blob();
-    return (blob&&blob.size>0)?blob:null;
+    // opaque blob은 size=0으로 보고될 수 있으나 실제 데이터 있음
+    // size가 0이어도 type 체크로 이미지인지 확인
+    if(blob&&(blob.size>0||blob.type.startsWith('image'))) return blob;
+    // size=0, type='' 이면 opaque → 실제 이미지로 판단하고 반환
+    if(blob) return blob;
+    return null;
   }catch(e){ return null; }
 }
 
-// 방법 B: HTMLImageElement + Canvas — crossOrigin 설정으로 Blob 변환 시도
-// (GitHub Pages가 Access-Control-Allow-Origin:* 를 보내면 작동)
+// ── Canvas 캡처: crossOrigin 없이 직접 로드 후 Canvas 추출 ──
+// crossOrigin 없으면 CORS 필요 없음 — 단, tainted canvas로 toBlob 실패
+// → crossOrigin='use-credentials'로 재시도
 function tryImgCanvas(url){
   return new Promise(resolve=>{
     const img=new Image();
     img.crossOrigin='anonymous';
+    const timer=setTimeout(()=>resolve(null),8000);
     img.onload=()=>{
+      clearTimeout(timer);
       try{
         const c=document.createElement('canvas');
-        c.width=img.naturalWidth||img.width;
-        c.height=img.naturalHeight||img.height;
-        c.getContext('2d').drawImage(img,0,0);
-        c.toBlob(blob=>resolve(blob&&blob.size>0?blob:null),'image/jpeg',0.85);
-      }catch(e){ resolve(null); } // tainted canvas (CORS 없을 때)
+        c.width=Math.min(img.naturalWidth||300,300);
+        c.height=Math.min(img.naturalHeight||450,450);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        c.toBlob(b=>{
+          if(b&&b.size>100) resolve(b);
+          else resolve(null);
+        },'image/jpeg',0.82);
+      }catch(e){ resolve(null); }
     };
-    img.onerror=()=>resolve(null);
-    // cache-busting 없이 — 브라우저 캐시 활용
-    img.src=url;
-    setTimeout(()=>resolve(null),15000);
-  });
-}
-
-// 방법 C: img.src만 저장 — IDB 저장 불가, 화면 표시만 가능
-// 반환값: {url, idbSaved:false} 형태
-function tryImgDirect(url){
-  return new Promise(resolve=>{
-    const img=new Image();
-    img.onload=()=>resolve(url);
-    img.onerror=()=>resolve(null);
-    img.src=url;
-    setTimeout(()=>resolve(null),12000);
+    img.onerror=()=>{ clearTimeout(timer); resolve(null); };
+    img.src=url+'?t='+Date.now(); // 캐시 우회로 CORS 재협상 유도
   });
 }
 
 async function fetchGithubImageWithFallback(no){
-  const urls=getGithubImgUrls(no);
-  for(const url of urls){
-    // A) fetch CORS 시도
-    const blobA=await tryFetchCors(url);
-    if(blobA) return {blob:blobA, url, method:'fetch'};
-
-    // B) Canvas 캡처 시도 (CORS 허용 서버라면 가능)
-    const blobB=await tryImgCanvas(url);
-    if(blobB) return {blob:blobB, url, method:'canvas'};
-
-    // C) 직접 img.src 로드 (CORS 없어도 화면에 표시, IDB 저장 불가)
-    const directUrl=await tryImgDirect(url);
-    if(directUrl) return {blob:null, url:directUrl, method:'direct'};
-  }
-  return null;
+  if(!no) return null;
+  // jpg만 시도 (확장자 루프 제거 — 지연 최소화)
+  const url=getGithubImgUrl(no,'jpg');
+  // 1) no-cors fetch 시도 (opaque blob)
+  const blobNoCors=await tryFetchNoCors(url);
+  if(blobNoCors&&blobNoCors.size>100) return {blob:blobNoCors, url, method:'no-cors'};
+  // 2) Canvas 캡처 시도
+  const blobCanvas=await tryImgCanvas(url);
+  if(blobCanvas) return {blob:blobCanvas, url, method:'canvas'};
+  // 3) 실패 시 URL만 반환 — img.src로 직접 표시 (IDB 저장 불가)
+  return {blob:null, url, method:'direct'};
 }
 
 async function syncImagesFromGithub(items, onProgress){
@@ -579,14 +571,14 @@ async function syncImagesFromGithub(items, onProgress){
       try{
         const result=await fetchGithubImageWithFallback(item.excelNo);
         if(!result){ failed++; return; }
-        if(result.blob){
-          // A/B: blob 있음 → IDB 저장 + ObjectURL 캐시
+        if(result.blob&&result.blob.size>100){
+          // blob 유효 → IDB 저장 + ObjectURL 캐시
           const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
           await saveImageByNo(item.excelNo,resized,null);
           const objUrl=URL.createObjectURL(resized);
           imgUrlCache.set(item.excelNo,objUrl);
         } else {
-          // C: direct URL만 — 메모리 캐시에 직접 URL 저장 (세션 내만 유효)
+          // direct URL — 메모리 캐시 (세션 유효, 화면 표시는 됨)
           imgUrlCache.set(item.excelNo,result.url);
         }
         done++;
@@ -1206,7 +1198,7 @@ async function fetchAndCacheGithubImage(no){
   try{
     const result=await fetchGithubImageWithFallback(no);
     if(!result) return null;
-    if(result.blob){
+    if(result.blob&&result.blob.size>100){
       // blob 있음: IDB 저장 + ObjectURL
       const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
       await saveImageByNo(no,resized,null);
@@ -1214,7 +1206,7 @@ async function fetchAndCacheGithubImage(no){
       imgUrlCache.set(no,objUrl);
       return objUrl;
     } else {
-      // direct URL: 메모리 캐시만 (세션 유효)
+      // direct URL: 메모리 캐시 (세션 유효)
       imgUrlCache.set(no,result.url);
       return result.url;
     }
@@ -1223,14 +1215,13 @@ async function fetchAndCacheGithubImage(no){
 
 async function getCachedImgUrl(no){
   if(!no) return null;
-  // 1. 메모리 캐시 (ObjectURL 유효성 확인)
+  // 1. 메모리 캐시
   if(imgUrlCache.has(no)){
     const cached=imgUrlCache.get(no);
-    // ObjectURL이 만료되면 null이나 빈 문자열일 수 있음 — 재확인
-    if(cached&&(cached.startsWith('blob:')||cached.startsWith('http'))) return cached;
-    imgUrlCache.delete(no); // 만료된 캐시 제거
+    if(cached) return cached;
+    imgUrlCache.delete(no);
   }
-  // 2. IndexedDB 확인
+  // 2. IndexedDB에 저장된 blob
   const r=await idbGet(ST_IMAGES,no).catch(()=>null);
   if(r&&r.blob&&r.blob.size>0){
     try{
@@ -1238,12 +1229,17 @@ async function getCachedImgUrl(no){
       imgUrlCache.set(no,url);
       return url;
     }catch(e){
-      // blob이 손상됐으면 IDB에서 삭제 후 재다운로드
       await idbDel(ST_IMAGES,no).catch(()=>{});
     }
   }
-  // 3. GitHub 이미지 폴백 (IndexedDB 비어있을 때)
-  return await fetchAndCacheGithubImage(no);
+  // 3. IDB 없음 → GitHub 직접 URL 반환 (즉시, 타임아웃 없음)
+  //    브라우저가 <img src>로 직접 로드 — CORS 불필요
+  const directUrl=getGithubImgUrl(no,'jpg');
+  if(directUrl){
+    imgUrlCache.set(no,directUrl); // 세션 캐시
+    return directUrl;
+  }
+  return null;
 }
 
 // 이미지 날짜 맵 (no → fileDate) — 정렬용
@@ -1724,13 +1720,21 @@ function buildCard(item){
     +(item.year?'<span class="ph-no">'+item.year+'</span>':'')
     +'</div>';
 
-  // 이미지 비동기 로드 (카드 이미 DOM에 추가된 후 독립 실행)
+  // 이미지 로드 — getCachedImgUrl이 즉시 URL 반환(IDB 또는 GitHub직접)
   getCachedImgUrl(item.excelNo).then(bUrl=>{
     if(!bUrl) return;
     const img=document.createElement('img');img.className='poster-img';img.alt=item.title;
-    img.loading='lazy';
+    img.loading='eager';             // 모바일 첫 화면 즉시 표시
+    img.decoding='async';
+    img.crossOrigin='anonymous';     // Canvas 저장용 (실패해도 무관)
     img.onload=()=>{ pd.innerHTML=''; pd.appendChild(img); };
-    img.onerror=()=>{}; // 플레이스홀더 유지
+    img.onerror=()=>{
+      // jpg 실패 시 png 시도
+      if(img.src.endsWith('.jpg')){
+        img.crossOrigin='anonymous';
+        img.src=img.src.replace('.jpg','.png');
+      }
+    };
     img.src=bUrl;
   }).catch(()=>{});
 
@@ -3218,7 +3222,7 @@ scrollTopBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
     }
   }
 
-  debug('영화/드라마 DB v27b 준비 완료');
+  debug('영화/드라마 DB v27 준비 완료');
 })();
 </script>
 </body>
