@@ -444,148 +444,50 @@ function getGithubImageUrl(no){
   return getGithubBase()+'/'+folder+'/'+no+'.jpg';
 }
 
-// GitHub 연결 진단 함수 — GET 방식으로 실제 접근 확인
+// GitHub 연결 진단 함수
 async function diagnosGithub(){
   const base=getGithubBase();
   const excelUrl=getGithubExcelUrl();
-  // 이미지는 1번 jpg/png 모두 시도
-  const img1url=base+'/images/movie/1.jpg';
-  const img1urlPng=base+'/images/movie/1.png';
+  const imgUrl=getGithubImageUrl(1);
   const results=[];
-  // 엑셀 확인
-  try{
-    const r=await fetch(excelUrl,{method:'HEAD',cache:'no-store',mode:'cors',signal:AbortSignal.timeout(8000)});
-    results.push({label:'엑셀',ok:r.ok,status:r.status,url:excelUrl});
-  }catch(e){
-    const hint=e.message.includes('fetch')||e.message.includes('network')
-      ?'(네트워크 오류 — GitHub Pages 활성화 확인)'
-      :'('+e.message+')';
-    results.push({label:'엑셀',ok:false,status:'연결 실패 '+hint,url:excelUrl});
-  }
-  // 이미지 확인 (jpg → png 순)
-  let imgOk=false;
-  for(const [ext,url] of [['jpg',img1url],['png',img1urlPng]]){
+  for(const [label,url] of [['엑셀',excelUrl],['이미지(1.jpg)',imgUrl]]){
     try{
-      const r=await fetch(url,{method:'HEAD',cache:'no-store',mode:'cors',signal:AbortSignal.timeout(8000)});
-      if(r.ok){ results.push({label:'이미지(1.'+ext+')',ok:true,status:r.status,url}); imgOk=true; break; }
-    }catch(e){}
-  }
-  if(!imgOk){
-    results.push({label:'이미지(1.jpg)',ok:false,status:'images/movie/ 폴더에 파일 없음 또는 접근 불가',url:img1url});
+      const r=await fetch(url,{method:'HEAD',cache:'no-cache'});
+      results.push({label,ok:r.ok,status:r.status,url});
+    }catch(e){
+      results.push({label,ok:false,status:'네트워크 오류',url,err:e.message});
+    }
   }
   return results;
 }
 
-// 이미지 일괄 동기화 — GitHub에서 없는 이미지만 다운로드
-// ══════════════════════════════════════════════════════════════
-// GitHub 이미지 URL 생성 (폴더 분기 + 확장자)
-// ══════════════════════════════════════════════════════════════
-function getGithubImgUrl(no, ext='jpg'){
-  if(!no) return null;
-  const base=getGithubBase();
-  let folder;
-  if(no<=1000)      folder='images/movie';
-  else if(no<=2000) folder='images/movie_2';
-  else if(no<=3000) folder='images/movie_3';
-  else              folder='images/movie_4';
-  return base+'/'+folder+'/'+no+'.'+ext;
-}
-
-// ── IDB 저장용: fetch no-cors (opaque) → Blob 추출 시도 ──
-// GitHub Pages는 CORS 미지원 → no-cors가 유일한 fetch 방법
-// opaque response는 blob 추출 가능하나 크기/타입 확인 불가
-async function tryFetchNoCors(url){
-  try{
-    const resp=await fetch(url,{
-      cache:'no-store',
-      mode:'no-cors',          // opaque response — blob 추출은 가능
-      signal:AbortSignal.timeout(15000)
-    });
-    // opaque response: resp.ok=false, resp.status=0, blob은 추출 가능
-    const blob=await resp.blob();
-    // opaque blob은 size=0으로 보고될 수 있으나 실제 데이터 있음
-    // size가 0이어도 type 체크로 이미지인지 확인
-    if(blob&&(blob.size>0||blob.type.startsWith('image'))) return blob;
-    // size=0, type='' 이면 opaque → 실제 이미지로 판단하고 반환
-    if(blob) return blob;
-    return null;
-  }catch(e){ return null; }
-}
-
-// ── Canvas 캡처: crossOrigin 없이 직접 로드 후 Canvas 추출 ──
-// crossOrigin 없으면 CORS 필요 없음 — 단, tainted canvas로 toBlob 실패
-// → crossOrigin='use-credentials'로 재시도
-function tryImgCanvas(url){
-  return new Promise(resolve=>{
-    const img=new Image();
-    img.crossOrigin='anonymous';
-    const timer=setTimeout(()=>resolve(null),8000);
-    img.onload=()=>{
-      clearTimeout(timer);
-      try{
-        const c=document.createElement('canvas');
-        c.width=Math.min(img.naturalWidth||300,300);
-        c.height=Math.min(img.naturalHeight||450,450);
-        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-        c.toBlob(b=>{
-          if(b&&b.size>100) resolve(b);
-          else resolve(null);
-        },'image/jpeg',0.82);
-      }catch(e){ resolve(null); }
-    };
-    img.onerror=()=>{ clearTimeout(timer); resolve(null); };
-    img.src=url+'?t='+Date.now(); // 캐시 우회로 CORS 재협상 유도
-  });
-}
-
-async function fetchGithubImageWithFallback(no){
-  if(!no) return null;
-  // jpg만 시도 (확장자 루프 제거 — 지연 최소화)
-  const url=getGithubImgUrl(no,'jpg');
-  // 1) no-cors fetch 시도 (opaque blob)
-  const blobNoCors=await tryFetchNoCors(url);
-  if(blobNoCors&&blobNoCors.size>100) return {blob:blobNoCors, url, method:'no-cors'};
-  // 2) Canvas 캡처 시도
-  const blobCanvas=await tryImgCanvas(url);
-  if(blobCanvas) return {blob:blobCanvas, url, method:'canvas'};
-  // 3) 실패 시 URL만 반환 — img.src로 직접 표시 (IDB 저장 불가)
-  return {blob:null, url, method:'direct'};
-}
-
+// 이미지 일괄 동기화 — 없는 이미지만 GitHub에서 fetch
 async function syncImagesFromGithub(items, onProgress){
-  // IDB까지 확인하여 실제 누락된 항목만 필터링
-  const missing=[];
-  for(const i of items){
-    if(!i.excelNo) continue;
-    if(imgUrlCache.has(i.excelNo)) continue;
-    const existing=await idbGet(ST_IMAGES,i.excelNo).catch(()=>null);
-    if(existing&&existing.blob) continue;
-    missing.push(i);
-  }
+  const missing=items.filter(i=>i.excelNo&&!imgUrlCache.has(i.excelNo));
   if(!missing.length) return {done:0,failed:0,total:0};
   let done=0,failed=0;
-  const BATCH=3; // 동시 요청 수 줄여서 안정성 향상
+  const BATCH=5; // 동시 요청 수
   for(let i=0;i<missing.length;i+=BATCH){
     const batch=missing.slice(i,i+BATCH);
     await Promise.allSettled(batch.map(async item=>{
+      const url=getGithubImageUrl(item.excelNo);
+      if(!url) return;
       try{
-        const result=await fetchGithubImageWithFallback(item.excelNo);
-        if(!result){ failed++; return; }
-        if(result.blob&&result.blob.size>100){
-          // blob 유효 → IDB 저장 + ObjectURL 캐시
-          const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
-          await saveImageByNo(item.excelNo,resized,null);
-          const objUrl=URL.createObjectURL(resized);
-          imgUrlCache.set(item.excelNo,objUrl);
-        } else {
-          // direct URL — 메모리 캐시 (세션 유효, 화면 표시는 됨)
-          imgUrlCache.set(item.excelNo,result.url);
-        }
+        const already=await idbGet(ST_IMAGES,item.excelNo).catch(()=>null);
+        if(already&&already.blob){ done++; return; }
+        const resp=await fetch(url,{cache:'force-cache'});
+        if(!resp.ok){ failed++; return; }
+        const blob=await resp.blob();
+        if(!blob.size){ failed++; return; }
+        const resized=await resizeBlob(blob,300).catch(()=>blob);
+        await saveImageByNo(item.excelNo,resized,null);
+        const objUrl=URL.createObjectURL(resized);
+        imgUrlCache.set(item.excelNo,objUrl);
         done++;
       }catch(e){ failed++; }
     }));
     if(onProgress) onProgress(done+failed, missing.length, done, failed);
-    await new Promise(r=>setTimeout(r,80)); // 과부하 방지
+    await new Promise(r=>setTimeout(r,50)); // 과부하 방지
   }
   return {done,failed,total:missing.length};
 }
@@ -597,10 +499,8 @@ async function openImgSyncModal(){
     <button class="modal-close">&times;</button>
     <h3>🖼️ GitHub 이미지 동기화</h3>
     <div style="background:rgba(52,160,240,.07);border:1px solid rgba(52,160,240,.2);border-radius:9px;padding:.7rem .9rem;font-size:.72rem;color:rgba(255,255,255,.55);line-height:1.75;margin:.5rem 0">
-      GitHub <code style="word-break:break-all">${base}/images/movie/</code> 등에서<br>
-      로컬 IndexedDB로 포스터를 동기화합니다. (jpg → png → webp 순 시도)<br>
-      이미 저장된 이미지는 건너뛰고, 없는 이미지만 다운로드합니다.<br>
-      <span style="color:#fbbf24">⚠️ 실패가 많으면 GitHub Pages 설정 → 이미지 파일 경로를 확인하세요.</span>
+      GitHub <code>${base}</code>의 이미지 폴더에서 로컬 IndexedDB로 포스터를 동기화합니다.<br>
+      이미 저장된 이미지는 건너뛰고, 없는 이미지만 다운로드합니다.
     </div>
     <div id="imgSyncDiag" style="font-size:.7rem;color:rgba(255,255,255,.4);margin-bottom:.5rem">연결 확인 중…</div>
     <div class="mactions" style="flex-wrap:wrap;gap:.4rem">
@@ -613,7 +513,7 @@ async function openImgSyncModal(){
   document.body.appendChild(modal);
   modal.querySelector('.modal-close').onclick=()=>modal.remove();
   modal.querySelector('#imgSyncCancel').onclick=()=>modal.remove();
-  modal.onclick=e=>{if(e.target===modal){modal.remove();if(exportRow)exportRow.style.display='none';}};
+  modal.onclick=e=>{if(e.target===modal)modal.remove();};
 
   const diagEl=modal.querySelector('#imgSyncDiag');
   const progEl=modal.querySelector('#imgSyncProgress');
@@ -663,36 +563,7 @@ async function loadExcelFromGithub(force=false){
   const excelUrl=getGithubExcelUrl();
   showToast('GitHub 엑셀 다운로드 중…', 'info', 0);
   try{
-    // CORS 시도 → 실패 시 no-cors (opaque) → 실패 시 XMLHttpRequest 사용
-    let resp;
-    try{
-      resp=await fetch(excelUrl,{cache:'no-store',mode:'cors',credentials:'omit'});
-    }catch(corsErr){
-      // XMLHttpRequest 폴백 — file:// 환경에서도 작동
-      try{
-        const buf=await new Promise((res,rej)=>{
-          const xhr=new XMLHttpRequest();
-          xhr.open('GET',excelUrl,true);
-          xhr.responseType='arraybuffer';
-          xhr.timeout=30000;
-          xhr.onload=()=>xhr.status>=200&&xhr.status<300?res(xhr.response):rej(new Error('HTTP '+xhr.status));
-          xhr.onerror=()=>rej(new Error('네트워크 오류 (XHR)'));
-          xhr.ontimeout=()=>rej(new Error('타임아웃'));
-          xhr.send();
-        });
-        const n=await importFromExcel(buf);
-        showToast('✅ '+n.toLocaleString()+'개 작품 로드 완료 (XHR)', 'success', 4000);
-        await refreshData();
-        const loaded2=await loadAllItems();
-        const noTagCount2=loaded2.filter(i=>!(i.hashTags&&i.hashTags.length)).length;
-        if(noTagCount2>0){ await autoTagAll(false); await refreshData(); }
-        return true;
-      }catch(xhrErr){
-        showToast('❌ 로드 실패: '+xhrErr.message+'\n→ 브라우저에서 직접 엑셀 URL 접근 후 앱 새로고침', 'error', 12000);
-        console.error('Excel XHR error:', xhrErr, excelUrl);
-        return false;
-      }
-    }
+    const resp=await fetch(excelUrl,{cache:'no-cache'});
     if(!resp.ok){
       let hint='';
       if(resp.status===404) hint='\n→ 저장소 루트에 movie_list_complete.xlsx 업로드 필요';
@@ -1194,52 +1065,32 @@ function clearImgCache(){
 
 // ── GitHub 이미지 fetch & IndexedDB 캐시 저장 ──
 async function fetchAndCacheGithubImage(no){
-  if(!no) return null;
+  const url=getGithubImageUrl(no);
+  if(!url) return null;
   try{
-    const result=await fetchGithubImageWithFallback(no);
-    if(!result) return null;
-    if(result.blob&&result.blob.size>100){
-      // blob 있음: IDB 저장 + ObjectURL
-      const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
-      await saveImageByNo(no,resized,null);
-      const objUrl=URL.createObjectURL(resized);
-      imgUrlCache.set(no,objUrl);
-      return objUrl;
-    } else {
-      // direct URL: 메모리 캐시 (세션 유효)
-      imgUrlCache.set(no,result.url);
-      return result.url;
-    }
+    const resp=await fetch(url,{signal:AbortSignal.timeout(8000)});
+    if(!resp.ok) return null;
+    const blob=await resp.blob();
+    if(!blob.size) return null;
+    const resized=await resizeBlob(blob,300).catch(()=>blob);
+    await saveImageByNo(no,resized,null);
+    const objUrl=URL.createObjectURL(resized);
+    imgUrlCache.set(no,objUrl);
+    return objUrl;
   }catch(e){ return null; }
 }
 
 async function getCachedImgUrl(no){
-  if(!no) return null;
-  // 1. 메모리 캐시
-  if(imgUrlCache.has(no)){
-    const cached=imgUrlCache.get(no);
-    if(cached) return cached;
-    imgUrlCache.delete(no);
-  }
-  // 2. IndexedDB에 저장된 blob
+  if(imgUrlCache.has(no))return imgUrlCache.get(no);
+  // 1. IndexedDB 확인
   const r=await idbGet(ST_IMAGES,no).catch(()=>null);
-  if(r&&r.blob&&r.blob.size>0){
-    try{
-      const url=URL.createObjectURL(r.blob);
-      imgUrlCache.set(no,url);
-      return url;
-    }catch(e){
-      await idbDel(ST_IMAGES,no).catch(()=>{});
-    }
+  if(r&&r.blob){
+    const url=URL.createObjectURL(r.blob);
+    imgUrlCache.set(no,url);
+    return url;
   }
-  // 3. IDB 없음 → GitHub 직접 URL 반환 (즉시, 타임아웃 없음)
-  //    브라우저가 <img src>로 직접 로드 — CORS 불필요
-  const directUrl=getGithubImgUrl(no,'jpg');
-  if(directUrl){
-    imgUrlCache.set(no,directUrl); // 세션 캐시
-    return directUrl;
-  }
-  return null;
+  // 2. GitHub 이미지 폴백 (모바일 등 IndexedDB 비어있을 때)
+  return await fetchAndCacheGithubImage(no);
 }
 
 // 이미지 날짜 맵 (no → fileDate) — 정렬용
@@ -1700,15 +1551,31 @@ async function getSimilarItems(item, n=5){
 
 // ── 페이지네이션 상태 ──
 let _curPage=0;
-const PAGE_SIZE=30; // 페이지당 카드 수
-let _filteredAll=[]; // 현재 필터 기준 전체 목록
+const PAGE_SIZE=30;
+let _filteredAll=[];
 
-function buildCard(item){
+// 다음 페이지 버튼
+function appendNextPageBtn(total, loaded, onNext){
+  const existing=cardContainer.querySelector('.npb-wrap');
+  if(existing) existing.remove();
+  if(loaded>=total) return;
+  const wrap=document.createElement('div');
+  wrap.className='npb-wrap';
+  wrap.style.cssText='grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:.8rem 0 .4rem';
+  const btn=document.createElement('button');
+  btn.style.cssText='background:#e8a020;border:none;color:#111;padding:.5rem 1.6rem;border-radius:20px;font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit';
+  btn.textContent='▼ 다음 페이지 ('+(total-loaded)+'개 남음)';
+  btn.onclick=onNext;
+  wrap.appendChild(btn);
+  cardContainer.appendChild(wrap);
+}
+
+// 카드 1개 빌드 (이미지 제외, 동기)
+function buildCardShell(item){
   const card=document.createElement('div');
   card.className='movie-card'+(isItemFav(item.id)?' fav-card':'');
   card.dataset.itemId=item.id;
 
-  // 포스터 — 즉시 플레이스홀더 표시 후 이미지 비동기 로드 (블로킹 없음)
   const pd=document.createElement('div');pd.className='poster';
   pd.title=item.link?'클릭하여 정보 보기':'';
   pd.onclick=()=>item.link&&window.open(item.link,'_blank');
@@ -1719,27 +1586,8 @@ function buildCard(item){
     +(g?'<span style="font-size:.5rem;color:rgba(232,160,32,.55)">'+esc(g)+'</span>':'')
     +(item.year?'<span class="ph-no">'+item.year+'</span>':'')
     +'</div>';
+  pd.dataset.no=item.excelNo; // 나중에 이미지 주입 위해 표시
 
-  // 이미지 로드 — getCachedImgUrl이 즉시 URL 반환(IDB 또는 GitHub직접)
-  getCachedImgUrl(item.excelNo).then(bUrl=>{
-    if(!bUrl) return;
-    const img=document.createElement('img');img.className='poster-img';img.alt=item.title;
-    img.loading='eager';             // 모바일 첫 화면 즉시 표시
-    img.decoding='async';
-    img.crossOrigin='anonymous';     // Canvas 저장용 (실패해도 무관)
-    img.onload=()=>{ pd.innerHTML=''; pd.appendChild(img); };
-    img.onerror=()=>{
-      // jpg 실패 시 png 시도
-      if(img.src.endsWith('.jpg')){
-        img.crossOrigin='anonymous';
-        img.src=img.src.replace('.jpg','.png');
-      }
-    };
-    img.src=bUrl;
-  }).catch(()=>{});
-
-  // 정보
-  const inf=document.createElement('div');inf.className='card-info';
   const gt=(item.genreList||[]).filter(g=>g!=='기타').slice(0,2).join(' · ');
   const isDrama=item.category==='드라마';
   const isDocu=item.category==='다큐멘터리';
@@ -1747,6 +1595,7 @@ function buildCard(item){
   const ep=isDrama?extractEpisode(item.runtime):'';
   const tagsHtml=(item.hashTags&&item.hashTags.length)?`<div class="card-hashtags">${item.hashTags.slice(0,3).map(t=>`<span class="card-htag">${esc(t)}</span>`).join('')}</div>`:'';
   const noteHtml=item.humNote?`<div style="font-size:.57rem;color:rgba(255,200,100,.45);margin-top:.12rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(item.humNote)}">📝 ${esc(item.humNote.slice(0,25))}${item.humNote.length>25?'…':''}</div>`:'';
+  const inf=document.createElement('div');inf.className='card-info';
   inf.innerHTML=`<div class="card-title">${esc(item.title)}${ep?` <span class="ep-badge">(${ep})</span>`:''}</div>
     <div class="card-meta">
       ${item.rating!=='?'?`<span class="rating">★ ${item.rating}</span>`:''}
@@ -1755,12 +1604,10 @@ function buildCard(item){
       ${catBadge}
     </div>${gt?`<div class="card-genre">${esc(gt)}</div>`:''}${tagsHtml}${noteHtml}`;
 
-  // 액션
   const ad=document.createElement('div');ad.className='card-actions';
   const fb=document.createElement('button');
   fb.className='fav-btn'+(isItemFav(item.id)?' active':'');
   fb.textContent=isItemFav(item.id)?'★':'☆';
-  fb.title='클릭: 즐겨찾기 | 우클릭: 카테고리';
   fb.onclick=async e=>{ e.stopPropagation(); await quickToggleFav(item.id,fb,card); };
   fb.oncontextmenu=async e=>{ e.preventDefault();e.stopPropagation(); await showFavCatPicker(item.id,fb,card); };
   const right=document.createElement('div');right.className='card-act-right';
@@ -1776,7 +1623,6 @@ function buildCard(item){
       await refreshData();}};
   right.append(eb,del);ad.append(fb,right);
 
-  // 유사작
   const simBar=document.createElement('div');simBar.className='sim-bar';
   const simBtnEl=document.createElement('button');simBtnEl.className='sim-btn';
   simBtnEl.innerHTML='🎬 비슷한 작품 <span style="opacity:.5;font-size:.54rem">▸</span>';
@@ -1789,16 +1635,16 @@ function buildCard(item){
     if(!simLoaded){
       simLoaded=true;
       const sims=await getSimilarItems(item,5);
-      if(!sims.length){ simStrip.innerHTML='<div class="sim-empty">유사 작품 없음</div>'; }
+      if(!sims.length){simStrip.innerHTML='<div class="sim-empty">유사 작품 없음</div>';}
       else {
         for(const si of sims){
           const sDiv=document.createElement('div');sDiv.className='sim-item';
           sDiv.onclick=e2=>{e2.stopPropagation();scrollToCard(si.id);};
           const sThumb=document.createElement('div');sThumb.className='sim-item-thumb';
           getCachedImgUrl(si.excelNo).then(sUrl=>{
-            if(sUrl){const si2=document.createElement('img');si2.src=sUrl;si2.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:3px';sThumb.appendChild(si2);}
+            if(sUrl){const sImg=document.createElement('img');sImg.src=sUrl;sImg.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:3px';sThumb.appendChild(sImg);}
             else sThumb.textContent='🎬';
-          }).catch(()=>{ sThumb.textContent='🎬'; });
+          }).catch(()=>{sThumb.textContent='🎬';});
           const sInfo=document.createElement('div');sInfo.className='sim-item-info';
           sInfo.innerHTML=`<div class="sim-item-title">${esc(si.title)}</div><div class="sim-item-meta">★${si.rating} · ${si.year||'?'}</div>`;
           sDiv.append(sThumb,sInfo);simStrip.appendChild(sDiv);
@@ -1813,19 +1659,46 @@ function buildCard(item){
   return card;
 }
 
-// ── 다음 페이지 버튼 ──
-function buildNextPageBtn(remaining, onNext){
-  const wrap=document.createElement('div');
-  wrap.style.cssText='grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1rem 0 .5rem';
-  const btn=document.createElement('button');
-  btn.style.cssText='background:#e8a020;border:none;color:#111;padding:.55rem 1.8rem;border-radius:20px;font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit';
-  btn.textContent=`▼ 다음 페이지 (${remaining}개 남음)`;
-  btn.onclick=onNext;
-  const info=document.createElement('div');
-  info.style.cssText='font-size:.65rem;color:rgba(255,255,255,.25)';
-  info.textContent=`현재 페이지 표시 완료`;
-  wrap.append(btn,info);
-  return wrap;
+// 이미지 순차 로드 (v24 방식 + 세마포어로 동시 4개 제한)
+const IMG_FETCH_SEM={
+  max:4, cur:0, queue:[],
+  acquire(){return new Promise(res=>{if(this.cur<this.max){this.cur++;res();}else{this.queue.push(res);}});},
+  release(){if(this.queue.length){this.queue.shift()();}else{this.cur--;}}
+};
+async function getCachedImgUrlSem(no){
+  await IMG_FETCH_SEM.acquire();
+  try{ return await getCachedImgUrl(no); }
+  finally{ IMG_FETCH_SEM.release(); }
+}
+
+async function loadImagesForCards(cards, items){
+  // 순차 로드: 카드 DOM이 이미 화면에 있는 상태에서 이미지만 주입
+  for(let i=0;i<items.length;i++){
+    const item=items[i];
+    const card=cards[i];
+    if(!card) continue;
+    const pd=card.querySelector('.poster');
+    if(!pd) continue;
+    try{
+      const bUrl=await getCachedImgUrlSem(item.excelNo);
+      if(bUrl){
+        const img=document.createElement('img');img.className='poster-img';img.alt=item.title;
+        img.loading='lazy';
+        const g=(item.genreList||[]).filter(g=>g!=='기타')[0]||'';
+        img.onerror=()=>{
+          pd.innerHTML='<div class="poster-placeholder">'
+            +'<span class="ph-icon" style="font-size:1rem">🎬</span>'
+            +'<span style="font-size:.58rem;color:rgba(255,255,255,.5);text-align:center;padding:0 .2rem;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">'+esc(item.title)+'</span>'
+            +(g?'<span style="font-size:.5rem;color:rgba(232,160,32,.55)">'+esc(g)+'</span>':'')
+            +'</div>';
+        };
+        img.onload=()=>{ pd.innerHTML=''; pd.appendChild(img); };
+        img.src=bUrl;
+      }
+    }catch(e){}
+    // 5장마다 브라우저에 숨 돌릴 시간 줌 (UI 응답성)
+    if(i%5===4) await new Promise(r=>setTimeout(r,0));
+  }
 }
 
 async function renderCards(filtered){
@@ -1834,7 +1707,7 @@ async function renderCards(filtered){
   cardContainer.innerHTML='';
   statsCount.innerText=`${_filteredAll.length.toLocaleString()}개`;
   if(!_filteredAll.length){
-    cardContainer.innerHTML=`<div class="empty-message"><span class="em-icon">🎬</span>${_filteredAll?'검색 결과가 없습니다.':'작품이 없습니다.<br>엑셀 파일을 업로드하세요.'}</div>`;
+    cardContainer.innerHTML=`<div class="empty-message"><span class="em-icon">🎬</span>${filtered&&filtered.length===0?'검색 결과가 없습니다.':'작품이 없습니다.'}</div>`;
     return;
   }
   await renderPage();
@@ -1845,31 +1718,33 @@ async function renderPage(){
   const end=Math.min(start+PAGE_SIZE, _filteredAll.length);
   const pageItems=_filteredAll.slice(start, end);
 
-  // 기존 "다음 페이지" 버튼 제거
-  const oldBtn=cardContainer.querySelector('.next-page-wrap');
+  // 기존 다음페이지 버튼 제거
+  const oldBtn=cardContainer.querySelector('.npb-wrap');
   if(oldBtn) oldBtn.remove();
 
-  // 카드 동기 렌더링 (이미지는 비동기)
+  // 1단계: 카드 껍데기 즉시 렌더 (동기, 빠름)
+  const cards=[];
   const frag=document.createDocumentFragment();
   for(const item of pageItems){
-    frag.appendChild(buildCard(item));
+    const card=buildCardShell(item);
+    frag.appendChild(card);
+    cards.push(card);
   }
   cardContainer.appendChild(frag);
 
-  // 다음 페이지 버튼
+  // 다음 페이지 버튼 표시
   const remaining=_filteredAll.length-end;
   if(remaining>0){
-    const btn=buildNextPageBtn(remaining, async()=>{
+    appendNextPageBtn(_filteredAll.length, end, async()=>{
       _curPage++;
       await renderPage();
-      // 새 페이지 첫 카드로 스크롤
-      const cards=cardContainer.querySelectorAll('.movie-card');
-      if(cards[start]) cards[start].scrollIntoView({behavior:'smooth',block:'start'});
+      const allCards=cardContainer.querySelectorAll('.movie-card');
+      if(allCards[start]) allCards[start].scrollIntoView({behavior:'smooth',block:'start'});
     });
-    btn.className='next-page-wrap';
-    btn.style.cssText+='grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1rem 0 .5rem';
-    cardContainer.appendChild(btn);
   }
+
+  // 2단계: 이미지 순차 로드 (세마포어 4개 동시 제한, 논블로킹)
+  loadImagesForCards(cards, pageItems); // await 없이 호출 → 이미지 로드 중에도 UI 반응
 }
 
 
@@ -2125,27 +2000,22 @@ async function openExportHtmlModal(){
       </div>
     </div>
     <div class="rec-results" id="recResults"></div>
-    <!-- 하단 공유 바: 모달 밖 고정으로 이동됨. 여기는 결과 카운트만 표시 -->
+    <!-- SNS 공유: 태그 선택 후 항상 표시 -->
+    <div id="recShareRow" style="display:none;margin-top:.6rem;gap:.4rem;flex-wrap:wrap">
+      <button id="recShareBtn" style="background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;padding:.44rem 1rem;border-radius:9px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.8rem">📤 SNS 공유</button>
+      <button id="recExportBtn" style="background:#8b5cf6;border:none;color:#fff;padding:.44rem 1rem;border-radius:9px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.8rem">📄 HTML 저장</button>
+      <span style="font-size:.63rem;color:rgba(255,255,255,.28);align-self:center">영화 목록+링크 공유 | 포스터 내장 HTML 파일</span>
+    </div>
   </div>`;
   document.body.appendChild(modal);
+  modal.querySelector('.modal-close').onclick=()=>modal.remove();
+
   const grid=modal.querySelector('#recTagGrid');
   const resultsEl=modal.querySelector('#recResults');
   const headerRow=modal.querySelector('#recHeaderRow');
   const countEl=modal.querySelector('#recCount');
   const tagInfo=modal.querySelector('#recTagInfo');
-  // 외부 고정 공유바 (모달 밖, 모바일에서도 항상 보임)
-  let exportRow=document.getElementById('recFloatingBar');
-  if(!exportRow){
-    exportRow=document.createElement('div');
-    exportRow.id='recFloatingBar';
-    exportRow.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#1a1040;border-top:2px solid rgba(139,92,246,.4);padding:.55rem 1rem;display:none;gap:.45rem;justify-content:center;align-items:center;z-index:2500;flex-wrap:wrap';
-    exportRow.innerHTML='<span id="recFloatCount" style="font-size:.68rem;color:rgba(255,255,255,.45)"></span>'
-      +'<button id="recShareBtn" style="background:rgba(139,92,246,.22);border:1px solid rgba(139,92,246,.4);color:#c4b5fd;padding:.44rem 1.1rem;border-radius:20px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.8rem">📤 SNS 공유</button>'
-      +'<button id="recExportBtn" style="background:#8b5cf6;border:none;color:#fff;padding:.44rem 1.1rem;border-radius:20px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.8rem">📄 HTML 저장</button>';
-    document.body.appendChild(exportRow);
-  }
-  // 모달 닫힐 때 공유바도 숨김
-  modal.querySelector('.modal-close').addEventListener('click',()=>{ exportRow.style.display='none'; });
+  const exportRow=modal.querySelector('#recShareRow');
   let selTags=new Set();
   let recSortMode='match';
   let currentTop=[];
@@ -2182,9 +2052,6 @@ async function openExportHtmlModal(){
     headerRow.style.display='flex';
     countEl.textContent=`${matched.length}편 중 상위 ${currentTop.length}편`;
     exportRow.style.display=currentTop.length?'flex':'none';
-    const floatCount=document.getElementById('recFloatCount');
-    if(floatCount) floatCount.textContent=currentTop.length?currentTop.length+'편 선택됨':'';
-    if(!currentTop.length && exportRow) exportRow.style.display='none';
     if(!currentTop.length){
       resultsEl.innerHTML='<p style="color:rgba(255,255,255,.25);font-size:.75rem;padding:1rem;grid-column:1/-1">해당 태그 작품 없음. 🤖 태그 자동분류를 먼저 실행하세요.</p>';
       return;
@@ -2402,7 +2269,7 @@ function openHelpModal(){
       <h4>📋 처음 시작 — 자동 초기화</h4>
       <div class="help-row"><span class="help-key">엑셀 자동 로드</span><span class="help-desc">앱 첫 실행 시 GitHub에서 <code>movie_list_complete.xlsx</code> 자동 다운로드 → IndexedDB 저장</span></div>
       <div class="help-row"><span class="help-key">태그 자동 분류</span><span class="help-desc">엑셀 로드 완료 직후 감정태그 없는 작품 자동 분류 실행. 이후 실행에서도 빠진 작품 자동 보완</span></div>
-      <div class="help-row"><span class="help-key">이미지 자동 로드</span><span class="help-desc">포스터는 GitHub의 <code>images/movie/</code>~<code>movie_4/</code> 폴더에서 NO.jpg → NO.png → NO.webp 순으로 자동 fetch → IndexedDB 캐싱. 이후 오프라인에서도 표시</span></div>
+      <div class="help-row"><span class="help-key">이미지 자동 로드</span><span class="help-desc">포스터는 GitHub <code>images/movie/</code> 폴더에서 NO번호.jpg 형식으로 자동 fetch → IndexedDB 캐싱. 이후 오프라인에서도 표시</span></div>
       <div class="help-row"><span class="help-key">🔄 동기화</span><span class="help-desc">엑셀 업데이트 후 GitHub push → 앱에서 동기화 버튼 클릭 (데스크탑 전용)</span></div>
       <div class="help-tip">💡 두 번째 실행부터는 IndexedDB에 저장된 이미지·태그·데이터를 즉시 표시합니다.</div>
     </div>
@@ -2455,14 +2322,6 @@ function openHelpModal(){
       <div class="help-row"><span class="help-key">유사작</span><span class="help-desc">카드 하단 버튼 → 장르·태그 기반 유사 5편. 비동기 처리로 브라우저 멈춤 없음</span></div>
       <div class="help-row"><span class="help-key">📊 통계</span><span class="help-desc">국가별·장르별·연도별·카테고리·감정태그 막대 차트</span></div>
       <div class="help-tip">💡 Chrome/Edge 권장. 데스크탑에서 이미지 폴더 선택 후 IndexedDB 저장 → 모바일은 GitHub images 폴더에서 자동 로드.</div>
-      <div class="help-tip" style="background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.2);color:rgba(249,168,168,.9)">
-        ⚠️ <b>이미지 로드 실패 시 체크리스트:</b><br>
-        1. GitHub Pages 활성화 확인 (Settings → Pages → main/root)<br>
-        2. 이미지 파일명 확인: <code>images/movie/1.jpg</code> ~ <code>images/movie_4/3423.jpg</code><br>
-        3. 파일명이 <b>숫자.jpg</b> 형식인지 확인 (1_제목.jpg 형식 불가)<br>
-        4. 브라우저에서 직접 URL 접근 후 <b>🖼️ 이미지 동기화</b> 재시도<br>
-        5. 그래도 실패 시: <b>연결 진단</b> 버튼으로 원인 확인
-      </div>
     </div>
   </div>`;
   document.body.appendChild(modal);
