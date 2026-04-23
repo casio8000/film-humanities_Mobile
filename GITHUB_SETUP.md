@@ -1,88 +1,72 @@
-# 📱 영화DB — GitHub Pages 모바일 앱 설정 가이드
+# 🎬 영화/드라마 DB — GitHub Pages 설정 가이드
 
-## 업로드할 파일 목록
+## ✅ 파일명 영구 고정: `movie_db_final.html`
+앱 파일명이 `movie_db_final.html`로 고정되어 업데이트 시 **manifest.json과 index.html을 수정할 필요 없음**
+
+---
+
+## 📁 GitHub 저장소 파일 구조
 
 ```
-📁 GitHub 저장소 루트
-├── movie_db_v30.html          ← 메인 앱
-├── manifest.json              ← PWA 설정
+film-humanities_Mobile/ (루트)
+├── movie_db_final.html        ← 앱 (업데이트 시 이 파일만 교체)
+├── manifest.json              ← PWA 설정 (수정 불필요)
 ├── icon-192.png               ← 앱 아이콘
 ├── icon-512.png               ← 앱 아이콘 (고해상도)
-├── movie_list_complete.xlsx   ← 영화 DB 엑셀 (업데이트 시 덮어쓰기)
-└── generate_humnotes.py       ← 인문학 노트 생성 스크립트 (선택)
+├── movie_list_complete.xlsx   ← 영화 데이터 (엑셀 수정 후 재업로드)
+├── generate_humnotes.py       ← 인문학 노트 일괄 생성 스크립트
+│
+└── images/
+    ├── movie/          ← NO 1 ~ 1,000.jpg
+    ├── movie_2/        ← NO 1,001 ~ 2,000.jpg
+    ├── movie_3/        ← NO 2,001 ~ 3,000.jpg
+    └── movie_4/        ← NO 3,001 ~ 3,423.jpg
 ```
 
----
-
-## 1단계 — GitHub Pages 활성화
-
-1. GitHub 저장소 → **Settings** 탭
-2. 왼쪽 메뉴 **Pages** 클릭
-3. Source: **Deploy from a branch**
-4. Branch: **main** / **/ (root)** 선택 → **Save**
-5. 잠시 후 `https://casio8000.github.io/film-humanities_Mobile/` 주소 생성
+> ⚠️ 이미지 파일명은 **순수 번호.jpg** 형식만 지원 (예: `1.jpg`, `1234.jpg`)
 
 ---
 
-## 2단계 — 모바일 홈 화면에 앱 추가
+## 🔄 업데이트 시 수정할 파일
+
+| 상황 | 수정할 파일 |
+|------|------------|
+| 앱 기능 수정 | `movie_db_final.html` 만 교체 |
+| 엑셀 데이터 수정 | `movie_list_complete.xlsx` 교체 → 앱에서 🔄 데이터 동기화 |
+| 이미지 추가/수정 | 해당 `images/movie*/` 파일 교체 → 앱에서 🖼️ 이미지 동기화 |
+| 인문학 노트 수정 | 엑셀 K열 수정 → xlsx 재업로드 → 🔄 데이터 동기화 |
+
+> `manifest.json`, `icon-*.png`, `GITHUB_SETUP.md`는 특별한 경우 외 수정 불필요
+
+---
+
+## 📱 모바일 앱 설치
 
 ### iOS (Safari)
-1. Safari에서 위 GitHub Pages URL 접속
-2. 하단 공유 버튼(□↑) 탭
-3. **"홈 화면에 추가"** 선택
-4. 이름 확인 후 **추가** → 앱 아이콘 생성 완료
+1. `https://casio8000.github.io/film-humanities_Mobile/movie_db_final.html` 접속
+2. 공유(□↑) → **홈 화면에 추가**
 
 ### Android (Chrome)
-1. Chrome에서 URL 접속
-2. 주소창 오른쪽 메뉴(⋮) 탭
-3. **"앱 설치"** 또는 **"홈 화면에 추가"** 선택
-4. 설치 → 앱처럼 실행 가능
+1. 위 URL 접속
+2. 메뉴(⋮) → **앱 설치**
 
 ---
 
-## 3단계 — 엑셀 업데이트 방법
+## 🔗 영화 링크 수정 방법 (엑셀 B열)
 
-엑셀 파일을 수정하고 GitHub에 push하면 앱에서 🔄 동기화 버튼으로 즉시 반영됩니다.
+1. 엑셀 B열에서 해당 제목 셀 우클릭 → 하이퍼링크 편집
+2. 올바른 네이버/왓챠/IMDb URL 입력
+3. 저장 후 GitHub에 push
+4. 앱에서 **🔄 데이터 동기화** 클릭
 
-```bash
-# 로컬에서 수정 후
-git add movie_list_complete.xlsx
-git commit -m "영화 데이터 업데이트"
-git push
+---
+
+## 🔁 앱 첫 실행 자동 처리 순서
+
 ```
-
-앱에서: **🔄 GitHub 동기화** 버튼 클릭
-
----
-
-## 4단계 — 인문학 노트 생성 후 반영
-
-```bash
-# 스크립트 실행 (엑셀 K열에 노트 자동 생성)
-python generate_humnotes.py
-
-# GitHub에 업로드
-git add movie_list_complete.xlsx
-git commit -m "인문학 노트 추가"
-git push
-
-# 앱에서 🔄 동기화 클릭
+1. IndexedDB 초기화
+2. 데이터 없으면 → GitHub 엑셀 자동 다운로드
+3. 태그 없는 작품 → 감정태그 자동 분류
+4. 카드 표시 시 → GitHub images/ 포스터 순차 다운로드 (세마포어 4개 동시 제한)
+5. 이후 실행 → IndexedDB에서 즉시 로드 (오프라인 가능)
 ```
-
----
-
-## 주요 URL 구조
-
-| 파일 | 역할 |
-|------|------|
-| `movie_db_v30.html` | 메인 앱 |
-| `manifest.json` | PWA (홈 화면 앱) 설정 |
-| `movie_list_complete.xlsx` | 영화 데이터 (앱이 자동 로드) |
-
----
-
-## 특징
-
-- **IndexedDB 로컬 저장**: 이미지를 한 번 로드하면 기기에 저장되어 이후 오프라인에서도 포스터 표시
-- **PWA**: 홈 화면 추가 시 전체화면 앱처럼 실행, 주소창 없음
-- **GitHub Raw URL**: 엑셀 파일은 GitHub에서 직접 fetch → 항상 최신 데이터
