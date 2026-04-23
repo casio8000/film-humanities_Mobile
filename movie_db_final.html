@@ -520,22 +520,34 @@ function getGithubImgUrl(no){
 async function fetchAndSaveGithubImage(no){
   const url=getGithubImgUrl(no);
   if(!url) return null;
+  // 이미 캐시에 있으면 즉시 반환
+  if(imgUrlCache.has(no)) return imgUrlCache.get(no);
+  // 이미 IDB에 있으면 즉시 반환
+  const existing=await idbGet(ST_IMAGES,no).catch(()=>null);
+  if(existing&&existing.blob&&existing.blob.size>100){
+    const objUrl=URL.createObjectURL(existing.blob);
+    imgUrlCache.set(no,objUrl);
+    return objUrl;
+  }
   try{
-    // 타임아웃: 12초 후 null 반환 (AbortSignal.timeout 사용 불가 기기 대응)
-    const fetchPromise=fetch(url,{cache:'no-cache'});
-    const timeoutPromise=new Promise(r=>setTimeout(()=>r(null),12000));
-    const resp=await Promise.race([fetchPromise,timeoutPromise]);
-    if(!resp||!resp.ok) return null;
+    // 단순 fetch — GitHub Pages CORS 정상 지원
+    const resp=await fetch(url);
+    if(!resp||!resp.ok){
+      console.warn('[IMG] fetch failed',no,resp&&resp.status);
+      return null;
+    }
     const blob=await resp.blob();
-    if(!blob||blob.size<100) return null;
-    // 리사이즈 후 IDB 저장
+    if(!blob||blob.size<500){
+      console.warn('[IMG] blob too small',no,blob&&blob.size);
+      return null;
+    }
     const resized=await resizeBlob(blob,300).catch(()=>blob);
     await saveImageByNo(no,resized,null);
     const objUrl=URL.createObjectURL(resized);
     imgUrlCache.set(no,objUrl);
     return objUrl;
   }catch(e){
-    console.warn('[IMG]',no,e.message);
+    console.warn('[IMG] error',no,e.message);
     return null;
   }
 }
@@ -981,7 +993,7 @@ async function importFromExcel(buf){
     const runtime=String(row[H.runtime]||'—').trim();
     const genreList=parseGenres(genreRaw);
     // B열 HYPERLINK URL 우선 사용, 없으면 네이버 영화 검색
-    const link=excelUrl||`https://search.naver.com/search.naver?query=${encodeURIComponent(title+' 영화 '+year)}`;
+    const link=excelUrl||'';
     const tagsRaw=H.tags!==undefined?String(row[H.tags]||'').trim():'';
     // 감정태그만 허용 (감독/주연 데이터 완전 차단)
     const hashTags=(tagsRaw && !/^감독:/i.test(tagsRaw) && !/^주연:/i.test(tagsRaw) && !/감독:/i.test(tagsRaw))
@@ -1027,9 +1039,15 @@ async function importFromExcel(buf){
       if(!it.ostLink && prev.ostLink) it.ostLink = prev.ostLink;
       // addedAt 보존 (최초 추가 시점 유지)
       if(prev.addedAt) it.addedAt = prev.addedAt;
-      // link: 엑셀 B열 하이퍼링크가 있으면 항상 최신 엑셀값 사용 (구버전 덮어쓰기)
-      // 없으면 기존 네이버 검색 URL 유지
-      if(!it.link && prev.link) it.link = prev.link;
+      // link: 엑셀 B열에 진짜 하이퍼링크(http)가 있으면 항상 최신 사용
+      // 없으면 기존 유효한 링크 보존 (단, 구버전 네이버검색 URL은 보존하지 않음)
+      if(it.link && it.link.startsWith('http')){
+        // 엑셀 B열 하이퍼링크 → 사용 (이미 it.link에 있음)
+      } else if(prev.link && prev.link.startsWith('http') && !prev.link.includes('search.naver.com')){
+        it.link = prev.link; // 기존 유효 링크 보존 (네이버 검색 URL 제외)
+      } else {
+        it.link = ''; // 없으면 빈 문자열 (카드 클릭 시 fallback)
+      }
     }
   }
 
@@ -1173,14 +1191,8 @@ async function getCachedImgUrl(no){
       await idbDel(ST_IMAGES,no).catch(()=>{});
     }
   }
-  // 3. IDB 없음 → GitHub 직접 URL 반환 (즉시, 타임아웃 없음)
-  //    브라우저가 <img src>로 직접 로드 — CORS 불필요
-  const directUrl=getGithubImgUrl(no,'jpg');
-  if(directUrl){
-    imgUrlCache.set(no,directUrl); // 세션 캐시
-    return directUrl;
-  }
-  return null;
+  // 3. IDB 없음 → GitHub에서 fetch해서 blob 저장 (세마포어로 동시 제한)
+  return await fetchAndSaveGithubImage(no);
 }
 
 // 이미지 날짜 맵 (no → fileDate) — 정렬용
@@ -1698,7 +1710,7 @@ function buildCard(item){
   const pd=document.createElement('div');pd.className='poster';
   pd.title=item.link?'클릭: 영화 정보 보기':'포스터';
   pd.style.cursor=item.link?'pointer':'default';
-  pd.onclick=()=>{ if(item.link) window.open(item.link,'_blank'); };
+  pd.onclick=()=>{ const dest=item.link&&item.link.startsWith('http')?item.link:`https://search.naver.com/search.naver?query=${encodeURIComponent(item.title+' 영화')}`; window.open(dest,'_blank'); };
   const g=(item.genreList||[]).filter(g=>g!=='기타')[0]||'';
   pd.innerHTML='<div class="poster-placeholder">'
     +'<span class="ph-icon" style="font-size:1rem">🎬</span>'
@@ -2781,7 +2793,7 @@ async function fullRestore(file){
   for(const f of oldFavs)await idbDel(ST_FAVS,f.id).catch(()=>{});
   for(const item of imported){
     item.genreList=parseGenres(item.genreRaw||'기타');
-    item.link=item.link||`https://search.naver.com/search.naver?query=${encodeURIComponent(item.title+' 영화')}`;
+    // link: 엑셀 B열 하이퍼링크 그대로 사용 (없으면 빈 문자열)
     item.hashTags=item.hashTags||[];
     delete item.id;
     await saveItem(item);
