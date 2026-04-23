@@ -476,7 +476,7 @@ async function diagnosGithub(){
   const results=[];
   // 엑셀 확인
   try{
-    const r=await fetch(excelUrl,{method:'HEAD',cache:'no-store',mode:'cors',signal:AbortSignal.timeout(8000)});
+    const r=await fetch(excelUrl,{method:'HEAD',cache:'no-store',mode:'cors'});
     results.push({label:'엑셀',ok:r.ok,status:r.status,url:excelUrl});
   }catch(e){
     const hint=e.message.includes('fetch')||e.message.includes('network')
@@ -488,7 +488,7 @@ async function diagnosGithub(){
   let imgOk=false;
   for(const [ext,url] of [['jpg',img1url],['png',img1urlPng]]){
     try{
-      const r=await fetch(url,{method:'HEAD',cache:'no-store',mode:'cors',signal:AbortSignal.timeout(8000)});
+      const r=await fetch(url,{method:'HEAD',cache:'no-store',mode:'cors'});
       if(r.ok){ results.push({label:'이미지(1.'+ext+')',ok:true,status:r.status,url}); imgOk=true; break; }
     }catch(e){}
   }
@@ -502,7 +502,8 @@ async function diagnosGithub(){
 // ══════════════════════════════════════════════════════════════
 // GitHub 이미지 URL 생성 (폴더 분기 + 확장자)
 // ══════════════════════════════════════════════════════════════
-function getGithubImgUrl(no, ext='jpg'){
+// ── GitHub 이미지 URL 생성 (4개 폴더 분할) ──
+function getGithubImgUrl(no){
   if(!no) return null;
   const base=getGithubBase();
   let folder;
@@ -510,69 +511,35 @@ function getGithubImgUrl(no, ext='jpg'){
   else if(no<=2000) folder='images/movie_2';
   else if(no<=3000) folder='images/movie_3';
   else              folder='images/movie_4';
-  return base+'/'+folder+'/'+no+'.'+ext;
+  return base+'/'+folder+'/'+no+'.jpg';
 }
 
-// ── IDB 저장용: fetch no-cors (opaque) → Blob 추출 시도 ──
-// GitHub Pages는 CORS 미지원 → no-cors가 유일한 fetch 방법
-// opaque response는 blob 추출 가능하나 크기/타입 확인 불가
-async function tryFetchNoCors(url){
+// ── GitHub 이미지 fetch → IndexedDB 저장 (v24 방식: 단순 CORS fetch) ──
+// GitHub Pages는 CORS를 지원하므로 mode:'cors'(기본값)로 직접 fetch
+// AbortSignal.timeout은 iOS 16 미만 미지원 → Promise.race로 대체
+async function fetchAndSaveGithubImage(no){
+  const url=getGithubImgUrl(no);
+  if(!url) return null;
   try{
-    const resp=await fetch(url,{
-      cache:'no-store',
-      mode:'no-cors',          // opaque response — blob 추출은 가능
-      signal:AbortSignal.timeout(15000)
-    });
-    // opaque response: resp.ok=false, resp.status=0, blob은 추출 가능
+    // 타임아웃: 12초 후 null 반환 (AbortSignal.timeout 사용 불가 기기 대응)
+    const fetchPromise=fetch(url,{cache:'no-cache'});
+    const timeoutPromise=new Promise(r=>setTimeout(()=>r(null),12000));
+    const resp=await Promise.race([fetchPromise,timeoutPromise]);
+    if(!resp||!resp.ok) return null;
     const blob=await resp.blob();
-    // opaque blob은 size=0으로 보고될 수 있으나 실제 데이터 있음
-    // size가 0이어도 type 체크로 이미지인지 확인
-    if(blob&&(blob.size>0||blob.type.startsWith('image'))) return blob;
-    // size=0, type='' 이면 opaque → 실제 이미지로 판단하고 반환
-    if(blob) return blob;
+    if(!blob||blob.size<100) return null;
+    // 리사이즈 후 IDB 저장
+    const resized=await resizeBlob(blob,300).catch(()=>blob);
+    await saveImageByNo(no,resized,null);
+    const objUrl=URL.createObjectURL(resized);
+    imgUrlCache.set(no,objUrl);
+    return objUrl;
+  }catch(e){
+    console.warn('[IMG]',no,e.message);
     return null;
-  }catch(e){ return null; }
+  }
 }
 
-// ── Canvas 캡처: crossOrigin 없이 직접 로드 후 Canvas 추출 ──
-// crossOrigin 없으면 CORS 필요 없음 — 단, tainted canvas로 toBlob 실패
-// → crossOrigin='use-credentials'로 재시도
-function tryImgCanvas(url){
-  return new Promise(resolve=>{
-    const img=new Image();
-    img.crossOrigin='anonymous';
-    const timer=setTimeout(()=>resolve(null),8000);
-    img.onload=()=>{
-      clearTimeout(timer);
-      try{
-        const c=document.createElement('canvas');
-        c.width=Math.min(img.naturalWidth||300,300);
-        c.height=Math.min(img.naturalHeight||450,450);
-        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-        c.toBlob(b=>{
-          if(b&&b.size>100) resolve(b);
-          else resolve(null);
-        },'image/jpeg',0.82);
-      }catch(e){ resolve(null); }
-    };
-    img.onerror=()=>{ clearTimeout(timer); resolve(null); };
-    img.src=url+'?t='+Date.now(); // 캐시 우회로 CORS 재협상 유도
-  });
-}
-
-async function fetchGithubImageWithFallback(no){
-  if(!no) return null;
-  // jpg만 시도 (확장자 루프 제거 — 지연 최소화)
-  const url=getGithubImgUrl(no,'jpg');
-  // 1) no-cors fetch 시도 (opaque blob)
-  const blobNoCors=await tryFetchNoCors(url);
-  if(blobNoCors&&blobNoCors.size>100) return {blob:blobNoCors, url, method:'no-cors'};
-  // 2) Canvas 캡처 시도
-  const blobCanvas=await tryImgCanvas(url);
-  if(blobCanvas) return {blob:blobCanvas, url, method:'canvas'};
-  // 3) 실패 시 URL만 반환 — img.src로 직접 표시 (IDB 저장 불가)
-  return {blob:null, url, method:'direct'};
-}
 
 async function syncImagesFromGithub(items, onProgress){
   // IDB까지 확인하여 실제 누락된 항목만 필터링
@@ -591,19 +558,8 @@ async function syncImagesFromGithub(items, onProgress){
     const batch=missing.slice(i,i+BATCH);
     await Promise.allSettled(batch.map(async item=>{
       try{
-        const result=await fetchGithubImageWithFallback(item.excelNo);
-        if(!result){ failed++; return; }
-        if(result.blob&&result.blob.size>100){
-          // blob 유효 → IDB 저장 + ObjectURL 캐시
-          const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
-          await saveImageByNo(item.excelNo,resized,null);
-          const objUrl=URL.createObjectURL(resized);
-          imgUrlCache.set(item.excelNo,objUrl);
-        } else {
-          // direct URL — 메모리 캐시 (세션 유효, 화면 표시는 됨)
-          imgUrlCache.set(item.excelNo,result.url);
-        }
-        done++;
+        const objUrl=await fetchAndSaveGithubImage(item.excelNo);
+        if(objUrl){ done++; } else { failed++; }
       }catch(e){ failed++; }
     }));
     if(onProgress) onProgress(done+failed, missing.length, done, failed);
@@ -1194,24 +1150,9 @@ function clearImgCache(){
 
 // ── GitHub 이미지 fetch & IndexedDB 캐시 저장 ──
 async function fetchAndCacheGithubImage(no){
-  if(!no) return null;
-  try{
-    const result=await fetchGithubImageWithFallback(no);
-    if(!result) return null;
-    if(result.blob&&result.blob.size>100){
-      // blob 있음: IDB 저장 + ObjectURL
-      const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
-      await saveImageByNo(no,resized,null);
-      const objUrl=URL.createObjectURL(resized);
-      imgUrlCache.set(no,objUrl);
-      return objUrl;
-    } else {
-      // direct URL: 메모리 캐시 (세션 유효)
-      imgUrlCache.set(no,result.url);
-      return result.url;
-    }
-  }catch(e){ return null; }
+  return await fetchAndSaveGithubImage(no);
 }
+
 
 async function getCachedImgUrl(no){
   if(!no) return null;
