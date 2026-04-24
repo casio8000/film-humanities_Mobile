@@ -159,7 +159,11 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 }
 .fav-panel.open{transform:translateX(0);box-shadow:-4px 0 32px rgba(0,0,0,.7)}
 /* body.fav-open: 배경 스크롤 완전 차단 (모바일 핵심) */
-body.fav-open{overflow:hidden!important;position:fixed;width:100%;touch-action:none}
+html.fav-open{overflow:hidden!important}
+html.fav-open body{overflow:hidden!important;touch-action:none}
+/* PWA standalone: status bar 높이 보정 */
+.pwa-standalone .fav-panel{top:env(safe-area-inset-top,0px)}
+.pwa-standalone .fav-panel{bottom:env(safe-area-inset-bottom,0px)}
 @media(max-width:680px){
   .fav-panel{
     width:100%!important;       /* vw 단위 대신 % 사용 — safe-area 영향 없음 */
@@ -702,16 +706,24 @@ async function loadExcelFromGithub(force=false){
   }
   const excelUrl=getGithubExcelUrl();
   showToast('GitHub 엑셀 다운로드 중…', 'info', 0);
+  // ★ XHR 1순위: simple request → OPTIONS preflight 없음 → 모바일/PWA 호환
+  const loadBuf=()=>new Promise((res,rej)=>{
+    const xhr=new XMLHttpRequest();
+    xhr.open('GET',excelUrl,true);
+    xhr.responseType='arraybuffer';
+    xhr.timeout=30000;
+    xhr.onload=()=>{ if(xhr.status>=200&&xhr.status<300)res(xhr.response); else rej(new Error('HTTP '+xhr.status)); };
+    xhr.onerror=()=>rej(new Error('네트워크 오류'));
+    xhr.ontimeout=()=>rej(new Error('타임아웃(30s)'));
+    xhr.send();
+  });
   try{
-    const resp=await fetch(excelUrl,{cache:'no-store',mode:'cors',credentials:'omit'});
-    if(!resp.ok){
-      let hint='';
-      if(resp.status===404) hint='\n→ 저장소 루트에 movie_list_complete.xlsx 업로드 필요';
-      else if(resp.status===403) hint='\n→ GitHub Pages가 비활성화됐거나 저장소가 Private\n→ Settings → Pages → main/root 활성화';
-      showToast('❌ HTTP '+resp.status+hint, 'error', 10000);
-      return false;
-    }
-    const buf=await resp.arrayBuffer();
+    const buf=await loadBuf().catch(async xhrErr=>{
+      // XHR 실패 시 fetch cors 폴백
+      const resp=await fetch(excelUrl,{cache:'no-store',mode:'cors',credentials:'omit'});
+      if(!resp.ok) throw new Error('HTTP '+resp.status+(resp.status===404?' (파일 없음)':resp.status===403?' (접근 거부)':''));
+      return resp.arrayBuffer();
+    });
     const n=await importFromExcel(buf);
     showToast(`✅ ${n.toLocaleString()}개 작품 로드 완료`, 'success', 4000);
     await refreshData();
@@ -725,8 +737,8 @@ async function loadExcelFromGithub(force=false){
     }
     return true;
   }catch(e){
-    showToast('❌ GitHub 로드 실패: '+e.message+'\n→ GitHub Pages URL과 인터넷 연결을 확인하세요', 'error', 10000);
-    console.error('GitHub Excel load error:', e, excelUrl);
+    showToast('❌ 엑셀 로드 실패: '+e.message+'\n→ URL: '+excelUrl+'\n→ GitHub Pages 활성화/파일명 확인', 'error', 12000);
+    console.error('[DB] Excel load error:', e.message, excelUrl);
     return false;
   }
 }
@@ -1538,22 +1550,23 @@ async function renderFavList(){
   }
 }
 
+// ★ iOS PWA standalone 즐겨찾기 패널 — html.fav-open 방식
+// body position:fixed는 standalone에서 scrollY=0 + safe-area 충돌 발생
+// html 태그에 overflow:hidden만 적용하는 방식이 가장 안전
+let _favScrollY=0;
 function openFavPanel(){
   showingFav=true;
+  _favScrollY=window.scrollY||window.pageYOffset||0;
+  document.documentElement.classList.add('fav-open');
   favPanel.classList.add('open');
-  // ★ body 스크롤 잠금 — 모바일에서 패널 뒤 콘텐츠 스크롤 방지
-  document.body.classList.add('fav-open');
-  // iOS Safari: body position:fixed 시 스크롤 위치 보존
-  document.body.style.top='-'+window.scrollY+'px';
+  // favPanel을 body 직하로 이동 (stacking context 최상단)
+  if(favPanel.parentNode!==document.body) document.body.appendChild(favPanel);
 }
 function closeFavPanel(){
   showingFav=false;
   favPanel.classList.remove('open');
-  // ★ body 스크롤 잠금 해제 + 스크롤 위치 복원
-  const scrollY=document.body.style.top;
-  document.body.classList.remove('fav-open');
-  document.body.style.top='';
-  if(scrollY) window.scrollTo(0,-parseInt(scrollY||'0'));
+  document.documentElement.classList.remove('fav-open');
+  if(_favScrollY>0) requestAnimationFrame(()=>window.scrollTo(0,_favScrollY));
 }
 function scrollToCard(itemId){
   const el=document.querySelector(`[data-item-id="${itemId}"]`);
@@ -2592,7 +2605,7 @@ function openEditModal(item){
     <span class="mlabel">💜 감정 해시태그 (쉼표 구분, # 자동)</span>
     <input class="mfield" id="eHashtags" placeholder="#감동, #힐링, #생각" value="${esc((item.hashTags||[]).join(', '))}">
     <span class="mlabel">📝 인문학 노트</span>
-    <textarea class="mfield" id="eNote" rows="3" placeholder="인문학적 감상이나 키워드를 메모하세요">${esc(item.humNote||'')}</textarea>
+    <textarea class="mfield" id="eNote" rows="4" placeholder="인문학적 감상, 키워드, 명대사 등 자유롭게 메모&#10;(엑셀 재동기화 후에도 보존됩니다)">${esc(item.humNote||'')}</textarea>
     <span class="mlabel">포스터 이미지 교체 (선택)</span>
     <div style="display:flex;gap:.5rem;align-items:center;margin:.25rem 0">
       <label class="tbtn slate" style="cursor:pointer;font-size:.72rem">🖼️ 이미지 선택
@@ -3341,6 +3354,12 @@ scrollTopBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
   }
 
   debug('영화/드라마 DB final 준비 완료');
+})();
+
+// ★ PWA standalone 감지
+(function(){
+  var isStandalone=window.navigator.standalone===true||window.matchMedia('(display-mode:standalone)').matches;
+  if(isStandalone) document.documentElement.classList.add('pwa-standalone');
 })();
 </script>
 </body>
