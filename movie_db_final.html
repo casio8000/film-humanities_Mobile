@@ -141,39 +141,48 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 .icon-btn.del:hover{background:rgba(239,68,68,.18);color:#f87171}
 
 /* ── 즐겨찾기 패널 ── */
-/* ★ 모바일 겹침 방지: inset 명시 + will-change + body.fav-open 스크롤 잠금 */
-.fav-panel{
+/* ── 즐겨찾기 오버레이 (dimmer) ── */
+/* ★ 오버레이 방식으로 완전 재설계 — iOS PWA standalone stacking 버그 근본 해결
+   position:fixed 패널 단독 사용 시 iOS standalone에서 다른 fixed/transform 요소와
+   stacking context 충돌 발생 → 전체화면 dimmer 안에 패널 배치로 해결 */
+.fav-overlay{
+  display:none;
   position:fixed;
-  top:0;right:0;bottom:0;      /* 명시적 bottom:0 — 100dvh 의존 없음 */
+  inset:0;
+  z-index:9999;
+  background:transparent;
+  transition:background .25s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.fav-overlay.open{
+  display:flex;
+  justify-content:flex-end;
+  background:rgba(0,0,0,.6);
+}
+/* ── 즐겨찾기 패널 (오버레이 자식) ── */
+.fav-panel{
+  position:relative;
   width:340px;
+  height:100%;
   background:#0f1824;
   border-left:1px solid rgba(255,255,255,.08);
-  z-index:9999;
   display:flex;flex-direction:column;
   transform:translateX(100%);
   transition:transform .25s cubic-bezier(.4,0,.2,1);
   overflow:hidden;
-  isolation:isolate;
-  will-change:transform;        /* GPU 레이어 강제 → iOS 렌더링 버그 방지 */
   -webkit-overflow-scrolling:touch;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  flex-shrink:0;
 }
-.fav-panel.open{transform:translateX(0);box-shadow:-4px 0 32px rgba(0,0,0,.7)}
-/* body.fav-open: 배경 스크롤 완전 차단 (모바일 핵심) */
-html.fav-open{overflow:hidden!important}
-html.fav-open body{overflow:hidden!important;touch-action:none}
-/* PWA standalone: status bar 높이 보정 */
-.pwa-standalone .fav-panel{top:env(safe-area-inset-top,0px)}
-.pwa-standalone .fav-panel{bottom:env(safe-area-inset-bottom,0px)}
+.fav-overlay.open .fav-panel{
+  transform:translateX(0);
+  box-shadow:-4px 0 32px rgba(0,0,0,.8);
+}
 @media(max-width:680px){
-  .fav-panel{
-    width:100%!important;       /* vw 단위 대신 % 사용 — safe-area 영향 없음 */
-    left:0!important;           /* 좌우 모두 명시 */
-    right:0!important;
-    border-left:none!important;
-    top:0!important;
-    bottom:0!important;
-  }
+  .fav-panel{width:100%!important;border-left:none!important;}
 }
+
 .fav-panel-header{padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:.5rem;flex-shrink:0}
 .fav-panel-header h3{font-size:.88rem;font-weight:700;color:#fbbf24;flex:1}
 .fav-close{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.7);font-size:1.2rem;cursor:pointer;padding:.3rem .5rem;border-radius:8px;min-width:2.2rem;min-height:2.2rem;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:rgba(255,255,255,.2)}
@@ -310,7 +319,8 @@ html.fav-open body{overflow:hidden!important;touch-action:none}
 </head>
 <body>
 
-<!-- 즐겨찾기 패널 -->
+<!-- 즐겨찾기 오버레이 + 패널 -->
+<div class="fav-overlay" id="favOverlay">
 <div class="fav-panel" id="favPanel">
   <div class="fav-panel-header" style="padding:.7rem .85rem;gap:.4rem;flex-wrap:nowrap">
     <h3 style="font-size:.85rem;min-width:0;flex:1">⭐ 즐겨찾기</h3>
@@ -322,6 +332,7 @@ html.fav-open body{overflow:hidden!important;touch-action:none}
   <div class="fav-cat-bar" id="favCatBar"></div>
   <div class="fav-list" id="favList"></div>
 </div>
+</div><!-- /fav-overlay -->
 
 <!-- 상단 고정 헤더 -->
 <div class="sticky-header">
@@ -1550,22 +1561,22 @@ async function renderFavList(){
   }
 }
 
-// ★ iOS PWA standalone 즐겨찾기 패널 — html.fav-open 방식
-// body position:fixed는 standalone에서 scrollY=0 + safe-area 충돌 발생
-// html 태그에 overflow:hidden만 적용하는 방식이 가장 안전
+// ★ 즐겨찾기 — 오버레이 방식 (iOS PWA standalone 완전 호환)
+// position:fixed 패널 단독 사용 시 iOS standalone에서 stacking 충돌
+// → 전체화면 overlay(dimmer) 안에 패널 배치로 완전 해결
+const favOverlay = document.getElementById('favOverlay');
 let _favScrollY=0;
 function openFavPanel(){
   showingFav=true;
   _favScrollY=window.scrollY||window.pageYOffset||0;
-  document.documentElement.classList.add('fav-open');
-  favPanel.classList.add('open');
-  // favPanel을 body 직하로 이동 (stacking context 최상단)
-  if(favPanel.parentNode!==document.body) document.body.appendChild(favPanel);
+  // 오버레이 표시 (display:flex → 패널 오른쪽 정렬)
+  favOverlay.classList.add('open');
+  // dimmer 클릭 시 닫기
+  favOverlay.onclick=e=>{ if(e.target===favOverlay) closeFavPanel(); };
 }
 function closeFavPanel(){
   showingFav=false;
-  favPanel.classList.remove('open');
-  document.documentElement.classList.remove('fav-open');
+  favOverlay.classList.remove('open');
   if(_favScrollY>0) requestAnimationFrame(()=>window.scrollTo(0,_favScrollY));
 }
 function scrollToCard(itemId){
@@ -2526,6 +2537,7 @@ function openHelpModal(){
       <div class="help-row"><span class="help-key">백업</span><span class="help-desc">💾 버튼 → <code>movieDB_backup_날짜.json</code>. 데이터+즐겨찾기 포함 (이미지 제외)</span></div>
       <div class="help-row"><span class="help-key">복원</span><span class="help-desc">📂 복원 → 백업 JSON → 기존 데이터 교체. 이미지는 재접속 시 GitHub에서 자동 재다운로드</span></div>
       <div class="help-row"><span class="help-key">엑셀 재업로드</span><span class="help-desc">수동 태그·메모·즐겨찾기는 excelNo 기준 자동 보존. GitHub에 push 후 동기화로 모든 기기 최신화</span></div>
+      <div class="help-row"><span class="help-key">📝 인문노트 이전</span><span class="help-desc">인문노트는 <b>이 기기 IDB에만 저장</b>됩니다. PC→모바일: PC에서 💾 백업 → 모바일에서 📂 복원. 또는 엑셀에 K열 '인문학노트' 추가 → GitHub push → 동기화.</span></div>
     </div>
 
     <div class="help-section">
@@ -2604,7 +2616,7 @@ function openEditModal(item){
     <input class="mfield" id="eOst" placeholder="https://youtube.com/..." value="${esc(item.ostLink||'')}">
     <span class="mlabel">💜 감정 해시태그 (쉼표 구분, # 자동)</span>
     <input class="mfield" id="eHashtags" placeholder="#감동, #힐링, #생각" value="${esc((item.hashTags||[]).join(', '))}">
-    <span class="mlabel">📝 인문학 노트</span>
+    <span class="mlabel">📝 인문학 노트 <small style="color:rgba(255,180,60,.4);font-weight:400">— 이 기기에만 저장, PC↔모바일 이전: 백업→복원</small></span>
     <textarea class="mfield" id="eNote" rows="4" placeholder="인문학적 감상, 키워드, 명대사 등 자유롭게 메모&#10;(엑셀 재동기화 후에도 보존됩니다)">${esc(item.humNote||'')}</textarea>
     <span class="mlabel">포스터 이미지 교체 (선택)</span>
     <div style="display:flex;gap:.5rem;align-items:center;margin:.25rem 0">
@@ -2735,7 +2747,7 @@ async function openAddNewModal(){
     <span class="mlabel">💜 감정 해시태그 (쉼표 구분)</span>
     <input class="mfield" id="anHashtags" placeholder="#감동, #힐링, #설렘">
 
-    <span class="mlabel">📝 메모 (인문학 노트)</span>
+    <span class="mlabel">📝 인문학 노트 <small style="color:rgba(255,180,60,.4);font-weight:400">— 이 기기에만 저장</small></span>
     <textarea class="mfield" id="anNote" rows="2" placeholder="감상이나 키워드를 메모하세요"></textarea>
 
     <div class="mactions">
