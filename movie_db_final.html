@@ -1,0 +1,3304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>🎬 영화/드라마 DB (final)</title>
+<!-- PWA 설정 -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="영화DB">
+<meta name="theme-color" content="#090f1e">
+<link rel="manifest" href="manifest.json">
+<!-- Open Graph (GitHub Pages 공유용) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="🎬 나의 영화/드라마 DB">
+<meta property="og:description" content="개인 영화 관람 기록 · 감정별 추천 · 인문학 노트">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden;-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e2e8f0;min-height:100vh;padding-bottom:calc(5rem + env(safe-area-inset-bottom));padding-top:env(safe-area-inset-top);overflow-x:hidden;width:100%;max-width:100vw}
+
+/* ── safe-area 적용 (노치/홈바 겹침 방지) ── */
+.sticky-header{position:sticky;top:0;top:env(safe-area-inset-top);z-index:200;background:#0d1117}
+.progress-panel{padding-bottom:calc(.48rem + env(safe-area-inset-bottom))}
+.scroll-top-btn{bottom:calc(3.5rem + env(safe-area-inset-bottom))}
+
+/* ── 상단 고정 헤더 ── */
+.sticky-header{position:sticky;top:0;z-index:200;background:#0d1117}
+.main-nav{background:linear-gradient(135deg,#090f1e,#0e1f3a);border-bottom:1px solid rgba(255,255,255,.06);padding:.6rem 1.2rem}
+.nav-inner{max-width:1440px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.5rem}
+.logo h1{font-size:1rem;font-weight:700;color:#eef2ff;white-space:nowrap}
+.stats-badge{background:rgba(100,160,240,.15);border:1px solid rgba(100,160,240,.25);color:#93c5fd;padding:.1rem .5rem;border-radius:16px;font-size:.63rem;font-weight:600;margin-left:.35rem;vertical-align:middle}
+.nav-links{display:flex;gap:.2rem;flex-wrap:wrap;align-items:center}
+.nav-btn{background:transparent;border:1px solid transparent;padding:.26rem .7rem;border-radius:16px;font-weight:600;font-size:.73rem;color:rgba(255,255,255,.48);cursor:pointer;transition:all .13s;font-family:inherit;position:relative}
+.nav-btn:hover{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.12)}
+.nav-btn.active{background:#e8a020;color:#111;border-color:#e8a020}
+.fav-nav-btn{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);color:#fbbf24;padding:.26rem .7rem;border-radius:16px;font-weight:600;font-size:.73rem;cursor:pointer;transition:all .13s;font-family:inherit}
+.fav-nav-btn:hover,.fav-nav-btn.active{background:#fbbf24;color:#111;border-color:#fbbf24}
+
+/* ── 서브카테고리 드롭다운 ── */
+.nav-btn-wrap{position:relative;display:inline-flex;align-items:center}
+.sub-dropdown{position:absolute;top:calc(100% + 6px);left:0;background:#1a2540;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.35rem;z-index:500;min-width:130px;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none;flex-direction:column;gap:.18rem}
+.sub-dropdown.open{display:flex}
+.sub-chip{background:transparent;border:none;color:rgba(255,255,255,.6);padding:.28rem .6rem;border-radius:7px;cursor:pointer;font-size:.72rem;font-family:inherit;text-align:left;transition:background .1s;white-space:nowrap}
+.sub-chip:hover{background:rgba(255,255,255,.08);color:#fff}
+.sub-chip.active{background:rgba(232,160,32,.18);color:#e8a020}
+.dropdown-arrow{font-size:.55rem;margin-left:.18rem;opacity:.5}
+
+/* ── 검색바 ── */
+.search-bar{background:#111827;border-bottom:1px solid rgba(255,255,255,.055);padding:.5rem 1.2rem}
+.search-bar-inner{max-width:1440px;margin:0 auto;display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.search-wrap{display:flex;flex:1;min-width:180px;background:#161e30;border:1px solid rgba(255,255,255,.09);border-radius:20px;overflow:hidden}
+.search-wrap input{flex:1;padding:.4rem .85rem;background:transparent;border:none;color:#e2e8f0;font-size:.81rem;font-family:inherit;outline:none}
+.search-wrap input::placeholder{color:rgba(255,255,255,.2)}
+.search-wrap button{background:#e8a020;border:none;padding:.4rem .85rem;color:#111;font-weight:700;font-size:.74rem;cursor:pointer;transition:background .12s}
+.search-wrap button:hover{background:#f0b030}
+.sort-select{background:#161e30;border:1px solid rgba(255,255,255,.09);color:#d1deff;padding:.4rem .75rem;border-radius:20px;font-size:.73rem;cursor:pointer;min-width:140px;font-family:inherit}
+.sort-select option{background:#161e30}
+
+/* ── 툴바 ── */
+.toolbar{max-width:1440px;margin:.5rem auto 0;padding:0 1.2rem;display:flex;flex-wrap:wrap;gap:.38rem;align-items:center}
+.tbtn{background:#161e30;border:1px solid rgba(255,255,255,.09);color:#c4d4f0;padding:.4rem .78rem;border-radius:18px;cursor:pointer;font-weight:500;font-size:.73rem;white-space:nowrap;transition:all .13s;font-family:inherit;display:inline-flex;align-items:center;gap:.28rem}
+.tbtn:hover{background:#1e2d48;border-color:rgba(255,255,255,.18)}
+.tbtn.gold{background:#e8a020;color:#111;border-color:#e8a020;font-weight:700}
+.tbtn.gold:hover{background:#f0b030}
+.tbtn.green{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.28);color:#6ee7b7}
+.tbtn.green:hover{background:rgba(52,211,153,.18)}
+.tbtn.slate{background:#1e2a3e}
+
+/* ── 장르 필터 ── */
+.filter-bar{max-width:1440px;margin:.4rem auto 0;padding:.35rem 1.2rem;display:flex;flex-wrap:wrap;align-items:center;gap:.28rem}
+.filter-label{font-size:.68rem;color:rgba(255,255,255,.3);font-weight:500;margin-right:.08rem}
+.filter-chips{display:flex;flex-wrap:wrap;gap:.22rem;align-items:center}
+.chip{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.42);padding:.16rem .55rem;border-radius:11px;cursor:pointer;font-size:.67rem;font-weight:500;transition:all .12s}
+.chip:hover{background:rgba(255,255,255,.1);color:#fff}
+.chip.active{background:#e8a020;border-color:#e8a020;color:#111}
+.stats-count{margin-left:auto;font-size:.67rem;color:rgba(255,255,255,.26)}
+
+/* ── 해시태그 필터 바 ── */
+.hashtag-bar{max-width:1440px;margin:.3rem auto 0;padding:.3rem 1.2rem;display:flex;flex-wrap:wrap;align-items:center;gap:.22rem}
+.hashtag-label{font-size:.65rem;color:rgba(255,255,255,.28);font-weight:500;margin-right:.1rem}
+.htag{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);color:rgba(167,139,250,.65);padding:.14rem .5rem;border-radius:11px;cursor:pointer;font-size:.64rem;font-weight:500;transition:all .12s}
+.htag:hover{background:rgba(139,92,246,.18);color:#c4b5fd}
+.htag.active{background:rgba(139,92,246,.3);border-color:#8b5cf6;color:#ddd6fe}
+
+/* ── 카드 그리드 ── */
+.grid-container{max-width:1440px;margin:.6rem auto;padding:0 .85rem;display:grid;grid-template-columns:repeat(6,1fr);gap:.82rem}
+@media(max-width:1200px){.grid-container{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:960px) {.grid-container{grid-template-columns:repeat(4,1fr);gap:.65rem}}
+@media(max-width:680px) {.grid-container{grid-template-columns:repeat(3,1fr);gap:.45rem}}
+@media(max-width:380px) {.grid-container{grid-template-columns:repeat(3,1fr);gap:.32rem}}
+.movie-card{background:#131b2c;border:1px solid rgba(255,255,255,.055);border-radius:11px;overflow:hidden;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s,border-color .15s}
+.movie-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.45);border-color:rgba(232,160,32,.28)}
+.movie-card.fav-card{border-color:rgba(251,191,36,.3)}
+
+.poster{aspect-ratio:2/3;background:#0c1320;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative}
+.poster-img{width:100%;height:100%;object-fit:cover;transition:transform .2s}
+.movie-card:hover .poster-img{transform:scale(1.04)}
+.poster-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;background:linear-gradient(160deg,#182038,#0c1320);color:rgba(255,255,255,.16);font-size:.6rem;text-align:center;padding:.3rem}
+.ph-icon{font-size:1.5rem;opacity:.28}
+.ph-no{font-size:.55rem;color:rgba(255,255,255,.13);margin-top:.08rem}
+
+.card-info{padding:.48rem .52rem .32rem;flex:1}
+.card-title{font-weight:700;font-size:.78rem;line-height:1.32;color:#dde8f8;word-break:keep-all;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ep-badge{font-size:.6rem;color:#fbbf24;font-weight:600;white-space:nowrap}
+.card-meta{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:.25rem;display:flex;flex-wrap:wrap;gap:.2rem .35rem;align-items:center;line-height:1.5}
+.card-meta .rating{color:#fbbf24;font-weight:700;font-size:.7rem}
+.card-meta .year{color:#94a3b8}
+.card-meta .country{color:#94a3b8}
+.cat-badge{background:rgba(99,179,237,.14);border:1px solid rgba(99,179,237,.26);color:#7dd3fc;font-size:.59rem;font-weight:700;padding:.02rem .35rem;border-radius:6px}
+.cat-badge.drama{background:rgba(167,139,250,.14);border-color:rgba(167,139,250,.26);color:#c4b5fd}
+.cat-badge.docu{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.25);color:#6ee7b7}
+.card-genre{font-size:.59rem;color:rgba(255,255,255,.22);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-hashtags{display:flex;flex-wrap:wrap;gap:.18rem;margin-top:.2rem}
+.card-htag{font-size:.55rem;color:rgba(167,139,250,.6);background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.14);border-radius:6px;padding:.04rem .3rem}
+
+.card-actions{display:flex;align-items:center;padding:.22rem .35rem .3rem;border-top:1px solid rgba(255,255,255,.04);gap:.15rem}
+
+/* ── 유사작 섹션 ── */
+.sim-bar{border-top:1px solid rgba(255,255,255,.04);padding:.18rem .35rem}
+.sim-btn{width:100%;background:none;border:none;color:rgba(255,255,255,.22);font-size:.58rem;font-family:inherit;cursor:pointer;text-align:left;padding:.1rem 0;transition:color .1s;display:flex;align-items:center;gap:.25rem}
+.sim-btn:hover{color:rgba(139,92,246,.75)}
+.sim-strip{display:none;flex-direction:column;gap:.22rem;margin-top:.25rem;padding-bottom:.18rem}
+.sim-strip.open{display:flex}
+.sim-item{display:flex;align-items:center;gap:.35rem;cursor:pointer;padding:.15rem .1rem;border-radius:6px;transition:background .1s}
+.sim-item:hover{background:rgba(255,255,255,.05)}
+.sim-item-thumb{width:22px;height:33px;border-radius:3px;object-fit:cover;background:#182038;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:rgba(255,255,255,.2)}
+.sim-item-info{flex:1;min-width:0}
+.sim-item-title{font-size:.62rem;color:#c8d8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.sim-item-meta{font-size:.55rem;color:rgba(255,255,255,.3)}
+.sim-empty{font-size:.6rem;color:rgba(255,255,255,.2);padding:.1rem .1rem}
+.fav-btn{background:none;border:none;cursor:pointer;font-size:1rem;padding:.08rem .12rem;line-height:1;transition:transform .15s,color .15s;flex-shrink:0;color:rgba(255,255,255,.25)}
+.fav-btn:hover{transform:scale(1.25);color:#fbbf24}
+.fav-btn.active{color:#fbbf24;filter:drop-shadow(0 0 5px rgba(251,191,36,.7));transform:scale(1.05)}
+.card-act-right{display:flex;gap:.15rem;margin-left:auto}
+.icon-btn{background:rgba(255,255,255,.04);border:none;cursor:pointer;font-size:.64rem;padding:.14rem .38rem;border-radius:6px;color:rgba(255,255,255,.3);transition:all .1s}
+.icon-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.icon-btn.del:hover{background:rgba(239,68,68,.18);color:#f87171}
+
+/* ── 즐겨찾기 패널 ── */
+.fav-panel{position:fixed;top:0;right:0;width:340px;max-width:100vw;height:100vh;height:100dvh;height:-webkit-fill-available;background:#0f1824;border-left:1px solid rgba(255,255,255,.08);z-index:2147483647;display:flex;flex-direction:column;transform:translate3d(100%,0,0);transition:transform .25s cubic-bezier(.4,0,.2,1);overflow:hidden;will-change:transform;-webkit-overflow-scrolling:touch;isolation:isolate}
+.fav-panel.open{transform:translate3d(0,0,0)}
+@media(max-width:680px){.fav-panel{width:100vw!important;max-width:100vw!important;border-left:none}}
+.fav-panel-header{padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.fav-panel-header h3{font-size:.88rem;font-weight:700;color:#fbbf24;flex:1}
+.fav-close{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.7);font-size:1.2rem;cursor:pointer;padding:.3rem .5rem;border-radius:8px;min-width:2.2rem;min-height:2.2rem;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:rgba(255,255,255,.2)}
+.fav-close:hover{color:#fff}
+.fav-cat-bar{padding:.5rem .8rem;border-bottom:1px solid rgba(255,255,255,.06);display:flex;flex-wrap:wrap;gap:.25rem;align-items:center;flex-shrink:0}
+.fav-cat-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);padding:.18rem .6rem;border-radius:12px;cursor:pointer;font-size:.68rem;font-weight:600;transition:all .12s;font-family:inherit}
+.fav-cat-chip:hover{background:rgba(255,255,255,.1);color:#fff}
+.fav-cat-chip.active{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.35);color:#fbbf24}
+.add-cat-btn{background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.25);color:#e8a020;padding:.18rem .5rem;border-radius:12px;cursor:pointer;font-size:.68rem;font-family:inherit;transition:all .12s}
+.add-cat-btn:hover{background:rgba(232,160,32,.2)}
+.fav-list{flex:1;overflow-y:auto;padding:.5rem .8rem}
+.fav-item{display:flex;align-items:center;gap:.5rem;padding:.4rem .5rem;border-radius:8px;margin-bottom:.2rem;cursor:pointer;transition:background .1s}
+.fav-item:hover{background:rgba(255,255,255,.04)}
+.fav-item-poster{width:28px;height:42px;border-radius:4px;object-fit:cover;background:#182038;flex-shrink:0}
+.fav-item-info{flex:1;min-width:0}
+.fav-item-title{font-size:.74rem;font-weight:600;color:#dde8f8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fav-item-meta{font-size:.62rem;color:rgba(255,255,255,.3);margin-top:.1rem}
+.fav-item-del{background:none;border:none;color:rgba(255,255,255,.2);cursor:pointer;font-size:.75rem;padding:.15rem;flex-shrink:0}
+.fav-item-del:hover{color:#f87171}
+.fav-empty{text-align:center;padding:2rem 1rem;color:rgba(255,255,255,.18);font-size:.78rem;line-height:1.8}
+
+/* ── 빈 화면 ── */
+.empty-message{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:rgba(255,255,255,.15);font-size:.83rem;line-height:2.2}
+.em-icon{font-size:2.4rem;display:block;margin-bottom:.55rem;opacity:.22}
+
+/* ── 진행 패널 ── */
+.progress-panel{position:fixed;bottom:0;left:0;right:0;background:#0b1120;border-top:1px solid rgba(255,255,255,.07);color:#d1deff;padding:.48rem 1.1rem;display:flex;flex-wrap:wrap;gap:.48rem;align-items:center;font-size:.7rem;z-index:1000}
+.pb-wrap{flex:3;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.pb-fill{width:0%;height:100%;background:#e8a020;transition:width .15s;border-radius:3px}
+.pb-stat{font-family:monospace;background:rgba(255,255,255,.06);padding:.1rem .4rem;border-radius:8px}
+
+/* ── 모달 ── */
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:2000;padding:1rem}
+.modal-box{background:#131b2c;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1.15rem;width:100%;max-width:480px;max-height:92dvh;overflow-y:auto;position:relative}
+.modal-box h3{font-size:.88rem;margin-bottom:.75rem;color:#e8edf5;display:flex;align-items:center;gap:.4rem}
+.modal-close{position:absolute;top:12px;right:15px;font-size:1.15rem;cursor:pointer;background:none;border:none;color:rgba(255,255,255,.35)}
+.modal-close:hover{color:#fff}
+.mfield{width:100%;padding:.42rem .65rem;margin:.25rem 0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#e2e8f0;font-family:inherit;font-size:.8rem}
+.mfield:focus{outline:none;border-color:#e8a020}
+.mfield option{background:#131b2c}
+.mlabel{font-size:.7rem;color:rgba(255,255,255,.38);margin:.4rem 0 .1rem;display:block}
+.mactions{display:flex;gap:.4rem;margin-top:.75rem}
+.msave{background:#e8a020;border:none;color:#111;padding:.46rem .95rem;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.8rem}
+.mcancel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#e2e8f0;padding:.46rem .85rem;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.8rem}
+
+
+/* ── 설정 배너 ── */
+.setup-banner{max-width:1440px;margin:.6rem auto 0;padding:0 1.1rem}
+.setup-card{background:#131b2c;border:1.5px dashed rgba(232,160,32,.32);border-radius:13px;padding:.85rem 1.1rem;display:flex;flex-wrap:wrap;align-items:center;gap:.7rem}
+.sc-text h3{font-size:.82rem;font-weight:700;color:#e8a020;margin-bottom:.2rem}
+.sc-text p{font-size:.7rem;color:rgba(255,255,255,.38);line-height:1.6}
+.sc-text p b{color:rgba(255,255,255,.58)}
+.sc-actions{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+.folder-status{font-size:.66rem;padding:.18rem .5rem;border-radius:9px;font-weight:600}
+.folder-status.ok{background:rgba(52,211,153,.1);color:#6ee7b7;border:1px solid rgba(52,211,153,.22)}
+.folder-status.none{background:rgba(255,255,255,.04);color:rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.07)}
+
+/* ── 맨위로 버튼 ── */
+.scroll-top-btn{position:fixed;bottom:3.5rem;right:1.2rem;width:2.4rem;height:2.4rem;background:#e8a020;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#111;box-shadow:0 4px 14px rgba(0,0,0,.4);z-index:300;opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s}
+.scroll-top-btn.visible{opacity:1;transform:translateY(0)}
+.scroll-top-btn:hover{background:#f0b030;transform:translateY(-2px)}
+
+/* ── 디버그 ── */
+.debug-panel{position:fixed;bottom:48px;left:10px;background:rgba(0,0,0,.8);color:#4ade80;font-size:.58rem;padding:3px 8px;border-radius:6px;z-index:999;max-width:88%;pointer-events:none}
+
+/* ── 통계 모달 ── */
+.stat-modal-box{max-width:720px}
+.stat-tabs{display:flex;gap:.3rem;margin-bottom:.8rem;flex-wrap:wrap}
+.stat-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);padding:.28rem .7rem;border-radius:14px;cursor:pointer;font-size:.71rem;font-weight:600;font-family:inherit;transition:all .12s}
+.stat-tab.active{background:#e8a020;color:#111;border-color:#e8a020}
+.stat-chart-area{background:rgba(255,255,255,.02);border-radius:10px;padding:.8rem;min-height:220px}
+.bar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem}
+.bar-label{font-size:.68rem;color:rgba(255,255,255,.5);width:80px;text-align:right;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;background:rgba(255,255,255,.06);border-radius:4px;height:16px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:#e8a020;transition:width .4s}
+.bar-fill.blue{background:#3b82f6}
+.bar-fill.green{background:#10b981}
+.bar-fill.purple{background:#8b5cf6}
+.bar-count{font-size:.66rem;color:rgba(255,255,255,.4);width:30px;flex-shrink:0}
+
+/* ── 도움말 모달 ── */
+.help-modal-box{max-width:640px}
+.help-section{margin-bottom:1rem}
+.help-section h4{font-size:.8rem;font-weight:700;color:#e8a020;margin-bottom:.4rem;display:flex;align-items:center;gap:.35rem}
+.help-row{display:flex;gap:.5rem;align-items:flex-start;margin-bottom:.3rem}
+.help-key{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.1rem .4rem;font-size:.65rem;font-family:monospace;color:#93c5fd;white-space:nowrap;flex-shrink:0}
+.help-desc{font-size:.72rem;color:rgba(255,255,255,.5);line-height:1.5}
+.help-tip{background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.15);border-radius:8px;padding:.45rem .7rem;font-size:.7rem;color:rgba(232,160,32,.8);margin-top:.5rem;line-height:1.6}
+
+/* ── 추천 모달 (개선) ── */
+.rec-modal-box{max-width:740px}
+.rec-emotion-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.4rem;margin:.5rem 0 .8rem}
+.htag-pick{background:rgba(139,92,246,.09);border:1px solid rgba(139,92,246,.2);color:#c4b5fd;padding:.32rem .6rem;border-radius:12px;cursor:pointer;font-size:.76rem;transition:all .12s;font-family:inherit;display:flex;align-items:center;gap:.3rem;justify-content:center}
+.htag-pick:hover{background:rgba(139,92,246,.2)}
+.htag-pick.sel{background:rgba(139,92,246,.38);border-color:#8b5cf6;color:#ddd6fe;font-weight:700;box-shadow:0 0 10px rgba(139,92,246,.3)}
+.htag-pick .et-emoji{font-size:1rem}
+.htag-pick .et-label{font-size:.72rem}
+.htag-pick .et-count{font-size:.6rem;color:rgba(255,255,255,.3);margin-left:.1rem}
+.rec-header-row{display:flex;align-items:center;gap:.5rem;margin:.5rem 0 .4rem;flex-wrap:wrap}
+.rec-sort-btns{display:flex;gap:.25rem;margin-left:auto}
+.rec-sort-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);padding:.18rem .55rem;border-radius:10px;cursor:pointer;font-size:.67rem;font-family:inherit;transition:all .12s}
+.rec-sort-btn.active{background:#e8a020;border-color:#e8a020;color:#111;font-weight:700}
+.rec-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.55rem;margin-top:.5rem;max-height:420px;overflow-y:auto}
+.rec-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .14s;display:flex;flex-direction:column}
+.rec-card:hover{background:rgba(232,160,32,.07);border-color:rgba(232,160,32,.28);transform:translateY(-2px)}
+.rec-card-poster{aspect-ratio:2/3;background:#0c1320;overflow:hidden;position:relative}
+.rec-card-poster img{width:100%;height:100%;object-fit:cover}
+.rec-card-poster .no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;opacity:.2;background:linear-gradient(160deg,#182038,#0c1320)}
+.rec-card-score{position:absolute;top:.25rem;right:.25rem;background:rgba(139,92,246,.75);color:white;font-size:.58rem;font-weight:700;padding:.08rem .3rem;border-radius:6px}
+.rec-card-body{padding:.4rem .45rem .35rem;flex:1}
+.rec-card-title{font-size:.72rem;font-weight:700;color:#dde8f8;line-height:1.3;margin-bottom:.18rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rec-card-meta{font-size:.61rem;color:rgba(255,255,255,.35)}
+.rec-card-meta .rc-rating{color:#fbbf24;font-weight:700}
+.rec-card-tags{display:flex;flex-wrap:wrap;gap:.15rem;margin-top:.22rem}
+.rec-card-htag{font-size:.57rem;color:#a78bfa;background:rgba(139,92,246,.12);border-radius:5px;padding:.03rem .25rem}
+.rec-card-htag.matched{color:#ddd6fe;background:rgba(139,92,246,.3);font-weight:700}
+.auto-tag-info{font-size:.68rem;color:rgba(139,92,246,.6);margin:.3rem 0;padding:.3rem .6rem;background:rgba(139,92,246,.06);border-radius:8px}
+
+@media(max-width:680px){
+  .toolbar{flex-direction:column;align-items:stretch}
+  .search-wrap{min-width:unset}
+  .card-title{font-size:.7rem}
+  .card-meta{font-size:.63rem}
+  .card-genre{display:none}
+}
+/* mobile-only: 데스크탑 전용 버튼 숨김 */
+@media(max-width:768px){
+  .desktop-only{display:none!important}
+}
+
+/* ── 즐겨찾기 패널 모바일 전체화면 ── */
+@media(max-width:680px){
+  .fav-panel{
+    width:100vw!important;
+    max-width:100vw!important;
+    right:0!important;
+    top:0!important;
+    border-left:none!important;
+  }
+  .fav-panel.open{
+    box-shadow:0 0 40px rgba(0,0,0,.9)!important;
+  }
+}
+/* iOS Safari 추가 보정 */
+@supports (-webkit-touch-callout: none){
+  .fav-panel{
+    height:-webkit-fill-available!important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- 상단 고정 헤더 -->
+<div class="sticky-header">
+  <div class="main-nav">
+    <div class="nav-inner">
+      <div class="logo">
+        <h1>🎬 영화/드라마 DB <span id="totalStats" class="stats-badge">준비중…</span></h1>
+      </div>
+      <div class="nav-links">
+        <button class="nav-btn active" data-category="all">전체</button>
+
+        <!-- 영화 (국가별 서브카테고리) -->
+        <div class="nav-btn-wrap" id="movieWrap">
+          <button class="nav-btn" data-category="movie" id="movieBtn">영화<span class="dropdown-arrow">▾</span></button>
+          <div class="sub-dropdown" id="movieDropdown">
+            <button class="sub-chip" data-sub="한국">🇰🇷 한국</button>
+            <button class="sub-chip" data-sub="미국">🇺🇸 미국</button>
+            <button class="sub-chip" data-sub="일본">🇯🇵 일본</button>
+            <button class="sub-chip" data-sub="영국">🇬🇧 영국</button>
+            <button class="sub-chip" data-sub="프랑스">🇫🇷 프랑스</button>
+            <button class="sub-chip" data-sub="중국">🇨🇳 중국</button>
+            <button class="sub-chip" data-sub="이탈리아">🇮🇹 이탈리아</button>
+            <button class="sub-chip" data-sub="기타">🌐 기타국</button>
+          </div>
+        </div>
+
+        <!-- 드라마 (국가별 서브카테고리) -->
+        <div class="nav-btn-wrap" id="dramaWrap">
+          <button class="nav-btn" data-category="drama" id="dramaBtn">드라마<span class="dropdown-arrow">▾</span></button>
+          <div class="sub-dropdown" id="dramaDropdown">
+            <button class="sub-chip" data-sub="한국">🇰🇷 한국</button>
+            <button class="sub-chip" data-sub="미국">🇺🇸 미국</button>
+            <button class="sub-chip" data-sub="일본">🇯🇵 일본</button>
+            <button class="sub-chip" data-sub="중국">🇨🇳 중국</button>
+            <button class="sub-chip" data-sub="영국">🇬🇧 영국</button>
+            <button class="sub-chip" data-sub="기타">🌐 기타국</button>
+          </div>
+        </div>
+
+        <!-- 다큐멘터리 (세부분류) -->
+        <div class="nav-btn-wrap" id="docuWrap">
+          <button class="nav-btn" data-category="documentary" id="docuBtn">다큐<span class="dropdown-arrow">▾</span></button>
+          <div class="sub-dropdown" id="docuDropdown">
+            <button class="sub-chip" data-sub="자연">🌿 자연/동물</button>
+            <button class="sub-chip" data-sub="역사">📜 역사</button>
+            <button class="sub-chip" data-sub="사회">🏛️ 사회/정치</button>
+            <button class="sub-chip" data-sub="과학">🔬 과학/기술</button>
+            <button class="sub-chip" data-sub="인물">👤 인물</button>
+          </div>
+        </div>
+
+        <button class="nav-btn" data-category="other">기타</button>
+        <button class="fav-nav-btn" id="favNavBtn">⭐ 즐겨찾기</button>
+        <button class="tbtn" id="btnExportHtml" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3);color:#c4b5fd;font-size:.71rem">💜 감정추천 내보내기</button>
+      </div>
+    </div>
+  </div>
+  <!-- 검색바 -->
+  <div class="search-bar">
+    <div class="search-bar-inner">
+      <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="🔍 제목 검색 (초성/공백 무시, 부분 일치)">
+        <button id="searchBtn">검색</button>
+      </div>
+      <select id="sortSelect" class="sort-select">
+        <option value="fileDateDesc">관람일 최신순 (엑셀 J열)</option>
+        <option value="fileDateAsc">관람일 오래된순 (엑셀 J열)</option>
+        <option value="noAsc">연번순 (NO↑)</option>
+        <option value="noDesc">연번 역순</option>
+        <option value="titleAsc">가나다순</option>
+        <option value="titleDesc">가나다 역순</option>
+        <option value="ratingDesc">평점 높은순</option>
+        <option value="yearDesc">최신 개봉순</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- 툴바 -->
+<!-- 툴바 -->
+<div class="toolbar">
+  <label class="tbtn gold desktop-only" style="cursor:pointer">📂 엑셀 업로드<input type="file" id="importExcelBtn" accept=".xlsx,.xls" style="display:none"></label>
+  <button class="tbtn" id="btnGithubSync" style="background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.3);color:#6ee7b7;font-weight:700">🔄 데이터 동기화</button>
+  <button class="tbtn" id="btnImgSync" style="background:rgba(99,160,240,.1);border-color:rgba(99,160,240,.25);color:#93c5fd;font-weight:700">🖼️ 이미지 동기화</button>
+  <button class="tbtn gold" id="fullBackupBtn">💾 백업</button>
+  <label class="tbtn slate">📂 복원<input type="file" id="fullRestoreZip" accept=".json" style="display:none"></label>
+  <button class="tbtn" id="btnStats">📊 통계</button>
+  <button class="tbtn" id="btnAutoTag">🤖 태그분류</button>
+  <button class="tbtn desktop-only" id="btnExport">📥 CSV</button>
+  <button class="tbtn desktop-only green" id="btnSelectFolder2">📁 로컬 이미지</button>
+  <button class="tbtn" id="refreshBtn">↺ 새로고침</button>
+  <button class="tbtn" id="btnAddNew" style="background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.3);color:#6ee7b7;font-weight:700">➕ 추가</button>
+  <button class="tbtn desktop-only" id="btnOst" style="background:rgba(232,160,32,.1);border-color:rgba(232,160,32,.25);color:#fbbf24">🎵 OST</button>
+  <button class="tbtn" id="btnHelp" style="background:rgba(99,179,237,.1);border-color:rgba(99,179,237,.25);color:#93c5fd">❓ 도움말</button>
+</div>
+
+<!-- 엑셀·폴더 히든 인풋 (이벤트 바인딩 보존용, 화면 미표시) -->
+<input type="file" id="importExcel" accept=".xlsx,.xls" style="display:none">
+
+<!-- 장르 필터 -->
+<div class="filter-bar">
+  <span class="filter-label">장르</span>
+  <div class="filter-chips" id="filterChips"></div>
+  <span class="stats-count" id="statsCount"></span>
+</div>
+
+<!-- 해시태그(감정) 필터 -->
+<div class="hashtag-bar" id="hashtagBar">
+  <span class="hashtag-label">💜 감정태그</span>
+  <div id="hashtagChips"></div>
+</div>
+
+<!-- 카드 그리드 -->
+<div class="grid-container" id="cardContainer"></div>
+
+<!-- 진행 패널 -->
+<div class="progress-panel" id="progressPanel" style="display:none">
+  <span id="progressFileName" style="flex:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">준비중…</span>
+  <div class="pb-wrap"><div class="pb-fill" id="progressFill"></div></div>
+  <span id="progressStats" class="pb-stat">0/0</span>
+  <button id="closeProgressBtn" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer">✕</button>
+</div>
+
+<!-- 맨위로 버튼 -->
+<button class="scroll-top-btn" id="scrollTopBtn" title="맨 위로">▲</button>
+<div id="debugPanel" class="debug-panel"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DB v9 추가사항:
+// · HYPERLINK 수식 파싱 수정 → 제목·링크 정확히 추출
+// · 카드 6열 레이아웃 (wide screen 기준)
+// · 유사작 추천 (카드 하단 버튼 → 장르+태그 기반 5편)
+// · 도움말 v9 업데이트
+// ══════════════════════════════════════════════════════════════
+
+const DB_NAME='MovieDB_v18', DB_VER=18;
+const ST_ITEMS='items', ST_IMAGES='images', ST_FAVS='favs';
+
+// ── GitHub 설정 ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// GitHub 설정 — 저장소 루트 경로를 정확히 입력하세요
+// ══════════════════════════════════════════════════════════════
+function getGithubBase(){ return localStorage.getItem('gh_base')||'https://casio8000.github.io/film-humanities_Mobile'; }
+function getGithubExcelUrl(){ return getGithubBase()+'/movie_list_complete.xlsx'; }
+function getGithubImageUrl(no){
+  if(!no) return null;
+  let folder;
+  if(no<=1000)      folder='images/movie';
+  else if(no<=2000) folder='images/movie_2';
+  else if(no<=3000) folder='images/movie_3';
+  else              folder='images/movie_4';
+  return getGithubBase()+'/'+folder+'/'+no+'.jpg';
+}
+
+// GitHub 연결 진단 함수 — GET 방식으로 실제 접근 확인
+async function diagnosGithub(){
+  const base=getGithubBase();
+  const excelUrl=getGithubExcelUrl();
+  // 이미지는 1번 jpg/png 모두 시도
+  const img1url=base+'/images/movie/1.jpg';
+  const img1urlPng=base+'/images/movie/1.png';
+  const results=[];
+  // 엑셀 확인
+  try{
+    const r=await fetch(excelUrl,{method:'HEAD',cache:'no-store',mode:'cors',signal:AbortSignal.timeout(8000)});
+    results.push({label:'엑셀',ok:r.ok,status:r.status,url:excelUrl});
+  }catch(e){
+    const hint=e.message.includes('fetch')||e.message.includes('network')
+      ?'(네트워크 오류 — GitHub Pages 활성화 확인)'
+      :'('+e.message+')';
+    results.push({label:'엑셀',ok:false,status:'연결 실패 '+hint,url:excelUrl});
+  }
+  // 이미지 확인 (jpg → png 순)
+  let imgOk=false;
+  for(const [ext,url] of [['jpg',img1url],['png',img1urlPng]]){
+    try{
+      const r=await fetch(url,{method:'HEAD',cache:'no-store',mode:'cors',signal:AbortSignal.timeout(8000)});
+      if(r.ok){ results.push({label:'이미지(1.'+ext+')',ok:true,status:r.status,url}); imgOk=true; break; }
+    }catch(e){}
+  }
+  if(!imgOk){
+    results.push({label:'이미지(1.jpg)',ok:false,status:'images/movie/ 폴더에 파일 없음 또는 접근 불가',url:img1url});
+  }
+  return results;
+}
+
+// 이미지 일괄 동기화 — GitHub에서 없는 이미지만 다운로드
+// ══════════════════════════════════════════════════════════════
+// GitHub 이미지 URL 생성 (폴더 분기 + 확장자)
+// ══════════════════════════════════════════════════════════════
+function getGithubImgUrl(no, ext='jpg'){
+  if(!no) return null;
+  const base=getGithubBase();
+  let folder;
+  if(no<=1000)      folder='images/movie';
+  else if(no<=2000) folder='images/movie_2';
+  else if(no<=3000) folder='images/movie_3';
+  else              folder='images/movie_4';
+  return base+'/'+folder+'/'+no+'.'+ext;
+}
+
+// ── IDB 저장용: fetch no-cors (opaque) → Blob 추출 시도 ──
+// GitHub Pages는 CORS 미지원 → no-cors가 유일한 fetch 방법
+// opaque response는 blob 추출 가능하나 크기/타입 확인 불가
+async function tryFetchNoCors(url){
+  try{
+    const resp=await fetch(url,{
+      cache:'no-store',
+      mode:'no-cors',          // opaque response — blob 추출은 가능
+      signal:AbortSignal.timeout(15000)
+    });
+    // opaque response: resp.ok=false, resp.status=0, blob은 추출 가능
+    const blob=await resp.blob();
+    // opaque blob은 size=0으로 보고될 수 있으나 실제 데이터 있음
+    // size가 0이어도 type 체크로 이미지인지 확인
+    if(blob&&(blob.size>0||blob.type.startsWith('image'))) return blob;
+    // size=0, type='' 이면 opaque → 실제 이미지로 판단하고 반환
+    if(blob) return blob;
+    return null;
+  }catch(e){ return null; }
+}
+
+// ── Canvas 캡처: crossOrigin 없이 직접 로드 후 Canvas 추출 ──
+// crossOrigin 없으면 CORS 필요 없음 — 단, tainted canvas로 toBlob 실패
+// → crossOrigin='use-credentials'로 재시도
+function tryImgCanvas(url){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    const timer=setTimeout(()=>resolve(null),8000);
+    img.onload=()=>{
+      clearTimeout(timer);
+      try{
+        const c=document.createElement('canvas');
+        c.width=Math.min(img.naturalWidth||300,300);
+        c.height=Math.min(img.naturalHeight||450,450);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        c.toBlob(b=>{
+          if(b&&b.size>100) resolve(b);
+          else resolve(null);
+        },'image/jpeg',0.82);
+      }catch(e){ resolve(null); }
+    };
+    img.onerror=()=>{ clearTimeout(timer); resolve(null); };
+    img.src=url+'?t='+Date.now(); // 캐시 우회로 CORS 재협상 유도
+  });
+}
+
+async function fetchGithubImageWithFallback(no){
+  if(!no) return null;
+  // jpg만 시도 (확장자 루프 제거 — 지연 최소화)
+  const url=getGithubImgUrl(no,'jpg');
+  // 1) no-cors fetch 시도 (opaque blob)
+  const blobNoCors=await tryFetchNoCors(url);
+  if(blobNoCors&&blobNoCors.size>100) return {blob:blobNoCors, url, method:'no-cors'};
+  // 2) Canvas 캡처 시도
+  const blobCanvas=await tryImgCanvas(url);
+  if(blobCanvas) return {blob:blobCanvas, url, method:'canvas'};
+  // 3) 실패 시 URL만 반환 — img.src로 직접 표시 (IDB 저장 불가)
+  return {blob:null, url, method:'direct'};
+}
+
+// resizeBlob이 없을 경우 대체 함수
+if(typeof resizeBlob==='undefined'){
+  window.resizeBlob=async(blob)=>blob;
+}
+
+async function syncImagesFromGithub(items, onProgress){
+  // IDB 실제 저장 여부만 체크 (imgUrlCache는 GitHub URL도 포함하므로 체크 안 함)
+  const missing=[];
+  for(const i of items){
+    if(!i.excelNo) continue;
+    // IDB에 실제 blob이 있는지만 확인
+    const existing=await idbGet(ST_IMAGES,i.excelNo).catch(()=>null);
+    if(existing&&existing.blob&&existing.blob.size>100) continue;
+    missing.push(i);
+  }
+  if(!missing.length) return {done:0,failed:0,total:0};
+  let done=0,failed=0;
+  const BATCH=3; // 동시 요청 수 줄여서 안정성 향상
+  for(let i=0;i<missing.length;i+=BATCH){
+    const batch=missing.slice(i,i+BATCH);
+    await Promise.allSettled(batch.map(async item=>{
+      try{
+        const result=await fetchGithubImageWithFallback(item.excelNo);
+        if(!result){ failed++; return; }
+        if(result.blob&&result.blob.size>100){
+          // blob 유효 → IDB 저장 + ObjectURL 캐시
+          const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
+          await saveImageByNo(item.excelNo,resized,null);
+          const objUrl=URL.createObjectURL(resized);
+          imgUrlCache.set(item.excelNo,objUrl);
+        } else {
+          // direct URL — 메모리 캐시 (세션 유효, 화면 표시는 됨)
+          imgUrlCache.set(item.excelNo,result.url);
+        }
+        done++;
+      }catch(e){ failed++; }
+    }));
+    if(onProgress) onProgress(done+failed, missing.length, done, failed);
+    await new Promise(r=>setTimeout(r,80)); // 과부하 방지
+  }
+  return {done,failed,total:missing.length};
+}
+
+async function openImgSyncModal(){
+  const modal=document.createElement('div');modal.className='modal';
+  const base=getGithubBase();
+  modal.innerHTML=`<div class="modal-box" style="max-width:480px">
+    <button class="modal-close">&times;</button>
+    <h3>🖼️ GitHub 이미지 동기화</h3>
+    <div style="background:rgba(52,160,240,.07);border:1px solid rgba(52,160,240,.2);border-radius:9px;padding:.7rem .9rem;font-size:.72rem;color:rgba(255,255,255,.55);line-height:1.75;margin:.5rem 0">
+      GitHub <code style="word-break:break-all">${base}/images/movie/</code> 등에서<br>
+      로컬 IndexedDB로 포스터를 동기화합니다. (jpg → png → webp 순 시도)<br>
+      이미 저장된 이미지는 건너뛰고, 없는 이미지만 다운로드합니다.<br>
+      <span style="color:#fbbf24">⚠️ 실패가 많으면 GitHub Pages 설정 → 이미지 파일 경로를 확인하세요.</span>
+    </div>
+    <div id="imgSyncDiag" style="font-size:.7rem;color:rgba(255,255,255,.4);margin-bottom:.5rem">연결 확인 중…</div>
+    <div class="mactions" style="flex-wrap:wrap;gap:.4rem">
+      <button class="msave" id="imgSyncStart">🖼️ 이미지 동기화 시작</button>
+      <button id="imgSyncDiagBtn" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#e2e8f0;padding:.46rem .85rem;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.8rem">🔍 연결 진단</button>
+      <button class="mcancel" id="imgSyncCancel">닫기</button>
+    </div>
+    <div id="imgSyncProgress" style="margin-top:.6rem;font-size:.72rem;color:rgba(255,255,255,.4)"></div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('.modal-close').onclick=()=>modal.remove();
+  modal.querySelector('#imgSyncCancel').onclick=()=>modal.remove();
+  // modal 배경클릭 닫기는 위에서 처리됨
+
+  const diagEl=modal.querySelector('#imgSyncDiag');
+  const progEl=modal.querySelector('#imgSyncProgress');
+
+  // 자동 진단
+  const runDiag=async()=>{
+    diagEl.innerHTML='<span style="color:#fbbf24">⏳ GitHub 연결 확인 중…</span>';
+    const results=await diagnosGithub();
+    const lines=results.map(r=>r.ok
+      ?`<span style="color:#6ee7b7">✅ ${r.label}: 정상 (${r.status})</span>`
+      :`<span style="color:#f87171">❌ ${r.label}: ${r.status}${r.err?' — '+r.err:''}</span>`
+    );
+    diagEl.innerHTML=lines.join('<br>');
+    return results.every(r=>r.ok);
+  };
+
+  await runDiag();
+  modal.querySelector('#imgSyncDiagBtn').onclick=runDiag;
+
+  modal.querySelector('#imgSyncStart').onclick=async()=>{
+    const ok=await runDiag();
+    if(!ok){
+      progEl.innerHTML='<span style="color:#f87171">❌ GitHub에 연결할 수 없습니다. 저장소 설정과 Pages 활성화를 확인하세요.</span>';
+      return;
+    }
+    modal.querySelector('#imgSyncStart').disabled=true;
+    modal.querySelector('#imgSyncStart').textContent='동기화 중…';
+    const items=await loadAllItems();
+    progEl.innerHTML='시작 중…';
+    const {done,failed,total}=await syncImagesFromGithub(items,(cur,tot,d,f)=>{
+      progEl.innerHTML=`⬇️ ${cur}/${tot} — ✅ ${d}개 저장, ❌ ${f}개 실패`;
+    });
+    await refreshData();
+    modal.querySelector('#imgSyncStart').disabled=false;
+    modal.querySelector('#imgSyncStart').textContent='🖼️ 이미지 동기화 시작';
+    progEl.innerHTML=`<span style="color:#6ee7b7">✅ 완료 — ${done}개 저장, ${failed}개 실패 (전체 ${total}개 대상)</span>`;
+    showToast(`이미지 동기화 완료 — ${done}개 저장`, 'success', 4000);
+  };
+}
+
+async function loadExcelFromGithub(force=false){
+  // file:// 환경에서는 외부 URL 접근 불가 — 바로 안내 반환
+  if(location.protocol === 'file:'){
+    showToast('⚠️ 로컬 파일 실행 중 — 🔄 동기화는 GitHub Pages에서만 작동합니다.\n📂 엑셀 업로드 버튼으로 직접 파일을 선택하세요.', 'warn', 8000);
+    return false;
+  }
+  const items=await loadAllItems().catch(()=>[]);
+  if(!force && items.length>0){
+    debug('데이터 있음 — GitHub 로드 스킵');
+    return false;
+  }
+  const excelUrl=getGithubExcelUrl();
+  showToast('GitHub 엑셀 다운로드 중…', 'info', 6000);
+  try{
+    const resp=await fetch(excelUrl,{cache:'no-store',mode:'cors',credentials:'omit'});
+    if(!resp.ok){
+      let hint='';
+      if(resp.status===404) hint='\n→ 저장소 루트에 movie_list_complete.xlsx 업로드 필요';
+      else if(resp.status===403) hint='\n→ GitHub Pages가 비활성화됐거나 저장소가 Private\n→ Settings → Pages → main/root 활성화';
+      showToast('❌ HTTP '+resp.status+hint, 'error', 10000);
+      return false;
+    }
+    const buf=await resp.arrayBuffer();
+    const n=await importFromExcel(buf);
+    showToast(`✅ ${n.toLocaleString()}개 작품 로드 완료`, 'success', 4000);
+    await refreshData();
+    const loaded=await loadAllItems();
+    const noTagCount=loaded.filter(i=>!(i.hashTags&&i.hashTags.length)).length;
+    if(noTagCount>0){
+      showToast(`🤖 감정태그 자동 분류 중… (${noTagCount}개)`, 'info', 3000);
+      await autoTagAll(false);
+      await refreshData();
+      showToast('✅ 태그 분류 완료', 'success', 3000);
+    }
+    return true;
+  }catch(e){
+    showToast('❌ GitHub 로드 실패: '+e.message+'\n→ GitHub Pages URL과 인터넷 연결을 확인하세요', 'error', 10000);
+    console.error('GitHub Excel load error:', e, excelUrl);
+    return false;
+  }
+}
+
+let db=null;
+let rawItems=[];
+let allItems=[];
+let curCategory='all', curSubFilter='', curGenre='', searchKw='', curSort='fileDateDesc';
+let curHashtag='';
+let favData={};
+let favCats=['전체'];
+let curFavCat='전체';
+let showingFav=false;
+let folderHandle=null;
+
+// 이미지 ObjectURL 캐시 (메모리 내 재사용)
+const imgUrlCache = new Map(); // no → objectURL
+
+// DOM
+const cardContainer  = document.getElementById('cardContainer');
+const filterChipsDiv = document.getElementById('filterChips');
+const statsCount     = document.getElementById('statsCount');
+const totalStats     = document.getElementById('totalStats');
+const navBtns        = document.querySelectorAll('.nav-btn[data-category]');
+const searchInput    = document.getElementById('searchInput');
+const searchBtn      = document.getElementById('searchBtn');
+const sortSelect     = document.getElementById('sortSelect');
+const importExcel    = document.getElementById('importExcel');
+const fullBackupBtn  = document.getElementById('fullBackupBtn');
+const fullRestoreInput = document.getElementById('fullRestoreZip');
+const refreshBtn     = document.getElementById('refreshBtn');
+const progressPanel  = document.getElementById('progressPanel');
+const progressFName  = document.getElementById('progressFileName');
+const progressFill   = document.getElementById('progressFill');
+const progressStats  = document.getElementById('progressStats');
+const closeProgBtn   = document.getElementById('closeProgressBtn');
+const debugPanel     = document.getElementById('debugPanel');
+const setupBanner    = {innerHTML:'',style:{}}; // removed from UI
+const favPanel       = document.getElementById('favPanel');
+const favListEl      = document.getElementById('favList');
+const favCatBar      = document.getElementById('favCatBar');
+const scrollTopBtn   = document.getElementById('scrollTopBtn');
+const hashtagChipsDiv= document.getElementById('hashtagChips');
+
+sortSelect.value = 'fileDateDesc';
+function debug(m){console.log('[DB]',m);debugPanel.innerText=m;setTimeout(()=>{if(debugPanel.innerText===m)debugPanel.innerText='';},5000);}
+
+// ══════════════════════════════════════════════════════════════
+// 감정 해시태그 정의
+// ══════════════════════════════════════════════════════════════
+const EMOTION_TAGS = [
+  {tag:'#감동', emoji:'😢', desc:'마음이 찡한'},
+  {tag:'#힐링', emoji:'🌿', desc:'따뜻하고 위로되는'},
+  {tag:'#긴장', emoji:'😰', desc:'손에 땀 쥐는'},
+  {tag:'#웃음', emoji:'😂', desc:'유쾌하고 재밌는'},
+  {tag:'#생각', emoji:'🤔', desc:'깊이 생각하게 만드는'},
+  {tag:'#공포', emoji:'😱', desc:'무섭고 소름돋는'},
+  {tag:'#설렘', emoji:'💕', desc:'두근두근 로맨틱'},
+  {tag:'#분노', emoji:'😤', desc:'사회/부조리에 분노'},
+  {tag:'#슬픔', emoji:'💧', desc:'눈물이 나는'},
+  {tag:'#신기', emoji:'✨', desc:'경이롭고 신비로운'},
+  {tag:'#고독', emoji:'🌙', desc:'혼자 보기 좋은 사색'},
+  {tag:'#에너지', emoji:'⚡', desc:'활기차고 신나는'},
+];
+
+// ══════════════════════════════════════════════════════════════
+// 초성 검색
+// ══════════════════════════════════════════════════════════════
+const CHOSUNG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+function getChosung(str){
+  return [...str].map(c=>{
+    const code=c.charCodeAt(0)-0xAC00;
+    if(code<0||code>11171)return c;
+    return CHOSUNG[Math.floor(code/588)];
+  }).join('');
+}
+function matchSearch(title, kw){
+  const t=String(title||'').replace(/\s+/g,'').toLowerCase();
+  const k=kw.replace(/\s+/g,'').toLowerCase();
+  if(!k)return true;
+  // 직접 포함
+  if(t.includes(k))return true;
+  // 초성 검색
+  const tCs=getChosung(t);
+  const kCs=getChosung(k);
+  if(tCs.includes(k)||t.includes(kCs))return true;
+  return false;
+}
+
+// ══════════════════════════════════════════════════════════════
+// IndexedDB
+// ══════════════════════════════════════════════════════════════
+function initDB(){return new Promise((res,rej)=>{
+  const req=indexedDB.open(DB_NAME,DB_VER);
+  req.onerror=()=>rej(req.error);
+  req.onsuccess=()=>{db=req.result;res();};
+  req.onupgradeneeded=e=>{const d=e.target.result;
+    if(!d.objectStoreNames.contains(ST_ITEMS))d.createObjectStore(ST_ITEMS,{keyPath:'id',autoIncrement:true});
+    if(!d.objectStoreNames.contains(ST_IMAGES))d.createObjectStore(ST_IMAGES,{keyPath:'no'});
+    if(!d.objectStoreNames.contains(ST_FAVS)){
+      const fs=d.createObjectStore(ST_FAVS,{keyPath:'id',autoIncrement:true});
+      fs.createIndex('itemId','itemId',{unique:false});
+    }
+  };
+});}
+
+const mkTx=(s,m)=>db.transaction(s,m).objectStore(s);
+const idbAll=s=>new Promise((r,j)=>{const q=mkTx(s,'readonly').getAll();q.onsuccess=()=>r(q.result||[]);q.onerror=()=>j(q.error);});
+const idbGet=(s,k)=>new Promise((r,j)=>{const q=mkTx(s,'readonly').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);});
+const idbPut=(s,v)=>new Promise((r,j)=>{const q=mkTx(s,'readwrite').put(v);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);});
+const idbDel=(s,k)=>new Promise((r,j)=>{const q=mkTx(s,'readwrite').delete(k);q.onsuccess=()=>r();q.onerror=()=>j(q.error);});
+function idbAddFav(val){return new Promise((r,j)=>{
+  const q=mkTx(ST_FAVS,'readwrite').add(val);
+  q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);
+});}
+
+async function loadAllItems(){return idbAll(ST_ITEMS);}
+async function loadImageByNo(no){
+  const r=await idbGet(ST_IMAGES,no);
+  return r?{blob:r.blob,fileDate:r.fileDate||null}:null;
+}
+async function saveImageByNo(no,blob,fileDate){
+  return idbPut(ST_IMAGES,{no,blob,savedAt:Date.now(),fileDate:fileDate||null});
+}
+async function saveItem(item){
+  const newId=await idbPut(ST_ITEMS,item);
+  if(!item.id)item.id=newId;
+  return item;
+}
+
+// ══════════════════════════════════════════════════════════════
+// 데이터 품질 경고 모달 (X 누를 때까지 유지)
+// ══════════════════════════════════════════════════════════════
+function showDataWarningModal(issues){
+  const existing=document.getElementById('dataWarnModal');
+  if(existing)existing.remove();
+  const modal=document.createElement('div');
+  modal.id='dataWarnModal';
+  modal.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:3000;padding:1rem';
+  // 중첩 템플릿 리터럴 방지 — issues 행을 먼저 문자열로 생성
+  const issueRows=issues.map(iss=>'<div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);border-radius:9px;padding:.65rem .85rem;font-size:.73rem;color:#fca5a5;line-height:1.7;white-space:pre-line">'+esc(iss)+'</div>').join('');
+  modal.innerHTML='<div style="background:#1a1f2e;border:2px solid rgba(239,68,68,.45);border-radius:16px;padding:1.3rem 1.5rem;width:100%;max-width:500px;position:relative;max-height:85vh;overflow-y:auto">'
+    +'<button onclick="this.closest(\'#dataWarnModal\').remove()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(255,255,255,.4);font-size:1.3rem;cursor:pointer;line-height:1">✕</button>'
+    +'<h3 style="font-size:.92rem;font-weight:700;color:#f87171;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem">⚠️ 엑셀 데이터 품질 경고</h3>'
+    +'<p style="font-size:.72rem;color:rgba(255,255,255,.45);margin-bottom:.75rem;line-height:1.6">로딩은 완료되었지만, 아래 항목을 확인하고 엑셀 파일을 수정하세요.</p>'
+    +'<div style="display:flex;flex-direction:column;gap:.5rem">'+issueRows+'</div>'
+    +'<div style="margin-top:1rem;text-align:right">'
+    +'<button onclick="this.closest(\'#dataWarnModal\').remove()" style="background:#e8a020;border:none;color:#111;padding:.42rem 1.1rem;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.8rem">확인 후 닫기</button>'
+    +'</div></div>';
+  document.body.appendChild(modal);
+}
+
+// ── 토스트 알림 (로딩 완료 등 비침습적 메시지) ──
+function showToast(msg, type='success', duration=4000){
+  const existing=document.getElementById('dbToast');
+  if(existing)existing.remove();
+  const colors={success:'rgba(52,211,153,.9)',warn:'rgba(232,160,32,.9)',info:'rgba(99,179,237,.9)',error:'rgba(239,68,68,.9)'};
+  const icons={success:'✅',warn:'⚠️',info:'ℹ️',error:'❌'};
+  const toast=document.createElement('div');
+  toast.id='dbToast';
+  toast.style.cssText=`position:fixed;bottom:4.5rem;left:50%;transform:translateX(-50%);background:${colors[type]||colors.success};color:#111;padding:.55rem 1.2rem;border-radius:20px;font-size:.78rem;font-weight:700;z-index:4000;box-shadow:0 4px 18px rgba(0,0,0,.5);pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;opacity:0;transition:opacity .25s`;
+  toast.textContent=icons[type]+' '+msg;
+  document.body.appendChild(toast);
+  requestAnimationFrame(()=>{toast.style.opacity='1';});
+  setTimeout(()=>{
+    toast.style.opacity='0';
+    setTimeout(()=>toast.remove(),300);
+  },duration);
+}
+
+// ══════════════════════════════════════════════════════════════
+// 장르/유틸
+// ══════════════════════════════════════════════════════════════
+const GMAP={'멜로':'로맨스','멜로/로맨스':'로맨스','로맨틱 코미디':'로맨스','호러':'공포','스리러':'스릴러','군사':'전쟁','코':'코미디','다큐멘터리':'다큐','SF':'SF','sf':'SF'};
+const GALLOWED=new Set(['액션','드라마','코미디','로맨스','스릴러','공포','SF','판타지','미스터리','범죄','모험','전쟁','애니메이션','다큐','사극','가족','스포츠','법정','성인','재난','정치','의학','서부','기타']);
+const normGenre=g=>{const t=(g||'').trim(),m=GMAP[t]||t;return GALLOWED.has(m)?m:'기타';};
+const parseGenres=raw=>{if(!raw)return['기타'];const l=[...new Set(raw.split(',').map(g=>normGenre(g)))];return l.length?l:['기타'];};
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function extractEpisode(runtime){
+  if(!runtime)return '';
+  const m=runtime.match(/(\d+)\s*[화부회편]/);
+  return m?m[1]+'화':'';
+}
+
+// ══════════════════════════════════════════════════════════════
+// 이미지 리사이즈
+// ══════════════════════════════════════════════════════════════
+function resizeBlob(src,maxW=300){return new Promise((res,rej)=>{
+  const url=URL.createObjectURL(src instanceof Blob?src:new Blob([src]));
+  const img=new Image();
+  img.onload=()=>{URL.revokeObjectURL(url);
+    let w=img.width,h=img.height;
+    if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    c.toBlob(b=>b?res(b):rej(new Error('toBlob')),'image/jpeg',.82);
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('load'));};
+  img.src=url;
+});}
+
+function resizeFile(file,maxW=300){return new Promise((res,rej)=>{
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+  img.onload=()=>{URL.revokeObjectURL(url);
+    let w=img.width,h=img.height;
+    if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    c.toBlob(b=>b?res(b):rej(new Error('toBlob')),'image/jpeg',.82);
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('load'));};
+  img.src=url;
+});}
+
+// ══════════════════════════════════════════════════════════════
+// 엑셀 파싱 (전체 행 읽기 - A열 마지막까지)
+// B열 =HYPERLINK("url","제목") 수식 완전 지원
+// ══════════════════════════════════════════════════════════════
+
+// HYPERLINK 수식 파싱 — "=HYPERLINK("url","제목")" 형태 처리
+function parseTitleCell(raw) {
+  if (raw == null || raw === '') return { text: '', url: '' };
+  const s = String(raw);
+  // =HYPERLINK("url","제목") or HYPERLINK("url","제목")
+  const m = s.match(/=?\s*HYPERLINK\s*\(\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)/i);
+  if (m) return { url: m[1].trim(), text: m[2].trim() };
+  // 일반 텍스트
+  return { text: s.trim(), url: '' };
+}
+
+async function importFromExcel(buf){
+  // cellFormula:true 로 수식 문자열도 함께 읽음
+  const wb=XLSX.read(buf,{type:'array', cellFormula:true, cellText:false});
+  const ws=wb.Sheets[wb.SheetNames[0]];
+
+  // A열 기반 범위 계산 — !ref 범위 전체 포함
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',blankrows:false,raw:true});
+
+  let hIdx=-1;
+  for(let i=0;i<Math.min(rows.length,5);i++){
+    if(String(rows[i][0]).trim()==='NO' && String(rows[i][1]).trim()==='한글제목'){hIdx=i;break;}
+  }
+  if(hIdx<0)throw new Error('헤더를 찾을 수 없습니다 (NO·한글제목 필요)');
+
+  const H={};
+  rows[hIdx].forEach((h,i)=>{
+    const hs=String(h).trim();
+    if(hs==='NO')H.no=i; if(hs==='한글제목')H.title=i; if(hs==='평점')H.rating=i;
+    if(hs==='국가')H.country=i; if(hs==='개봉연도')H.year=i; if(hs==='카테고리')H.cat=i;
+    if(hs==='장르')H.genre=i; if(hs==='러닝타임/화수')H.runtime=i;
+    if(hs==='비고'||hs==='태그'||hs==='감정태그')H.tags=i;
+    if(hs==='감독/주연')H.director=i;
+    if(hs==='OST'||hs==='YouTube OST')H.ost=i;
+    if(hs==='인문학노트'||hs==='인문학 노트'||hs==='메모'||hs==='노트'||hs.toLowerCase()==='note'||hs.toLowerCase()==='humnote')H.note=i;
+    if(hs==='감상일'||hs==='관람일'||hs==='관람날짜')H.viewDate=i;
+  });
+
+  // NO 열(A열) 기준: 숫자이면 유효 행
+  const dataRows=rows.slice(hIdx+1).filter(r=>{
+    const v=r[H.no];
+    if(v===undefined||v==='')return false;
+    const n=parseFloat(String(v).trim());
+    return !isNaN(n)&&n>0;
+  });
+
+  // SheetJS가 HYPERLINK 수식을 원문으로 돌려줄 경우를 위해
+  // ws 셀 직접 접근으로 .f(수식) 또는 .v(값) 확인
+  const cellRef=(colIdx,rowIdx)=>{
+    const col=XLSX.utils.encode_col(colIdx);
+    const row=XLSX.utils.encode_row(hIdx+1+rowIdx);
+    return ws[col+row];
+  };
+
+  const now=Date.now();
+  const items=[];
+  let dataIdx=0;
+  for(const row of dataRows){
+    const no=parseInt(String(row[H.no]).trim());
+
+    // 제목·링크 추출 — 수식문자열, 셀값, 직접접근 3중 폴백
+    let title='', excelUrl='';
+    if(H.title!==undefined){
+      const raw=row[H.title];
+      const parsed=parseTitleCell(raw);
+      title=parsed.text;
+      excelUrl=parsed.url;
+      // SheetJS가 평가된 값(.v)을 이미 준 경우 수식 파싱 불필요 — 단 HYPERLINK 수식은 .f에 있음
+      if(!title || title.startsWith('=') || /HYPERLINK/i.test(title)){
+        // 셀 직접 접근 시도
+        const wsCell=cellRef(H.title, dataIdx);
+        if(wsCell){
+          if(wsCell.l&&wsCell.l.Target) excelUrl=wsCell.l.Target;
+          // .v 는 display 텍스트
+          if(wsCell.v&&!String(wsCell.v).startsWith('=')) title=String(wsCell.v).trim();
+          else if(wsCell.f){ const fp=parseTitleCell('='+wsCell.f); if(fp.text) title=fp.text; if(fp.url) excelUrl=fp.url; }
+        }
+      }
+    }
+    if(!title || /^=?HYPERLINK/i.test(title)) title=`(제목없음-${no})`;
+
+    const rv=row[H.rating];
+    const rating=(rv!==''&&rv!==undefined&&!isNaN(parseFloat(rv)))?parseFloat(rv).toFixed(1):'?';
+    const country=String(row[H.country]||'').trim()||'미분류';
+    let year=String(row[H.year]||'').replace('.0','').trim();
+    if(!year||isNaN(parseInt(year)))year='';
+    const category=String(row[H.cat]||'영화').trim();
+    const genreRaw=String(row[H.genre]||'기타').trim();
+    const runtime=String(row[H.runtime]||'—').trim();
+    const genreList=parseGenres(genreRaw);
+    // B열 HYPERLINK URL 우선 사용, 없으면 네이버 영화 검색
+    const link=excelUrl||`https://search.naver.com/search.naver?query=${encodeURIComponent(title+' 영화 '+year)}`;
+    const tagsRaw=H.tags!==undefined?String(row[H.tags]||'').trim():'';
+    // 감정태그만 허용 (감독/주연 데이터 완전 차단)
+    const hashTags=(tagsRaw && !/^감독:/i.test(tagsRaw) && !/^주연:/i.test(tagsRaw) && !/감독:/i.test(tagsRaw))
+      ?tagsRaw.split(/[,#\s]+/).map(t=>t.trim()).filter(t=>t.length>1).map(t=>t.startsWith('#')?t:'#'+t)
+        .filter(t=>EMOTION_TAGS.some(e=>e.tag===t)) // EMOTION_TAGS 목록에 있는 것만 허용
+      :[];
+    const ostLink=H.ost!==undefined?String(row[H.ost]||'').trim():'';
+    const humNote=H.note!==undefined?String(row[H.note]||'').trim():'';
+    // J열 감상일 → timestamp (정렬용)
+    let viewDate=null;
+    if(H.viewDate!==undefined && row[H.viewDate]!==undefined && row[H.viewDate]!==''){
+      const vd=row[H.viewDate];
+      if(typeof vd==='number'){
+        // Excel 날짜 직렬화 숫자 → JS Date
+        const d=new Date(Math.round((vd-25569)*86400*1000));
+        if(!isNaN(d.getTime())) viewDate=d.getTime();
+      } else {
+        const d=new Date(String(vd).trim());
+        if(!isNaN(d.getTime())) viewDate=d.getTime();
+      }
+    }
+    items.push({title,rating,country,year,category,genreRaw,genreList,runtime,link,excelNo:no,addedAt:now,hashTags,ostLink,humNote,viewDate});
+    dataIdx++;
+  }
+
+  // ── 기존 데이터에서 excelNo 기준으로 이미지·태그·메모 보존 맵 구성 ──
+  const old = await loadAllItems();
+  // excelNo → 기존 항목 맵 (수동 편집된 태그·메모·ostLink 보존용)
+  const oldMap = new Map();
+  old.forEach(o => { if(o.excelNo) oldMap.set(o.excelNo, o); });
+
+  // 새 항목에 기존 수동 데이터 병합
+  for(const it of items){
+    const prev = oldMap.get(it.excelNo);
+    if(prev){
+      // hashTags: 엑셀에 태그가 없고 기존에 수동 태그가 있으면 보존
+      if((!it.hashTags || !it.hashTags.length) && prev.hashTags && prev.hashTags.length){
+        it.hashTags = prev.hashTags;
+      }
+      // humNote: 엑셀 K열 값 있으면 엑셀 우선(최신 반영), 없으면 기존 보존
+      if(it.humNote){
+        // 엑셀에 값 있음 → 항상 엑셀 값 사용 (수정된 인문학노트 즉시 반영)
+      } else if(prev.humNote){
+        it.humNote = prev.humNote; // 엑셀에 없으면 기존 보존
+      }
+      // ostLink: 엑셀에 없으면 기존 보존
+      if(!it.ostLink && prev.ostLink) it.ostLink = prev.ostLink;
+      // addedAt 보존 (최초 추가 시점 유지)
+      if(prev.addedAt) it.addedAt = prev.addedAt;
+    }
+  }
+
+  // 기존 데이터 삭제 후 새로 저장 (이미지는 ST_IMAGES에 별도 보존됨)
+  for(const o of old) await idbDel(ST_ITEMS, o.id).catch(()=>{});
+  for(const it of items) await saveItem(it);
+  curSort='fileDateDesc'; sortSelect.value='fileDateDesc';
+
+  // ── 데이터 품질 검사 ──
+  const issues=[];
+  // NO 누락 (원본 rows에서 NO가 비어있는 데이터 행)
+  const missingNo=rows.slice(hIdx+1).filter(r=>{
+    const v=r[H.no];
+    if(v===undefined||v==='')return true;
+    const n=parseFloat(String(v).trim());
+    return isNaN(n)||n<=0;
+  }).length;
+  if(missingNo>0) issues.push(`⚠️ NO(연번) 누락 행: ${missingNo}건 — A열을 확인하세요`);
+  // 제목 중복 검사
+  const titleCount={};
+  items.forEach(i=>{ titleCount[i.title]=(titleCount[i.title]||0)+1; });
+  const dupTitles=Object.entries(titleCount).filter(([,c])=>c>1).map(([t,c])=>`"${t}"(${c}건)`);
+  if(dupTitles.length) issues.push(`⚠️ 중복 제목 ${dupTitles.length}건:\n${dupTitles.slice(0,8).join(', ')}${dupTitles.length>8?` 외 ${dupTitles.length-8}건`:''}`);
+  // 경고 팝업 (닫을 때까지 유지 — 모달 형태)
+  if(issues.length){
+    setTimeout(()=>showDataWarningModal(issues),400);
+  }
+
+  return items.length;
+}
+
+// ══════════════════════════════════════════════════════════════
+// 폴더 → IndexedDB 이미지 자동 저장 (파일 수정날짜 저장 포함)
+// ══════════════════════════════════════════════════════════════
+function extractNo(filename){
+  const name=filename.replace(/\.[^.]+$/,'');
+  const m=name.match(/^(\d+)(?:[_\s\-.]|$)/)||name.match(/^(\d+)$/);
+  return m?parseInt(m[1]):null;
+}
+
+async function scanAndSaveFolder(handle){
+  const imageExts=/\.(jpe?g|png|webp|gif|bmp)$/i;
+  progressPanel.style.display='flex';
+  progressFName.innerText='폴더 스캔 및 이미지 저장중…';
+  progressFill.style.width='0%';
+
+  const items=await loadAllItems();
+  const validNos=new Set(items.map(i=>i.excelNo).filter(Boolean));
+
+  const allFiles=[];
+  for await(const [name,entry] of handle.entries()){
+    if(entry.kind==='file'&&imageExts.test(name)){
+      const no=extractNo(name);
+      if(no!==null&&validNos.has(no))allFiles.push({name,entry,no});
+    }
+  }
+
+  let saved=0,skipped=0;
+  for(let i=0;i<allFiles.length;i++){
+    const {entry,no}=allFiles[i];
+    try{
+      // 이미 저장된 것은 스킵
+      const existing=await idbGet(ST_IMAGES,no);
+      if(existing){skipped++;continue;}
+      const file=await entry.getFile();
+      // 파일 수정날짜 저장 (관람일 기준 정렬용)
+      const fileDate=file.lastModified||null;
+      const blob=await resizeBlob(file);
+      await saveImageByNo(no,blob,fileDate);
+      saved++;
+    }catch(e){/* skip */}
+    const pct=((i+1)/allFiles.length*100).toFixed(0);
+    progressFill.style.width=pct+'%';
+    progressStats.innerText=`✅${saved} ⏭️${skipped} (${i+1}/${allFiles.length})`;
+    progressFName.innerText=allFiles[i].name;
+    if(i%30===0)await new Promise(r=>setTimeout(r,1));
+  }
+  progressPanel.style.display='none';
+  return {total:allFiles.length,saved,skipped};
+}
+
+async function selectFolder(){
+  if(!('showDirectoryPicker' in window)){
+    alert('Chrome 또는 Edge 브라우저에서만 지원됩니다.');return;
+  }
+  try{
+    const handle=await window.showDirectoryPicker({mode:'read'});
+    folderHandle=handle;
+    updateFolderBanner(handle.name,'scanning');
+    const {total,saved,skipped}=await scanAndSaveFolder(handle);
+    updateFolderBanner(handle.name,'ok',`이미지 ${total}개 중 ${saved}개 새로 저장, ${skipped}개 기존 유지`);
+    clearImgCache();
+    await refreshData();
+    showToast(`이미지 로딩 완료 — ${total}개 처리 (신규 ${saved}개 저장). 정렬·필터 정상 사용 가능합니다.`, 'success', 6000);
+  }catch(e){
+    if(e.name!=='AbortError')alert('폴더 선택 오류: '+e.message);
+  }
+}
+
+function updateFolderBanner(name,state,detail=''){
+  debug(`폴더: ${name} [${state}] ${detail}`);
+}
+async function addNewImages(){
+  if(!folderHandle){await selectFolder();return;}
+  const {total,saved,skipped}=await scanAndSaveFolder(folderHandle);
+  clearImgCache();
+  alert(`새 이미지 추가 완료\n✅ 저장: ${saved}개  ⏭️ 유지: ${skipped}개`);
+  await refreshData();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 이미지 캐시 관리 (ObjectURL 재사용)
+// ══════════════════════════════════════════════════════════════
+function clearImgCache(){
+  imgUrlCache.forEach(url=>URL.revokeObjectURL(url));
+  imgUrlCache.clear();
+}
+
+// ── GitHub 이미지 fetch & IndexedDB 캐시 저장 ──
+async function fetchAndCacheGithubImage(no){
+  if(!no) return null;
+  try{
+    const result=await fetchGithubImageWithFallback(no);
+    if(!result) return null;
+    if(result.blob&&result.blob.size>100){
+      // blob 있음: IDB 저장 + ObjectURL
+      const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
+      await saveImageByNo(no,resized,null);
+      const objUrl=URL.createObjectURL(resized);
+      imgUrlCache.set(no,objUrl);
+      return objUrl;
+    } else {
+      // direct URL: 메모리 캐시 (세션 유효)
+      imgUrlCache.set(no,result.url);
+      return result.url;
+    }
+  }catch(e){ return null; }
+}
+
+async function getCachedImgUrl(no){
+  if(!no) return null;
+  // 1. 메모리 캐시 — blob:// URL만 (GitHub URL은 캐시 안 함)
+  if(imgUrlCache.has(no)){
+    const cached=imgUrlCache.get(no);
+    if(cached&&cached.startsWith('blob:')) return cached;
+    imgUrlCache.delete(no); // blob: 아닌 URL 제거
+  }
+  // 2. IndexedDB에 저장된 blob
+  const r=await idbGet(ST_IMAGES,no).catch(()=>null);
+  if(r&&r.blob&&r.blob.size>100){
+    try{
+      const url=URL.createObjectURL(r.blob);
+      imgUrlCache.set(no,url); // blob: URL만 캐시
+      return url;
+    }catch(e){
+      await idbDel(ST_IMAGES,no).catch(()=>{});
+    }
+  }
+  // 3. IDB 없음 → GitHub 직접 URL 반환 (캐시에 저장 안 함)
+  //    → 다음에 getCachedImgUrl 호출 시 IDB 재체크 → 동기화 후 자동 전환
+  return getGithubImgUrl(no,'jpg') || null;
+}
+
+// 이미지 날짜 맵 (no → fileDate) — 정렬용
+let imgDateMap=new Map();
+async function loadImgDateMap(){
+  const all=await idbAll(ST_IMAGES);
+  imgDateMap.clear();
+  all.forEach(r=>{if(r.fileDate)imgDateMap.set(r.no,r.fileDate);});
+}
+
+// ══════════════════════════════════════════════════════════════
+// 즐겨찾기 관리
+// ══════════════════════════════════════════════════════════════
+function saveFavCatsLocal(){
+  try{localStorage.setItem('favCats_v16',JSON.stringify(favCats));}catch(e){}
+}
+function loadFavCatsLocal(){
+  try{const s=localStorage.getItem('favCats_v16');if(s)favCats=JSON.parse(s);}catch(e){}
+}
+
+async function loadFavs(){
+  const rows=await idbAll(ST_FAVS);
+  favData={};
+  rows.forEach(r=>{
+    const key=String(r.itemId);
+    if(!favData[key])favData[key]=[];
+    favData[key].push({favId:r.id,cat:r.cat||'전체'});
+  });
+  const dbCats=['전체',...new Set(rows.map(r=>r.cat||'전체').filter(c=>c!=='전체'))];
+  loadFavCatsLocal();
+  const merged=['전체',...new Set([...favCats.filter(c=>c!=='전체'),...dbCats.filter(c=>c!=='전체')])];
+  favCats=merged;
+  saveFavCatsLocal();
+}
+
+function isItemFav(itemId,cat=''){
+  const key=String(itemId);
+  const favs=favData[key]||[];
+  if(!cat||cat==='전체')return favs.length>0;
+  return favs.some(f=>f.cat===cat);
+}
+
+function idbAddFav2(val){return new Promise((r,j)=>{
+  const q=mkTx(ST_FAVS,'readwrite').add(val);
+  q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);
+});}
+
+async function toggleFav(itemId,cat){
+  if(!cat)cat='전체';
+  const key=String(itemId);
+  const favs=favData[key]||[];
+  const existing=favs.find(f=>f.cat===cat);
+  if(existing){
+    await idbDel(ST_FAVS,existing.favId);
+  } else {
+    await idbAddFav2({itemId:Number(itemId),cat,addedAt:Date.now()});
+  }
+  await loadFavs();
+}
+
+// 즐겨찾기 단클릭: 바로 '전체'로 토글 (카테고리 피커 없이)
+async function quickToggleFav(itemId,favBtn,card){
+  await toggleFav(itemId,'전체');
+  const nowFav=isItemFav(itemId);
+  favBtn.textContent=nowFav?'★':'☆';
+  favBtn.className='fav-btn'+(nowFav?' active':'');
+  card.className='movie-card'+(nowFav?' fav-card':'');
+}
+
+// 즐겨찾기 오래누르기/우클릭: 카테고리 피커 표시
+async function showFavCatPicker(itemId,favBtn,card){
+  const existing=document.getElementById('fav-picker');
+  if(existing)existing.remove();
+  const picker=document.createElement('div');
+  picker.id='fav-picker';
+  picker.style.cssText=`position:fixed;background:#1a2540;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:.5rem;z-index:3000;min-width:165px;box-shadow:0 8px 28px rgba(0,0,0,.6)`;
+  const rect=favBtn.getBoundingClientRect();
+  const spaceBelow=window.innerHeight-rect.bottom-10;
+  if(spaceBelow<140){picker.style.bottom=(window.innerHeight-rect.top+6)+'px';picker.style.top='auto';}
+  else{picker.style.top=(rect.bottom+6)+'px';}
+  picker.style.left=Math.min(rect.left,window.innerWidth-180)+'px';
+
+  await loadFavs();
+  const title=document.createElement('div');
+  title.style.cssText='font-size:.66rem;color:rgba(255,255,255,.3);padding:.2rem .4rem .4rem;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:.3rem';
+  title.textContent='카테고리 선택 (우클릭)';
+  picker.appendChild(title);
+
+  const cats=favCats.length>=1?favCats:['전체'];
+  cats.forEach(cat=>{
+    const btn=document.createElement('button');
+    const active=isItemFav(itemId,cat);
+    btn.style.cssText=`display:flex;align-items:center;gap:.4rem;width:100%;background:${active?'rgba(251,191,36,.15)':'transparent'};border:none;color:${active?'#fbbf24':'rgba(255,255,255,.65)'};padding:.32rem .55rem;border-radius:7px;cursor:pointer;font-size:.75rem;font-family:inherit;text-align:left;transition:background .1s`;
+    btn.innerHTML=`<span style="font-size:.9rem">${active?'★':'☆'}</span> ${esc(cat)}`;
+    btn.onclick=async e=>{
+      e.stopPropagation();
+      await toggleFav(itemId,cat);
+      picker.remove();
+      const nowFav=isItemFav(itemId);
+      favBtn.textContent=nowFav?'★':'☆';
+      favBtn.className='fav-btn'+(nowFav?' active':'');
+      card.className='movie-card'+(nowFav?' fav-card':'');
+    };
+    picker.appendChild(btn);
+  });
+  const sep=document.createElement('div');sep.style.cssText='border-top:1px solid rgba(255,255,255,.07);margin:.3rem 0';
+  picker.appendChild(sep);
+  const addBtn=document.createElement('button');
+  addBtn.style.cssText='display:flex;align-items:center;gap:.4rem;width:100%;background:transparent;border:1px dashed rgba(232,160,32,.3);color:rgba(232,160,32,.8);padding:.32rem .55rem;border-radius:7px;cursor:pointer;font-size:.72rem;font-family:inherit';
+  addBtn.innerHTML='<span>＋</span> 새 카테고리 추가';
+  addBtn.onclick=async e=>{e.stopPropagation();picker.remove();await addFavCategory();};
+  picker.appendChild(addBtn);
+  document.body.appendChild(picker);
+  const close=e=>{if(!picker.contains(e.target)&&e.target!==favBtn){picker.remove();document.removeEventListener('mousedown',close);}};
+  setTimeout(()=>document.addEventListener('mousedown',close),50);
+}
+
+async function addFavCategory(){
+  const name=prompt('새 즐겨찾기 카테고리 이름:');
+  if(!name||!name.trim())return;
+  const n=name.trim();
+  if(!favCats.includes(n)){favCats.push(n);saveFavCatsLocal();}
+  curFavCat=n;
+  renderFavCatBar();
+  await renderFavList();
+}
+
+function renderFavCatBar(){
+  favCatBar.innerHTML='';
+  favCats.forEach((cat,idx)=>{
+    const wrap=document.createElement('div');
+    wrap.style.cssText='position:relative;display:inline-flex;align-items:center;';
+    const btn=document.createElement('button');
+    btn.className='fav-cat-chip'+(curFavCat===cat?' active':'');
+    btn.textContent=cat;
+    btn.title=cat==='전체'?'전체 즐겨찾기':'클릭: 필터 | 우클릭: 편집/삭제';
+    btn.onclick=async()=>{curFavCat=cat;renderFavCatBar();await renderFavList();};
+    // 우클릭: 카테고리 이름 수정 or 삭제 (전체는 불가)
+    if(cat!=='전체'){
+      btn.oncontextmenu=e=>{
+        e.preventDefault();
+        showCatEditMenu(cat, idx, btn);
+      };
+    }
+    wrap.appendChild(btn);
+    favCatBar.appendChild(wrap);
+  });
+  const addBtn=document.createElement('button');
+  addBtn.className='add-cat-btn';addBtn.textContent='+ 카테고리';
+  addBtn.onclick=addFavCategory;
+  favCatBar.appendChild(addBtn);
+}
+
+// 즐겨찾기 카테고리 수정/삭제 컨텍스트 메뉴
+function showCatEditMenu(cat, idx, triggerEl){
+  const existing=document.getElementById('cat-edit-menu');
+  if(existing)existing.remove();
+  const menu=document.createElement('div');
+  menu.id='cat-edit-menu';
+  const rect=triggerEl.getBoundingClientRect();
+  menu.style.cssText=`position:fixed;top:${rect.bottom+4}px;left:${rect.left}px;background:#1a2540;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:.35rem;z-index:4000;min-width:150px;box-shadow:0 6px 20px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:.18rem`;
+
+  const title=document.createElement('div');
+  title.style.cssText='font-size:.63rem;color:rgba(255,255,255,.28);padding:.1rem .4rem .3rem;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:.18rem';
+  title.textContent='📂 '+cat;
+  menu.appendChild(title);
+
+  // 이름 변경
+  const renameBtn=document.createElement('button');
+  renameBtn.style.cssText='display:flex;align-items:center;gap:.4rem;width:100%;background:transparent;border:none;color:rgba(255,255,255,.65);padding:.3rem .5rem;border-radius:6px;cursor:pointer;font-size:.73rem;font-family:inherit;text-align:left';
+  renameBtn.innerHTML='✏️ 이름 변경';
+  renameBtn.onmouseenter=()=>renameBtn.style.background='rgba(255,255,255,.07)';
+  renameBtn.onmouseleave=()=>renameBtn.style.background='transparent';
+  renameBtn.onclick=async()=>{
+    menu.remove();
+    const newName=prompt(`카테고리 이름 변경
+현재: "${cat}"
+새 이름:`, cat);
+    if(!newName||!newName.trim()||newName.trim()===cat)return;
+    const n=newName.trim();
+    if(favCats.includes(n)){alert('이미 존재하는 카테고리명입니다.');return;}
+    // DB에서 해당 카테고리의 favs 업데이트
+    const favRows=await idbAll(ST_FAVS);
+    for(const row of favRows){
+      if(row.cat===cat){
+        await idbPut(ST_FAVS,{...row,cat:n});
+      }
+    }
+    favCats[idx]=n;
+    if(curFavCat===cat)curFavCat=n;
+    saveFavCatsLocal();
+    await loadFavs();
+    renderFavCatBar();
+    await renderFavList();
+  };
+  menu.appendChild(renameBtn);
+
+  // 삭제
+  const delBtn=document.createElement('button');
+  delBtn.style.cssText='display:flex;align-items:center;gap:.4rem;width:100%;background:transparent;border:none;color:#f87171;padding:.3rem .5rem;border-radius:6px;cursor:pointer;font-size:.73rem;font-family:inherit;text-align:left';
+  delBtn.innerHTML='🗑️ 카테고리 삭제';
+  delBtn.onmouseenter=()=>delBtn.style.background='rgba(239,68,68,.08)';
+  delBtn.onmouseleave=()=>delBtn.style.background='transparent';
+  delBtn.onclick=async()=>{
+    menu.remove();
+    if(!confirm(`"${cat}" 카테고리를 삭제합니까?
+(이 카테고리의 즐겨찾기 항목도 함께 삭제됩니다)`))return;
+    // DB에서 해당 카테고리 favs 삭제
+    const favRows=await idbAll(ST_FAVS);
+    for(const row of favRows){
+      if(row.cat===cat) await idbDel(ST_FAVS,row.id).catch(()=>{});
+    }
+    favCats.splice(idx,1);
+    if(curFavCat===cat)curFavCat='전체';
+    saveFavCatsLocal();
+    await loadFavs();
+    renderFavCatBar();
+    await renderFavList();
+  };
+  menu.appendChild(delBtn);
+
+  document.body.appendChild(menu);
+  const closeMenu=e=>{if(!menu.contains(e.target)&&e.target!==triggerEl){menu.remove();document.removeEventListener('mousedown',closeMenu);}};
+  setTimeout(()=>document.addEventListener('mousedown',closeMenu),50);
+}
+
+async function renderFavList(){
+  const items=await loadAllItems();
+  const itemMap=new Map(items.map(i=>[i.id,i]));
+  favListEl.innerHTML='';
+  let favItems=[];
+  Object.entries(favData).forEach(([idStr,favs])=>{
+    const id=parseInt(idStr);
+    const item=itemMap.get(id);
+    if(!item)return;
+    const inCat=curFavCat==='전체'?favs.length>0:favs.some(f=>f.cat===curFavCat);
+    if(inCat)favItems.push(item);
+  });
+  if(!favItems.length){
+    favListEl.innerHTML='<div class="fav-empty">⭐ 즐겨찾기가 없습니다<br>카드의 별표를 클릭해서 즉시 추가<br>우클릭으로 카테고리 지정 가능</div>';
+    return;
+  }
+  for(const item of favItems){
+    const div=document.createElement('div');div.className='fav-item';
+    const bUrl=await getCachedImgUrl(item.excelNo);
+    const posterEl=document.createElement(bUrl?'img':'div');
+    posterEl.className='fav-item-poster';
+    if(bUrl){posterEl.src=bUrl;}
+    else{posterEl.style.cssText='display:flex;align-items:center;justify-content:center;font-size:.7rem;opacity:.3';posterEl.textContent='🎬';}
+    div.onclick=()=>{scrollToCard(item.id);closeFavPanel();};
+    const info=document.createElement('div');info.className='fav-item-info';
+    info.innerHTML=`<div class="fav-item-title">${esc(item.title)}</div><div class="fav-item-meta">${item.year||''} ${item.country||''}</div>`;
+    const delBtn=document.createElement('button');delBtn.className='fav-item-del';delBtn.textContent='✕';
+    delBtn.onclick=async e=>{e.stopPropagation();
+      const cat=curFavCat==='전체'?'전체':curFavCat;
+      await toggleFav(item.id,cat);
+      await renderFavList();
+      await render();
+    };
+    div.append(posterEl,info,delBtn);
+    favListEl.appendChild(div);
+  }
+}
+
+function openFavPanel(){showingFav=true;favPanel.classList.add('open');}
+function closeFavPanel(){showingFav=false;favPanel.classList.remove('open');}
+function scrollToCard(itemId){
+  const el=document.querySelector(`[data-item-id="${itemId}"]`);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// ══════════════════════════════════════════════════════════════
+// 정렬 (항상 rawItems 기준으로 재정렬 - 연속 정렬 버그 수정)
+// ══════════════════════════════════════════════════════════════
+function applySort(items,mode){
+  const a=[...items]; // 항상 원본의 복사본 정렬
+  switch(mode){
+    case'fileDateDesc': // J열 감상일 내림차순 (최신 관람순)
+      return a.sort((x,y)=>{
+        const da=x.viewDate||imgDateMap.get(x.excelNo)||0;
+        const db2=y.viewDate||imgDateMap.get(y.excelNo)||0;
+        return db2-da;
+      });
+    case'fileDateAsc':
+      return a.sort((x,y)=>{
+        const da=x.viewDate||imgDateMap.get(x.excelNo)||9999999999999;
+        const db2=y.viewDate||imgDateMap.get(y.excelNo)||9999999999999;
+        return da-db2;
+      });
+    case'titleAsc':  return a.sort((x,y)=>String(x.title).localeCompare(String(y.title),'ko'));
+    case'titleDesc': return a.sort((x,y)=>String(y.title).localeCompare(String(x.title),'ko'));
+    case'noAsc':     return a.sort((x,y)=>(x.excelNo||0)-(y.excelNo||0));
+    case'noDesc':    return a.sort((x,y)=>(y.excelNo||0)-(x.excelNo||0));
+    case'ratingDesc':return a.sort((x,y)=>(parseFloat(y.rating)||0)-(parseFloat(x.rating)||0));
+    case'yearDesc':  return a.sort((x,y)=>(parseInt(y.year)||0)-(parseInt(x.year)||0));
+    default:return a;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// 데이터 새로고침
+// ══════════════════════════════════════════════════════════════
+async function refreshData(){
+  rawItems=await loadAllItems();
+  await loadImgDateMap(); // 이미지 날짜 맵 로드
+  allItems=applySort(rawItems,curSort); // rawItems 기준으로 정렬
+  await loadFavs();
+  updateStats();
+  updateHashtagBar();
+  await render();
+}
+
+function updateStats(){
+  const tot=rawItems.length;
+  const mv=rawItems.filter(i=>i.category==='영화').length;
+  const dr=rawItems.filter(i=>i.category==='드라마').length;
+  const dc=rawItems.filter(i=>{
+    if(i.category==='다큐멘터리') return true;
+    const gr=(i.genreRaw||'').split(',').map(g=>g.trim().toLowerCase());
+    return gr.some(g=>g==='다큐'||g==='다큐멘터리');
+  }).length;
+  totalStats.innerText=`총 ${tot.toLocaleString()}편 · 영화 ${mv} · 드라마 ${dr} · 다큐 ${dc}`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// 해시태그 바 업데이트
+// ══════════════════════════════════════════════════════════════
+function updateHashtagBar(){
+  // EMOTION_TAGS 12개만 표시 — 감독/배우 이름 오염 방지
+  // 각 태그별 해당 작품 수 계산
+  const tagCountMap={};
+  rawItems.forEach(i=>(i.hashTags||[]).forEach(t=>{
+    if(EMOTION_TAGS.some(e=>e.tag===t)) tagCountMap[t]=(tagCountMap[t]||0)+1;
+  }));
+
+  hashtagChipsDiv.innerHTML='';
+  EMOTION_TAGS.forEach(et=>{
+    const cnt=tagCountMap[et.tag]||0;
+    const chip=document.createElement('span');
+    chip.className='htag'+(curHashtag===et.tag?' active':'');
+    chip.title=et.desc+(cnt?` (${cnt}편)`:'');
+    // 작품 수가 있으면 카운트 표시
+    chip.innerHTML=et.emoji+' '+et.tag+(cnt?`<sup style="font-size:.5rem;opacity:.55;margin-left:.15rem">${cnt}</sup>`:'');
+    chip.style.opacity=cnt?'1':'.4'; // 태그된 작품 없으면 흐리게
+    chip.onclick=()=>{curHashtag=(curHashtag===et.tag?'':et.tag);updateHashtagBar();render();};
+    hashtagChipsDiv.appendChild(chip);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 필터
+// ══════════════════════════════════════════════════════════════
+function filterByCat(items,cat){
+  if(cat==='all')return items;
+  if(cat==='movie'){
+    let mv=items.filter(i=>i.category==='영화');
+    if(curSubFilter){
+      if(curSubFilter==='기타'){
+        const known=['대한민국','한국','미국','일본','영국','프랑스','중국','이탈리아'];
+        mv=mv.filter(i=>!known.some(k=>(i.country||'').includes(k)));
+      } else {
+        // '한국' 선택 시 '대한민국'도 포함
+        const subKey=curSubFilter==='한국'?['한국','대한민국']:[curSubFilter];
+        mv=mv.filter(i=>subKey.some(k=>(i.country||'').includes(k)));
+      }
+    }
+    return mv;
+  }
+  if(cat==='drama'){
+    let d=items.filter(i=>i.category==='드라마');
+    if(curSubFilter){
+      if(curSubFilter==='기타'){
+        const known=['대한민국','한국','미국','일본','중국','영국'];
+        d=d.filter(i=>!known.some(k=>(i.country||'').includes(k)));
+      } else {
+        // '한국' 선택 시 '대한민국'도 포함
+        const subKey=curSubFilter==='한국'?['한국','대한민국']:[curSubFilter];
+        d=d.filter(i=>subKey.some(k=>(i.country||'').includes(k)));
+      }
+    }
+    return d;
+  }
+  if(cat==='documentary'){
+    // category='다큐멘터리' 항목 먼저, 이후 장르에만 '다큐' 있는 항목
+    const byCat=items.filter(i=>i.category==='다큐멘터리');
+    const byGenre=items.filter(i=>{
+      if(i.category==='다큐멘터리') return false;
+      const gr=(i.genreRaw||'').split(',').map(g=>g.trim().toLowerCase());
+      return gr.some(g=>g==='다큐'||g==='다큐멘터리');
+    });
+    let dc=[...byCat,...byGenre];
+    if(curSubFilter){
+      dc=dc.filter(i=>{
+        const gr=(i.genreRaw||'').toLowerCase()+' '+(i.title||'').toLowerCase();
+        return gr.includes(curSubFilter.toLowerCase());
+      });
+    }
+    return dc;
+  }
+  // 기타: 영화·드라마 아니고, 다큐 조건도 아닌 것
+  if(cat==='other') return items.filter(i=>{
+    if(['영화','드라마','다큐멘터리'].includes(i.category)) return false;
+    const gr=(i.genreRaw||'').split(',').map(g=>g.trim().toLowerCase());
+    if(gr.some(g=>g==='다큐'||g==='다큐멘터리')) return false;
+    return true;
+  });
+  return items;
+}
+
+// 렌더링 진행 중 플래그 (이미지 로딩 중 정렬/재렌더 충돌 방지)
+let isRendering = false;
+
+// ══════════════════════════════════════════════════════════════
+// 렌더링
+// ══════════════════════════════════════════════════════════════
+async function render(){
+  if(isRendering) return; // 렌더링 중 중복 호출 방지
+  isRendering = true;
+  // 정렬·필터 컨트롤 일시 비활성화 (이미지 로딩 완료 전 조작 방지)
+  sortSelect.disabled = true;
+  updateGenreChips();
+  let filtered=filterByCat(allItems,curCategory);
+  if(curGenre)filtered=filtered.filter(i=>(i.genreList||[]).includes(curGenre));
+  if(curHashtag)filtered=filtered.filter(i=>(i.hashTags||[]).includes(curHashtag));
+  const kw=searchKw.trim();
+  if(kw)filtered=filtered.filter(i=>matchSearch(i.title,kw));
+  statsCount.innerText=`${filtered.length.toLocaleString()}개`;
+  await renderCards(filtered);
+  sortSelect.disabled = false;
+  isRendering = false;
+}
+
+// ══════════════════════════════════════════════════════════════
+// 유사작 추천 (장르 + 감정태그 기반)
+// ══════════════════════════════════════════════════════════════
+// ── 유사작 추천 (비동기 청크 처리 — 브라우저 멈춤 방지)
+async function getSimilarItems(item, n=5){
+  const genres=new Set((item.genreList||[]).filter(g=>g!=='기타'));
+  const tags=new Set(item.hashTags||[]);
+  if(!genres.size&&!tags.size) return [];
+  const CHUNK=200;
+  const results=[];
+  const pool=rawItems.filter(i=>i.id!==item.id);
+  for(let i=0;i<pool.length;i+=CHUNK){
+    const slice=pool.slice(i,i+CHUNK);
+    for(const it of slice){
+      let score=0;
+      (it.genreList||[]).forEach(g=>{ if(genres.has(g)) score+=2; });
+      (it.hashTags||[]).forEach(t=>{ if(tags.has(t)) score+=1; });
+      if(score>0) results.push({item:it,score});
+    }
+    if(i+CHUNK<pool.length) await new Promise(r=>setTimeout(r,0)); // yield to browser
+  }
+  return results
+    .sort((a,b)=>b.score-a.score||(parseFloat(b.item.rating)||0)-(parseFloat(a.item.rating)||0))
+    .slice(0,n).map(x=>x.item);
+}
+
+// ── 페이지네이션 상태 ──
+let _curPage=0;
+const PAGE_SIZE=30; // 페이지당 카드 수
+let _filteredAll=[]; // 현재 필터 기준 전체 목록
+
+function buildCard(item){
+  const card=document.createElement('div');
+  card.className='movie-card'+(isItemFav(item.id)?' fav-card':'');
+  card.dataset.itemId=item.id;
+
+  // 포스터 — 즉시 플레이스홀더 표시 후 이미지 비동기 로드 (블로킹 없음)
+  const pd=document.createElement('div');pd.className='poster';
+  const isNaverFallback=item.link&&item.link.includes('search.naver.com');
+  pd.title=item.link?(isNaverFallback?'클릭: 네이버 검색 (B열 링크 없음)':'클릭: 영화 정보 보기'):'포스터';
+  pd.style.cursor=item.link?'pointer':'default';
+  pd.onclick=()=>{ if(item.link) window.open(item.link,'_blank'); };
+  const g=(item.genreList||[]).filter(g=>g!=='기타')[0]||'';
+  pd.innerHTML='<div class="poster-placeholder">'
+    +'<span class="ph-icon" style="font-size:1rem">🎬</span>'
+    +'<span style="font-size:.58rem;color:rgba(255,255,255,.5);text-align:center;padding:0 .2rem;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">'+esc(item.title)+'</span>'
+    +(g?'<span style="font-size:.5rem;color:rgba(232,160,32,.55)">'+esc(g)+'</span>':'')
+    +(item.year?'<span class="ph-no">'+item.year+'</span>':'')
+    +'</div>';
+
+  // 이미지 로드 — getCachedImgUrl이 즉시 URL 반환(IDB 또는 GitHub직접)
+  getCachedImgUrl(item.excelNo).then(bUrl=>{
+    if(!bUrl) return;
+    const img=document.createElement('img');img.className='poster-img';img.alt=item.title;
+    img.loading='eager';             // 모바일 첫 화면 즉시 표시
+    img.decoding='async';
+    img.crossOrigin='anonymous';     // Canvas 저장용 (실패해도 무관)
+    img.onload=()=>{ pd.innerHTML=''; pd.appendChild(img); };
+    img.onerror=()=>{
+      // jpg 실패 시 png 시도
+      if(img.src.endsWith('.jpg')){
+        img.crossOrigin='anonymous';
+        img.src=img.src.replace('.jpg','.png');
+      }
+    };
+    img.src=bUrl;
+  }).catch(()=>{});
+
+  // 정보
+  const inf=document.createElement('div');inf.className='card-info';
+  const gt=(item.genreList||[]).filter(g=>g!=='기타').slice(0,2).join(' · ');
+  const isDrama=item.category==='드라마';
+  const isDocu=item.category==='다큐멘터리';
+  const catBadge=isDrama?`<span class="cat-badge drama">드라마</span>`:isDocu?`<span class="cat-badge docu">다큐</span>`:(item.category!=='영화'?`<span class="cat-badge">${esc(item.category)}</span>`:'');
+  const ep=isDrama?extractEpisode(item.runtime):'';
+  const tagsHtml=(item.hashTags&&item.hashTags.length)?`<div class="card-hashtags">${item.hashTags.slice(0,3).map(t=>`<span class="card-htag">${esc(t)}</span>`).join('')}</div>`:'';
+  const noteHtml=item.humNote?`<div style="font-size:.57rem;color:rgba(255,200,100,.45);margin-top:.12rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(item.humNote)}">📝 ${esc(item.humNote.slice(0,25))}${item.humNote.length>25?'…':''}</div>`:'';
+  inf.innerHTML=`<div class="card-title">${esc(item.title)}${ep?` <span class="ep-badge">(${ep})</span>`:''}</div>
+    <div class="card-meta">
+      ${item.rating!=='?'?`<span class="rating">★ ${item.rating}</span>`:''}
+      ${item.year?`<span class="year">${item.year}</span>`:''}
+      ${item.country?`<span class="country">${esc(item.country)}</span>`:''}
+      ${catBadge}
+    </div>${gt?`<div class="card-genre">${esc(gt)}</div>`:''}${tagsHtml}${noteHtml}`;
+
+  // 액션
+  const ad=document.createElement('div');ad.className='card-actions';
+  const fb=document.createElement('button');
+  fb.className='fav-btn'+(isItemFav(item.id)?' active':'');
+  fb.textContent=isItemFav(item.id)?'★':'☆';
+  fb.title='클릭: 즐겨찾기 | 우클릭: 카테고리';
+  fb.onclick=async e=>{ e.stopPropagation(); await quickToggleFav(item.id,fb,card); };
+  fb.oncontextmenu=async e=>{ e.preventDefault();e.stopPropagation(); await showFavCatPicker(item.id,fb,card); };
+  const right=document.createElement('div');right.className='card-act-right';
+  const ostLink=item.ostLink||(findOstForItem(item)?findOstForItem(item).url:'');
+  if(ostLink){ const ostB=document.createElement('button');ostB.className='icon-btn';ostB.textContent='🎵';ostB.title='OST';ostB.onclick=e=>{e.stopPropagation();window.open(ostLink,'_blank');};right.append(ostB); }
+  const eb=document.createElement('button');eb.className='icon-btn';eb.textContent='✏️';eb.onclick=e=>{e.stopPropagation();openEditModal(item);};
+  const del=document.createElement('button');del.className='icon-btn del';del.textContent='🗑️';
+  del.onclick=async e=>{e.stopPropagation();
+    if(confirm(`"${item.title}" 삭제?`)){
+      await idbDel(ST_ITEMS,item.id).catch(()=>{});
+      await idbDel(ST_IMAGES,item.excelNo).catch(()=>{});
+      imgUrlCache.delete(item.excelNo);
+      await refreshData();}};
+  right.append(eb,del);ad.append(fb,right);
+
+  // 유사작
+  const simBar=document.createElement('div');simBar.className='sim-bar';
+  const simBtnEl=document.createElement('button');simBtnEl.className='sim-btn';
+  simBtnEl.innerHTML='🎬 비슷한 작품 <span style="opacity:.5;font-size:.54rem">▸</span>';
+  const simStrip=document.createElement('div');simStrip.className='sim-strip';
+  let simLoaded=false;
+  simBtnEl.onclick=async e=>{
+    e.stopPropagation();
+    const isOpen=simStrip.classList.contains('open');
+    if(isOpen){simStrip.classList.remove('open');simBtnEl.innerHTML='🎬 비슷한 작품 <span style="opacity:.5;font-size:.54rem">▸</span>';return;}
+    if(!simLoaded){
+      simLoaded=true;
+      const sims=await getSimilarItems(item,5);
+      if(!sims.length){ simStrip.innerHTML='<div class="sim-empty">유사 작품 없음</div>'; }
+      else {
+        for(const si of sims){
+          const sDiv=document.createElement('div');sDiv.className='sim-item';
+          sDiv.onclick=e2=>{e2.stopPropagation();scrollToCard(si.id);};
+          const sThumb=document.createElement('div');sThumb.className='sim-item-thumb';
+          getCachedImgUrl(si.excelNo).then(sUrl=>{
+            if(sUrl){const si2=document.createElement('img');si2.src=sUrl;si2.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:3px';sThumb.appendChild(si2);}
+            else sThumb.textContent='🎬';
+          }).catch(()=>{ sThumb.textContent='🎬'; });
+          const sInfo=document.createElement('div');sInfo.className='sim-item-info';
+          sInfo.innerHTML=`<div class="sim-item-title">${esc(si.title)}</div><div class="sim-item-meta">★${si.rating} · ${si.year||'?'}</div>`;
+          sDiv.append(sThumb,sInfo);simStrip.appendChild(sDiv);
+        }
+      }
+    }
+    simStrip.classList.add('open');
+    simBtnEl.innerHTML='🎬 비슷한 작품 <span style="opacity:.5;font-size:.54rem">▾</span>';
+  };
+  simBar.append(simBtnEl,simStrip);
+  card.append(pd,inf,ad,simBar);
+  return card;
+}
+
+// ── 다음 페이지 버튼 ──
+function buildNextPageBtn(remaining, onNext){
+  const wrap=document.createElement('div');
+  wrap.style.cssText='grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1rem 0 .5rem';
+  const btn=document.createElement('button');
+  btn.style.cssText='background:#e8a020;border:none;color:#111;padding:.55rem 1.8rem;border-radius:20px;font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit';
+  btn.textContent=`▼ 다음 페이지 (${remaining}개 남음)`;
+  btn.onclick=onNext;
+  const info=document.createElement('div');
+  info.style.cssText='font-size:.65rem;color:rgba(255,255,255,.25)';
+  info.textContent=`현재 페이지 표시 완료`;
+  wrap.append(btn,info);
+  return wrap;
+}
+
+async function renderCards(filtered){
+  _filteredAll=filtered||[];
+  _curPage=0;
+  cardContainer.innerHTML='';
+  statsCount.innerText=`${_filteredAll.length.toLocaleString()}개`;
+  if(!_filteredAll.length){
+    cardContainer.innerHTML=`<div class="empty-message"><span class="em-icon">🎬</span>${_filteredAll?'검색 결과가 없습니다.':'작품이 없습니다.<br>엑셀 파일을 업로드하세요.'}</div>`;
+    return;
+  }
+  await renderPage();
+}
+
+async function renderPage(){
+  const start=_curPage*PAGE_SIZE;
+  const end=Math.min(start+PAGE_SIZE, _filteredAll.length);
+  const pageItems=_filteredAll.slice(start, end);
+
+  // 기존 "다음 페이지" 버튼 제거
+  const oldBtn=cardContainer.querySelector('.next-page-wrap');
+  if(oldBtn) oldBtn.remove();
+
+  // 카드 동기 렌더링 (이미지는 비동기)
+  const frag=document.createDocumentFragment();
+  for(const item of pageItems){
+    frag.appendChild(buildCard(item));
+  }
+  cardContainer.appendChild(frag);
+
+  // 다음 페이지 버튼
+  const remaining=_filteredAll.length-end;
+  if(remaining>0){
+    const btn=buildNextPageBtn(remaining, async()=>{
+      _curPage++;
+      await renderPage();
+      // 새 페이지 첫 카드로 스크롤
+      const cards=cardContainer.querySelectorAll('.movie-card');
+      if(cards[start]) cards[start].scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    btn.className='next-page-wrap';
+    btn.style.cssText+='grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1rem 0 .5rem';
+    cardContainer.appendChild(btn);
+  }
+}
+
+
+function updateGenreChips(){
+  const gSet=new Set();
+  const base=filterByCat(allItems,curCategory);
+  base.forEach(it=>(it.genreList||[]).forEach(g=>{if(g&&g!=='기타')gSet.add(g);}));
+  const genres=[...gSet].sort((a,b)=>a.localeCompare(b,'ko'));
+  filterChipsDiv.innerHTML='';
+  const ac=Object.assign(document.createElement('div'),{className:'chip'+((!curGenre)?' active':''),innerText:'전체'});
+  ac.onclick=()=>{curGenre='';render();};filterChipsDiv.appendChild(ac);
+  genres.forEach(g=>{
+    const ch=Object.assign(document.createElement('div'),{className:'chip'+(curGenre===g?' active':''),innerText:g});
+    ch.onclick=()=>{curGenre=(curGenre===g?'':g);render();};filterChipsDiv.appendChild(ch);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 감정 태그 자동 분류 엔진
+// 장르 + 제목 키워드 기반으로 각 항목에 감정태그 자동 부여
+// ══════════════════════════════════════════════════════════════
+
+// 장르 → 감정태그 기본 매핑
+const GENRE_TO_EMOTION = {
+  '액션':    ['#에너지','#긴장'],
+  '드라마':  ['#감동','#슬픔','#생각'],
+  '코미디':  ['#웃음','#에너지'],
+  '로맨스':  ['#설렘','#슬픔'],
+  '스릴러':  ['#긴장','#공포'],
+  '공포':    ['#공포','#긴장'],
+  'SF':      ['#신기','#생각','#에너지'],
+  '판타지':  ['#신기','#에너지'],
+  '미스터리':['#긴장','#생각'],
+  '범죄':    ['#긴장','#분노'],
+  '모험':    ['#에너지','#신기'],
+  '전쟁':    ['#분노','#슬픔','#긴장'],
+  '애니메이션':['#신기','#웃음','#가족'],
+  '다큐':    ['#생각','#신기'],
+  '사극':    ['#생각','#감동'],
+  '가족':    ['#힐링','#감동'],
+  '스포츠':  ['#에너지','#감동'],
+  '법정':    ['#분노','#생각'],
+  '재난':    ['#긴장','#슬픔'],
+  '정치':    ['#분노','#생각'],
+  '의학':    ['#생각','#감동'],
+  '서부':    ['#에너지','#고독'],
+  '멜로':    ['#설렘','#슬픔'],
+  '기타':    [],
+};
+
+// 제목 키워드 → 감정태그
+const TITLE_KEYWORD_MAP = [
+  {words:['사랑','연인','그녀','그녀의','남자','여자','로맨스','결혼','웨딩','데이트'],tags:['#설렘']},
+  {words:['전쟁','전투','군인','병사','폭탄','작전','특수부대','침략'],      tags:['#긴장','#분노']},
+  {words:['공포','귀신','유령','악마','괴물','혼령','저주','납치','살인'],   tags:['#공포','#긴장']},
+  {words:['웃음','코미디','개그','해프닝','황당','유쾌'],                   tags:['#웃음']},
+  {words:['눈물','이별','상실','죽음','기억','그리움','아픔','슬픔'],        tags:['#슬픔','#감동']},
+  {words:['우주','행성','미래','로봇','AI','외계','과학','기술'],            tags:['#신기','#생각']},
+  {words:['자연','숲','바다','동물','여행','치유','힐링'],                   tags:['#힐링']},
+  {words:['혁명','독립','저항','민주','사회','정의','불평등','차별'],        tags:['#분노','#생각']},
+  {words:['스포츠','축구','야구','농구','격투','권투','수영','달리기'],       tags:['#에너지']},
+  {words:['탑건','전투기','조종사','파일럿','공군','항공'],                    tags:['#에너지','#긴장']},
+  {words:['탐정','추리','미스터리','수사','범인','사건'],                    tags:['#긴장','#생각']},
+  {words:['음악','밴드','피아노','오케스트라','노래','콘서트'],               tags:['#힐링','#감동']},
+  {words:['가족','아버지','어머니','형제','자매','엄마','아빠','할머니'],     tags:['#감동','#힐링']},
+  {words:['학교','청춘','성장','우정','졸업','입시'],                        tags:['#감동','#설렘']},
+  {words:['역사','조선','고려','왕','전통','사극'],                          tags:['#생각','#감동']},
+  {words:['혼자','고독','외로움','사색','철학'],                             tags:['#고독','#생각']},
+  {words:['복수','복수극','응징','정의'],                                    tags:['#분노','#긴장']},
+  {words:['재난','지진','폭풍','화산','쓰나미','대재앙'],                    tags:['#긴장','#에너지']},
+];
+
+// 평점 기반 보정: 평점 높을수록 긍정 감정 강화
+function ratingBoostTags(rating){
+  const r=parseFloat(rating)||0;
+  if(r>=8.5) return ['#감동','#힐링'];
+  if(r>=7.5) return ['#감동'];
+  return [];
+}
+
+/**
+ * 단일 항목의 감정 태그 자동 분류
+ * @returns {string[]} 감정태그 배열 (중복 제거, 최대 5개)
+ */
+function autoClassifyTags(item){
+  const tagScore = {}; // tag → score
+
+  const addTags=(tags,weight=1)=>{
+    tags.forEach(t=>{ tagScore[t]=(tagScore[t]||0)+weight; });
+  };
+
+  // 1) 장르 기반 (가중치 2)
+  (item.genreList||[]).forEach(g=>{
+    const ets=GENRE_TO_EMOTION[g]||[];
+    addTags(ets, 2);
+  });
+
+  // 2) 제목 키워드 (가중치 1.5)
+  const titleLower=(item.title||'').toLowerCase();
+  TITLE_KEYWORD_MAP.forEach(({words,tags})=>{
+    if(words.some(w=>titleLower.includes(w))) addTags(tags, 1.5);
+  });
+
+  // 3) genreRaw 원문 키워드 (가중치 1)
+  const genreRawLower=(item.genreRaw||'').toLowerCase();
+  TITLE_KEYWORD_MAP.forEach(({words,tags})=>{
+    if(words.some(w=>genreRawLower.includes(w))) addTags(tags, 1);
+  });
+
+  // 4) 평점 보정 (가중치 0.5)
+  addTags(ratingBoostTags(item.rating), 0.5);
+
+  // 5) 카테고리별 기본 태그
+  if(item.category==='다큐멘터리') addTags(['#생각','#신기'], 1);
+  if(item.category==='드라마')     addTags(['#생각'], 0.5);
+
+  // 점수 내림차순 정렬, 상위 4개
+  const sorted = Object.entries(tagScore)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([t])=>t);
+
+  // EMOTION_TAGS 목록에 있는 것만 반환
+  const valid = EMOTION_TAGS.map(e=>e.tag);
+  return sorted.filter(t=>valid.includes(t)).slice(0,4);
+}
+
+/**
+ * 전체 DB 항목에 감정 태그 자동 분류 (기존 수동 태그는 보존)
+ */
+async function autoTagAll(overwrite=false){
+  const items = await loadAllItems();
+  // 기존 오염 태그 먼저 정리 (EMOTION_TAGS에 없는 것 제거)
+  const validTags=new Set(EMOTION_TAGS.map(e=>e.tag));
+  for(const item of items){
+    const cleaned=(item.hashTags||[]).filter(t=>validTags.has(t));
+    if(cleaned.length !== (item.hashTags||[]).length){
+      await saveItem({...item, hashTags:cleaned});
+    }
+  }
+  const freshItems = await loadAllItems();
+  const needTag = freshItems.filter(i=> overwrite || !(i.hashTags&&i.hashTags.length));
+  if(!needTag.length){
+    alert('모든 항목에 이미 감정태그가 있습니다.\n덮어쓰기를 원하면 다시 실행 후 "덮어쓰기" 선택');
+    return 0;
+  }
+  // 작품 수 업데이트
+  const items2 = await loadAllItems();
+  const needTag2 = overwrite ? items2 : items2.filter(i=>!(i.hashTags&&i.hashTags.length));
+  let done=0;
+  progressPanel.style.display='flex';
+  progressFName.innerText='감정태그 자동 분류중…';
+  progressFill.style.width='0%';
+  for(let i=0;i<needTag2.length;i++){
+    const item=needTag2[i];
+    const autoTags=autoClassifyTags(item);
+    // 기존 수동 태그 + 자동 태그 합치기 (중복 제거)
+    const existing=overwrite?[]:(item.hashTags||[]);
+    const merged=[...new Set([...existing,...autoTags])];
+    await saveItem({...item, hashTags:merged});
+    done++;
+    progressFill.style.width=((i+1)/needTag2.length*100).toFixed(0)+'%';
+    progressStats.innerText=`${done}/${needTag2.length}`;
+    progressFName.innerText=item.title;
+    if(i%50===0) await new Promise(r=>setTimeout(r,1));
+  }
+  progressPanel.style.display='none';
+  return done;
+}
+
+// ══════════════════════════════════════════════════════════════
+// 📝 인문학 노트 일괄 자동생성 (앱 시작 시 + 수동 실행)
+// 무료 한도(분당 15회) 준수: 요청 간 4초 간격
+// ══════════════════════════════════════════════════════════════
+async function openAutoTagModal(){
+  const items=await loadAllItems();
+  const noTag=items.filter(i=>!(i.hashTags&&i.hashTags.length));
+  const hasTag=items.filter(i=>i.hashTags&&i.hashTags.length>0);
+  const modal=document.createElement('div');modal.className='modal';
+  modal.innerHTML=`<div class="modal-box" style="max-width:440px">
+    <button class="modal-close">&times;</button>
+    <h3>🤖 감정태그 자동 분류</h3>
+    <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);border-radius:10px;padding:.7rem .9rem;margin:.5rem 0;font-size:.73rem;color:rgba(255,255,255,.5);line-height:1.7">
+      <b style="color:#c4b5fd">분류 방식:</b> 장르·제목 키워드·평점을 분석해 감정태그를 자동 부여합니다.<br>
+      수동으로 지정한 태그는 보존됩니다.
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:.7rem 0;text-align:center">
+      <div style="background:rgba(255,255,255,.04);border-radius:9px;padding:.6rem">
+        <div style="font-size:1.1rem;font-weight:800;color:#e8a020">${noTag.length.toLocaleString()}</div>
+        <div style="font-size:.66rem;color:rgba(255,255,255,.35)">태그 없음 (분류 필요)</div>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:9px;padding:.6rem">
+        <div style="font-size:1.1rem;font-weight:800;color:#34d399">${hasTag.length.toLocaleString()}</div>
+        <div style="font-size:.66rem;color:rgba(255,255,255,.35)">태그 있음</div>
+      </div>
+    </div>
+    <div class="mactions">
+      <button class="msave" id="atRun">🤖 태그 없는 항목 분류 (${noTag.length}개)</button>
+    </div>
+    <div style="margin-top:.5rem">
+      <button style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171;padding:.4rem .8rem;border-radius:8px;cursor:pointer;font-size:.72rem;font-family:inherit;width:100%" id="atOverwrite">⚠️ 전체 덮어쓰기 (수동태그 포함 모두 재분류)</button>
+    </div>
+    <div id="atResult" style="margin-top:.6rem;font-size:.72rem;color:rgba(255,255,255,.4)"></div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('.modal-close').onclick=()=>modal.remove();
+  // 배경 클릭으로도 닫힘
+  modal.addEventListener('click', e=>{ if(e.target===modal) modal.remove(); });
+  modal.querySelector('#atRun').onclick=async()=>{
+    modal.querySelector('#atRun').disabled=true;
+    modal.querySelector('#atRun').textContent='분류중…';
+    const n=await autoTagAll(false);
+    modal.querySelector('#atResult').innerHTML=`<span style="color:#6ee7b7">✅ ${n}개 항목에 감정태그 자동 분류 완료!</span>`;
+    modal.querySelector('#atRun').textContent='✅ 분류 완료';
+    modal.querySelector('#atRun').disabled=false;
+    modal.querySelector('#atRun').style.background='#34d399';
+    await refreshData();
+  };
+  modal.querySelector('#atOverwrite').onclick=async()=>{
+    if(!confirm('수동으로 지정한 태그까지 모두 덮어씁니다. 계속하시겠습니까?'))return;
+    modal.querySelector('#atOverwrite').disabled=true;
+    modal.querySelector('#atOverwrite').textContent='재분류중…';
+    const n=await autoTagAll(true);
+    modal.querySelector('#atResult').innerHTML=`<span style="color:#6ee7b7">✅ 전체 ${n}개 항목 태그 재분류 완료!</span>`;
+    modal.querySelector('#atOverwrite').textContent='✅ 완료';
+    modal.querySelector('#atOverwrite').disabled=false;
+    await refreshData();
+  };
+}
+
+// ══════════════════════════════════════════════════════════════
+// 감정 추천 모달 (완전 재설계 — 포스터 + 점수 + 정렬)
+// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// 감정별 추천 HTML 내보내기 (선택한 감정태그 기반 큐레이션 페이지 생성)
+// ══════════════════════════════════════════════════════════════
+async function openExportHtmlModal(){
+  // 기존 floating bar 제거 (이전 버전 잔재)
+  const oldBar=document.getElementById('recFloatingBar');
+  if(oldBar) oldBar.remove();
+
+  const modal=document.createElement('div');modal.className='modal';
+  modal.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:2000;padding:.75rem';
+  modal.innerHTML='<div class="modal-box rec-modal-box" style="display:flex;flex-direction:column;max-height:92dvh;overflow:hidden">'+
+    '<div style="flex-shrink:0;padding:.1rem 0 .6rem;border-bottom:1px solid rgba(255,255,255,.07)">'+
+    '<button class="modal-close" style="position:absolute;top:12px;right:15px">&times;</button>'+
+    '<h3 style="padding-right:2rem">💜 감정별 추천 — HTML 큐레이션 내보내기</h3>'+
+    '<p style="font-size:.7rem;color:rgba(255,255,255,.35)">감정태그 선택 → 추천 목록 확인 → 하단 버튼으로 저장/공유</p>'+
+    '</div>'+
+    '<div style="flex:1;overflow-y:auto;padding:.5rem 0">'+
+    '<div class="auto-tag-info" id="recTagInfo"></div>'+
+    '<div class="rec-emotion-grid" id="recTagGrid"></div>'+
+    '<div class="rec-header-row" id="recHeaderRow" style="display:none">'+
+      '<span id="recCount" style="font-size:.7rem;color:rgba(255,255,255,.35)"></span>'+
+      '<div class="rec-sort-btns">'+
+        '<button class="rec-sort-btn active" data-rsort="match">🎯 매칭순</button>'+
+        '<button class="rec-sort-btn" data-rsort="rating">⭐ 평점순</button>'+
+        '<button class="rec-sort-btn" data-rsort="year">📅 최신순</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="rec-results" id="recResults"></div>'+
+    '</div>'+
+    '<div id="recActionBar" style="flex-shrink:0;display:none;gap:.4rem;padding:.6rem 0 .2rem;border-top:1px solid rgba(139,92,246,.25);flex-wrap:wrap;align-items:center;justify-content:center">'+
+      '<span id="recCount2" style="font-size:.65rem;color:rgba(255,255,255,.38)"></span>'+
+      '<button id="recShareBtn" style="background:rgba(139,92,246,.22);border:1px solid rgba(139,92,246,.4);color:#c4b5fd;padding:.44rem 1.1rem;border-radius:20px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.8rem;min-height:2.5rem">📤 SNS 공유</button>'+
+      '<button id="recExportBtn" style="background:#8b5cf6;border:none;color:#fff;padding:.44rem 1.1rem;border-radius:20px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.8rem;min-height:2.5rem">📄 HTML 저장</button>'+
+    '</div>'+
+    '</div>';
+  document.body.appendChild(modal);
+
+  // ── 닫기: X 버튼 + 배경 클릭 ──
+  const closeModal=()=>modal.remove();
+  modal.querySelector('.modal-close').onclick=closeModal;
+  modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
+
+  const grid=modal.querySelector('#recTagGrid');
+  const resultsEl=modal.querySelector('#recResults');
+  const headerRow=modal.querySelector('#recHeaderRow');
+  const countEl=modal.querySelector('#recCount');
+  const tagInfo=modal.querySelector('#recTagInfo');
+  const actionBar=modal.querySelector('#recActionBar');
+  const exportRow=actionBar; // 같은 요소 참조
+  let selTags=new Set();
+  let recSortMode='match';
+  let currentTop=[];
+
+  const tagCountMap={};
+  rawItems.forEach(i=>(i.hashTags||[]).forEach(t=>{tagCountMap[t]=(tagCountMap[t]||0)+1;}));
+  const totalTagged=rawItems.filter(i=>i.hashTags&&i.hashTags.length>0).length;
+  tagInfo.textContent=`현재 ${totalTagged.toLocaleString()}개 작품에 감정태그 분류됨.${totalTagged<rawItems.length?' (🤖 태그 자동분류로 추가 가능)':''}`;
+
+  modal.querySelectorAll('.rec-sort-btn').forEach(b=>{
+    b.onclick=()=>{
+      recSortMode=b.dataset.rsort;
+      modal.querySelectorAll('.rec-sort-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      renderRecResults();
+    };
+  });
+
+  async function renderRecResults(){
+    if(!selTags.size){resultsEl.innerHTML='';headerRow.style.display='none';exportRow.style.display='none';return;}
+    const matched=rawItems.filter(i=>[...selTags].some(st=>(i.hashTags||[]).includes(st)));
+    const scored=matched.map(i=>{
+      const matchCount=[...selTags].filter(st=>(i.hashTags||[]).includes(st)).length;
+      const matchRatio=matchCount/selTags.size;
+      const rating=parseFloat(i.rating)||0;
+      const composite=matchRatio*0.7+(rating/10)*0.3;
+      return {item:i,matchCount,matchRatio,rating,composite};
+    });
+    let sorted;
+    if(recSortMode==='match') sorted=scored.sort((a,b)=>b.composite-a.composite||b.rating-a.rating);
+    else if(recSortMode==='rating') sorted=scored.sort((a,b)=>b.rating-a.rating||b.matchCount-a.matchCount);
+    else sorted=scored.sort((a,b)=>(parseInt(b.item.year)||0)-(parseInt(a.item.year)||0)||b.composite-a.composite);
+    currentTop=sorted.slice(0,36);
+    headerRow.style.display='flex';
+    countEl.textContent=`${matched.length}편 중 상위 ${currentTop.length}편`;
+    actionBar.style.display=currentTop.length?'flex':'none';
+    const cnt2=modal.querySelector('#recCount2');
+    if(cnt2) cnt2.textContent=currentTop.length?currentTop.length+'편 매칭':'';
+    if(!currentTop.length){
+      resultsEl.innerHTML='<p style="color:rgba(255,255,255,.25);font-size:.75rem;padding:1rem;grid-column:1/-1">해당 태그 작품 없음. 🤖 태그 자동분류를 먼저 실행하세요.</p>';
+      return;
+    }
+    resultsEl.innerHTML='';
+    for(const {item:i,matchCount} of currentTop){
+      const div=document.createElement('div');div.className='rec-card';
+      div.onclick=()=>{modal.remove();scrollToCard(i.id);};
+      const posterDiv=document.createElement('div');posterDiv.className='rec-card-poster';
+      const bUrl=await getCachedImgUrl(i.excelNo);
+      if(bUrl){const img=document.createElement('img');img.src=bUrl;img.alt=i.title;img.loading='lazy';posterDiv.appendChild(img);}
+      else posterDiv.innerHTML='<div class="no-img">🎬</div>';
+      const scoreBadge=document.createElement('div');scoreBadge.className='rec-card-score';
+      scoreBadge.textContent=matchCount+'/'+selTags.size+' 매칭';
+      posterDiv.appendChild(scoreBadge);
+      const body=document.createElement('div');body.className='rec-card-body';
+      const tagsHtml=(i.hashTags||[]).map(t=>`<span class="rec-card-htag${selTags.has(t)?' matched':''}">${esc(t)}</span>`).join('');
+      body.innerHTML=`<div class="rec-card-title">${esc(i.title)}</div>
+        <div class="rec-card-meta"><span class="rc-rating">★${i.rating!=='?'?i.rating:'?'}</span>${i.year?` · ${i.year}`:''}${i.country?` · ${esc(i.country)}`:''}</div>
+        <div class="rec-card-tags">${tagsHtml}</div>`;
+      div.append(posterDiv,body);
+      resultsEl.appendChild(div);
+    }
+  }
+
+  EMOTION_TAGS.forEach(et=>{
+    const cnt=tagCountMap[et.tag]||0;
+    const btn=document.createElement('button');btn.className='htag-pick';
+    btn.title=et.desc+(cnt?` (${cnt}편)`:'');
+    btn.innerHTML=`<span class="et-emoji">${et.emoji}</span><span class="et-label">${et.tag}</span><span class="et-count">${cnt||''}</span>`;
+    if(!cnt)btn.style.opacity='.4';
+    btn.onclick=()=>{
+      if(selTags.has(et.tag)){selTags.delete(et.tag);btn.classList.remove('sel');}
+      else{selTags.add(et.tag);btn.classList.add('sel');}
+      renderRecResults();
+    };
+    grid.appendChild(btn);
+  });
+
+  // HTML 내보내기
+  modal.querySelector('#recExportBtn').onclick=async()=>{
+    if(!currentTop.length){alert('표시된 작품이 없습니다.');return;}
+    const tagLabel=[...selTags].join(' ');
+    const dateStr=new Date().toLocaleDateString('ko-KR');
+    // 포스터를 base64로 변환해 HTML에 인라인 삽입
+    const cardHtmlArr=[];
+    let firstB64='';
+    for(const {item:i,matchCount} of currentTop){
+      const bUrl=await getCachedImgUrl(i.excelNo);
+      let b64='';
+      let imgTag='<div class="no-img">🎬</div>';
+      if(bUrl){
+        try{
+          const resp=await fetch(bUrl);
+          const blob=await resp.blob();
+          b64=await new Promise(r=>{const fr=new FileReader();fr.onload=e=>r(e.target.result);fr.readAsDataURL(blob);});
+          imgTag=`<img src="${b64}" alt="${esc(i.title)}" loading="lazy">`;
+          if(!firstB64) firstB64=b64;
+        }catch(e){}
+      }
+      const naverUrl=`https://search.naver.com/search.naver?query=${encodeURIComponent(i.title+' '+i.year+' 영화')}`;
+      const note=i.humNote?`<div class="note">"${esc(i.humNote)}"</div>`:'';
+      const tags=(i.hashTags||[]).map(t=>`<span class="tag${selTags.has(t)?' match':''}">${esc(t)}</span>`).join('');
+      cardHtmlArr.push(
+        `<a class="card" href="${naverUrl}" target="_blank" rel="noopener">` +
+        `<div class="poster">${imgTag}</div>` +
+        `<div class="info">` +
+        `<div class="title">${esc(i.title)}</div>` +
+        `<div class="meta"><span class="rating">★${i.rating!=='?'?i.rating:'?'}</span>${i.year?' · '+i.year:''}${i.country?' · '+esc(i.country):''}</div>` +
+        `<div class="tags">${tags}</div>` +
+        note +
+        `</div></a>`
+      );
+    }
+    // OG 이미지용 첫 포스터
+    const ogImg=firstB64;
+    const pageTitle=[...selTags].join(' ')+' — 나의 영화 큐레이션';
+    const pageDesc=[...selTags].join(' ')+' 감정과 어울리는 '+currentTop.length+'편을 선별했습니다.';
+
+    // OG 이미지 메타 (백틱 충돌 방지를 위해 문자열 연결 방식 사용)
+    const ogImgMeta=ogImg
+      ? '<meta property="og:image" content="'+ogImg+'">\n<meta property="og:image:width" content="300">\n<meta property="og:image:height" content="450">\n<meta name="twitter:image" content="'+ogImg+'">'
+      : '';
+
+    const tagBadgesHtml=[...selTags].map(function(t){
+      return '<span class="tag-badge">'+t+'</span>';
+    }).join('');
+
+    const shareTitleJs=pageTitle.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const shareDescJs=pageDesc.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
+    const html='<!DOCTYPE html>\n'
+      +'<html lang="ko">\n<head>\n'
+      +'<meta charset="UTF-8">\n'
+      +'<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">\n'
+      +'<title>'+pageTitle+'</title>\n'
+      +'<meta property="og:type" content="website">\n'
+      +'<meta property="og:title" content="'+pageTitle+'">\n'
+      +'<meta property="og:description" content="'+pageDesc+'">\n'
+      +'<meta name="twitter:card" content="summary_large_image">\n'
+      +'<meta name="twitter:title" content="'+pageTitle+'">\n'
+      +'<meta name="twitter:description" content="'+pageDesc+'">\n'
+      +ogImgMeta+'\n'
+      +'<style>\n'
+      +'*{box-sizing:border-box;margin:0;padding:0}\n'
+      +'body{font-family:\'Apple SD Gothic Neo\',\'Noto Sans KR\',system-ui,sans-serif;background:#0d1117;color:#e2e8f0;min-height:100vh;padding:1.5rem 1rem 4rem}\n'
+      +'.header{text-align:center;margin-bottom:2rem}\n'
+      +'.header h1{font-size:1.3rem;font-weight:800;color:#c4b5fd;margin-bottom:.35rem}\n'
+      +'.header p{font-size:.75rem;color:rgba(255,255,255,.35)}\n'
+      +'.tag-badges{display:flex;justify-content:center;flex-wrap:wrap;gap:.35rem;margin:.7rem 0}\n'
+      +'.tag-badge{background:rgba(139,92,246,.25);border:1px solid rgba(139,92,246,.4);color:#c4b5fd;padding:.2rem .6rem;border-radius:12px;font-size:.75rem;font-weight:700}\n'
+      +'.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.7rem;max-width:1200px;margin:0 auto}\n'
+      +'@media(max-width:480px){.grid{grid-template-columns:repeat(3,1fr);gap:.5rem}}\n'
+      +'.card{background:#131b2c;border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;text-decoration:none;color:inherit;transition:transform .15s,border-color .15s}\n'
+      +'.card:hover{transform:translateY(-3px);border-color:rgba(139,92,246,.35)}\n'
+      +'.card:active{transform:scale(.97)}\n'
+      +'.poster{aspect-ratio:2/3;overflow:hidden;background:#0c1320;display:flex;align-items:center;justify-content:center}\n'
+      +'.poster img{width:100%;height:100%;object-fit:cover}\n'
+      +'.poster .no-img{font-size:1.8rem;opacity:.2}\n'
+      +'.info{padding:.45rem .48rem .38rem;flex:1}\n'
+      +'.title{font-size:.75rem;font-weight:700;color:#dde8f8;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:.18rem}\n'
+      +'.meta{font-size:.64rem;color:rgba(255,255,255,.4);margin-bottom:.18rem}\n'
+      +'.rating{color:#fbbf24;font-weight:700}\n'
+      +'.tags{display:flex;flex-wrap:wrap;gap:.15rem;margin-top:.18rem}\n'
+      +'.tag{font-size:.58rem;background:rgba(139,92,246,.12);color:#a78bfa;border-radius:4px;padding:.03rem .28rem}\n'
+      +'.tag.match{background:rgba(139,92,246,.35);color:#ddd6fe;font-weight:700}\n'
+      +'.note{font-size:.64rem;color:rgba(255,200,100,.65);margin-top:.28rem;line-height:1.55;font-style:italic}\n'
+      +'.share-bar{position:fixed;bottom:0;left:0;right:0;background:#131b2c;border-top:1px solid rgba(255,255,255,.07);padding:.6rem 1rem;display:flex;gap:.5rem;justify-content:center;align-items:center;z-index:100}\n'
+      +'.share-btn{background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;padding:.4rem 1.1rem;border-radius:20px;cursor:pointer;font-size:.78rem;font-weight:700;font-family:inherit;transition:background .13s}\n'
+      +'.share-btn:hover,.share-btn:active{background:rgba(139,92,246,.4)}\n'
+      +'.share-btn.copy{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.55)}\n'
+      +'.footer{text-align:center;margin-top:1.5rem;margin-bottom:4rem;font-size:.62rem;color:rgba(255,255,255,.18)}\n'
+      +'@media print{body{background:#fff;color:#111}.share-bar{display:none}.card{border-color:#ddd}.title{color:#111}.meta{color:#666}}\n'
+      +'</style>\n</head>\n<body>\n'
+      +'<div class="header">\n'
+      +'  <h1>💜 나의 영화 큐레이션</h1>\n'
+      +'  <div class="tag-badges">'+tagBadgesHtml+'</div>\n'
+      +'  <p>'+pageDesc+'</p>\n'
+      +'</div>\n'
+      +'<div class="grid">\n'
+      +cardHtmlArr.join('\n')
+      +'\n</div>\n'
+      +'<div class="footer">개인 영화 관람 기록 DB · 큐레이션 생성일: '+dateStr+'</div>\n'
+      +'<div class="share-bar">\n'
+      +'  <button class="share-btn" id="shareBtn">📤 공유하기</button>\n'
+      +'  <button class="share-btn copy" id="copyBtn">🔗 링크 복사</button>\n'
+      +'</div>\n'
+      +'<script>\n'
+      +'(function(){\n'
+      +'  var shareBtn=document.getElementById("shareBtn");\n'
+      +'  var copyBtn=document.getElementById("copyBtn");\n'
+      +'  var title=\''+shareTitleJs+'\';\n'
+      +'  var desc=\''+shareDescJs+'\';\n'
+      +'  if(navigator.share){\n'
+      +'    shareBtn.onclick=function(){\n'
+      +'      navigator.share({title:title,text:desc}).catch(function(){});\n'
+      +'    };\n'
+      +'  } else {\n'
+      +'    shareBtn.textContent="🔗 URL 복사";\n'
+      +'    shareBtn.onclick=function(){\n'
+      +'      navigator.clipboard.writeText(window.location.href).then(function(){\n'
+      +'        shareBtn.textContent="✅ 복사됨";\n'
+      +'        setTimeout(function(){shareBtn.textContent="🔗 URL 복사";},1500);\n'
+      +'      });\n'
+      +'    };\n'
+      +'  }\n'
+      +'  copyBtn.onclick=function(){\n'
+      +'    var text=title+"\\n\\n"+desc+"\\n\\n"+window.location.href;\n'
+      +'    navigator.clipboard.writeText(text).then(function(){\n'
+      +'      copyBtn.textContent="✅ 복사됨";\n'
+      +'      setTimeout(function(){copyBtn.textContent="🔗 링크 복사";},1500);\n'
+      +'    });\n'
+      +'  };\n'
+      +'})();\n'
+      +'<\/script>\n'
+      +'</body>\n</html>'
+    const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`영화큐레이션_${[...selTags].join('_')}_${new Date().toISOString().slice(0,10)}.html`;
+    a.click();
+    showToast(`HTML 큐레이션 파일 저장 완료 — ${currentTop.length}편`, 'success', 4000);
+  };
+
+  // SNS 공유 버튼 — file:// URL 제외, 텍스트 위주 공유
+  modal.querySelector('#recShareBtn').onclick=async()=>{
+    if(!currentTop.length){showToast('먼저 태그를 선택하세요','info',2000);return;}
+    const tagLabel=[...selTags].join(' ');
+    const title=tagLabel+' — 나의 영화 큐레이션';
+    const lines=currentTop.slice(0,15).map((x,idx)=>{
+      const i=x.item||x;
+      return (idx+1)+'. '+i.title+(i.year?' ('+i.year+')':'')+(i.rating&&i.rating!=='?'?' ★'+i.rating:'');
+    });
+    const text=title+'\n\n'+lines.join('\n')+(currentTop.length>15?'\n... 외 '+(currentTop.length-15)+'편':'');
+    const isFile=location.protocol==='file:';
+    if(navigator.share&&!isFile){
+      try{ await navigator.share({title,text}); return; }catch(e){}
+    }
+    try{
+      await navigator.clipboard.writeText(text);
+      showToast('큐레이션 목록 복사됨. 카카오톡에 붙여넣기 하세요 ✅','success',3500);
+    }catch(e){ showToast('복사 실패. HTML 저장 후 공유하세요','error',3000); }
+  };
+}
+
+// ══════════════════════════════════════════════════════════════
+// 도움말 모달
+// ══════════════════════════════════════════════════════════════
+function openHelpModal(){
+  const modal=document.createElement('div');modal.className='modal';
+  modal.innerHTML=`<div class="modal-box help-modal-box">
+    <button class="modal-close">&times;</button>
+    <h3>❓ 영화/드라마 DB final 사용 도움말</h3>
+
+    <div class="help-section">
+      <h4>📋 처음 시작 — 자동 초기화</h4>
+      <div class="help-row"><span class="help-key">엑셀 자동 로드</span><span class="help-desc">앱 첫 실행 시 GitHub에서 <code>movie_list_complete.xlsx</code> 자동 다운로드 → IndexedDB 저장</span></div>
+      <div class="help-row"><span class="help-key">태그 자동 분류</span><span class="help-desc">엑셀 로드 완료 직후 감정태그 없는 작품 자동 분류 실행. 이후 실행에서도 빠진 작품 자동 보완</span></div>
+      <div class="help-row"><span class="help-key">이미지 자동 로드</span><span class="help-desc">포스터는 GitHub의 <code>images/movie/</code>~<code>movie_4/</code> 폴더에서 NO.jpg → NO.png → NO.webp 순으로 자동 fetch → IndexedDB 캐싱. 이후 오프라인에서도 표시</span></div>
+      <div class="help-row"><span class="help-key">🔄 동기화</span><span class="help-desc">엑셀 업데이트 후 GitHub push → 앱에서 동기화 버튼 클릭 (데스크탑 전용)</span></div>
+      <div class="help-tip">💡 두 번째 실행부터는 IndexedDB에 저장된 이미지·태그·데이터를 즉시 표시합니다.</div>
+    </div>
+
+    <div class="help-section">
+      <h4>📁 GitHub 업로드 파일 목록</h4>
+      <div class="help-row"><span class="help-key">필수 파일</span><span class="help-desc"><code>movie_db_v24.html</code> · <code>manifest.json</code> · <code>icon-192.png</code> · <code>icon-512.png</code> · <code>movie_list_complete.xlsx</code></span></div>
+      <div class="help-row"><span class="help-key">이미지 폴더</span><span class="help-desc"><code>images/movie/1~1000.jpg</code> · <code>images/movie_2/1001~2000.jpg</code> · <code>images/movie_3/2001~3000.jpg</code> · <code>images/movie_4/3001~3423.jpg</code></span></div>
+      <div class="help-row"><span class="help-key">파일명 규칙</span><span class="help-desc">이미지 파일명은 <b>순수 번호.jpg</b> 형식만 지원 (예: <code>1.jpg</code>, <code>1234.jpg</code>). 한글 제목 포함 금지</span></div>
+    </div>
+
+    <div class="help-section">
+      <h4>📱 모바일 앱으로 사용하기</h4>
+      <div class="help-row"><span class="help-key">iOS Safari</span><span class="help-desc">공유(□↑) → <b>홈 화면에 추가</b> → 전체화면 앱으로 실행</span></div>
+      <div class="help-row"><span class="help-key">Android Chrome</span><span class="help-desc">메뉴(⋮) → <b>앱 설치</b> → 아이콘으로 실행</span></div>
+      <div class="help-row"><span class="help-key">카드 레이아웃</span><span class="help-desc">모바일 3열 · 태블릿 4~5열 · 데스크탑 6열 자동 전환. 불필요 버튼 모바일에서 자동 숨김</span></div>
+    </div>
+
+    <div class="help-section">
+      <h4>📅 정렬 기준</h4>
+      <div class="help-row"><span class="help-key">관람일 최신순</span><span class="help-desc">엑셀 <b>J열(감상일)</b> 기준 정렬. J열이 비어있는 작품은 뒤로 정렬</span></div>
+      <div class="help-row"><span class="help-key">기타 정렬</span><span class="help-desc">연번순 · 가나다순 · 평점순 · 최신 개봉순</span></div>
+      <div class="help-tip">💡 엑셀 J열에 날짜(예: 2024-03-15)를 입력하면 관람일 정렬이 정확히 동작합니다.</div>
+    </div>
+
+    <div class="help-section">
+      <h4>💜 감정추천 & SNS 공유</h4>
+      <div class="help-row"><span class="help-key">🤖 태그 자동분류</span><span class="help-desc">장르·제목 키워드·평점 분석 → 12개 감정태그 자동 부여. 앱 시작 시에도 자동 실행</span></div>
+      <div class="help-row"><span class="help-key">💜 감정추천 내보내기</span><span class="help-desc">감정 태그 선택 → <b>📄 HTML 내보내기</b>(포스터 내장 파일) 또는 <b>📤 SNS 공유</b>(영화 제목+네이버 링크 공유)</span></div>
+      <div class="help-row"><span class="help-key">카드 클릭</span><span class="help-desc">내보낸 HTML의 카드 클릭 → 네이버 영화 검색 페이지 연결</span></div>
+      <div class="help-row"><span class="help-key">카카오톡 공유</span><span class="help-desc">SNS 공유 버튼 → 모바일 공유 시트 → 카카오톡 선택. GitHub Pages URL을 공유하면 OG 미리보기 자동 표시</span></div>
+    </div>
+
+    <div class="help-section">
+      <h4>⭐ 즐겨찾기 & 공유</h4>
+      <div class="help-row"><span class="help-key">☆ 클릭</span><span class="help-desc">카드 별표 → 즐겨찾기 즉시 추가/해제</span></div>
+      <div class="help-row"><span class="help-key">📤 공유</span><span class="help-desc">즐겨찾기 패널 상단 버튼 → 목록 + 각 영화 네이버 링크를 카카오톡·문자로 공유</span></div>
+      <div class="help-row"><span class="help-key">우클릭</span><span class="help-desc">별표 우클릭 → 카테고리 선택·이름변경·삭제</span></div>
+    </div>
+
+    <div class="help-section">
+      <h4>💾 백업 & 복원</h4>
+      <div class="help-row"><span class="help-key">백업</span><span class="help-desc">💾 버튼 → <code>movieDB_backup_날짜.json</code>. 데이터+즐겨찾기 포함 (이미지 제외)</span></div>
+      <div class="help-row"><span class="help-key">복원</span><span class="help-desc">📂 복원 → 백업 JSON → 기존 데이터 교체. 이미지는 재접속 시 GitHub에서 자동 재다운로드</span></div>
+      <div class="help-row"><span class="help-key">엑셀 재업로드</span><span class="help-desc">수동 태그·메모·즐겨찾기는 excelNo 기준 자동 보존. GitHub에 push 후 동기화로 모든 기기 최신화</span></div>
+    </div>
+
+    <div class="help-section">
+      <h4>🎬 기타 기능</h4>
+      <div class="help-row"><span class="help-key">유사작</span><span class="help-desc">카드 하단 버튼 → 장르·태그 기반 유사 5편. 비동기 처리로 브라우저 멈춤 없음</span></div>
+      <div class="help-row"><span class="help-key">📊 통계</span><span class="help-desc">국가별·장르별·연도별·카테고리·감정태그 막대 차트</span></div>
+      <div class="help-tip">💡 Chrome/Edge 권장. 데스크탑에서 이미지 폴더 선택 후 IndexedDB 저장 → 모바일은 GitHub images 폴더에서 자동 로드.</div>
+      <div class="help-tip" style="background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.2);color:rgba(249,168,168,.9)">
+        ⚠️ <b>이미지 로드 실패 시 체크리스트:</b><br>
+        1. GitHub Pages 활성화 확인 (Settings → Pages → main/root)<br>
+        2. 이미지 파일명 확인: <code>images/movie/1.jpg</code> ~ <code>images/movie_4/3423.jpg</code><br>
+        3. 파일명이 <b>숫자.jpg</b> 형식인지 확인 (1_제목.jpg 형식 불가)<br>
+        4. 브라우저에서 직접 URL 접근 후 <b>🖼️ 이미지 동기화</b> 재시도<br>
+        5. 그래도 실패 시: <b>연결 진단</b> 버튼으로 원인 확인
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h4>🗄️ 데이터 관리 — 작품 추가 & 수정</h4>
+      <div class="help-row"><span class="help-key">① 엑셀 수정 (권장)</span><span class="help-desc">로컬 엑셀 파일 수정 → GitHub push → 앱 <b>🔄 데이터 동기화</b>. 태그·메모·즐겨찾기 자동 보존</span></div>
+      <div class="help-row"><span class="help-key">② 이미지 추가</span><span class="help-desc"><code>images/movie/NO번호.jpg</code> 형식으로 GitHub에 업로드 → 앱 <b>🖼️ 이미지 동기화</b></span></div>
+      <div class="help-row"><span class="help-key">③ 로컬 직접 (데스크탑)</span><span class="help-desc">툴바 <b>📂 엑셀 업로드</b>로 파일 선택 + <b>📁 로컬 이미지</b>로 폴더 선택</span></div>
+      <div class="help-row"><span class="help-key">④ 앱 내 개별 추가</span><span class="help-desc">➕ 추가 버튼 → 한 건 입력. <b>단, 엑셀과 별개</b>이므로 나중에 엑셀에도 추가 권장</span></div>
+      <div class="help-row"><span class="help-key">⑤ 개별 수정</span><span class="help-desc">카드 ✏️ 버튼 → 모든 필드+이미지 교체. 엑셀 재동기화 시 엑셀 값 우선 (태그·메모는 보존)</span></div>
+      <div class="help-tip">💡 권장 순서: 엑셀 수정 → GitHub push → 🔄 동기화 → 🖼️ 이미지 동기화</div>
+    </div>
+
+    <div class="help-section">
+      <h4>🔗 카드 이미지 클릭 링크 기준</h4>
+      <div class="help-row"><span class="help-key">1순위</span><span class="help-desc">엑셀 <b>B열 HYPERLINK 주소</b> — <code>=HYPERLINK("URL","제목")</code> 형식의 링크를 우선 사용</span></div>
+      <div class="help-row"><span class="help-key">2순위 (자동)</span><span class="help-desc">B열 링크 없을 때 → 네이버 영화 검색 (제목+연도 조합)</span></div>
+      <div class="help-row"><span class="help-key">수동 변경</span><span class="help-desc">카드 ✏️ 수정 → <b>정보 링크</b> 필드에서 직접 URL 입력 가능</span></div>
+      <div class="help-tip">💡 B열: <code>=HYPERLINK("https://movie.naver.com/movie/bi/mi/basic.naver?code=12345","제목")</code> 형식으로 입력하면 정확한 페이지로 이동</div>
+    </div>
+
+    <div class="help-section">
+      <h4>⚠️ 실행 환경별 차이</h4>
+      <div class="help-row"><span class="help-key">로컬 (file://)</span><span class="help-desc">데스크탑에서 HTML 직접 오픈. <b>🔄 동기화 불가</b> — 📂 엑셀 업로드 + 📁 로컬 이미지로 수동 로드</span></div>
+      <div class="help-row"><span class="help-key">GitHub Pages</span><span class="help-desc">모바일/웹 접속. <b>🔄 자동 동기화 가능</b>. URL: <code>casio8000.github.io/film-humanities_Mobile/movie_db_final.html</code></span></div>
+    </div>
+
+    <div class="help-section">
+      <h4>📁 파일명 변경 시 수정 목록</h4>
+      <div class="help-row"><span class="help-key">index.html</span><span class="help-desc"><code>location.replace('movie_db_final.html')</code> 부분만 새 파일명으로 변경 후 GitHub 업로드</span></div>
+      <div class="help-row"><span class="help-key">manifest.json</span><span class="help-desc"><b>수정 불필요</b> — <code>"start_url":"index.html"</code>로 고정. index.html만 바꾸면 됨</span></div>
+      <div class="help-row"><span class="help-key">GITHUB_SETUP.md</span><span class="help-desc">앱 동작에 영향 없는 문서 파일. 안내 내용의 파일명 언급이 있다면 참고용으로만 수정</span></div>
+      <div class="help-row"><span class="help-key">홈 화면 앱 아이콘</span><span class="help-desc">index.html 수정 → GitHub push → 기존 홈 화면 앱 <b>삭제 후 재추가</b> (iOS는 재추가 필수)</span></div>
+      <div class="help-tip">💡 파일명을 <b>movie_db_final.html</b>로 고정하면 앞으로 index.html도 수정할 필요 없습니다</div>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('.modal-close').onclick=()=>modal.remove();
+  modal.onclick=e=>{if(e.target===modal)modal.remove();};
+}
+// ══════════════════════════════════════════════════════════════
+// 편집 모달
+// ══════════════════════════════════════════════════════════════
+function openEditModal(item){
+  const modal=document.createElement('div');modal.className='modal';
+  modal.innerHTML=`<div class="modal-box">
+    <button class="modal-close">&times;</button>
+    <h3>✏️ 작품 수정 <span style="font-size:.66rem;color:rgba(255,255,255,.25)">NO.${item.excelNo||'?'}</span></h3>
+    <span class="mlabel">제목</span>
+    <input class="mfield" id="eTitle" value="${esc(item.title)}">
+    <span class="mlabel">평점</span>
+    <input class="mfield" id="eRating" placeholder="8.5" value="${item.rating!=='?'?item.rating:''}">
+    <span class="mlabel">국가</span>
+    <input class="mfield" id="eCountry" value="${esc(item.country||'')}">
+    <span class="mlabel">개봉연도</span>
+    <input class="mfield" id="eYear" value="${item.year||''}">
+    <span class="mlabel">카테고리</span>
+    <select class="mfield" id="eCategory">
+      <option value="영화" ${item.category==='영화'?'selected':''}>영화</option>
+      <option value="드라마" ${item.category==='드라마'?'selected':''}>드라마</option>
+      <option value="다큐멘터리" ${item.category==='다큐멘터리'?'selected':''}>다큐멘터리</option>
+      <option value="기타" ${!['영화','드라마','다큐멘터리'].includes(item.category)?'selected':''}>기타</option>
+    </select>
+    <span class="mlabel">장르 (쉼표 구분)</span>
+    <input class="mfield" id="eGenre" value="${esc(item.genreRaw||'')}">
+    <span class="mlabel">러닝타임/화수</span>
+    <input class="mfield" id="eRuntime" value="${esc(item.runtime||'')}">
+    <span class="mlabel">정보 링크</span>
+    <input class="mfield" id="eLink" value="${esc(item.link||'')}">
+    <span class="mlabel">🎵 YouTube OST 링크</span>
+    <input class="mfield" id="eOst" placeholder="https://youtube.com/..." value="${esc(item.ostLink||'')}">
+    <span class="mlabel">💜 감정 해시태그 (쉼표 구분, # 자동)</span>
+    <input class="mfield" id="eHashtags" placeholder="#감동, #힐링, #생각" value="${esc((item.hashTags||[]).join(', '))}">
+    <span class="mlabel">📝 인문학 노트</span>
+    <textarea class="mfield" id="eNote" rows="3" placeholder="인문학적 감상이나 키워드를 메모하세요">${esc(item.humNote||'')}</textarea>
+    <span class="mlabel">포스터 이미지 교체 (선택)</span>
+    <div style="display:flex;gap:.5rem;align-items:center;margin:.25rem 0">
+      <label class="tbtn slate" style="cursor:pointer;font-size:.72rem">🖼️ 이미지 선택
+        <input type="file" id="eImage" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none">
+      </label>
+      <span id="eImageName" style="font-size:.68rem;color:rgba(255,255,255,.3)">선택 안됨</span>
+    </div>
+    <div id="eImagePreview" style="margin:.25rem 0;display:none">
+      <img id="ePreviewImg" style="width:80px;height:120px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.1)">
+    </div>
+    <div class="mactions">
+      <button class="msave" id="mSave">저장</button>
+      <button class="mcancel" id="mCancel">취소</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('.modal-close').onclick=()=>modal.remove();
+  modal.querySelector('#mCancel').onclick=()=>modal.remove();
+
+  modal.querySelector('#eImage').onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    modal.querySelector('#eImageName').textContent=file.name;
+    const prev=modal.querySelector('#eImagePreview');
+    const img=modal.querySelector('#ePreviewImg');
+    img.src=URL.createObjectURL(file);prev.style.display='block';
+  };
+  modal.querySelector('#mSave').onclick=async()=>{
+    const nt=modal.querySelector('#eTitle').value.trim();
+    if(!nt){alert('제목은 필수입니다.');return;}
+    const nr=modal.querySelector('#eRating').value;
+    const nc=modal.querySelector('#eCountry').value.trim()||'미분류';
+    const ny=modal.querySelector('#eYear').value.trim();
+    const ncat=modal.querySelector('#eCategory').value;
+    const ng=modal.querySelector('#eGenre').value.trim()||'기타';
+    const nrt=modal.querySelector('#eRuntime').value.trim()||'—';
+    const nl=modal.querySelector('#eLink').value.trim()||`https://search.naver.com/search.naver?query=${encodeURIComponent(nt+' 영화')}`;
+    const nost=modal.querySelector('#eOst').value.trim();
+    const nhNote=modal.querySelector('#eNote').value.trim();
+    const nTagsRaw=modal.querySelector('#eHashtags').value.trim();
+    const nHashTags=nTagsRaw?nTagsRaw.split(/[,\s]+/).map(t=>t.startsWith('#')?t:'#'+t).filter(t=>t.length>1):[];
+    const imgFile=modal.querySelector('#eImage').files[0];
+    if(imgFile&&item.excelNo){
+      try{
+        const blob=await resizeFile(imgFile);
+        await saveImageByNo(item.excelNo,blob,imgFile.lastModified||null);
+        imgUrlCache.delete(item.excelNo); // 캐시 무효화
+      }catch(e){console.warn('이미지 저장 실패',e);}
+    }
+    await saveItem({...item,title:nt,rating:(nr&&!isNaN(parseFloat(nr)))?parseFloat(nr).toFixed(1):'?',
+      country:nc,year:ny,category:ncat,genreRaw:ng,genreList:parseGenres(ng),runtime:nrt,link:nl,
+      ostLink:nost,humNote:nhNote,hashTags:nHashTags});
+    await refreshData();modal.remove();
+  };
+}
+
+// ══════════════════════════════════════════════════════════════
+// 신규 작품 추가 모달
+// ══════════════════════════════════════════════════════════════
+async function openAddNewModal(){
+  // 다음 excelNo 자동 계산 (현재 최대 NO + 1)
+  const allCurrent = await loadAllItems();
+  const maxNo = allCurrent.reduce((m,i)=>Math.max(m, i.excelNo||0), 0);
+  const nextNo = maxNo + 1;
+
+  const modal = document.createElement('div'); modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box" style="max-width:520px">
+    <button class="modal-close">&times;</button>
+    <h3>➕ 신규 작품 추가 <span style="font-size:.66rem;color:rgba(255,255,255,.25)">NO.${nextNo}</span></h3>
+
+    <!-- 포스터 미리보기 (상단 강조) -->
+    <div id="anImgArea" style="display:flex;align-items:flex-start;gap:.85rem;margin-bottom:.75rem">
+      <div id="anThumb" style="width:90px;height:135px;border-radius:8px;background:#182038;border:1.5px dashed rgba(255,255,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;flex-shrink:0;overflow:hidden;cursor:pointer" onclick="document.getElementById('anImageInput').click()">
+        <span style="font-size:1.6rem;opacity:.3">🎬</span>
+        <span style="font-size:.58rem;color:rgba(255,255,255,.22);text-align:center">클릭하여<br>포스터 선택</span>
+      </div>
+      <div style="flex:1">
+        <label class="tbtn green" style="cursor:pointer;font-size:.72rem;display:inline-flex;margin-bottom:.4rem">
+          🖼️ 포스터 이미지 선택
+          <input type="file" id="anImageInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none">
+        </label>
+        <div id="anImgName" style="font-size:.65rem;color:rgba(255,255,255,.28);margin-bottom:.3rem">선택 안됨</div>
+        <div style="font-size:.62rem;color:rgba(255,255,255,.2);line-height:1.6">이미지는 즉시 저장되며<br>재부팅 후에도 유지됩니다.</div>
+      </div>
+    </div>
+
+    <span class="mlabel">제목 <span style="color:#f87171">*</span></span>
+    <input class="mfield" id="anTitle" placeholder="한글 제목을 입력하세요">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem">
+      <div>
+        <span class="mlabel">평점</span>
+        <input class="mfield" id="anRating" placeholder="8.5">
+      </div>
+      <div>
+        <span class="mlabel">개봉연도</span>
+        <input class="mfield" id="anYear" placeholder="2024">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem">
+      <div>
+        <span class="mlabel">국가</span>
+        <input class="mfield" id="anCountry" placeholder="한국">
+      </div>
+      <div>
+        <span class="mlabel">카테고리</span>
+        <select class="mfield" id="anCategory">
+          <option value="영화">영화</option>
+          <option value="드라마">드라마</option>
+          <option value="다큐멘터리">다큐멘터리</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+    </div>
+
+    <span class="mlabel">장르 (쉼표 구분)</span>
+    <input class="mfield" id="anGenre" placeholder="드라마, 로맨스">
+
+    <span class="mlabel">러닝타임/화수</span>
+    <input class="mfield" id="anRuntime" placeholder="126분 또는 16화">
+
+    <span class="mlabel">🎵 YouTube OST 링크</span>
+    <input class="mfield" id="anOst" placeholder="https://youtube.com/...">
+
+    <span class="mlabel">💜 감정 해시태그 (쉼표 구분)</span>
+    <input class="mfield" id="anHashtags" placeholder="#감동, #힐링, #설렘">
+
+    <span class="mlabel">📝 메모 (인문학 노트)</span>
+    <textarea class="mfield" id="anNote" rows="2" placeholder="감상이나 키워드를 메모하세요"></textarea>
+
+    <div class="mactions">
+      <button class="msave" id="anSave">💾 저장하기</button>
+      <button class="mcancel" id="anCancel">취소</button>
+    </div>
+    <div id="anMsg" style="font-size:.7rem;color:#6ee7b7;margin-top:.4rem;display:none"></div>
+  </div>`;
+
+  document.body.appendChild(modal);
+  modal.querySelector('.modal-close').onclick = () => modal.remove();
+  modal.querySelector('#anCancel').onclick = () => modal.remove();
+  modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
+
+  // 이미지 미리보기
+  modal.querySelector('#anImageInput').onchange = e => {
+    const file = e.target.files[0]; if(!file) return;
+    modal.querySelector('#anImgName').textContent = file.name;
+    const thumb = modal.querySelector('#anThumb');
+    const url = URL.createObjectURL(file);
+    thumb.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+  };
+
+  // 저장
+  modal.querySelector('#anSave').onclick = async () => {
+    const title = modal.querySelector('#anTitle').value.trim();
+    if(!title){ alert('제목은 필수입니다.'); return; }
+
+    const saveBtn = modal.querySelector('#anSave');
+    saveBtn.disabled = true; saveBtn.textContent = '저장중…';
+
+    const rating = modal.querySelector('#anRating').value;
+    const country = modal.querySelector('#anCountry').value.trim() || '미분류';
+    const year = modal.querySelector('#anYear').value.trim();
+    const category = modal.querySelector('#anCategory').value;
+    const genreRaw = modal.querySelector('#anGenre').value.trim() || '기타';
+    const runtime = modal.querySelector('#anRuntime').value.trim() || '—';
+    const ostLink = modal.querySelector('#anOst').value.trim();
+    const note = modal.querySelector('#anNote').value.trim();
+    const tagsRaw = modal.querySelector('#anHashtags').value.trim();
+    const hashTags = tagsRaw
+      ? tagsRaw.split(/[,\s]+/).map(t => t.startsWith('#') ? t : '#'+t).filter(t => t.length > 1)
+          .filter(t => EMOTION_TAGS.some(e => e.tag === t))
+      : [];
+
+    const link = `https://search.naver.com/search.naver?query=${encodeURIComponent(title+' '+category)}`;
+    const newItem = {
+      title, rating: (rating && !isNaN(parseFloat(rating))) ? parseFloat(rating).toFixed(1) : '?',
+      country, year, category, genreRaw, genreList: parseGenres(genreRaw),
+      runtime, link, excelNo: nextNo, addedAt: Date.now(),
+      hashTags, ostLink, humNote: note
+    };
+
+    // 이미지 저장
+    const imgFile = modal.querySelector('#anImageInput').files[0];
+    if(imgFile){
+      try{
+        const blob = await resizeFile(imgFile);
+        await saveImageByNo(nextNo, blob, imgFile.lastModified || null);
+        imgUrlCache.delete(nextNo);
+      }catch(e){ console.warn('이미지 저장 실패', e); }
+    }
+
+    await saveItem(newItem);
+    await refreshData();
+
+    const msgEl = modal.querySelector('#anMsg');
+    msgEl.textContent = `✅ "${title}" (NO.${nextNo}) 저장 완료!`;
+    msgEl.style.display = 'block';
+    saveBtn.textContent = '✅ 저장 완료';
+    saveBtn.style.background = '#34d399';
+
+    // 2초 후 모달 닫기
+    setTimeout(() => modal.remove(), 1800);
+  };
+}
+
+// ══════════════════════════════════════════════════════════════
+// 통계 대시보드
+// ══════════════════════════════════════════════════════════════
+function openStatsModal(){
+  const modal=document.createElement('div');modal.className='modal';
+  modal.innerHTML=`<div class="modal-box stat-modal-box">
+    <button class="modal-close">&times;</button>
+    <h3>📊 통계 대시보드</h3>
+    <div class="stat-tabs">
+      <button class="stat-tab active" data-tab="country">국가별</button>
+      <button class="stat-tab" data-tab="genre">장르별</button>
+      <button class="stat-tab" data-tab="year">연도별</button>
+      <button class="stat-tab" data-tab="category">카테고리</button>
+      <button class="stat-tab" data-tab="hashtag">감정태그</button>
+    </div>
+    <div class="stat-chart-area" id="statChart"></div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('.modal-close').onclick=()=>modal.remove();
+  const renderStat=tab=>{
+    modal.querySelectorAll('.stat-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+    const chart=modal.querySelector('#statChart');chart.innerHTML='';
+    let data={},colors={country:'#e8a020',genre:'#3b82f6',year:'#10b981',category:'#8b5cf6',hashtag:'#a78bfa'};
+    if(tab==='country')rawItems.forEach(i=>{const k=i.country||'미분류';data[k]=(data[k]||0)+1;});
+    else if(tab==='genre')rawItems.forEach(i=>(i.genreList||[]).forEach(g=>{data[g]=(data[g]||0)+1;}));
+    else if(tab==='year')rawItems.forEach(i=>{const k=i.year||'연도없음';data[k]=(data[k]||0)+1;});
+    else if(tab==='category')rawItems.forEach(i=>{const k=i.category||'기타';data[k]=(data[k]||0)+1;});
+    else if(tab==='hashtag')rawItems.forEach(i=>(i.hashTags||[]).forEach(t=>{data[t]=(data[t]||0)+1;}));
+    const sorted=Object.entries(data).sort((a,b)=>b[1]-a[1]).slice(0,20);
+    const max=sorted[0]?.[1]||1;
+    if(!sorted.length){chart.innerHTML='<p style="color:rgba(255,255,255,.25);font-size:.75rem">데이터 없음</p>';return;}
+    sorted.forEach(([label,count])=>{
+      const row=document.createElement('div');row.className='bar-row';
+      row.innerHTML=`<div class="bar-label" title="${esc(label)}">${esc(label)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(count/max*100).toFixed(1)}%;background:${colors[tab]||'#e8a020'}"></div></div>
+        <div class="bar-count">${count}</div>`;
+      chart.appendChild(row);
+    });
+  };
+  renderStat('country');
+  modal.querySelectorAll('.stat-tab').forEach(t=>t.onclick=()=>renderStat(t.dataset.tab));
+}
+
+// ══════════════════════════════════════════════════════════════
+// 엑셀 내보내기
+// ══════════════════════════════════════════════════════════════
+async function exportToExcel(){
+  const items=allItems.filter(i=>{
+    if(!filterByCat([i],curCategory).length)return false;
+    if(curGenre&&!(i.genreList||[]).includes(curGenre))return false;
+    if(searchKw.trim()){if(!matchSearch(i.title,searchKw))return false;}
+    return true;
+  });
+  const rows=[['NO','제목','평점','국가','개봉연도','카테고리','장르','러닝타임','감정태그','OST링크','인문학노트']];
+  items.forEach(i=>rows.push([i.excelNo||'',i.title,i.rating,i.country,i.year,i.category,i.genreRaw,i.runtime,(i.hashTags||[]).join(','),i.ostLink||'',i.humNote||'']));
+  const csv=rows.map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`movieDB_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 백업/복원
+// ══════════════════════════════════════════════════════════════
+async function fullBackup(){
+  const items=await loadAllItems();
+  if(!items.length){alert('데이터가 없습니다.');return;}
+  const favRows=await idbAll(ST_FAVS);
+  loadFavCatsLocal();
+  const data={items:items.map(({id,...r})=>r),favs:favRows.map(({id,...r})=>r),favCats,exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`movieDB_backup_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  alert(`✅ 백업 완료 — ${items.length.toLocaleString()}개\n즐겨찾기 ${favRows.length}개 포함`);
+}
+
+async function fullRestore(file){
+  if(!confirm('기존 데이터가 삭제되고 복원됩니다. 계속?'))return;
+  const text=await file.text();
+  const data=JSON.parse(text);
+  const imported=Array.isArray(data)?data:(data.items||[]);
+  const favs=data.favs||[];
+  const cats=data.favCats||['전체'];
+  const old=await loadAllItems();
+  for(const o of old)await idbDel(ST_ITEMS,o.id).catch(()=>{});
+  const oldFavs=await idbAll(ST_FAVS);
+  for(const f of oldFavs)await idbDel(ST_FAVS,f.id).catch(()=>{});
+  for(const item of imported){
+    item.genreList=parseGenres(item.genreRaw||'기타');
+    item.link=item.link||`https://search.naver.com/search.naver?query=${encodeURIComponent(item.title+' 영화')}`;
+    item.hashTags=item.hashTags||[];
+    delete item.id;
+    await saveItem(item);
+  }
+  for(const fav of favs){delete fav.id;await idbAddFav2(fav);}
+  favCats=['전체',...new Set(cats.filter(c=>c!=='전체'))];
+  saveFavCatsLocal();
+  clearImgCache();
+  await refreshData();
+  alert(`✅ 복원 완료 — ${imported.length.toLocaleString()}개`);
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// 유명 OST 영화 데이터베이스 (대중성 높은 OST/배경음악 영화)
+// ══════════════════════════════════════════════════════════════
+// OST 유튜브 검색 URL 생성 — 고정 URL 대신 검색 결과로 연결
+function makeOstSearchUrl(searchQuery){
+  return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(searchQuery);
+}
+
+const FAMOUS_OST_DB = [
+  // ── 한국 영화 ──
+  {title:'기생충',         ost:'기생충 OST 짜파구리 정재일',           search:'기생충 OST 짜파구리 정재일',              composer:'정재일',            mood:'#긴장 #생각'},
+  {title:'올드보이',       ost:'올드보이 OST The Last Waltz 조영욱',   search:'올드보이 OST The Last Waltz',             composer:'조영욱',            mood:'#고독 #슬픔'},
+  {title:'아가씨',         ost:'아가씨 OST 사운드트랙 조영욱',         search:'아가씨 영화 OST soundtrack 조영욱',       composer:'조영욱',            mood:'#설렘 #긴장'},
+  {title:'밀정',           ost:'밀정 OST 이병훈',                      search:'밀정 OST 이병훈',                         composer:'이병훈',            mood:'#긴장'},
+  {title:'국제시장',       ost:'국제시장 OST 보고싶다',                search:'국제시장 OST 보고싶다',                   composer:'이병훈',            mood:'#감동 #슬픔'},
+  {title:'건축학개론',     ost:'건축학개론 OST 방준석',                search:'건축학개론 OST 방준석',                   composer:'방준석',            mood:'#설렘 #슬픔'},
+  {title:'클래식',         ost:'클래식 OST 너에게 난 나에게 넌',       search:'클래식 영화 OST 너에게 난 나에게 넌',     composer:'이병훈',            mood:'#설렘 #슬픔'},
+  {title:'엽기적인 그녀',  ost:'엽기적인 그녀 OST I Believe',          search:'엽기적인 그녀 OST I Believe',             composer:'박상원',            mood:'#설렘 #웃음'},
+  {title:'말아톤',         ost:'말아톤 OST 이병훈',                    search:'말아톤 OST soundtrack 이병훈',            composer:'이병훈',            mood:'#감동'},
+  {title:'오아시스',       ost:'오아시스 OST La Vie en Rose',          search:'오아시스 영화 OST La Vie en Rose',        composer:'',                  mood:'#슬픔 #감동'},
+  // ── 헐리우드 클래식 ──
+  {title:'쉰들러 리스트',  ost:'쉰들러 리스트 OST John Williams violin theme', search:'Schindler\'s List OST John Williams theme violin', composer:'존 윌리엄스',  mood:'#슬픔 #감동'},
+  {title:'인터스텔라',     ost:'인터스텔라 OST Hans Zimmer Cornfield Chase',    search:'Interstellar OST Hans Zimmer Cornfield Chase',    composer:'한스 짐머',    mood:'#신기 #감동 #고독'},
+  {title:'라라랜드',       ost:'라라랜드 OST City of Stars',                   search:'La La Land OST City of Stars',                   composer:'저스틴 허위츠',mood:'#설렘 #슬픔'},
+  {title:'그래비티',       ost:'그래비티 OST Steven Price',                    search:'Gravity 2013 OST Steven Price',                  composer:'스티븐 프라이스',mood:'#긴장 #신기'},
+  {title:'포레스트 검프',  ost:'포레스트 검프 OST Feather Theme',              search:'Forrest Gump OST Feather Theme Alan Silvestri',  composer:'앨런 실베스트리',mood:'#감동 #힐링'},
+  {title:'글래디에이터',   ost:'글래디에이터 OST Now We Are Free Hans Zimmer', search:'Gladiator OST Now We Are Free Hans Zimmer',       composer:'한스 짐머',    mood:'#에너지 #슬픔'},
+  {title:'피아노',         ost:'피아노 OST The Heart Asks Pleasure First',     search:'The Piano OST Heart Asks Pleasure First Nyman',  composer:'마이클 나이만',mood:'#고독 #슬픔'},
+  {title:'레옹',           ost:'레옹 OST Shape of My Heart Sting',             search:'Leon OST Shape of My Heart Sting',               composer:'에릭 세라',    mood:'#고독 #슬픔'},
+  {title:'시네마 천국',    ost:'시네마 천국 OST Love Theme Morricone',         search:'Cinema Paradiso OST Love Theme Ennio Morricone', composer:'엔니오 모리코네',mood:'#감동 #슬픔 #힐링'},
+  {title:'미션',           ost:"미션 OST Gabriel's Oboe Morricone",            search:"The Mission OST Gabriel's Oboe Ennio Morricone", composer:'엔니오 모리코네',mood:'#감동'},
+  {title:'아마데우스',     ost:'아마데우스 OST Mozart Symphony',               search:'Amadeus 1984 OST Mozart Symphony 25',            composer:'모차르트',      mood:'#신기 #생각'},
+  {title:'쇼생크 탈출',    ost:'쇼생크 탈출 OST End Title Thomas Newman',      search:'Shawshank Redemption OST End Title Thomas Newman',composer:'토마스 뉴먼',  mood:'#감동 #힐링'},
+  {title:'타이타닉',       ost:'타이타닉 OST My Heart Will Go On',             search:'Titanic OST My Heart Will Go On Celine Dion',    composer:'제임스 호너',  mood:'#설렘 #슬픔'},
+  {title:'아멜리에',       ost:"아멜리에 OST La Valse d'Amelie Yann Tiersen",  search:"Amelie OST La Valse d Amelie Yann Tiersen",      composer:'얀 티에르상',  mood:'#힐링 #설렘'},
+  {title:'그랜드 부다페스트 호텔',ost:'그랜드 부다페스트 호텔 OST Alexandre Desplat',search:'Grand Budapest Hotel OST Alexandre Desplat',composer:'알렉상드르 데스플라',mood:'#웃음 #신기'},
+  {title:'매트릭스',       ost:'매트릭스 OST Clubbed to Death Rob D',          search:'Matrix OST Clubbed to Death Rob D',               composer:'돈 데이비스',  mood:'#긴장 #신기'},
+  {title:'반지의 제왕',    ost:'반지의 제왕 OST Fellowship of the Ring',       search:'Lord of the Rings OST Fellowship Howard Shore',   composer:'하워드 쇼어',  mood:'#에너지 #신기'},
+  {title:'해리 포터',      ost:"해리 포터 OST Hedwig's Theme John Williams",   search:"Harry Potter OST Hedwig's Theme John Williams",  composer:'존 윌리엄스',  mood:'#신기'},
+  {title:'스타워즈',       ost:'스타워즈 OST Main Theme John Williams',        search:'Star Wars OST Main Theme John Williams',          composer:'존 윌리엄스',  mood:'#에너지 #신기'},
+  {title:'호빗',           ost:'호빗 OST Misty Mountains Cold Howard Shore',   search:'Hobbit OST Misty Mountains Cold Howard Shore',    composer:'하워드 쇼어',  mood:'#신기 #에너지'},
+  {title:'다크 나이트',    ost:'다크 나이트 OST Why So Serious Hans Zimmer',   search:'Dark Knight OST Why So Serious Hans Zimmer',     composer:'한스 짐머',    mood:'#긴장 #분노'},
+  {title:'인셉션',         ost:'인셉션 OST Time Hans Zimmer',                  search:'Inception OST Time Hans Zimmer',                  composer:'한스 짐머',    mood:'#신기 #긴장'},
+  {title:'뷰티풀 마인드',  ost:'뷰티풀 마인드 OST James Horner',              search:'Beautiful Mind OST James Horner A Kaleidoscope', composer:'제임스 호너',  mood:'#생각'},
+  {title:'어바웃 타임',    ost:'어바웃 타임 OST How Long Will I Love You',    search:'About Time OST How Long Will I Love You Nick Laird-Clowes',composer:'닉 라비',mood:'#감동 #설렘'},
+  {title:'비포 선라이즈',  ost:'비포 선라이즈 OST Before Sunrise soundtrack', search:'Before Sunrise OST soundtrack',                   composer:'프레드 프리스',mood:'#설렘 #고독'},
+  {title:'바그다드 카페',  ost:'바그다드 카페 OST Calling You Bob Telson',    search:'Bagdad Cafe OST Calling You Bob Telson',          composer:'밥 텔슨',      mood:'#힐링 #고독'},
+  {title:'천국보다 낯선',  ost:'천국보다 낯선 OST I Put a Spell on You',      search:'Stranger Than Paradise OST I Put a Spell on You', composer:'',             mood:'#고독'},
+  {title:'인생은 아름다워',ost:'인생은 아름다워 OST La Vita e Bella Piovani', search:'Life is Beautiful OST La Vita e Bella Piovani',   composer:'니콜라 피오바니',mood:'#감동 #슬픔'},
+  {title:'원스',           ost:'원스 OST Falling Slowly Glen Hansard',         search:'Once OST Falling Slowly Glen Hansard',            composer:'글렌 한사드',  mood:'#힐링 #설렘 #슬픔'},
+  {title:'비긴 어게인',    ost:'비긴 어게인 OST Lost Stars Begin Again',       search:'Begin Again OST Lost Stars',                      composer:'그레그 알렉산더',mood:'#힐링 #설렘'},
+  {title:'위플래쉬',       ost:'위플래쉬 OST Whiplash Justin Hurwitz',         search:'Whiplash OST Justin Hurwitz',                     composer:'저스틴 허위츠',mood:'#긴장 #에너지'},
+  {title:'보헤미안 랩소디',ost:'보헤미안 랩소디 Bohemian Rhapsody Live Aid Queen',search:'Bohemian Rhapsody Queen Live Aid 1985',      composer:'퀸',            mood:'#에너지 #감동'},
+  {title:'어메이징 그레이스',ost:'Amazing Grace 어메이징 그레이스 OST',       search:'Amazing Grace 2006 OST soundtrack',               composer:'',             mood:'#감동 #힐링'},
+  // ── 일본 애니/영화 ──
+  {title:'센과 치히로의 행방불명',ost:'센과 치히로 OST 언제나 몇번이라도 히사이시 조',search:'센과 치히로 OST 언제나 몇번이라도 Hisaishi Joe',composer:'히사이시 조',mood:'#신기 #감동'},
+  {title:'하울의 움직이는 성',ost:'하울의 움직이는 성 OST Merry Go Round Hisaishi',search:'Howl Moving Castle OST Merry Go Round Life Hisaishi',composer:'히사이시 조',mood:'#신기 #설렘'},
+  {title:'모노노케 히메',  ost:'모노노케 히메 OST Legend of Ashitaka Hisaishi',search:'Princess Mononoke OST Legend Ashitaka Hisaishi', composer:'히사이시 조',  mood:'#신기 #에너지'},
+  {title:'이웃집 토토로',  ost:'이웃집 토토로 OST My Neighbor Totoro Hisaishi',search:'My Neighbor Totoro OST theme Hisaishi Joe',       composer:'히사이시 조',  mood:'#힐링'},
+  {title:'너의 이름은',    ost:'너의 이름은 OST Nandemonaiya RADWIMPS',        search:'Your Name OST Nandemonaiya RADWIMPS',             composer:'RADWIMPS',      mood:'#설렘 #슬픔 #신기'},
+  {title:'초속 5센티미터', ost:'초속 5센티미터 OST One More Time One More Chance',search:'5 Centimeters Per Second OST One More Time Masayoshi Yamazaki',composer:'야마자키 마사요시',mood:'#슬픔 #고독'},
+];
+
+// DB 내 작품과 OST DB 매칭
+function findOstForItem(item){
+  const t=(item.title||'').toLowerCase().replace(/\s/g,'');
+  return FAMOUS_OST_DB.find(o=>{
+    const ot=o.title.toLowerCase().replace(/\s/g,'');
+    return t===ot || t.includes(ot) || ot.includes(t);
+  });
+}
+
+
+function openOstModal(){
+  const modal=document.createElement('div');modal.className='modal';
+  const matched=[];
+  const unmatched=[];
+  FAMOUS_OST_DB.forEach(o=>{
+    const inDB=rawItems.some(item=>{
+      const t=(item.title||'').toLowerCase().replace(/\s/g,'');
+      const ot=o.title.toLowerCase().replace(/\s/g,'');
+      return t===ot||t.includes(ot)||ot.includes(t);
+    });
+    if(inDB) matched.push({...o,inDB:true});
+    else unmatched.push({...o,inDB:false});
+  });
+  const all=[...matched,...unmatched];
+
+  modal.innerHTML=`<div class="modal-box" style="max-width:820px">
+    <button class="modal-close">&times;</button>
+    <h3>🎵 명작 OST 컬렉션</h3>
+    <p style="font-size:.71rem;color:rgba(255,255,255,.35);margin-bottom:.4rem">
+      대중성 높은 OST·배경음악으로 유명한 영화 모음입니다.
+      <span style="color:#34d399">● 초록</span>은 내 DB 수록 작품입니다.
+    </p>
+    <div style="background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.18);border-radius:9px;padding:.45rem .8rem;margin-bottom:.65rem;font-size:.69rem;color:rgba(232,160,32,.8);line-height:1.6">
+      🔍 <b>검색 방식 안내</b> — <b>[🔍 YouTube 검색]</b> 버튼을 누르면 최적화된 검색어로 YouTube 검색 결과가 열립니다.
+      원하는 영상을 직접 선택해 감상하세요. 검색어 옆 <b>[복사]</b>로 검색어를 클립보드에 복사할 수도 있습니다.
+    </div>
+    <div style="display:flex;gap:.35rem;margin-bottom:.65rem;flex-wrap:wrap">
+      <button class="stat-tab active" data-ostf="all" style="font-size:.68rem">전체 (${all.length})</button>
+      <button class="stat-tab" data-ostf="inDB" style="font-size:.68rem">내 DB 수록 (${matched.length})</button>
+      <button class="stat-tab" data-ostf="notInDB" style="font-size:.68rem">미수록 (${unmatched.length})</button>
+    </div>
+    <div id="ostList" style="display:flex;flex-direction:column;gap:.4rem;max-height:500px;overflow-y:auto"></div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('.modal-close').onclick=()=>modal.remove();
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+
+  function renderOstList(filter){
+    const list=filter==='inDB'?matched:filter==='notInDB'?unmatched:all;
+    const el=modal.querySelector('#ostList');
+    el.innerHTML='';
+    list.forEach(o=>{
+      const searchUrl = makeOstSearchUrl(o.search);
+      const row=document.createElement('div');
+      row.style.cssText=`display:flex;align-items:flex-start;gap:.65rem;padding:.5rem .65rem;border-radius:9px;border:1px solid ${o.inDB?'rgba(52,211,153,.15)':'rgba(255,255,255,.05)'};background:${o.inDB?'rgba(52,211,153,.04)':'rgba(255,255,255,.02)'};transition:background .12s`;
+      row.onmouseenter=()=>row.style.background=o.inDB?'rgba(52,211,153,.09)':'rgba(255,255,255,.05)';
+      row.onmouseleave=()=>row.style.background=o.inDB?'rgba(52,211,153,.04)':'rgba(255,255,255,.02)';
+
+      // 정보 영역
+      const info=document.createElement('div');
+      info.style.cssText='flex:1;min-width:0';
+      info.innerHTML=`
+        <div style="display:flex;align-items:center;gap:.35rem;flex-wrap:wrap">
+          <span style="font-size:.65rem;color:${o.inDB?'#34d399':'rgba(255,255,255,.2)'};flex-shrink:0">●</span>
+          <span style="font-size:.78rem;font-weight:700;color:${o.inDB?'#dde8f8':'rgba(255,255,255,.5)'}">${esc(o.title)}</span>
+          ${o.inDB?'<span style="font-size:.58rem;background:rgba(52,211,153,.15);color:#6ee7b7;border-radius:5px;padding:.02rem .3rem">DB수록</span>':''}
+        </div>
+        <div style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:.2rem">${esc(o.ost)}</div>
+        <div style="font-size:.6rem;color:rgba(139,92,246,.5);margin-top:.06rem">${esc(o.mood)}${o.composer?' · '+esc(o.composer):''}</div>
+        <div style="display:flex;align-items:center;gap:.3rem;margin-top:.35rem;flex-wrap:wrap">
+          <span style="font-size:.6rem;color:rgba(255,255,255,.2);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:.08rem .35rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(o.search)}">${esc(o.search)}</span>
+          <button style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);padding:.1rem .4rem;border-radius:5px;cursor:pointer;font-size:.6rem;font-family:inherit;flex-shrink:0;white-space:nowrap"
+            onclick="event.stopPropagation();navigator.clipboard.writeText('${o.search.replace(/'/g,"\\'")}').then(()=>{this.textContent='✅복사됨';setTimeout(()=>this.textContent='📋복사',1200)}).catch(()=>this.textContent='❌')">📋복사</button>
+        </div>`;
+
+      // 버튼 영역
+      const btns=document.createElement('div');
+      btns.style.cssText='display:flex;flex-direction:column;gap:.28rem;flex-shrink:0;align-items:stretch';
+
+      const searchBtn2=document.createElement('button');
+      searchBtn2.style.cssText='background:#e8a020;border:none;color:#111;padding:.3rem .7rem;border-radius:8px;cursor:pointer;font-size:.68rem;font-weight:700;white-space:nowrap';
+      searchBtn2.textContent='🔍 YouTube 검색';
+      searchBtn2.onclick=e=>{e.stopPropagation();window.open(searchUrl,'_blank');};
+
+      if(o.inDB){
+        const goBtn=document.createElement('button');
+        goBtn.style.cssText='background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.25);color:#6ee7b7;padding:.28rem .7rem;border-radius:8px;cursor:pointer;font-size:.64rem;font-weight:600;white-space:nowrap';
+        goBtn.textContent='📌 카드 이동';
+        goBtn.onclick=e=>{
+          e.stopPropagation();
+          const found=rawItems.find(item=>{
+            const t=(item.title||'').toLowerCase().replace(/\s/g,'');
+            const ot=o.title.toLowerCase().replace(/\s/g,'');
+            return t===ot||t.includes(ot)||ot.includes(t);
+          });
+          if(found){modal.remove();scrollToCard(found.id);}
+        };
+        btns.append(searchBtn2,goBtn);
+      } else {
+        btns.append(searchBtn2);
+      }
+
+      row.append(info,btns);
+      el.appendChild(row);
+    });
+    if(!list.length) el.innerHTML='<p style="color:rgba(255,255,255,.2);font-size:.75rem;padding:1rem;text-align:center">해당 항목 없음</p>';
+  }
+
+  renderOstList('all');
+  modal.querySelectorAll('[data-ostf]').forEach(b=>{
+    b.onclick=()=>{
+      modal.querySelectorAll('[data-ostf]').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      renderOstList(b.dataset.ostf);
+    };
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 서브카테고리 드롭다운 이벤트
+// ══════════════════════════════════════════════════════════════
+function setupSubDropdowns(){
+  // 서브필터 active 표시 — 서브칩 선택 시만 활성화, 버튼 클릭(전체) 시 초기화
+  const setActive=(dropId,sub)=>{
+    document.querySelectorAll('#'+dropId+' .sub-chip').forEach(c=>{
+      c.classList.toggle('active', sub!=='' && c.dataset.sub===sub);
+    });
+  };
+
+  // ── 드라마 ──
+  const dramaBtn=document.getElementById('dramaBtn');
+  const dramaDD=document.getElementById('dramaDropdown');
+  dramaBtn.onclick=e=>{
+    e.stopPropagation();
+    curCategory='drama'; curSubFilter=''; curGenre=''; searchKw=''; searchInput.value='';
+    setActive('dramaDropdown',''); // 서브필터 해제
+    navBtns.forEach(b=>b.classList.remove('active')); dramaBtn.classList.add('active');
+    dramaDD.classList.toggle('open');
+    document.getElementById('docuDropdown').classList.remove('open');
+    document.getElementById('movieDropdown').classList.remove('open');
+    render();
+  };
+  dramaDD.querySelectorAll('.sub-chip').forEach(c=>{
+    c.onclick=e=>{
+      e.stopPropagation();
+      curSubFilter=c.dataset.sub;
+      setActive('dramaDropdown',curSubFilter);
+      dramaDD.classList.remove('open');
+      curCategory='drama'; curGenre=''; searchKw=''; searchInput.value='';
+      navBtns.forEach(b=>b.classList.remove('active')); dramaBtn.classList.add('active');
+      render();
+    };
+  });
+
+  // ── 다큐 ──
+  const docuBtn=document.getElementById('docuBtn');
+  const docuDD=document.getElementById('docuDropdown');
+  docuBtn.onclick=e=>{
+    e.stopPropagation();
+    curCategory='documentary'; curSubFilter=''; curGenre=''; searchKw=''; searchInput.value='';
+    setActive('docuDropdown','');
+    navBtns.forEach(b=>b.classList.remove('active')); docuBtn.classList.add('active');
+    docuDD.classList.toggle('open');
+    dramaDD.classList.remove('open');
+    document.getElementById('movieDropdown').classList.remove('open');
+    render();
+  };
+  docuDD.querySelectorAll('.sub-chip').forEach(c=>{
+    c.onclick=e=>{
+      e.stopPropagation();
+      curSubFilter=c.dataset.sub;
+      setActive('docuDropdown',curSubFilter);
+      docuDD.classList.remove('open');
+      curCategory='documentary'; curGenre=''; searchKw=''; searchInput.value='';
+      navBtns.forEach(b=>b.classList.remove('active')); docuBtn.classList.add('active');
+      render();
+    };
+  });
+
+  // ── 영화 ──
+  const movieBtn=document.getElementById('movieBtn');
+  const movieDD=document.getElementById('movieDropdown');
+  movieBtn.onclick=e=>{
+    e.stopPropagation();
+    curCategory='movie'; curSubFilter=''; curGenre=''; searchKw=''; searchInput.value='';
+    setActive('movieDropdown','');
+    navBtns.forEach(b=>b.classList.remove('active')); movieBtn.classList.add('active');
+    movieDD.classList.toggle('open');
+    dramaDD.classList.remove('open');
+    document.getElementById('docuDropdown').classList.remove('open');
+    render();
+  };
+  movieDD.querySelectorAll('.sub-chip').forEach(c=>{
+    c.onclick=e=>{
+      e.stopPropagation();
+      curSubFilter=c.dataset.sub;
+      setActive('movieDropdown',curSubFilter);
+      movieDD.classList.remove('open');
+      curCategory='movie'; curGenre=''; searchKw=''; searchInput.value='';
+      navBtns.forEach(b=>b.classList.remove('active')); movieBtn.classList.add('active');
+      render();
+    };
+  });
+
+  document.addEventListener('click',()=>{
+    movieDD.classList.remove('open');
+    dramaDD.classList.remove('open');
+    docuDD.classList.remove('open');
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 이벤트 바인딩
+// ══════════════════════════════════════════════════════════════
+// importExcelBtn (툴바 visible 버튼)
+const importExcelBtn=document.getElementById('importExcelBtn');
+if(importExcelBtn) importExcelBtn.addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{try{
+    const n=await importFromExcel(ev.target.result);
+    alert('✅ '+n.toLocaleString()+'개 작품 로드\n기존 태그·메모는 보존됩니다.');
+    await refreshData();
+    showToast('엑셀 로드 완료 — '+n.toLocaleString()+'개','success',5000);
+  }catch(err){alert('엑셀 오류: '+err.message);}};
+  reader.readAsArrayBuffer(file);e.target.value='';
+});
+if(importExcel) importExcel.addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{try{
+    const n=await importFromExcel(ev.target.result);
+    alert(`✅ ${n.toLocaleString()}개 작품 로드\n기존 수동 태그·메모·OST는 그대로 보존되었습니다.\n이미지 폴더를 선택하면 새 포스터가 추가 저장됩니다.`);
+    await refreshData();
+    showToast(`엑셀 로드 완료 — ${n.toLocaleString()}개 작품, 카드 렌더링 완료`, 'success', 5000);
+    await refreshData();
+  }catch(err){alert('엑셀 오류: '+err.message);}};
+  reader.readAsArrayBuffer(file);e.target.value='';
+});
+
+if(document.getElementById('btnSelectFolder')) document.getElementById('btnSelectFolder').onclick=()=>selectFolder();
+if(document.getElementById('btnSelectFolder2')) document.getElementById('btnSelectFolder2').onclick=()=>selectFolder();
+fullBackupBtn.onclick=()=>fullBackup();
+fullRestoreInput.addEventListener('change',async e=>{
+  const file=e.target.files[0];
+  if(file){try{await fullRestore(file);}catch(err){alert('복원 오류: '+err.message);}}
+  e.target.value='';
+});
+
+refreshBtn.onclick=async()=>{
+  // 새로고침 시 캐시 초기화 (새 이미지 반영)
+  clearImgCache();
+  await refreshData();
+};
+
+// 정렬: rawItems 기준으로 재정렬 (연속 정렬 버그 수정)
+sortSelect.addEventListener('change',()=>{
+  curSort=sortSelect.value;
+  allItems=applySort(rawItems,curSort); // 항상 rawItems 기준!
+  render();
+});
+
+// 카테고리 탭 (영화/드라마/다큐 제외 — 서브드롭다운으로 처리)
+navBtns.forEach(btn=>{
+  const cat=btn.dataset.category;
+  if(cat==='movie'||cat==='drama'||cat==='documentary')return; // 서브드롭다운에서 처리
+  btn.addEventListener('click',()=>{
+    curCategory=cat;curSubFilter='';curGenre='';searchKw='';searchInput.value='';
+    navBtns.forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+    render();
+  });
+});
+
+document.getElementById('favNavBtn').onclick=()=>{
+  loadFavs().then(()=>{renderFavCatBar();renderFavList();openFavPanel();});
+};
+// 즐겨찾기 SNS 공유 — file:// URL 제외, 텍스트+링크 공유
+document.getElementById('favShareBtn').onclick=async()=>{
+  await loadFavs();
+  const items=await loadAllItems();
+  const itemMap=new Map(items.map(i=>[i.id,i]));
+  const favItems=[];
+  Object.entries(favData).forEach(([idStr,favs])=>{
+    const id=parseInt(idStr);
+    const item=itemMap.get(id);
+    if(item&&favs.length>0) favItems.push(item);
+  });
+  if(!favItems.length){showToast('즐겨찾기 목록이 비어 있습니다.','info',2500);return;}
+
+  const shareTitle='⭐ 나의 즐겨찾기 영화 '+favItems.length+'편';
+  const lines=favItems.slice(0,20).map((i,idx)=>{
+    const naverUrl='https://search.naver.com/search.naver?query='+encodeURIComponent(i.title+' 영화');
+    return (idx+1)+'. '+i.title+(i.year?' ('+i.year+')':'')+(i.rating&&i.rating!=='?'?' ★'+i.rating:'')+'\n   '+naverUrl;
+  });
+  if(favItems.length>20) lines.push('... 외 '+(favItems.length-20)+'편');
+  const shareText=shareTitle+'\n\n'+lines.join('\n\n');
+
+  const isFile=location.protocol==='file:';
+  // 모바일 시스템 공유 (카카오톡 등) — file:// 환경 제외
+  if(navigator.share&&!isFile){
+    try{ await navigator.share({title:shareTitle,text:shareText}); return; }catch(e){}
+  }
+  // 클립보드 복사 폴백
+  try{
+    await navigator.clipboard.writeText(shareText);
+    showToast('즐겨찾기 목록이 복사됐습니다. 카카오톡에 붙여넣기 하세요 ✅','success',4000);
+  }catch(e){
+    showToast('복사 실패. 브라우저 권한을 확인하세요.','error',3000);
+  }
+};
+document.getElementById('btnExportHtml').onclick=()=>openExportHtmlModal();
+
+let sTimer=null;
+const doSearch=()=>{searchKw=searchInput.value;render();};
+searchBtn.onclick=doSearch;
+searchInput.addEventListener('keypress',e=>{if(e.key==='Enter')doSearch();});
+searchInput.addEventListener('input',()=>{clearTimeout(sTimer);sTimer=setTimeout(doSearch,300);});
+
+closeProgBtn.onclick=()=>{progressPanel.style.display='none';};
+document.getElementById('favClose').onclick=closeFavPanel;
+document.getElementById('btnAddNew').onclick = () => openAddNewModal();
+document.getElementById('btnStats').onclick=openStatsModal;
+if(document.getElementById('btnExport')) document.getElementById('btnExport').onclick=exportToExcel;
+if(document.getElementById('btnOst')) document.getElementById('btnOst').onclick=openOstModal;
+document.getElementById('btnHelp').onclick=openHelpModal;
+document.getElementById('btnAutoTag').onclick=openAutoTagModal;
+if(document.getElementById('btnGithubSync')) document.getElementById('btnGithubSync').onclick=async()=>{
+  if(!confirm('GitHub에서 최신 엑셀을 다시 로드합니다.\n수동으로 추가한 태그·메모·즐겨찾기는 보존됩니다.\n계속하시겠습니까?')) return;
+  await loadExcelFromGithub(true);
+};
+document.getElementById('btnImgSync').onclick=()=>openImgSyncModal();
+
+window.addEventListener('scroll',()=>{
+  scrollTopBtn.classList.toggle('visible',window.scrollY>400);
+},{passive:true});
+scrollTopBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+
+// ══════════════════════════════════════════════════════════════
+// 초기화 — GitHub 자동 로드 + 태그 자동분류
+// ══════════════════════════════════════════════════════════════
+(async()=>{
+  await initDB();
+  loadFavCatsLocal();
+  setupSubDropdowns();
+  await refreshData();
+
+  const isFileProtocol = location.protocol === 'file:';
+
+  if(rawItems.length === 0){
+    // ── 데이터 없음 ──
+    if(isFileProtocol){
+      // 로컬 파일 실행: fetch 불가 → 수동 안내
+      debug('로컬 파일 실행 — 엑셀 업로드 필요');
+      // 빈 화면 안내 표시
+      if(cardContainer) cardContainer.innerHTML=
+        '<div class="empty-message"><span class="em-icon">📂</span>'
+        +'데이터가 없습니다.<br><span style="font-size:.75rem;opacity:.6">'
+        +'툴바에서 📂 엑셀 업로드를 실행하세요</span></div>';
+      if(totalStats) totalStats.textContent='데이터 없음';
+    } else {
+      // GitHub Pages: 자동 로드 시도
+      debug('데이터 없음 — GitHub 자동 로드 시작');
+      if(totalStats) totalStats.textContent='동기화 중…';
+      const ok = await loadExcelFromGithub(false);
+      if(!ok && rawItems.length === 0){
+        // 로드 실패 안내
+        if(cardContainer) cardContainer.innerHTML=
+          '<div class="empty-message"><span class="em-icon">⚠️</span>'
+          +'엑셀 로드 실패<br><span style="font-size:.75rem;opacity:.6">'
+          +'🔄 데이터 동기화 버튼을 눌러 다시 시도하세요</span></div>';
+        if(totalStats) totalStats.textContent='로드 실패';
+      }
+    }
+  } else {
+    // ── 데이터 있음 — 태그 자동 분류 ──
+    const noTagCount = rawItems.filter(i=>!(i.hashTags&&i.hashTags.length)).length;
+    if(noTagCount > 0){
+      debug('태그 자동 분류: '+noTagCount+'개');
+      await autoTagAll(false);
+      await refreshData();
+    }
+  }
+
+  debug('영화/드라마 DB final 준비 완료');
+})();
+</script>
+
+<!-- 즐겨찾기 패널 — body 최하단 배치로 z-index 충돌 완전 방지 -->
+<div class="fav-panel" id="favPanel">
+  <div class="fav-panel-header" style="padding:.7rem .85rem;gap:.4rem;flex-wrap:nowrap;flex-shrink:0">
+    <h3 style="font-size:.85rem;min-width:0;flex:1">⭐ 즐겨찾기</h3>
+    <button id="favShareBtn" title="즐겨찾기 목록 공유"
+      style="flex-shrink:0;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;padding:.28rem .65rem;border-radius:10px;cursor:pointer;font-size:.72rem;font-family:inherit;white-space:nowrap;min-height:2.2rem">📤 공유</button>
+    <button class="fav-close" id="favClose"
+      style="flex-shrink:0;min-width:2.4rem;min-height:2.4rem;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(255,255,255,.1);border-radius:50%;border:none;color:rgba(255,255,255,.8);cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,.3)">✕</button>
+  </div>
+  <div class="fav-cat-bar" id="favCatBar"></div>
+  <div class="fav-list" id="favList" style="-webkit-overflow-scrolling:touch;overflow-y:auto;flex:1"></div>
+</div>
+</body>
+</html>
