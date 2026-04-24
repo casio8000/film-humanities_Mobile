@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title>🎬 영화/드라마 DB (final)</title>
+<title>🎬 영화/드라마 DB</title>
 <!-- PWA 설정 -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -141,9 +141,35 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 .icon-btn.del:hover{background:rgba(239,68,68,.18);color:#f87171}
 
 /* ── 즐겨찾기 패널 ── */
-.fav-panel{position:fixed;top:0;right:0;width:340px;max-width:100vw;height:100vh;height:100dvh;height:-webkit-fill-available;background:#0f1824;border-left:1px solid rgba(255,255,255,.08);z-index:2147483647;display:flex;flex-direction:column;transform:translate3d(100%,0,0);transition:transform .25s cubic-bezier(.4,0,.2,1);overflow:hidden;will-change:transform;-webkit-overflow-scrolling:touch;isolation:isolate}
-.fav-panel.open{transform:translate3d(0,0,0)}
-@media(max-width:680px){.fav-panel{width:100vw!important;max-width:100vw!important;border-left:none}}
+/* ★ 모바일 겹침 방지: inset 명시 + will-change + body.fav-open 스크롤 잠금 */
+.fav-panel{
+  position:fixed;
+  top:0;right:0;bottom:0;      /* 명시적 bottom:0 — 100dvh 의존 없음 */
+  width:340px;
+  background:#0f1824;
+  border-left:1px solid rgba(255,255,255,.08);
+  z-index:9999;
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+  isolation:isolate;
+  will-change:transform;        /* GPU 레이어 강제 → iOS 렌더링 버그 방지 */
+  -webkit-overflow-scrolling:touch;
+}
+.fav-panel.open{transform:translateX(0);box-shadow:-4px 0 32px rgba(0,0,0,.7)}
+/* body.fav-open: 배경 스크롤 완전 차단 (모바일 핵심) */
+body.fav-open{overflow:hidden!important;position:fixed;width:100%;touch-action:none}
+@media(max-width:680px){
+  .fav-panel{
+    width:100%!important;       /* vw 단위 대신 % 사용 — safe-area 영향 없음 */
+    left:0!important;           /* 좌우 모두 명시 */
+    right:0!important;
+    border-left:none!important;
+    top:0!important;
+    bottom:0!important;
+  }
+}
 .fav-panel-header{padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:.5rem;flex-shrink:0}
 .fav-panel-header h3{font-size:.88rem;font-weight:700;color:#fbbf24;flex:1}
 .fav-close{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.7);font-size:1.2rem;cursor:pointer;padding:.3rem .5rem;border-radius:8px;min-width:2.2rem;min-height:2.2rem;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:rgba(255,255,255,.2)}
@@ -265,6 +291,7 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 @media(max-width:680px){
   .toolbar{flex-direction:column;align-items:stretch}
   .search-wrap{min-width:unset}
+  /* fav-panel은 별도 @media로 처리 */
   .card-title{font-size:.7rem}
   .card-meta{font-size:.63rem}
   .card-genre{display:none}
@@ -274,35 +301,30 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
   .desktop-only{display:none!important}
 }
 
-/* ── 즐겨찾기 패널 모바일 전체화면 ── */
-@media(max-width:680px){
-  .fav-panel{
-    width:100vw!important;
-    max-width:100vw!important;
-    right:0!important;
-    top:0!important;
-    border-left:none!important;
-  }
-  .fav-panel.open{
-    box-shadow:0 0 40px rgba(0,0,0,.9)!important;
-  }
-}
-/* iOS Safari 추가 보정 */
-@supports (-webkit-touch-callout: none){
-  .fav-panel{
-    height:-webkit-fill-available!important;
-  }
-}
+/* ★ fav-panel 모바일 스타일은 위 .fav-panel 블록에 통합 */
 </style>
 </head>
 <body>
+
+<!-- 즐겨찾기 패널 -->
+<div class="fav-panel" id="favPanel">
+  <div class="fav-panel-header" style="padding:.7rem .85rem;gap:.4rem;flex-wrap:nowrap">
+    <h3 style="font-size:.85rem;min-width:0;flex:1">⭐ 즐겨찾기</h3>
+    <button id="favShareBtn" title="즐겨찾기 목록 공유"
+      style="flex-shrink:0;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;padding:.22rem .55rem;border-radius:10px;cursor:pointer;font-size:.7rem;font-family:inherit;white-space:nowrap">📤 공유</button>
+    <button class="fav-close" id="favClose"
+      style="flex-shrink:0;min-width:2rem;min-height:2rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:rgba(255,255,255,.08);border-radius:50%;border:none;color:rgba(255,255,255,.6);cursor:pointer">✕</button>
+  </div>
+  <div class="fav-cat-bar" id="favCatBar"></div>
+  <div class="fav-list" id="favList"></div>
+</div>
 
 <!-- 상단 고정 헤더 -->
 <div class="sticky-header">
   <div class="main-nav">
     <div class="nav-inner">
       <div class="logo">
-        <h1>🎬 영화/드라마 DB <span id="totalStats" class="stats-badge">준비중…</span></h1>
+        <h1>🎬 영화/드라마 DB v30 <span id="totalStats" class="stats-badge">로딩중…</span></h1>
       </div>
       <div class="nav-links">
         <button class="nav-btn active" data-category="all">전체</button>
@@ -525,8 +547,8 @@ async function tryFetchNoCors(url){
 function tryImgCanvas(url){
   return new Promise(resolve=>{
     const img=new Image();
-    img.crossOrigin='anonymous';
-    const timer=setTimeout(()=>resolve(null),8000);
+    // ★ crossOrigin 없음 — GitHub Pages CORS 미지원, 설정 시 로드 실패
+    const timer=setTimeout(()=>resolve(null),12000);
     img.onload=()=>{
       clearTimeout(timer);
       try{
@@ -550,8 +572,9 @@ async function fetchGithubImageWithFallback(no){
   // jpg만 시도 (확장자 루프 제거 — 지연 최소화)
   const url=getGithubImgUrl(no,'jpg');
   // 1) no-cors fetch 시도 (opaque blob)
+  // ★ 모바일에서 opaque blob은 size=0 — size 체크 없이 blob 존재만 확인
   const blobNoCors=await tryFetchNoCors(url);
-  if(blobNoCors&&blobNoCors.size>100) return {blob:blobNoCors, url, method:'no-cors'};
+  if(blobNoCors) return {blob:blobNoCors, url, method:'no-cors'};
   // 2) Canvas 캡처 시도
   const blobCanvas=await tryImgCanvas(url);
   if(blobCanvas) return {blob:blobCanvas, url, method:'canvas'};
@@ -559,19 +582,14 @@ async function fetchGithubImageWithFallback(no){
   return {blob:null, url, method:'direct'};
 }
 
-// resizeBlob이 없을 경우 대체 함수
-if(typeof resizeBlob==='undefined'){
-  window.resizeBlob=async(blob)=>blob;
-}
-
 async function syncImagesFromGithub(items, onProgress){
-  // IDB 실제 저장 여부만 체크 (imgUrlCache는 GitHub URL도 포함하므로 체크 안 함)
+  // IDB까지 확인하여 실제 누락된 항목만 필터링
   const missing=[];
   for(const i of items){
     if(!i.excelNo) continue;
-    // IDB에 실제 blob이 있는지만 확인
+    if(imgUrlCache.has(i.excelNo)) continue;
     const existing=await idbGet(ST_IMAGES,i.excelNo).catch(()=>null);
-    if(existing&&existing.blob&&existing.blob.size>100) continue;
+    if(existing&&existing.blob) continue;
     missing.push(i);
   }
   if(!missing.length) return {done:0,failed:0,total:0};
@@ -583,17 +601,22 @@ async function syncImagesFromGithub(items, onProgress){
       try{
         const result=await fetchGithubImageWithFallback(item.excelNo);
         if(!result){ failed++; return; }
-        if(result.blob&&result.blob.size>100){
-          // blob 유효 → IDB 저장 + ObjectURL 캐시
-          const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
-          await saveImageByNo(item.excelNo,resized,null);
-          const objUrl=URL.createObjectURL(resized);
-          imgUrlCache.set(item.excelNo,objUrl);
+        if(result.blob){
+          // ★ opaque blob(size=0)도 저장 — 모바일에서 size는 0으로 보고됨
+          let blobToSave = result.blob;
+          if(result.blob.size > 0){
+            // size > 0인 경우(canvas blob)만 리사이즈 시도
+            blobToSave = await resizeBlob(result.blob, 300).catch(()=>result.blob);
+          }
+          await saveImageByNo(item.excelNo, blobToSave, null);
+          const objUrl = URL.createObjectURL(blobToSave);
+          imgUrlCache.set(item.excelNo, objUrl);
+          done++;
         } else {
-          // direct URL — 메모리 캐시 (세션 유효, 화면 표시는 됨)
-          imgUrlCache.set(item.excelNo,result.url);
+          // direct URL만 — IDB 저장 없음 (세션에만 유효)
+          imgUrlCache.set(item.excelNo, result.url);
+          failed++;
         }
-        done++;
       }catch(e){ failed++; }
     }));
     if(onProgress) onProgress(done+failed, missing.length, done, failed);
@@ -678,7 +701,7 @@ async function loadExcelFromGithub(force=false){
     return false;
   }
   const excelUrl=getGithubExcelUrl();
-  showToast('GitHub 엑셀 다운로드 중…', 'info', 6000);
+  showToast('GitHub 엑셀 다운로드 중…', 'info', 0);
   try{
     const resp=await fetch(excelUrl,{cache:'no-store',mode:'cors',credentials:'omit'});
     if(!resp.ok){
@@ -892,16 +915,21 @@ function extractEpisode(runtime){
 // 이미지 리사이즈
 // ══════════════════════════════════════════════════════════════
 function resizeBlob(src,maxW=300){return new Promise((res,rej)=>{
-  const url=URL.createObjectURL(src instanceof Blob?src:new Blob([src]));
+  const srcBlob=src instanceof Blob?src:new Blob([src]);
+  // ★ opaque blob (size=0): img 로드 불가 → 원본 그대로 반환
+  if(srcBlob.size===0){ res(srcBlob); return; }
+  const url=URL.createObjectURL(srcBlob);
   const img=new Image();
   img.onload=()=>{URL.revokeObjectURL(url);
-    let w=img.width,h=img.height;
+    let w=img.naturalWidth||img.width||0;
+    let h=img.naturalHeight||img.height||0;
+    if(w===0||h===0){ res(srcBlob); return; } // 크기 0 → 원본 반환
     if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
     const c=document.createElement('canvas');c.width=w;c.height=h;
     c.getContext('2d').drawImage(img,0,0,w,h);
-    c.toBlob(b=>b?res(b):rej(new Error('toBlob')),'image/jpeg',.82);
+    c.toBlob(b=>b&&b.size>0?res(b):res(srcBlob),'image/jpeg',.82);
   };
-  img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('load'));};
+  img.onerror=()=>{URL.revokeObjectURL(url); res(srcBlob);}; // 실패해도 원본 반환
   img.src=url;
 });}
 
@@ -930,9 +958,10 @@ function parseTitleCell(raw) {
   const s = String(raw);
   // =HYPERLINK("url","제목") or HYPERLINK("url","제목")
   const m = s.match(/=?\s*HYPERLINK\s*\(\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)/i);
-  if (m) return { url: m[1].trim(), text: m[2].trim() };
-  // 일반 텍스트
-  return { text: s.trim(), url: '' };
+  // ★ 제목 앞 '#' 제거 (엑셀에서 "#살아있다" → "살아있다")
+  if (m) return { url: m[1].trim(), text: m[2].replace(/^#/, '').trim() };
+  // 일반 텍스트도 # 제거
+  return { text: s.replace(/^#/, '').trim(), url: '' };
 }
 
 async function importFromExcel(buf){
@@ -984,23 +1013,31 @@ async function importFromExcel(buf){
   for(const row of dataRows){
     const no=parseInt(String(row[H.no]).trim());
 
-    // 제목·링크 추출 — 수식문자열, 셀값, 직접접근 3중 폴백
+    // 제목·링크 추출
+    // ★ 핵심 원리: SheetJS는 row[H.title]에 표시값(.v)만 줌 → URL 없음
+    //   URL(HYPERLINK 수식)은 반드시 wsCell.f에서 직접 파싱해야 함
     let title='', excelUrl='';
     if(H.title!==undefined){
-      const raw=row[H.title];
-      const parsed=parseTitleCell(raw);
-      title=parsed.text;
-      excelUrl=parsed.url;
-      // SheetJS가 평가된 값(.v)을 이미 준 경우 수식 파싱 불필요 — 단 HYPERLINK 수식은 .f에 있음
-      if(!title || title.startsWith('=') || /HYPERLINK/i.test(title)){
-        // 셀 직접 접근 시도
-        const wsCell=cellRef(H.title, dataIdx);
-        if(wsCell){
-          if(wsCell.l&&wsCell.l.Target) excelUrl=wsCell.l.Target;
-          // .v 는 display 텍스트
-          if(wsCell.v&&!String(wsCell.v).startsWith('=')) title=String(wsCell.v).trim();
-          else if(wsCell.f){ const fp=parseTitleCell('='+wsCell.f); if(fp.text) title=fp.text; if(fp.url) excelUrl=fp.url; }
+      // 1) title: row[H.title]에서 표시값 가져오기
+      const rawVal = row[H.title];
+      if(rawVal!=null && rawVal!==''){
+        const s = String(rawVal).trim();
+        // 만약 수식 문자열이 그대로 왔을 경우 (이론상 드묾)
+        const m = s.match(/=?\s*HYPERLINK\s*\(\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)/i);
+        if(m){ excelUrl=m[1].trim(); title=m[2].replace(/^#/,'').trim(); }
+        else { title=s.replace(/^#/,''); }
+      }
+      // 2) excelUrl: 항상 wsCell.f에서 직접 파싱 (row[]에는 URL이 없음)
+      //    wsCell.f 없으면 wsCell.l.Target 확인
+      const wsCell=cellRef(H.title, dataIdx);
+      if(wsCell){
+        if(wsCell.f){
+          const fp=parseTitleCell('='+wsCell.f);
+          if(fp.url) excelUrl=fp.url;          // 수식에서 URL 추출
+          if(!title && fp.text) title=fp.text.replace(/^#/,'').trim();
         }
+        if(!excelUrl && wsCell.l && wsCell.l.Target) excelUrl=wsCell.l.Target;
+        if(!title && wsCell.v) title=String(wsCell.v).replace(/^#/,'').trim();
       }
     }
     if(!title || /^=?HYPERLINK/i.test(title)) title=`(제목없음-${no})`;
@@ -1014,8 +1051,10 @@ async function importFromExcel(buf){
     const genreRaw=String(row[H.genre]||'기타').trim();
     const runtime=String(row[H.runtime]||'—').trim();
     const genreList=parseGenres(genreRaw);
-    // B열 HYPERLINK URL 우선 사용, 없으면 네이버 영화 검색
-    const link=excelUrl||`https://search.naver.com/search.naver?query=${encodeURIComponent(title+' 영화 '+year)}`;
+    // B열 HYPERLINK URL 우선 사용, 없으면 카테고리(G열) 기준 네이버 검색
+    // 영화→'영화', 드라마→'드라마', 다큐멘터리→'다큐멘터리'
+    const catKeyword = category==='드라마'?'드라마':category==='다큐멘터리'?'다큐멘터리':'영화';
+    const link=excelUrl||`https://search.naver.com/search.naver?query=${encodeURIComponent(title+' '+catKeyword)}`;
     const tagsRaw=H.tags!==undefined?String(row[H.tags]||'').trim():'';
     // 감정태그만 허용 (감독/주연 데이터 완전 차단)
     const hashTags=(tagsRaw && !/^감독:/i.test(tagsRaw) && !/^주연:/i.test(tagsRaw) && !/감독:/i.test(tagsRaw))
@@ -1047,24 +1086,28 @@ async function importFromExcel(buf){
   const oldMap = new Map();
   old.forEach(o => { if(o.excelNo) oldMap.set(o.excelNo, o); });
 
-  // 새 항목에 기존 수동 데이터 병합
+  // ── 엑셀 최신값 우선 원칙 ──
+  // title, link, rating, country, year, category, genre, runtime 은 항상 엑셀 최신값
+  // 보존 대상: hashTags(수동 편집), humNote(엑셀에 없을 때), ostLink(엑셀에 없을 때), addedAt
   for(const it of items){
     const prev = oldMap.get(it.excelNo);
     if(prev){
-      // hashTags: 엑셀에 태그가 없고 기존에 수동 태그가 있으면 보존
-      if((!it.hashTags || !it.hashTags.length) && prev.hashTags && prev.hashTags.length){
-        it.hashTags = prev.hashTags;
-      }
-      // humNote: 엑셀 K열 값 있으면 엑셀 우선(최신 반영), 없으면 기존 보존
-      if(it.humNote){
-        // 엑셀에 값 있음 → 항상 엑셀 값 사용 (수정된 인문학노트 즉시 반영)
-      } else if(prev.humNote){
-        it.humNote = prev.humNote; // 엑셀에 없으면 기존 보존
-      }
-      // ostLink: 엑셀에 없으면 기존 보존
-      if(!it.ostLink && prev.ostLink) it.ostLink = prev.ostLink;
-      // addedAt 보존 (최초 추가 시점 유지)
+      // ① addedAt: 최초 추가 시점만 보존
       if(prev.addedAt) it.addedAt = prev.addedAt;
+      // ② hashTags: 엑셀에 태그 없고 기존 수동 태그 있으면 보존
+      if(!it.hashTags || !it.hashTags.length){
+        if(prev.hashTags && prev.hashTags.length) it.hashTags = prev.hashTags;
+      }
+      // ③ humNote: 엑셀 K열에 값 있으면 엑셀 우선, 없으면 기존 보존
+      if(!it.humNote && prev.humNote) it.humNote = prev.humNote;
+      // ④ ostLink: 엑셀에 없으면 기존 보존
+      if(!it.ostLink && prev.ostLink) it.ostLink = prev.ostLink;
+      // ⑤ link: it.link가 네이버 검색(폴백)이고 prev.link가 실제 영화 URL이면 기존 유지
+      //    it.link가 실제 URL(movie.naver.com 등)이면 → 엑셀 B열에서 온 것 → 항상 사용
+      const isItFallback = it.link && it.link.includes('search.naver.com');
+      const isPrevReal = prev.link && !prev.link.includes('search.naver.com');
+      if(isItFallback && isPrevReal) it.link = prev.link;
+      // title, rating, country, year, category, genre, runtime 은 항상 엑셀값 (병합 없음)
     }
   }
 
@@ -1206,26 +1249,31 @@ async function fetchAndCacheGithubImage(no){
 
 async function getCachedImgUrl(no){
   if(!no) return null;
-  // 1. 메모리 캐시 — blob:// URL만 (GitHub URL은 캐시 안 함)
+  // 1. 메모리 캐시
   if(imgUrlCache.has(no)){
     const cached=imgUrlCache.get(no);
-    if(cached&&cached.startsWith('blob:')) return cached;
-    imgUrlCache.delete(no); // blob: 아닌 URL 제거
+    if(cached) return cached;
+    imgUrlCache.delete(no);
   }
   // 2. IndexedDB에 저장된 blob
   const r=await idbGet(ST_IMAGES,no).catch(()=>null);
-  if(r&&r.blob&&r.blob.size>100){
+  if(r&&r.blob&&r.blob.size>0){
     try{
       const url=URL.createObjectURL(r.blob);
-      imgUrlCache.set(no,url); // blob: URL만 캐시
+      imgUrlCache.set(no,url);
       return url;
     }catch(e){
       await idbDel(ST_IMAGES,no).catch(()=>{});
     }
   }
-  // 3. IDB 없음 → GitHub 직접 URL 반환 (캐시에 저장 안 함)
-  //    → 다음에 getCachedImgUrl 호출 시 IDB 재체크 → 동기화 후 자동 전환
-  return getGithubImgUrl(no,'jpg') || null;
+  // 3. IDB 없음 → GitHub 직접 URL 반환 (즉시, 타임아웃 없음)
+  //    브라우저가 <img src>로 직접 로드 — CORS 불필요
+  const directUrl=getGithubImgUrl(no,'jpg');
+  if(directUrl){
+    imgUrlCache.set(no,directUrl); // 세션 캐시
+    return directUrl;
+  }
+  return null;
 }
 
 // 이미지 날짜 맵 (no → fileDate) — 정렬용
@@ -1490,8 +1538,23 @@ async function renderFavList(){
   }
 }
 
-function openFavPanel(){showingFav=true;favPanel.classList.add('open');}
-function closeFavPanel(){showingFav=false;favPanel.classList.remove('open');}
+function openFavPanel(){
+  showingFav=true;
+  favPanel.classList.add('open');
+  // ★ body 스크롤 잠금 — 모바일에서 패널 뒤 콘텐츠 스크롤 방지
+  document.body.classList.add('fav-open');
+  // iOS Safari: body position:fixed 시 스크롤 위치 보존
+  document.body.style.top='-'+window.scrollY+'px';
+}
+function closeFavPanel(){
+  showingFav=false;
+  favPanel.classList.remove('open');
+  // ★ body 스크롤 잠금 해제 + 스크롤 위치 복원
+  const scrollY=document.body.style.top;
+  document.body.classList.remove('fav-open');
+  document.body.style.top='';
+  if(scrollY) window.scrollTo(0,-parseInt(scrollY||'0'));
+}
 function scrollToCard(itemId){
   const el=document.querySelector(`[data-item-id="${itemId}"]`);
   if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
@@ -1696,10 +1759,20 @@ function buildCard(item){
 
   // 포스터 — 즉시 플레이스홀더 표시 후 이미지 비동기 로드 (블로킹 없음)
   const pd=document.createElement('div');pd.className='poster';
-  const isNaverFallback=item.link&&item.link.includes('search.naver.com');
-  pd.title=item.link?(isNaverFallback?'클릭: 네이버 검색 (B열 링크 없음)':'클릭: 영화 정보 보기'):'포스터';
+  pd.title=item.link?'클릭: 영화 정보 보기':'포스터';
   pd.style.cursor=item.link?'pointer':'default';
-  pd.onclick=()=>{ if(item.link) window.open(item.link,'_blank'); };
+  pd.onclick=()=>{
+    if(!item.link) return;
+    // ★ <a> 태그 프로그래밍 클릭 — 모든 브라우저에서 팝업 차단 없이 동작
+    const a=document.createElement('a');
+    a.href=item.link;
+    a.target='_blank';
+    a.rel='noopener noreferrer';
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>document.body.removeChild(a),100);
+  };
   const g=(item.genreList||[]).filter(g=>g!=='기타')[0]||'';
   pd.innerHTML='<div class="poster-placeholder">'
     +'<span class="ph-icon" style="font-size:1rem">🎬</span>'
@@ -1714,13 +1787,12 @@ function buildCard(item){
     const img=document.createElement('img');img.className='poster-img';img.alt=item.title;
     img.loading='eager';             // 모바일 첫 화면 즉시 표시
     img.decoding='async';
-    img.crossOrigin='anonymous';     // Canvas 저장용 (실패해도 무관)
+    // ★ crossOrigin 없음 — GitHub Pages는 CORS 헤더 없음, 설정 시 이미지 로드 실패
     img.onload=()=>{ pd.innerHTML=''; pd.appendChild(img); };
     img.onerror=()=>{
       // jpg 실패 시 png 시도
-      if(img.src.endsWith('.jpg')){
-        img.crossOrigin='anonymous';
-        img.src=img.src.replace('.jpg','.png');
+      if(!img.src.includes('.png')){
+        img.src=img.src.replace(/\.jpg(\?.*)?$/,'.png');
       }
     };
     img.src=bUrl;
@@ -2389,7 +2461,7 @@ function openHelpModal(){
   const modal=document.createElement('div');modal.className='modal';
   modal.innerHTML=`<div class="modal-box help-modal-box">
     <button class="modal-close">&times;</button>
-    <h3>❓ 영화/드라마 DB final 사용 도움말</h3>
+    <h3>❓ 영화/드라마 DB v30 사용 도움말</h3>
 
     <div class="help-section">
       <h4>📋 처음 시작 — 자동 초기화</h4>
@@ -2479,16 +2551,7 @@ function openHelpModal(){
     <div class="help-section">
       <h4>⚠️ 실행 환경별 차이</h4>
       <div class="help-row"><span class="help-key">로컬 (file://)</span><span class="help-desc">데스크탑에서 HTML 직접 오픈. <b>🔄 동기화 불가</b> — 📂 엑셀 업로드 + 📁 로컬 이미지로 수동 로드</span></div>
-      <div class="help-row"><span class="help-key">GitHub Pages</span><span class="help-desc">모바일/웹 접속. <b>🔄 자동 동기화 가능</b>. URL: <code>casio8000.github.io/film-humanities_Mobile/movie_db_final.html</code></span></div>
-    </div>
-
-    <div class="help-section">
-      <h4>📁 파일명 변경 시 수정 목록</h4>
-      <div class="help-row"><span class="help-key">index.html</span><span class="help-desc"><code>location.replace('movie_db_final.html')</code> 부분만 새 파일명으로 변경 후 GitHub 업로드</span></div>
-      <div class="help-row"><span class="help-key">manifest.json</span><span class="help-desc"><b>수정 불필요</b> — <code>"start_url":"index.html"</code>로 고정. index.html만 바꾸면 됨</span></div>
-      <div class="help-row"><span class="help-key">GITHUB_SETUP.md</span><span class="help-desc">앱 동작에 영향 없는 문서 파일. 안내 내용의 파일명 언급이 있다면 참고용으로만 수정</span></div>
-      <div class="help-row"><span class="help-key">홈 화면 앱 아이콘</span><span class="help-desc">index.html 수정 → GitHub push → 기존 홈 화면 앱 <b>삭제 후 재추가</b> (iOS는 재추가 필수)</span></div>
-      <div class="help-tip">💡 파일명을 <b>movie_db_final.html</b>로 고정하면 앞으로 index.html도 수정할 필요 없습니다</div>
+      <div class="help-row"><span class="help-key">GitHub Pages</span><span class="help-desc">모바일/웹 접속. <b>🔄 자동 동기화 가능</b>. URL: <code>casio8000.github.io/film-humanities_Mobile/movie_db_v30.html</code></span></div>
     </div>
   </div>`;
   document.body.appendChild(modal);
@@ -2565,7 +2628,9 @@ function openEditModal(item){
     const ncat=modal.querySelector('#eCategory').value;
     const ng=modal.querySelector('#eGenre').value.trim()||'기타';
     const nrt=modal.querySelector('#eRuntime').value.trim()||'—';
-    const nl=modal.querySelector('#eLink').value.trim()||`https://search.naver.com/search.naver?query=${encodeURIComponent(nt+' 영화')}`;
+    const ncat2=modal.querySelector('#eCategory').value;
+    const editCatKw=ncat2==='드라마'?'드라마':ncat2==='다큐멘터리'?'다큐멘터리':'영화';
+    const nl=modal.querySelector('#eLink').value.trim()||`https://search.naver.com/search.naver?query=${encodeURIComponent(nt+' '+editCatKw)}`;
     const nost=modal.querySelector('#eOst').value.trim();
     const nhNote=modal.querySelector('#eNote').value.trim();
     const nTagsRaw=modal.querySelector('#eHashtags').value.trim();
@@ -2703,7 +2768,8 @@ async function openAddNewModal(){
           .filter(t => EMOTION_TAGS.some(e => e.tag === t))
       : [];
 
-    const link = `https://search.naver.com/search.naver?query=${encodeURIComponent(title+' '+category)}`;
+    const catKw = category==='드라마'?'드라마':category==='다큐멘터리'?'다큐멘터리':'영화';
+    const link = `https://search.naver.com/search.naver?query=${encodeURIComponent(title+' '+catKw)}`;
     const newItem = {
       title, rating: (rating && !isNaN(parseFloat(rating))) ? parseFloat(rating).toFixed(1) : '?',
       country, year, category, genreRaw, genreList: parseGenres(genreRaw),
@@ -2824,7 +2890,10 @@ async function fullRestore(file){
   for(const f of oldFavs)await idbDel(ST_FAVS,f.id).catch(()=>{});
   for(const item of imported){
     item.genreList=parseGenres(item.genreRaw||'기타');
-    item.link=item.link||`https://search.naver.com/search.naver?query=${encodeURIComponent(item.title+' 영화')}`;
+    // link: 저장된 값 우선 (엑셀 B열 HYPERLINK 보존), 없을 때만 기본 생성
+// link 폴백: 카테고리 기준 (영화/드라마/다큐)
+    const restoreCatKw=item.category==='드라마'?'드라마':item.category==='다큐멘터리'?'다큐멘터리':'영화';
+    item.link=item.link||(item.title?`https://search.naver.com/search.naver?query=${encodeURIComponent(item.title+' '+restoreCatKw)}`:'');
     item.hashTags=item.hashTags||[];
     delete item.id;
     await saveItem(item);
@@ -3248,37 +3317,24 @@ scrollTopBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
   await refreshData();
 
   const isFileProtocol = location.protocol === 'file:';
+  const isGithubPages  = location.hostname.includes('github.io');
 
   if(rawItems.length === 0){
-    // ── 데이터 없음 ──
+    // 데이터 없음
     if(isFileProtocol){
-      // 로컬 파일 실행: fetch 불가 → 수동 안내
-      debug('로컬 파일 실행 — 엑셀 업로드 필요');
-      // 빈 화면 안내 표시
-      if(cardContainer) cardContainer.innerHTML=
-        '<div class="empty-message"><span class="em-icon">📂</span>'
-        +'데이터가 없습니다.<br><span style="font-size:.75rem;opacity:.6">'
-        +'툴바에서 📂 엑셀 업로드를 실행하세요</span></div>';
-      if(totalStats) totalStats.textContent='데이터 없음';
+      // ── 로컬 파일 실행: GitHub fetch 불가 → 수동 안내 ──
+      debug('로컬 파일 실행 — 데스크탑 엑셀 업로드 필요');
+      showToast('📂 데이터 없음 — 툴바에서 엑셀 업로드 또는 🔄 동기화를 실행하세요', 'info', 8000);
     } else {
-      // GitHub Pages: 자동 로드 시도
-      debug('데이터 없음 — GitHub 자동 로드 시작');
-      if(totalStats) totalStats.textContent='동기화 중…';
-      const ok = await loadExcelFromGithub(false);
-      if(!ok && rawItems.length === 0){
-        // 로드 실패 안내
-        if(cardContainer) cardContainer.innerHTML=
-          '<div class="empty-message"><span class="em-icon">⚠️</span>'
-          +'엑셀 로드 실패<br><span style="font-size:.75rem;opacity:.6">'
-          +'🔄 데이터 동기화 버튼을 눌러 다시 시도하세요</span></div>';
-        if(totalStats) totalStats.textContent='로드 실패';
-      }
+      // ── GitHub Pages / 웹서버 실행: 자동 로드 가능 ──
+      debug('데이터 없음 — GitHub 자동 로드');
+      await loadExcelFromGithub(false);
     }
   } else {
-    // ── 데이터 있음 — 태그 자동 분류 ──
+    // 데이터 있음 — 태그 없는 항목만 조용히 자동 분류
     const noTagCount = rawItems.filter(i=>!(i.hashTags&&i.hashTags.length)).length;
     if(noTagCount > 0){
-      debug('태그 자동 분류: '+noTagCount+'개');
+      debug(`태그 없는 작품 ${noTagCount}개 — 자동 분류 시작`);
       await autoTagAll(false);
       await refreshData();
     }
@@ -3287,18 +3343,5 @@ scrollTopBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
   debug('영화/드라마 DB final 준비 완료');
 })();
 </script>
-
-<!-- 즐겨찾기 패널 — body 최하단 배치로 z-index 충돌 완전 방지 -->
-<div class="fav-panel" id="favPanel">
-  <div class="fav-panel-header" style="padding:.7rem .85rem;gap:.4rem;flex-wrap:nowrap;flex-shrink:0">
-    <h3 style="font-size:.85rem;min-width:0;flex:1">⭐ 즐겨찾기</h3>
-    <button id="favShareBtn" title="즐겨찾기 목록 공유"
-      style="flex-shrink:0;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;padding:.28rem .65rem;border-radius:10px;cursor:pointer;font-size:.72rem;font-family:inherit;white-space:nowrap;min-height:2.2rem">📤 공유</button>
-    <button class="fav-close" id="favClose"
-      style="flex-shrink:0;min-width:2.4rem;min-height:2.4rem;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(255,255,255,.1);border-radius:50%;border:none;color:rgba(255,255,255,.8);cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,.3)">✕</button>
-  </div>
-  <div class="fav-cat-bar" id="favCatBar"></div>
-  <div class="fav-list" id="favList" style="-webkit-overflow-scrolling:touch;overflow-y:auto;flex:1"></div>
-</div>
 </body>
 </html>
