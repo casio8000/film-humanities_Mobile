@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title>🎬 영화/드라마 DB (final)</title>
+<title>🎬 영화/드라마 DB</title>
 <!-- PWA 설정 -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,10 +11,21 @@
 <meta name="apple-mobile-web-app-title" content="영화DB">
 <meta name="theme-color" content="#090f1e">
 <link rel="manifest" href="manifest.json">
-<!-- Open Graph (GitHub Pages 공유용) -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="🎬 나의 영화/드라마 DB">
-<meta property="og:description" content="개인 영화 관람 기록 · 감정별 추천 · 인문학 노트">
+<!-- Open Graph / Twitter Card — SNS 공유 최적화 -->
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="🎬 나의 영화/드라마 DB">
+<meta property="og:description" content="3,400여 편의 영화·드라마 관람 기록 · 감정별 추천 · 인문학 노트">
+<meta property="og:image"       content="https://casio8000.github.io/film-humanities_Mobile/images/movie/1.jpg">
+<meta property="og:image:width" content="300">
+<meta property="og:image:height" content="450">
+<meta property="og:url"         content="https://casio8000.github.io/film-humanities_Mobile/">
+<meta property="og:site_name"   content="나의 영화/드라마 DB">
+<meta property="og:locale"      content="ko_KR">
+<!-- Twitter Card -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="🎬 나의 영화/드라마 DB">
+<meta name="twitter:description" content="3,400여 편의 영화·드라마 관람 기록 · 감정별 추천 · 인문학 노트">
+<meta name="twitter:image"       content="https://casio8000.github.io/film-humanities_Mobile/images/movie/1.jpg">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -141,9 +152,48 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 .icon-btn.del:hover{background:rgba(239,68,68,.18);color:#f87171}
 
 /* ── 즐겨찾기 패널 ── */
-.fav-panel{position:fixed;top:0;right:0;width:340px;max-width:100vw;height:100vh;height:100dvh;height:-webkit-fill-available;background:#0f1824;border-left:1px solid rgba(255,255,255,.08);z-index:2147483647;display:flex;flex-direction:column;transform:translate3d(100%,0,0);transition:transform .25s cubic-bezier(.4,0,.2,1);overflow:hidden;will-change:transform;-webkit-overflow-scrolling:touch;isolation:isolate}
-.fav-panel.open{transform:translate3d(0,0,0)}
-@media(max-width:680px){.fav-panel{width:100vw!important;max-width:100vw!important;border-left:none}}
+/* ── 즐겨찾기 오버레이 (dimmer) ── */
+/* ★ 오버레이 방식으로 완전 재설계 — iOS PWA standalone stacking 버그 근본 해결
+   position:fixed 패널 단독 사용 시 iOS standalone에서 다른 fixed/transform 요소와
+   stacking context 충돌 발생 → 전체화면 dimmer 안에 패널 배치로 해결 */
+.fav-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:transparent;
+  transition:background .25s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.fav-overlay.open{
+  display:flex;
+  justify-content:flex-end;
+  background:rgba(0,0,0,.6);
+}
+/* ── 즐겨찾기 패널 (오버레이 자식) ── */
+.fav-panel{
+  position:relative;
+  width:340px;
+  height:100%;
+  background:#0f1824;
+  border-left:1px solid rgba(255,255,255,.08);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  flex-shrink:0;
+}
+.fav-overlay.open .fav-panel{
+  transform:translateX(0);
+  box-shadow:-4px 0 32px rgba(0,0,0,.8);
+}
+@media(max-width:680px){
+  .fav-panel{width:100%!important;border-left:none!important;}
+}
+
 .fav-panel-header{padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:.5rem;flex-shrink:0}
 .fav-panel-header h3{font-size:.88rem;font-weight:700;color:#fbbf24;flex:1}
 .fav-close{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.7);font-size:1.2rem;cursor:pointer;padding:.3rem .5rem;border-radius:8px;min-width:2.2rem;min-height:2.2rem;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:rgba(255,255,255,.2)}
@@ -263,10 +313,9 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 .auto-tag-info{font-size:.68rem;color:rgba(139,92,246,.6);margin:.3rem 0;padding:.3rem .6rem;background:rgba(139,92,246,.06);border-radius:8px}
 
 @media(max-width:680px){
-  .toolbar{flex-direction:column;align-items:stretch;display:none}
-  .toolbar.open{display:flex}
-  .toolbar-toggle-btn{display:flex!important}
+  .toolbar{flex-direction:column;align-items:stretch}
   .search-wrap{min-width:unset}
+  /* fav-panel은 별도 @media로 처리 */
   .card-title{font-size:.7rem}
   .card-meta{font-size:.63rem}
   .card-genre{display:none}
@@ -276,55 +325,32 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
   .desktop-only{display:none!important}
 }
 
-/* ── 즐겨찾기 패널 모바일 전체화면 ── */
-@media(max-width:680px){
-  .fav-panel{
-    width:100vw!important;
-    max-width:100vw!important;
-    right:0!important;
-    top:0!important;
-    border-left:none!important;
-  }
-  .fav-panel.open{
-    box-shadow:0 0 40px rgba(0,0,0,.9)!important;
-  }
-}
-/* iOS Safari 추가 보정 */
-@supports (-webkit-touch-callout: none){
-  .fav-panel{
-    height:-webkit-fill-available!important;
-  }
-}
+/* ★ fav-panel 모바일 스타일은 위 .fav-panel 블록에 통합 */
 </style>
-<!-- OpenGraph / SNS 공유 -->
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="영화/드라마 DB">
-<meta property="og:title" content="🎬 나의 영화/드라마 관람 기록">
-<meta property="og:description" content="개인 영화 관람 기록 3,400편+ · 감정별 추천 · 인문학 노트 · 포스터 아카이브">
-<meta property="og:image" content="https://casio8000.github.io/film-humanities_Mobile/icon-512.png">
-<meta property="og:image:width" content="512">
-<meta property="og:image:height" content="512">
-<meta property="og:url" content="https://casio8000.github.io/film-humanities_Mobile/">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="🎬 나의 영화/드라마 관람 기록">
-<meta name="twitter:description" content="개인 영화 관람 기록 3,400편+ · 감정별 추천 · 포스터 아카이브">
-<meta name="twitter:image" content="https://casio8000.github.io/film-humanities_Mobile/icon-512.png">
-<!-- Apple PWA -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="영화DB">
-<meta name="theme-color" content="#090f1e">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
+
+<!-- 즐겨찾기 오버레이 + 패널 -->
+<div class="fav-overlay" id="favOverlay">
+<div class="fav-panel" id="favPanel">
+  <div class="fav-panel-header" style="padding:.7rem .85rem;gap:.4rem;flex-wrap:nowrap">
+    <h3 style="font-size:.85rem;min-width:0;flex:1">⭐ 즐겨찾기</h3>
+    <button id="favShareBtn" title="즐겨찾기 목록 공유"
+      style="flex-shrink:0;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;padding:.22rem .55rem;border-radius:10px;cursor:pointer;font-size:.7rem;font-family:inherit;white-space:nowrap">📤 공유</button>
+    <button class="fav-close" id="favClose"
+      style="flex-shrink:0;min-width:2rem;min-height:2rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:rgba(255,255,255,.08);border-radius:50%;border:none;color:rgba(255,255,255,.6);cursor:pointer">✕</button>
+  </div>
+  <div class="fav-cat-bar" id="favCatBar"></div>
+  <div class="fav-list" id="favList"></div>
+</div>
+</div><!-- /fav-overlay -->
 
 <!-- 상단 고정 헤더 -->
 <div class="sticky-header">
   <div class="main-nav">
     <div class="nav-inner">
       <div class="logo">
-        <h1>🎬 영화/드라마 DB <span id="totalStats" class="stats-badge">준비중…</span></h1>
+        <h1>🎬 영화/드라마 DB <span id="totalStats" class="stats-badge">로딩중…</span></h1>
       </div>
       <div class="nav-links">
         <button class="nav-btn active" data-category="all">전체</button>
@@ -371,8 +397,7 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 
         <button class="nav-btn" data-category="other">기타</button>
         <button class="fav-nav-btn" id="favNavBtn">⭐ 즐겨찾기</button>
-        <button id="menuToggleBtn" style="display:none;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#e2e8f0;padding:.28rem .7rem;border-radius:10px;cursor:pointer;font-size:.72rem;font-family:inherit;margin-left:.2rem" class="toolbar-toggle-btn">☰ 메뉴</button>
-        <button class="tbtn mobile-hide" id="btnExportHtml" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3);color:#c4b5fd;font-size:.71rem">💜 감정추천 내보내기</button>
+        <button class="tbtn" id="btnExportHtml" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3);color:#c4b5fd;font-size:.71rem">💜 감정추천 내보내기</button>
       </div>
     </div>
   </div>
@@ -445,16 +470,6 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 <!-- 맨위로 버튼 -->
 <button class="scroll-top-btn" id="scrollTopBtn" title="맨 위로">▲</button>
 <div id="debugPanel" class="debug-panel"></div>
-
-<!-- 즐겨찾기 패널 — body 최하단 배치로 z-index 충돌 완전 방지 -->
-<div class="fav-panel" id="favPanel">
-  <div class="fav-panel-header" style="padding:.7rem .85rem;gap:.4rem;flex-wrap:nowrap;flex-shrink:0">
-    <h3 style="font-size:.85rem;min-width:0;flex:1">⭐ 즐겨찾기</h3>
-    <button id="favShareBtn" title="즐겨찾기 목록 공유"
-      style="flex-shrink:0;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;padding:.28rem .65rem;border-radius:10px;cursor:pointer;font-size:.72rem;font-family:inherit;white-space:nowrap;min-height:2.2rem">📤 공유</button>
-    <button class="fav-close" id="favClose"
-      style="flex-shrink:0;min-width:2.4rem;min-height:2.4rem;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(255,255,255,.1);border-radius:50%;border:none;color:rgba(255,255,255,.8);cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,.3)">✕</button>
-  </div>
 
 <script>
 // ══════════════════════════════════════════════════════════════
@@ -558,8 +573,8 @@ async function tryFetchNoCors(url){
 function tryImgCanvas(url){
   return new Promise(resolve=>{
     const img=new Image();
-    img.crossOrigin='anonymous';
-    const timer=setTimeout(()=>resolve(null),8000);
+    // ★ crossOrigin 없음 — GitHub Pages CORS 미지원, 설정 시 로드 실패
+    const timer=setTimeout(()=>resolve(null),12000);
     img.onload=()=>{
       clearTimeout(timer);
       try{
@@ -583,8 +598,9 @@ async function fetchGithubImageWithFallback(no){
   // jpg만 시도 (확장자 루프 제거 — 지연 최소화)
   const url=getGithubImgUrl(no,'jpg');
   // 1) no-cors fetch 시도 (opaque blob)
+  // ★ 모바일에서 opaque blob은 size=0 — size 체크 없이 blob 존재만 확인
   const blobNoCors=await tryFetchNoCors(url);
-  if(blobNoCors&&blobNoCors.size>100) return {blob:blobNoCors, url, method:'no-cors'};
+  if(blobNoCors) return {blob:blobNoCors, url, method:'no-cors'};
   // 2) Canvas 캡처 시도
   const blobCanvas=await tryImgCanvas(url);
   if(blobCanvas) return {blob:blobCanvas, url, method:'canvas'};
@@ -592,19 +608,14 @@ async function fetchGithubImageWithFallback(no){
   return {blob:null, url, method:'direct'};
 }
 
-// resizeBlob이 없을 경우 대체 함수
-if(typeof resizeBlob==='undefined'){
-  window.resizeBlob=async(blob)=>blob;
-}
-
 async function syncImagesFromGithub(items, onProgress){
-  // IDB 실제 저장 여부만 체크 (imgUrlCache는 GitHub URL도 포함하므로 체크 안 함)
+  // IDB까지 확인하여 실제 누락된 항목만 필터링
   const missing=[];
   for(const i of items){
     if(!i.excelNo) continue;
-    // IDB에 실제 blob이 있는지만 확인
+    if(imgUrlCache.has(i.excelNo)) continue;
     const existing=await idbGet(ST_IMAGES,i.excelNo).catch(()=>null);
-    if(existing&&existing.blob&&existing.blob.size>100) continue;
+    if(existing&&existing.blob) continue;
     missing.push(i);
   }
   if(!missing.length) return {done:0,failed:0,total:0};
@@ -616,17 +627,22 @@ async function syncImagesFromGithub(items, onProgress){
       try{
         const result=await fetchGithubImageWithFallback(item.excelNo);
         if(!result){ failed++; return; }
-        if(result.blob&&result.blob.size>100){
-          // blob 유효 → IDB 저장 + ObjectURL 캐시
-          const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
-          await saveImageByNo(item.excelNo,resized,null);
-          const objUrl=URL.createObjectURL(resized);
-          imgUrlCache.set(item.excelNo,objUrl);
+        if(result.blob){
+          // ★ opaque blob(size=0)도 저장 — 모바일에서 size는 0으로 보고됨
+          let blobToSave = result.blob;
+          if(result.blob.size > 0){
+            // size > 0인 경우(canvas blob)만 리사이즈 시도
+            blobToSave = await resizeBlob(result.blob, 300).catch(()=>result.blob);
+          }
+          await saveImageByNo(item.excelNo, blobToSave, null);
+          const objUrl = URL.createObjectURL(blobToSave);
+          imgUrlCache.set(item.excelNo, objUrl);
+          done++;
         } else {
-          // direct URL — 메모리 캐시 (세션 유효, 화면 표시는 됨)
-          imgUrlCache.set(item.excelNo,result.url);
+          // direct URL만 — IDB 저장 없음 (세션에만 유효)
+          imgUrlCache.set(item.excelNo, result.url);
+          failed++;
         }
-        done++;
       }catch(e){ failed++; }
     }));
     if(onProgress) onProgress(done+failed, missing.length, done, failed);
@@ -711,17 +727,25 @@ async function loadExcelFromGithub(force=false){
     return false;
   }
   const excelUrl=getGithubExcelUrl();
-  showToast('GitHub 엑셀 다운로드 중…', 'info', 6000);
+  showToast('GitHub 엑셀 다운로드 중…', 'info', 0);
+  // ★ XHR 1순위: simple request → OPTIONS preflight 없음 → 모바일/PWA 호환
+  const loadBuf=()=>new Promise((res,rej)=>{
+    const xhr=new XMLHttpRequest();
+    xhr.open('GET',excelUrl,true);
+    xhr.responseType='arraybuffer';
+    xhr.timeout=30000;
+    xhr.onload=()=>{ if(xhr.status>=200&&xhr.status<300)res(xhr.response); else rej(new Error('HTTP '+xhr.status)); };
+    xhr.onerror=()=>rej(new Error('네트워크 오류'));
+    xhr.ontimeout=()=>rej(new Error('타임아웃(30s)'));
+    xhr.send();
+  });
   try{
-    const resp=await fetch(excelUrl,{cache:'no-store',mode:'cors',credentials:'omit'});
-    if(!resp.ok){
-      let hint='';
-      if(resp.status===404) hint='\n→ 저장소 루트에 movie_list_complete.xlsx 업로드 필요';
-      else if(resp.status===403) hint='\n→ GitHub Pages가 비활성화됐거나 저장소가 Private\n→ Settings → Pages → main/root 활성화';
-      showToast('❌ HTTP '+resp.status+hint, 'error', 10000);
-      return false;
-    }
-    const buf=await resp.arrayBuffer();
+    const buf=await loadBuf().catch(async xhrErr=>{
+      // XHR 실패 시 fetch cors 폴백
+      const resp=await fetch(excelUrl,{cache:'no-store',mode:'cors',credentials:'omit'});
+      if(!resp.ok) throw new Error('HTTP '+resp.status+(resp.status===404?' (파일 없음)':resp.status===403?' (접근 거부)':''));
+      return resp.arrayBuffer();
+    });
     const n=await importFromExcel(buf);
     showToast(`✅ ${n.toLocaleString()}개 작품 로드 완료`, 'success', 4000);
     await refreshData();
@@ -735,8 +759,8 @@ async function loadExcelFromGithub(force=false){
     }
     return true;
   }catch(e){
-    showToast('❌ GitHub 로드 실패: '+e.message+'\n→ GitHub Pages URL과 인터넷 연결을 확인하세요', 'error', 10000);
-    console.error('GitHub Excel load error:', e, excelUrl);
+    showToast('❌ 엑셀 로드 실패: '+e.message+'\n→ URL: '+excelUrl+'\n→ GitHub Pages 활성화/파일명 확인', 'error', 12000);
+    console.error('[DB] Excel load error:', e.message, excelUrl);
     return false;
   }
 }
@@ -925,16 +949,21 @@ function extractEpisode(runtime){
 // 이미지 리사이즈
 // ══════════════════════════════════════════════════════════════
 function resizeBlob(src,maxW=300){return new Promise((res,rej)=>{
-  const url=URL.createObjectURL(src instanceof Blob?src:new Blob([src]));
+  const srcBlob=src instanceof Blob?src:new Blob([src]);
+  // ★ opaque blob (size=0): img 로드 불가 → 원본 그대로 반환
+  if(srcBlob.size===0){ res(srcBlob); return; }
+  const url=URL.createObjectURL(srcBlob);
   const img=new Image();
   img.onload=()=>{URL.revokeObjectURL(url);
-    let w=img.width,h=img.height;
+    let w=img.naturalWidth||img.width||0;
+    let h=img.naturalHeight||img.height||0;
+    if(w===0||h===0){ res(srcBlob); return; } // 크기 0 → 원본 반환
     if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
     const c=document.createElement('canvas');c.width=w;c.height=h;
     c.getContext('2d').drawImage(img,0,0,w,h);
-    c.toBlob(b=>b?res(b):rej(new Error('toBlob')),'image/jpeg',.82);
+    c.toBlob(b=>b&&b.size>0?res(b):res(srcBlob),'image/jpeg',.82);
   };
-  img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('load'));};
+  img.onerror=()=>{URL.revokeObjectURL(url); res(srcBlob);}; // 실패해도 원본 반환
   img.src=url;
 });}
 
@@ -963,9 +992,10 @@ function parseTitleCell(raw) {
   const s = String(raw);
   // =HYPERLINK("url","제목") or HYPERLINK("url","제목")
   const m = s.match(/=?\s*HYPERLINK\s*\(\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)/i);
-  if (m) return { url: m[1].trim(), text: m[2].trim() };
-  // 일반 텍스트
-  return { text: s.trim(), url: '' };
+  // ★ 제목 앞 '#' 제거 (엑셀에서 "#살아있다" → "살아있다")
+  if (m) return { url: m[1].trim(), text: m[2].replace(/^#/, '').trim() };
+  // 일반 텍스트도 # 제거
+  return { text: s.replace(/^#/, '').trim(), url: '' };
 }
 
 async function importFromExcel(buf){
@@ -1017,23 +1047,31 @@ async function importFromExcel(buf){
   for(const row of dataRows){
     const no=parseInt(String(row[H.no]).trim());
 
-    // 제목·링크 추출 — 수식문자열, 셀값, 직접접근 3중 폴백
+    // 제목·링크 추출
+    // ★ 핵심 원리: SheetJS는 row[H.title]에 표시값(.v)만 줌 → URL 없음
+    //   URL(HYPERLINK 수식)은 반드시 wsCell.f에서 직접 파싱해야 함
     let title='', excelUrl='';
     if(H.title!==undefined){
-      const raw=row[H.title];
-      const parsed=parseTitleCell(raw);
-      title=parsed.text;
-      excelUrl=parsed.url;
-      // SheetJS가 평가된 값(.v)을 이미 준 경우 수식 파싱 불필요 — 단 HYPERLINK 수식은 .f에 있음
-      if(!title || title.startsWith('=') || /HYPERLINK/i.test(title)){
-        // 셀 직접 접근 시도
-        const wsCell=cellRef(H.title, dataIdx);
-        if(wsCell){
-          if(wsCell.l&&wsCell.l.Target) excelUrl=wsCell.l.Target;
-          // .v 는 display 텍스트
-          if(wsCell.v&&!String(wsCell.v).startsWith('=')) title=String(wsCell.v).trim();
-          else if(wsCell.f){ const fp=parseTitleCell('='+wsCell.f); if(fp.text) title=fp.text; if(fp.url) excelUrl=fp.url; }
+      // 1) title: row[H.title]에서 표시값 가져오기
+      const rawVal = row[H.title];
+      if(rawVal!=null && rawVal!==''){
+        const s = String(rawVal).trim();
+        // 만약 수식 문자열이 그대로 왔을 경우 (이론상 드묾)
+        const m = s.match(/=?\s*HYPERLINK\s*\(\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)/i);
+        if(m){ excelUrl=m[1].trim(); title=m[2].replace(/^#/,'').trim(); }
+        else { title=s.replace(/^#/,''); }
+      }
+      // 2) excelUrl: 항상 wsCell.f에서 직접 파싱 (row[]에는 URL이 없음)
+      //    wsCell.f 없으면 wsCell.l.Target 확인
+      const wsCell=cellRef(H.title, dataIdx);
+      if(wsCell){
+        if(wsCell.f){
+          const fp=parseTitleCell('='+wsCell.f);
+          if(fp.url) excelUrl=fp.url;          // 수식에서 URL 추출
+          if(!title && fp.text) title=fp.text.replace(/^#/,'').trim();
         }
+        if(!excelUrl && wsCell.l && wsCell.l.Target) excelUrl=wsCell.l.Target;
+        if(!title && wsCell.v) title=String(wsCell.v).replace(/^#/,'').trim();
       }
     }
     if(!title || /^=?HYPERLINK/i.test(title)) title=`(제목없음-${no})`;
@@ -1047,8 +1085,10 @@ async function importFromExcel(buf){
     const genreRaw=String(row[H.genre]||'기타').trim();
     const runtime=String(row[H.runtime]||'—').trim();
     const genreList=parseGenres(genreRaw);
-    // B열 HYPERLINK URL 우선 사용, 없으면 네이버 영화 검색
-    const link=excelUrl||`https://search.naver.com/search.naver?query=${encodeURIComponent(title+' 영화 '+year)}`;
+    // B열 HYPERLINK URL 우선 사용, 없으면 카테고리(G열) 기준 네이버 검색
+    // 영화→'영화', 드라마→'드라마', 다큐멘터리→'다큐멘터리'
+    const catKeyword = category==='드라마'?'드라마':category==='다큐멘터리'?'다큐멘터리':'영화';
+    const link=excelUrl||`https://search.naver.com/search.naver?query=${encodeURIComponent(title+' '+catKeyword)}`;
     const tagsRaw=H.tags!==undefined?String(row[H.tags]||'').trim():'';
     // 감정태그만 허용 (감독/주연 데이터 완전 차단)
     const hashTags=(tagsRaw && !/^감독:/i.test(tagsRaw) && !/^주연:/i.test(tagsRaw) && !/감독:/i.test(tagsRaw))
@@ -1080,24 +1120,28 @@ async function importFromExcel(buf){
   const oldMap = new Map();
   old.forEach(o => { if(o.excelNo) oldMap.set(o.excelNo, o); });
 
-  // 새 항목에 기존 수동 데이터 병합
+  // ── 엑셀 최신값 우선 원칙 ──
+  // title, link, rating, country, year, category, genre, runtime 은 항상 엑셀 최신값
+  // 보존 대상: hashTags(수동 편집), humNote(엑셀에 없을 때), ostLink(엑셀에 없을 때), addedAt
   for(const it of items){
     const prev = oldMap.get(it.excelNo);
     if(prev){
-      // hashTags: 엑셀에 태그가 없고 기존에 수동 태그가 있으면 보존
-      if((!it.hashTags || !it.hashTags.length) && prev.hashTags && prev.hashTags.length){
-        it.hashTags = prev.hashTags;
-      }
-      // humNote: 엑셀 K열 값 있으면 엑셀 우선(최신 반영), 없으면 기존 보존
-      if(it.humNote){
-        // 엑셀에 값 있음 → 항상 엑셀 값 사용 (수정된 인문학노트 즉시 반영)
-      } else if(prev.humNote){
-        it.humNote = prev.humNote; // 엑셀에 없으면 기존 보존
-      }
-      // ostLink: 엑셀에 없으면 기존 보존
-      if(!it.ostLink && prev.ostLink) it.ostLink = prev.ostLink;
-      // addedAt 보존 (최초 추가 시점 유지)
+      // ① addedAt: 최초 추가 시점만 보존
       if(prev.addedAt) it.addedAt = prev.addedAt;
+      // ② hashTags: 엑셀에 태그 없고 기존 수동 태그 있으면 보존
+      if(!it.hashTags || !it.hashTags.length){
+        if(prev.hashTags && prev.hashTags.length) it.hashTags = prev.hashTags;
+      }
+      // ③ humNote: 엑셀 K열에 값 있으면 엑셀 우선, 없으면 기존 보존
+      if(!it.humNote && prev.humNote) it.humNote = prev.humNote;
+      // ④ ostLink: 엑셀에 없으면 기존 보존
+      if(!it.ostLink && prev.ostLink) it.ostLink = prev.ostLink;
+      // ⑤ link: it.link가 네이버 검색(폴백)이고 prev.link가 실제 영화 URL이면 기존 유지
+      //    it.link가 실제 URL(movie.naver.com 등)이면 → 엑셀 B열에서 온 것 → 항상 사용
+      const isItFallback = it.link && it.link.includes('search.naver.com');
+      const isPrevReal = prev.link && !prev.link.includes('search.naver.com');
+      if(isItFallback && isPrevReal) it.link = prev.link;
+      // title, rating, country, year, category, genre, runtime 은 항상 엑셀값 (병합 없음)
     }
   }
 
@@ -1212,7 +1256,7 @@ async function addNewImages(){
 // 이미지 캐시 관리 (ObjectURL 재사용)
 // ══════════════════════════════════════════════════════════════
 function clearImgCache(){
-  imgUrlCache.forEach((url)=>{ if(url&&url.startsWith('blob:')) URL.revokeObjectURL(url); });
+  imgUrlCache.forEach(url=>URL.revokeObjectURL(url));
   imgUrlCache.clear();
 }
 
@@ -1239,26 +1283,31 @@ async function fetchAndCacheGithubImage(no){
 
 async function getCachedImgUrl(no){
   if(!no) return null;
-  // 1. 메모리 캐시 — blob:// URL만 (GitHub URL은 캐시 안 함)
+  // 1. 메모리 캐시
   if(imgUrlCache.has(no)){
     const cached=imgUrlCache.get(no);
-    if(cached&&cached.startsWith('blob:')) return cached;
-    imgUrlCache.delete(no); // blob: 아닌 URL 제거
+    if(cached) return cached;
+    imgUrlCache.delete(no);
   }
   // 2. IndexedDB에 저장된 blob
   const r=await idbGet(ST_IMAGES,no).catch(()=>null);
-  if(r&&r.blob&&r.blob.size>100){
+  if(r&&r.blob&&r.blob.size>0){
     try{
       const url=URL.createObjectURL(r.blob);
-      imgUrlCache.set(no,url); // blob: URL만 캐시
+      imgUrlCache.set(no,url);
       return url;
     }catch(e){
       await idbDel(ST_IMAGES,no).catch(()=>{});
     }
   }
-  // 3. IDB 없음 → GitHub 직접 URL 반환 (캐시에 저장 안 함)
-  //    → 다음에 getCachedImgUrl 호출 시 IDB 재체크 → 동기화 후 자동 전환
-  return getGithubImgUrl(no,'jpg') || null;
+  // 3. IDB 없음 → GitHub 직접 URL 반환 (즉시, 타임아웃 없음)
+  //    브라우저가 <img src>로 직접 로드 — CORS 불필요
+  const directUrl=getGithubImgUrl(no,'jpg');
+  if(directUrl){
+    imgUrlCache.set(no,directUrl); // 세션 캐시
+    return directUrl;
+  }
+  return null;
 }
 
 // 이미지 날짜 맵 (no → fileDate) — 정렬용
@@ -1523,8 +1572,24 @@ async function renderFavList(){
   }
 }
 
-function openFavPanel(){showingFav=true;favPanel.classList.add('open');}
-function closeFavPanel(){showingFav=false;favPanel.classList.remove('open');}
+// ★ 즐겨찾기 — 오버레이 방식 (iOS PWA standalone 완전 호환)
+// position:fixed 패널 단독 사용 시 iOS standalone에서 stacking 충돌
+// → 전체화면 overlay(dimmer) 안에 패널 배치로 완전 해결
+const favOverlay = document.getElementById('favOverlay');
+let _favScrollY=0;
+function openFavPanel(){
+  showingFav=true;
+  _favScrollY=window.scrollY||window.pageYOffset||0;
+  // 오버레이 표시 (display:flex → 패널 오른쪽 정렬)
+  favOverlay.classList.add('open');
+  // dimmer 클릭 시 닫기
+  favOverlay.onclick=e=>{ if(e.target===favOverlay) closeFavPanel(); };
+}
+function closeFavPanel(){
+  showingFav=false;
+  favOverlay.classList.remove('open');
+  if(_favScrollY>0) requestAnimationFrame(()=>window.scrollTo(0,_favScrollY));
+}
 function scrollToCard(itemId){
   const el=document.querySelector(`[data-item-id="${itemId}"]`);
   if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
@@ -1562,40 +1627,13 @@ function applySort(items,mode){
 // 데이터 새로고침
 // ══════════════════════════════════════════════════════════════
 async function refreshData(){
-  try{
-    rawItems = await loadAllItems();
-  }catch(e){
-    console.error('loadAllItems error:', e);
-    rawItems = [];
-  }
-  try{
-    await loadImgDateMap();
-  }catch(e){ console.warn('loadImgDateMap:', e); }
-  
-  allItems = applySort(rawItems, curSort);
-  
-  try{ await loadFavs(); }catch(e){ console.warn('loadFavs:', e); }
-  
-  try{ updateStats(); }catch(e){ console.warn('updateStats:', e); }
-  try{ updateHashtagBar(); }catch(e){ console.warn('updateHashtagBar:', e); }
-  try{ updateGenreChips(); }catch(e){ console.warn('updateGenreChips:', e); }
-  
-  // render 전 isRendering 무조건 해제
-  isRendering = false;
-  clearTimeout(_renderTimeout);
-  if(sortSelect) sortSelect.disabled = false;
-  
-  try{
-    await render();
-  }catch(e){
-    console.error('render error:', e);
-    // 에러 내용을 화면에 표시
-    if(cardContainer) cardContainer.innerHTML =
-      '<div class="empty-message"><span class="em-icon">⚠️</span>'
-      +'렌더링 오류: '+String(e.message||e)+'<br>'
-      +'<small style="opacity:.5">브라우저 콘솔(F12)을 확인하세요</small></div>';
-    if(totalStats) totalStats.textContent = '오류 발생';
-  }
+  rawItems=await loadAllItems();
+  await loadImgDateMap(); // 이미지 날짜 맵 로드
+  allItems=applySort(rawItems,curSort); // rawItems 기준으로 정렬
+  await loadFavs();
+  updateStats();
+  updateHashtagBar();
+  await render();
 }
 
 function updateStats(){
@@ -1614,7 +1652,6 @@ function updateStats(){
 // 해시태그 바 업데이트
 // ══════════════════════════════════════════════════════════════
 function updateHashtagBar(){
-  if(!hashtagChipsDiv) return;
   // EMOTION_TAGS 12개만 표시 — 감독/배우 이름 오염 방지
   // 각 태그별 해당 작품 수 계산
   const tagCountMap={};
@@ -1702,39 +1739,21 @@ let isRendering = false;
 // ══════════════════════════════════════════════════════════════
 // 렌더링
 // ══════════════════════════════════════════════════════════════
-let _renderTimeout = null;
 async function render(){
-  // isRendering 체크 제거 — refreshData에서 항상 해제 후 호출
+  if(isRendering) return; // 렌더링 중 중복 호출 방지
   isRendering = true;
-  if(sortSelect) sortSelect.disabled = true;
-  clearTimeout(_renderTimeout);
-  _renderTimeout = setTimeout(()=>{
-    isRendering = false;
-    if(sortSelect) sortSelect.disabled = false;
-  }, 15000);
-  try{
-    if(!filterChipsDiv || !cardContainer){
-      console.error('DOM not ready');
-      return;
-    }
-    updateGenreChips();
-    let filtered = filterByCat(allItems, curCategory);
-    if(curGenre) filtered = filtered.filter(i=>(i.genreList||[]).includes(curGenre));
-    if(curHashtag) filtered = filtered.filter(i=>(i.hashTags||[]).includes(curHashtag));
-    const kw = searchKw.trim();
-    if(kw) filtered = filtered.filter(i=>matchSearch(i.title, kw));
-    if(statsCount) statsCount.innerText = `${filtered.length.toLocaleString()}개`;
-    await renderCards(filtered);
-  }catch(e){
-    console.error('render error:', e);
-    if(cardContainer) cardContainer.innerHTML =
-      '<div class="empty-message"><span class="em-icon">⚠️</span>'
-      +'렌더 오류: '+String(e.message||e)+'</div>';
-  }finally{
-    clearTimeout(_renderTimeout);
-    if(sortSelect) sortSelect.disabled = false;
-    isRendering = false;
-  }
+  // 정렬·필터 컨트롤 일시 비활성화 (이미지 로딩 완료 전 조작 방지)
+  sortSelect.disabled = true;
+  updateGenreChips();
+  let filtered=filterByCat(allItems,curCategory);
+  if(curGenre)filtered=filtered.filter(i=>(i.genreList||[]).includes(curGenre));
+  if(curHashtag)filtered=filtered.filter(i=>(i.hashTags||[]).includes(curHashtag));
+  const kw=searchKw.trim();
+  if(kw)filtered=filtered.filter(i=>matchSearch(i.title,kw));
+  statsCount.innerText=`${filtered.length.toLocaleString()}개`;
+  await renderCards(filtered);
+  sortSelect.disabled = false;
+  isRendering = false;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1775,10 +1794,20 @@ function buildCard(item){
 
   // 포스터 — 즉시 플레이스홀더 표시 후 이미지 비동기 로드 (블로킹 없음)
   const pd=document.createElement('div');pd.className='poster';
-  const isNaverFallback=item.link&&item.link.includes('search.naver.com');
-  pd.title=item.link?(isNaverFallback?'클릭: 네이버 검색 (B열 링크 없음)':'클릭: 영화 정보 보기'):'포스터';
+  pd.title=item.link?'클릭: 영화 정보 보기':'포스터';
   pd.style.cursor=item.link?'pointer':'default';
-  pd.onclick=()=>{ if(item.link) window.open(item.link,'_blank'); };
+  pd.onclick=()=>{
+    if(!item.link) return;
+    // ★ <a> 태그 프로그래밍 클릭 — 모든 브라우저에서 팝업 차단 없이 동작
+    const a=document.createElement('a');
+    a.href=item.link;
+    a.target='_blank';
+    a.rel='noopener noreferrer';
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>document.body.removeChild(a),100);
+  };
   const g=(item.genreList||[]).filter(g=>g!=='기타')[0]||'';
   pd.innerHTML='<div class="poster-placeholder">'
     +'<span class="ph-icon" style="font-size:1rem">🎬</span>'
@@ -1793,13 +1822,12 @@ function buildCard(item){
     const img=document.createElement('img');img.className='poster-img';img.alt=item.title;
     img.loading='eager';             // 모바일 첫 화면 즉시 표시
     img.decoding='async';
-    img.crossOrigin='anonymous';     // Canvas 저장용 (실패해도 무관)
+    // ★ crossOrigin 없음 — GitHub Pages는 CORS 헤더 없음, 설정 시 이미지 로드 실패
     img.onload=()=>{ pd.innerHTML=''; pd.appendChild(img); };
     img.onerror=()=>{
       // jpg 실패 시 png 시도
-      if(img.src.endsWith('.jpg')){
-        img.crossOrigin='anonymous';
-        img.src=img.src.replace('.jpg','.png');
+      if(!img.src.includes('.png')){
+        img.src=img.src.replace(/\.jpg(\?.*)?$/,'.png');
       }
     };
     img.src=bUrl;
@@ -1831,8 +1859,7 @@ function buildCard(item){
   fb.onclick=async e=>{ e.stopPropagation(); await quickToggleFav(item.id,fb,card); };
   fb.oncontextmenu=async e=>{ e.preventDefault();e.stopPropagation(); await showFavCatPicker(item.id,fb,card); };
   const right=document.createElement('div');right.className='card-act-right';
-  let ostLink=item.ostLink||'';
-  if(!ostLink){try{const _o=findOstForItem(item);if(_o&&_o.search)ostLink=makeOstSearchUrl(_o.search);}catch(e){}}
+  const ostLink=item.ostLink||(findOstForItem(item)?findOstForItem(item).url:'');
   if(ostLink){ const ostB=document.createElement('button');ostB.className='icon-btn';ostB.textContent='🎵';ostB.title='OST';ostB.onclick=e=>{e.stopPropagation();window.open(ostLink,'_blank');};right.append(ostB); }
   const eb=document.createElement('button');eb.className='icon-btn';eb.textContent='✏️';eb.onclick=e=>{e.stopPropagation();openEditModal(item);};
   const del=document.createElement('button');del.className='icon-btn del';del.textContent='🗑️';
@@ -1942,7 +1969,6 @@ async function renderPage(){
 
 
 function updateGenreChips(){
-  if(!filterChipsDiv) return;
   const gSet=new Set();
   const base=filterByCat(allItems,curCategory);
   base.forEach(it=>(it.genreList||[]).forEach(g=>{if(g&&g!=='기타')gSet.add(g);}));
@@ -2391,7 +2417,180 @@ async function openExportHtmlModal(){
       +'.share-btn.copy{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.55)}\n'
       +'.footer{text-align:center;margin-top:1.5rem;margin-bottom:4rem;font-size:.62rem;color:rgba(255,255,255,.18)}\n'
       +'@media print{body{background:#fff;color:#111}.share-bar{display:none}.card{border-color:#ddd}.title{color:#111}.meta{color:#666}}\n'
-      +'</style>\n</head>\n<body>\n'
+      +'
+/* ═══════════════════════════════════════════════
+   모바일 전용 레이아웃 (≤680px)
+   - 하단 탭바로 홈/검색/즐겨찾기/설정 전환
+   - toolbar/filter는 설정 패널로 이동
+   - 첫 화면 = 포스터 카드
+═══════════════════════════════════════════════ */
+
+/* ── 하단 탭바 ── */
+.mobile-tabbar{
+  display:none; /* 데스크탑: 숨김 */
+}
+@media(max-width:680px){
+  /* 하단 탭바 표시 */
+  .mobile-tabbar{
+    display:flex;
+    position:fixed;
+    bottom:0; left:0; right:0;
+    height:calc(3.2rem + env(safe-area-inset-bottom,0px));
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    background:#0f1824;
+    border-top:1px solid rgba(255,255,255,.08);
+    z-index:500;
+    align-items:stretch;
+  }
+  .tab-btn{
+    flex:1;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:.15rem;
+    background:none;border:none;
+    color:rgba(255,255,255,.35);
+    font-size:.55rem;font-weight:600;
+    cursor:pointer;
+    transition:color .15s;
+    font-family:inherit;
+    padding-top:.35rem;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .tab-btn .tab-icon{ font-size:1.25rem; line-height:1; }
+  .tab-btn.active{ color:#e8a020; }
+  .tab-btn.active .tab-icon{ filter:drop-shadow(0 0 4px rgba(232,160,32,.5)); }
+
+  /* 콘텐츠 하단 여백 (탭바 높이만큼) */
+  body{ padding-bottom:calc(3.5rem + env(safe-area-inset-bottom,0px)) !important; }
+
+  /* 모바일: sticky-header 높이 최소화 */
+  .main-nav{ padding:.45rem .8rem; }
+  .logo h1{ font-size:.82rem; }
+  .nav-links{ gap:.12rem; }
+  .nav-btn{ font-size:.62rem; padding:.2rem .5rem; }
+
+  /* 모바일: toolbar 완전 숨김 (설정 패널로 이동) */
+  .toolbar{ display:none !important; }
+
+  /* 모바일: filter-bar 검색 탭에서만 표시 */
+  .filter-bar{ display:none; }
+  body.tab-search .filter-bar{ display:flex; }
+  body.tab-search .search-bar{ display:flex; }
+
+  /* 검색바: 기본 숨김, 검색 탭에서만 표시 */
+  .search-bar{ display:none; }
+}
+
+/* ── 설정 패널 (슬라이드업 시트) ── */
+.settings-sheet-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:8000;
+  background:rgba(0,0,0,0);
+  transition:background .25s;
+}
+.settings-sheet-overlay.open{
+  display:flex;
+  align-items:flex-end;
+  background:rgba(0,0,0,.6);
+}
+.settings-sheet{
+  width:100%;
+  background:#0f1824;
+  border-radius:20px 20px 0 0;
+  border-top:1px solid rgba(255,255,255,.1);
+  padding:0 0 env(safe-area-inset-bottom,16px);
+  max-height:88vh;
+  overflow-y:auto;
+  transform:translateY(100%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+  -webkit-overflow-scrolling:touch;
+}
+.settings-sheet-overlay.open .settings-sheet{
+  transform:translateY(0);
+}
+.sheet-handle{
+  width:36px;height:4px;
+  background:rgba(255,255,255,.18);
+  border-radius:2px;
+  margin:.75rem auto .2rem;
+}
+.sheet-title{
+  font-size:.82rem;font-weight:700;
+  color:#e2e8f0;
+  padding:.5rem 1.1rem .7rem;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.sheet-section{
+  padding:.6rem 1rem .2rem;
+}
+.sheet-section-label{
+  font-size:.62rem;font-weight:700;
+  color:rgba(255,255,255,.28);
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  margin-bottom:.4rem;
+}
+.sheet-btn{
+  display:flex;align-items:center;gap:.65rem;
+  width:100%;
+  padding:.7rem .6rem;
+  background:none;border:none;
+  color:#e2e8f0;
+  font-size:.8rem;font-weight:500;
+  font-family:inherit;
+  cursor:pointer;
+  border-radius:10px;
+  transition:background .12s;
+  -webkit-tap-highlight-color:transparent;
+  text-align:left;
+}
+.sheet-btn:hover,.sheet-btn:active{ background:rgba(255,255,255,.06); }
+.sheet-btn .sb-icon{ font-size:1.1rem; width:1.6rem; text-align:center; flex-shrink:0; }
+.sheet-btn .sb-label{ flex:1; }
+.sheet-btn .sb-desc{ font-size:.66rem; color:rgba(255,255,255,.28); margin-top:.1rem; display:block; }
+.sheet-divider{ height:1px; background:rgba(255,255,255,.055); margin:.25rem 1rem; }
+
+/* ── 모바일 검색 패널 (슬라이드다운) ── */
+@media(max-width:680px){
+  /* 검색 탭 활성화 시 nav 하단에 검색바+필터 표시 */
+  body.tab-search .search-bar{
+    display:flex;
+    animation:slideDown .2s ease;
+  }
+  body.tab-search .filter-bar{
+    display:flex;
+    animation:slideDown .2s ease;
+  }
+  @keyframes slideDown{
+    from{opacity:0;transform:translateY(-8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+}
+
+
+/* ── 모바일 홈 탭 최적화 ── */
+@media(max-width:680px){
+  /* nav-links 가로 스크롤 */
+  .nav-inner{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .nav-inner::-webkit-scrollbar{ display:none; }
+  .nav-links{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; flex-shrink:0; }
+  .nav-links::-webkit-scrollbar{ display:none; }
+
+  /* 모바일 카드: 3열, 타이틀 작게 */
+  .card-title{ font-size:.7rem; }
+  .card-meta{ font-size:.62rem; }
+  .card-actions{ padding:.18rem .28rem .22rem; }
+  .similar-btn{ font-size:.58rem; padding:.25rem .4rem; }
+
+  /* 설정 시트 열릴 때 배경 스크롤 방지 */
+  body.settings-open{ overflow:hidden; }
+
+  /* 모바일: stats-badge 작게 */
+  .stats-badge{ font-size:.55rem; padding:.08rem .4rem; }
+}
+</style>\n</head>\n<body>\n'
       +'<div class="header">\n'
       +'  <h1>💜 나의 영화 큐레이션</h1>\n'
       +'  <div class="tag-badges">'+tagBadgesHtml+'</div>\n'
@@ -2470,7 +2669,7 @@ function openHelpModal(){
   const modal=document.createElement('div');modal.className='modal';
   modal.innerHTML=`<div class="modal-box help-modal-box">
     <button class="modal-close">&times;</button>
-    <h3>❓ 영화/드라마 DB final 사용 도움말</h3>
+    <h3>❓ 영화/드라마 DB v30 사용 도움말</h3>
 
     <div class="help-section">
       <h4>📋 처음 시작 — 자동 초기화</h4>
@@ -2522,6 +2721,7 @@ function openHelpModal(){
       <div class="help-row"><span class="help-key">백업</span><span class="help-desc">💾 버튼 → <code>movieDB_backup_날짜.json</code>. 데이터+즐겨찾기 포함 (이미지 제외)</span></div>
       <div class="help-row"><span class="help-key">복원</span><span class="help-desc">📂 복원 → 백업 JSON → 기존 데이터 교체. 이미지는 재접속 시 GitHub에서 자동 재다운로드</span></div>
       <div class="help-row"><span class="help-key">엑셀 재업로드</span><span class="help-desc">수동 태그·메모·즐겨찾기는 excelNo 기준 자동 보존. GitHub에 push 후 동기화로 모든 기기 최신화</span></div>
+      <div class="help-row"><span class="help-key">📝 인문노트 이전</span><span class="help-desc">인문노트는 <b>이 기기 IDB에만 저장</b>됩니다. PC→모바일: PC에서 💾 백업 → 모바일에서 📂 복원. 또는 엑셀에 K열 '인문학노트' 추가 → GitHub push → 동기화.</span></div>
     </div>
 
     <div class="help-section">
@@ -2560,16 +2760,7 @@ function openHelpModal(){
     <div class="help-section">
       <h4>⚠️ 실행 환경별 차이</h4>
       <div class="help-row"><span class="help-key">로컬 (file://)</span><span class="help-desc">데스크탑에서 HTML 직접 오픈. <b>🔄 동기화 불가</b> — 📂 엑셀 업로드 + 📁 로컬 이미지로 수동 로드</span></div>
-      <div class="help-row"><span class="help-key">GitHub Pages</span><span class="help-desc">모바일/웹 접속. <b>🔄 자동 동기화 가능</b>. URL: <code>casio8000.github.io/film-humanities_Mobile/movie_db_final.html</code></span></div>
-    </div>
-
-    <div class="help-section">
-      <h4>📁 파일명 변경 시 수정 목록</h4>
-      <div class="help-row"><span class="help-key">index.html</span><span class="help-desc"><code>location.replace('movie_db_final.html')</code> 부분만 새 파일명으로 변경 후 GitHub 업로드</span></div>
-      <div class="help-row"><span class="help-key">manifest.json</span><span class="help-desc"><b>수정 불필요</b> — <code>"start_url":"index.html"</code>로 고정. index.html만 바꾸면 됨</span></div>
-      <div class="help-row"><span class="help-key">GITHUB_SETUP.md</span><span class="help-desc">앱 동작에 영향 없는 문서 파일. 안내 내용의 파일명 언급이 있다면 참고용으로만 수정</span></div>
-      <div class="help-row"><span class="help-key">홈 화면 앱 아이콘</span><span class="help-desc">index.html 수정 → GitHub push → 기존 홈 화면 앱 <b>삭제 후 재추가</b> (iOS는 재추가 필수)</span></div>
-      <div class="help-tip">💡 파일명을 <b>movie_db_final.html</b>로 고정하면 앞으로 index.html도 수정할 필요 없습니다</div>
+      <div class="help-row"><span class="help-key">GitHub Pages</span><span class="help-desc">모바일/웹 접속. <b>🔄 자동 동기화 가능</b>. URL: <code>casio8000.github.io/film-humanities_Mobile/movie_db_v30.html</code></span></div>
     </div>
   </div>`;
   document.body.appendChild(modal);
@@ -2609,8 +2800,8 @@ function openEditModal(item){
     <input class="mfield" id="eOst" placeholder="https://youtube.com/..." value="${esc(item.ostLink||'')}">
     <span class="mlabel">💜 감정 해시태그 (쉼표 구분, # 자동)</span>
     <input class="mfield" id="eHashtags" placeholder="#감동, #힐링, #생각" value="${esc((item.hashTags||[]).join(', '))}">
-    <span class="mlabel">📝 인문학 노트</span>
-    <textarea class="mfield" id="eNote" rows="3" placeholder="인문학적 감상이나 키워드를 메모하세요">${esc(item.humNote||'')}</textarea>
+    <span class="mlabel">📝 인문학 노트 <small style="color:rgba(255,180,60,.4);font-weight:400">— 이 기기에만 저장, PC↔모바일 이전: 백업→복원</small></span>
+    <textarea class="mfield" id="eNote" rows="4" placeholder="인문학적 감상, 키워드, 명대사 등 자유롭게 메모&#10;(엑셀 재동기화 후에도 보존됩니다)">${esc(item.humNote||'')}</textarea>
     <span class="mlabel">포스터 이미지 교체 (선택)</span>
     <div style="display:flex;gap:.5rem;align-items:center;margin:.25rem 0">
       <label class="tbtn slate" style="cursor:pointer;font-size:.72rem">🖼️ 이미지 선택
@@ -2646,7 +2837,9 @@ function openEditModal(item){
     const ncat=modal.querySelector('#eCategory').value;
     const ng=modal.querySelector('#eGenre').value.trim()||'기타';
     const nrt=modal.querySelector('#eRuntime').value.trim()||'—';
-    const nl=modal.querySelector('#eLink').value.trim()||`https://search.naver.com/search.naver?query=${encodeURIComponent(nt+' 영화')}`;
+    const ncat2=modal.querySelector('#eCategory').value;
+    const editCatKw=ncat2==='드라마'?'드라마':ncat2==='다큐멘터리'?'다큐멘터리':'영화';
+    const nl=modal.querySelector('#eLink').value.trim()||`https://search.naver.com/search.naver?query=${encodeURIComponent(nt+' '+editCatKw)}`;
     const nost=modal.querySelector('#eOst').value.trim();
     const nhNote=modal.querySelector('#eNote').value.trim();
     const nTagsRaw=modal.querySelector('#eHashtags').value.trim();
@@ -2738,7 +2931,7 @@ async function openAddNewModal(){
     <span class="mlabel">💜 감정 해시태그 (쉼표 구분)</span>
     <input class="mfield" id="anHashtags" placeholder="#감동, #힐링, #설렘">
 
-    <span class="mlabel">📝 메모 (인문학 노트)</span>
+    <span class="mlabel">📝 인문학 노트 <small style="color:rgba(255,180,60,.4);font-weight:400">— 이 기기에만 저장</small></span>
     <textarea class="mfield" id="anNote" rows="2" placeholder="감상이나 키워드를 메모하세요"></textarea>
 
     <div class="mactions">
@@ -2784,7 +2977,8 @@ async function openAddNewModal(){
           .filter(t => EMOTION_TAGS.some(e => e.tag === t))
       : [];
 
-    const link = `https://search.naver.com/search.naver?query=${encodeURIComponent(title+' '+category)}`;
+    const catKw = category==='드라마'?'드라마':category==='다큐멘터리'?'다큐멘터리':'영화';
+    const link = `https://search.naver.com/search.naver?query=${encodeURIComponent(title+' '+catKw)}`;
     const newItem = {
       title, rating: (rating && !isNaN(parseFloat(rating))) ? parseFloat(rating).toFixed(1) : '?',
       country, year, category, genreRaw, genreList: parseGenres(genreRaw),
@@ -2905,7 +3099,10 @@ async function fullRestore(file){
   for(const f of oldFavs)await idbDel(ST_FAVS,f.id).catch(()=>{});
   for(const item of imported){
     item.genreList=parseGenres(item.genreRaw||'기타');
-    item.link=item.link||`https://search.naver.com/search.naver?query=${encodeURIComponent(item.title+' 영화')}`;
+    // link: 저장된 값 우선 (엑셀 B열 HYPERLINK 보존), 없을 때만 기본 생성
+// link 폴백: 카테고리 기준 (영화/드라마/다큐)
+    const restoreCatKw=item.category==='드라마'?'드라마':item.category==='다큐멘터리'?'다큐멘터리':'영화';
+    item.link=item.link||(item.title?`https://search.naver.com/search.naver?query=${encodeURIComponent(item.title+' '+restoreCatKw)}`:'');
     item.hashTags=item.hashTags||[];
     delete item.id;
     await saveItem(item);
@@ -3259,7 +3456,7 @@ document.getElementById('favNavBtn').onclick=()=>{
   loadFavs().then(()=>{renderFavCatBar();renderFavList();openFavPanel();});
 };
 // 즐겨찾기 SNS 공유 — file:// URL 제외, 텍스트+링크 공유
-if(document.getElementById('favShareBtn')) document.getElementById('favShareBtn').onclick=async()=>{
+document.getElementById('favShareBtn').onclick=async()=>{
   await loadFavs();
   const items=await loadAllItems();
   const itemMap=new Map(items.map(i=>[i.id,i]));
@@ -3301,25 +3498,7 @@ searchInput.addEventListener('keypress',e=>{if(e.key==='Enter')doSearch();});
 searchInput.addEventListener('input',()=>{clearTimeout(sTimer);sTimer=setTimeout(doSearch,300);});
 
 closeProgBtn.onclick=()=>{progressPanel.style.display='none';};
-if(document.getElementById('favClose')) document.getElementById('favClose').onclick=closeFavPanel;
-// 모바일 메뉴 토글
-(function(){
-  const menuBtn=document.getElementById('menuToggleBtn');
-  const toolbar=document.querySelector('.toolbar');
-  if(menuBtn&&toolbar){
-    menuBtn.onclick=()=>{
-      toolbar.classList.toggle('open');
-      menuBtn.textContent=toolbar.classList.contains('open')?'✕ 닫기':'☰ 메뉴';
-    };
-    // 툴바 버튼 클릭 후 자동 닫기
-    toolbar.addEventListener('click',e=>{
-      if(e.target!==toolbar&&window.innerWidth<=680){
-        toolbar.classList.remove('open');
-        menuBtn.textContent='☰ 메뉴';
-      }
-    });
-  }
-})();
+document.getElementById('favClose').onclick=closeFavPanel;
 document.getElementById('btnAddNew').onclick = () => openAddNewModal();
 document.getElementById('btnStats').onclick=openStatsModal;
 if(document.getElementById('btnExport')) document.getElementById('btnExport').onclick=exportToExcel;
@@ -3338,221 +3517,209 @@ window.addEventListener('scroll',()=>{
 scrollTopBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 
 // ══════════════════════════════════════════════════════════════
-// 모바일 탭바 & 설정 패널
-// ══════════════════════════════════════════════════════════════
-function mobileTab(tab){
-  // 탭 버튼 active
-  ['home','search','fav','emotion','settings'].forEach(t=>{
-    const btn=document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1));
-    if(btn) btn.classList.toggle('active', t===tab);
-  });
-
-  if(tab==='home'){
-    // 검색 초기화
-    if(searchInput) searchInput.blur();
-    window.scrollTo({top:0, behavior:'smooth'});
-  } else if(tab==='search'){
-    // 검색창 포커스
-    if(searchInput){ searchInput.scrollIntoView({behavior:'smooth'}); searchInput.focus(); }
-  } else if(tab==='fav'){
-    loadFavs().then(()=>{renderFavCatBar();renderFavList();openFavPanel();});
-    // fav 탭은 active를 fav 버튼에서 home으로 복귀
-    setTimeout(()=>{
-      const h=document.getElementById('tabHome');if(h)h.classList.add('active');
-      const f=document.getElementById('tabFav');if(f)f.classList.remove('active');
-    }, 100);
-  } else if(tab==='emotion'){
-    openExportHtmlModal();
-    setTimeout(()=>{
-      const h=document.getElementById('tabHome');if(h)h.classList.add('active');
-      const e=document.getElementById('tabEmotion');if(e)e.classList.remove('active');
-    }, 100);
-  } else if(tab==='settings'){
-    openSettings();
-  }
-}
-
-function openSettings(){
-  const panel=document.getElementById('settingsPanel');
-  const overlay=document.getElementById('settingsOverlay');
-  if(panel) panel.classList.add('open');
-  if(overlay) overlay.classList.add('open');
-}
-
-function closeSettings(){
-  const panel=document.getElementById('settingsPanel');
-  const overlay=document.getElementById('settingsOverlay');
-  if(panel) panel.classList.remove('open');
-  if(overlay) overlay.classList.remove('open');
-  // 설정 탭 → 홈으로 복귀
-  const h=document.getElementById('tabHome');if(h)h.classList.add('active');
-  const s=document.getElementById('tabSettings');if(s)s.classList.remove('active');
-}
-
-// 앱 공유 — OpenGraph URL 공유
-async function shareApp(){
-  const shareUrl='https://casio8000.github.io/film-humanities_Mobile/';
-  const shareTitle='🎬 나의 영화/드라마 관람 기록';
-  const shareText='개인 영화 관람 기록 3,400편+ · 감정별 추천 · 포스터 아카이브\n\n'+shareUrl;
-  if(navigator.share){
-    try{
-      await navigator.share({title:shareTitle, text:shareText, url:shareUrl});
-      return;
-    }catch(e){}
-  }
-  try{
-    await navigator.clipboard.writeText(shareUrl);
-    showToast('앱 링크가 복사됐습니다. 카카오톡에 붙여넣기 하세요 ✅','success',3500);
-  }catch(e){
-    showToast('링크: '+shareUrl,'info',6000);
-  }
-}
-
-// 설정 패널 스와이프 다운 닫기
-(function(){
-  let startY=0;
-  const panel=document.getElementById('settingsPanel');
-  if(!panel) return;
-  panel.addEventListener('touchstart',e=>{ startY=e.touches[0].clientY; },{passive:true});
-  panel.addEventListener('touchend',e=>{
-    const dy=e.changedTouches[0].clientY-startY;
-    if(dy>60) closeSettings(); // 60px 이상 아래로 스와이프 시 닫기
-  },{passive:true});
-})();
-
-
-// ══════════════════════════════════════════════════════════════
 // 초기화 — GitHub 자동 로드 + 태그 자동분류
 // ══════════════════════════════════════════════════════════════
 (async()=>{
-  isRendering = false; // 초기화 시 렌더 락 해제 보장
   await initDB();
   loadFavCatsLocal();
   setupSubDropdowns();
   await refreshData();
 
   const isFileProtocol = location.protocol === 'file:';
+  const isGithubPages  = location.hostname.includes('github.io');
 
   if(rawItems.length === 0){
-    // ── 데이터 없음 ──
+    // 데이터 없음
     if(isFileProtocol){
-      // 로컬 파일 실행: fetch 불가 → 수동 안내
-      debug('로컬 파일 실행 — 엑셀 업로드 필요');
-      // 빈 화면 안내 표시
-      if(cardContainer) cardContainer.innerHTML=
-        '<div class="empty-message"><span class="em-icon">📂</span>'
-        +'데이터가 없습니다.<br><span style="font-size:.75rem;opacity:.6">'
-        +'툴바에서 📂 엑셀 업로드를 실행하세요</span></div>';
-      if(totalStats) totalStats.textContent='데이터 없음';
+      // ── 로컬 파일 실행: GitHub fetch 불가 → 수동 안내 ──
+      debug('로컬 파일 실행 — 데스크탑 엑셀 업로드 필요');
+      showToast('📂 데이터 없음 — 툴바에서 엑셀 업로드 또는 🔄 동기화를 실행하세요', 'info', 8000);
     } else {
-      // GitHub Pages: 자동 로드 시도
-      debug('데이터 없음 — GitHub 자동 로드 시작');
-      if(totalStats) totalStats.textContent='동기화 중…';
-      const ok = await loadExcelFromGithub(false);
-      if(!ok && rawItems.length === 0){
-        // 로드 실패 안내
-        if(cardContainer) cardContainer.innerHTML=
-          '<div class="empty-message"><span class="em-icon">⚠️</span>'
-          +'엑셀 로드 실패<br><span style="font-size:.75rem;opacity:.6">'
-          +'🔄 데이터 동기화 버튼을 눌러 다시 시도하세요</span></div>';
-        if(totalStats) totalStats.textContent='로드 실패';
-      }
+      // ── GitHub Pages / 웹서버 실행: 자동 로드 가능 ──
+      debug('데이터 없음 — GitHub 자동 로드');
+      await loadExcelFromGithub(false);
     }
   } else {
-    // ── 데이터 있음 — 태그 자동 분류 (백그라운드, 렌더 막지 않음) ──
+    // 데이터 있음 — 태그 없는 항목만 조용히 자동 분류
     const noTagCount = rawItems.filter(i=>!(i.hashTags&&i.hashTags.length)).length;
     if(noTagCount > 0){
-      debug('태그 자동 분류: '+noTagCount+'개');
-      // 백그라운드에서 분류 — await 하지 않아 렌더 즉시 진행
-      autoTagAll(false).then(async()=>{
-        rawItems = await loadAllItems();
-        allItems = applySort(rawItems, curSort);
-        updateHashtagBar();
-        await render();
-      }).catch(e=>console.warn('autoTag err:', e));
+      debug(`태그 없는 작품 ${noTagCount}개 — 자동 분류 시작`);
+      await autoTagAll(false);
+      await refreshData();
     }
   }
 
   debug('영화/드라마 DB final 준비 완료');
 })();
+
+// ★ PWA standalone 감지
+(function(){
+  var isStandalone=window.navigator.standalone===true||window.matchMedia('(display-mode:standalone)').matches;
+  if(isStandalone) document.documentElement.classList.add('pwa-standalone');
+})();
+
+// ══════════════════════════════════════════════════════
+// 모바일 탭바 + 설정 시트
+// ══════════════════════════════════════════════════════
+function isMobile(){ return window.innerWidth <= 680; }
+
+// 탭 전환
+function switchTab(tab){
+  if(!isMobile()) return;
+  const tabs = ['home','search','fav'];
+  tabs.forEach(t=>{
+    const btn = document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(btn) btn.classList.toggle('active', t===tab);
+  });
+  document.body.classList.remove('tab-home','tab-search','tab-fav');
+  document.body.classList.add('tab-'+tab);
+
+  if(tab==='home'){
+    // 홈: 검색바 숨김, 카드 표시
+    searchKw=''; searchInput.value='';
+    render();
+  } else if(tab==='search'){
+    // 검색: 검색바 표시, 포커스
+    setTimeout(()=>{ if(searchInput) searchInput.focus(); }, 200);
+  } else if(tab==='fav'){
+    // 즐겨찾기 패널 열기
+    loadFavs().then(()=>{ renderFavCatBar(); renderFavList(); openFavPanel(); });
+    // 탭 버튼은 fav로 유지하지 않음 (패널이 열리면 home으로 복귀)
+    setTimeout(()=>{
+      document.getElementById('tabFav').classList.remove('active');
+      document.getElementById('tabHome').classList.add('active');
+    }, 300);
+  }
+}
+
+// 설정 시트
+const settingsSheetOverlay = document.getElementById('settingsSheetOverlay');
+function openSettingsSheet(){
+  settingsSheetOverlay.classList.add('open');
+  settingsSheetOverlay.onclick = e=>{
+    if(e.target===settingsSheetOverlay) closeSettingsSheet();
+  };
+}
+function closeSettingsSheet(){
+  settingsSheetOverlay.classList.remove('open');
+}
+
+// 설정 시트의 엑셀 업로드 핸들러
+function handleExcelUpload(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev=>{
+    try{
+      const n = await importFromExcel(ev.target.result);
+      showToast('✅ '+n.toLocaleString()+'개 작품 로드', 'success', 4000);
+      await refreshData();
+    }catch(e){ showToast('❌ 엑셀 오류: '+e.message,'error',5000); }
+  };
+  reader.readAsArrayBuffer(file);
+  input.value='';
+}
+
+// 모바일 첫 진입: 홈 탭 활성화
+(function initMobileTab(){
+  if(!isMobile()) return;
+  document.body.classList.add('tab-home');
+  // 탭 설정 아이콘은 active 없음 (슬라이드업이므로)
+})();
+
 </script>
 
-  <div class="fav-cat-bar" id="favCatBar"></div>
-  <div class="fav-list" id="favList" style="-webkit-overflow-scrolling:touch;overflow-y:auto;flex:1"></div>
+<!-- ── 모바일 하단 탭바 ── -->
+<nav class="mobile-tabbar" id="mobileTabbar">
+  <button class="tab-btn active" id="tabHome" onclick="switchTab('home')">
+    <span class="tab-icon">🎬</span>
+    <span>홈</span>
+  </button>
+  <button class="tab-btn" id="tabSearch" onclick="switchTab('search')">
+    <span class="tab-icon">🔍</span>
+    <span>검색</span>
+  </button>
+  <button class="tab-btn" id="tabFav" onclick="switchTab('fav')">
+    <span class="tab-icon">⭐</span>
+    <span>즐겨찾기</span>
+  </button>
+  <button class="tab-btn" id="tabSettings" onclick="openSettingsSheet()">
+    <span class="tab-icon">⚙️</span>
+    <span>설정</span>
+  </button>
+</nav>
+
+<!-- ── 설정 시트 (슬라이드업) ── -->
+<div class="settings-sheet-overlay" id="settingsSheetOverlay">
+  <div class="settings-sheet" id="settingsSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">⚙️ 설정</div>
+
+    <!-- 데이터 동기화 -->
+    <div class="sheet-section">
+      <div class="sheet-section-label">데이터 동기화</div>
+      <button class="sheet-btn" onclick="closeSettingsSheet();document.getElementById('btnGithubSync').click()">
+        <span class="sb-icon">🔄</span>
+        <span class="sb-label">데이터 동기화<span class="sb-desc">GitHub에서 최신 엑셀 데이터 가져오기</span></span>
+      </button>
+      <button class="sheet-btn" onclick="closeSettingsSheet();document.getElementById('btnImgSync').click()">
+        <span class="sb-icon">🖼️</span>
+        <span class="sb-label">이미지 동기화<span class="sb-desc">GitHub에서 포스터 이미지 저장</span></span>
+      </button>
+    </div>
+    <div class="sheet-divider"></div>
+
+    <!-- 태그 & 분석 -->
+    <div class="sheet-section">
+      <div class="sheet-section-label">태그 & 분석</div>
+      <button class="sheet-btn" onclick="closeSettingsSheet();document.getElementById('btnAutoTag').click()">
+        <span class="sb-icon">🤖</span>
+        <span class="sb-label">감정태그 자동분류<span class="sb-desc">장르·제목 기반으로 태그 자동 부여</span></span>
+      </button>
+      <button class="sheet-btn" onclick="closeSettingsSheet();document.getElementById('btnStats').click()">
+        <span class="sb-icon">📊</span>
+        <span class="sb-label">통계 대시보드<span class="sb-desc">국가·장르·연도별 분포 차트</span></span>
+      </button>
+    </div>
+    <div class="sheet-divider"></div>
+
+    <!-- 데이터 관리 -->
+    <div class="sheet-section">
+      <div class="sheet-section-label">데이터 관리</div>
+      <button class="sheet-btn" onclick="closeSettingsSheet();document.getElementById('fullBackupBtn').click()">
+        <span class="sb-icon">💾</span>
+        <span class="sb-label">백업<span class="sb-desc">데이터·즐겨찾기·태그를 JSON으로 저장</span></span>
+      </button>
+      <button class="sheet-btn" onclick="closeSettingsSheet();document.getElementById('fullRestoreZip').click()">
+        <span class="sb-icon">📂</span>
+        <span class="sb-label">복원<span class="sb-desc">백업 JSON 파일에서 데이터 복원</span></span>
+      </button>
+      <button class="sheet-btn" onclick="closeSettingsSheet();document.getElementById('btnAddNew').click()">
+        <span class="sb-icon">➕</span>
+        <span class="sb-label">작품 추가<span class="sb-desc">새 영화·드라마 수동 추가</span></span>
+      </button>
+    </div>
+    <div class="sheet-divider"></div>
+
+    <!-- 기타 -->
+    <div class="sheet-section">
+      <div class="sheet-section-label">기타</div>
+      <button class="sheet-btn" onclick="closeSettingsSheet();document.getElementById('refreshBtn').click()">
+        <span class="sb-icon">↺</span>
+        <span class="sb-label">새로고침<span class="sb-desc">데이터 및 이미지 캐시 재로드</span></span>
+      </button>
+      <button class="sheet-btn" onclick="closeSettingsSheet();document.getElementById('btnHelp').click()">
+        <span class="sb-icon">❓</span>
+        <span class="sb-label">도움말<span class="sb-desc">사용 방법 안내</span></span>
+      </button>
+      <label class="sheet-btn" style="cursor:pointer">
+        <span class="sb-icon">📂</span>
+        <span class="sb-label">엑셀 업로드 (PC용)<span class="sb-desc">로컬 엑셀 파일 직접 업로드</span></span>
+        <input type="file" accept=".xlsx,.xls" style="display:none" onchange="document.getElementById('importExcelBtn').closest('label').querySelector('input').files;handleExcelUpload(this)">
+      </label>
+    </div>
+    <div style="height:.8rem"></div>
+  </div>
 </div>
-
-<!-- 하단 탭바 (모바일 전용) -->
-<div class="mobile-tabbar" id="mobileTabbar">
-  <button class="tab-btn active" id="tabHome" onclick="mobileTab('home')">
-    <span class="tab-icon">🎬</span>홈
-  </button>
-  <button class="tab-btn" id="tabSearch" onclick="mobileTab('search')">
-    <span class="tab-icon">🔍</span>검색
-  </button>
-  <button class="tab-btn" id="tabFav" onclick="mobileTab('fav')">
-    <span class="tab-icon">⭐</span>즐겨찾기
-  </button>
-  <button class="tab-btn" id="tabEmotion" onclick="mobileTab('emotion')">
-    <span class="tab-icon">💜</span>추천
-  </button>
-  <button class="tab-btn" id="tabSettings" onclick="mobileTab('settings')">
-    <span class="tab-icon">⚙️</span>설정
-  </button>
-</div>
-
-<!-- 설정 오버레이 -->
-<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
-
-<!-- 설정 패널 -->
-<div class="settings-panel" id="settingsPanel">
-  <div class="settings-handle"></div>
-  <div class="settings-title">⚙️ 설정 및 관리</div>
-
-  <div class="settings-section">
-    <h4>데이터 동기화</h4>
-    <button class="settings-btn" onclick="closeSettings();document.getElementById('btnGithubSync').click()">
-      <span class="s-icon">🔄</span><span class="s-label">데이터 동기화<br><small style="color:rgba(255,255,255,.35);font-size:.68rem">GitHub에서 최신 엑셀 로드</small></span><span class="s-arrow">›</span>
-    </button>
-    <button class="settings-btn" onclick="closeSettings();document.getElementById('btnImgSync').click()">
-      <span class="s-icon">🖼️</span><span class="s-label">이미지 동기화<br><small style="color:rgba(255,255,255,.35);font-size:.68rem">포스터 다운로드 및 저장</small></span><span class="s-arrow">›</span>
-    </button>
-  </div>
-
-  <div class="settings-section">
-    <h4>분류 & 태그</h4>
-    <button class="settings-btn" onclick="closeSettings();document.getElementById('btnAutoTag').click()">
-      <span class="s-icon">🤖</span><span class="s-label">감정태그 자동 분류<br><small style="color:rgba(255,255,255,.35);font-size:.68rem">장르·제목 기반 태그 자동 생성</small></span><span class="s-arrow">›</span>
-    </button>
-    <button class="settings-btn" onclick="closeSettings();document.getElementById('btnStats').click()">
-      <span class="s-icon">📊</span><span class="s-label">통계 보기<br><small style="color:rgba(255,255,255,.35);font-size:.68rem">국가별·장르별·연도별 분석</small></span><span class="s-arrow">›</span>
-    </button>
-  </div>
-
-  <div class="settings-section">
-    <h4>작품 관리</h4>
-    <button class="settings-btn" onclick="closeSettings();document.getElementById('btnAddNew').click()">
-      <span class="s-icon">➕</span><span class="s-label">작품 개별 추가</span><span class="s-arrow">›</span>
-    </button>
-    <button class="settings-btn" onclick="closeSettings();document.getElementById('refreshBtn').click()">
-      <span class="s-icon">↺</span><span class="s-label">화면 새로고침</span><span class="s-arrow">›</span>
-    </button>
-  </div>
-
-  <div class="settings-section">
-    <h4>백업 & 도움말</h4>
-    <button class="settings-btn" onclick="closeSettings();document.getElementById('fullBackupBtn').click()">
-      <span class="s-icon">💾</span><span class="s-label">데이터 백업</span><span class="s-arrow">›</span>
-    </button>
-    <button class="settings-btn" onclick="closeSettings();document.getElementById('btnHelp').click()">
-      <span class="s-icon">❓</span><span class="s-label">도움말</span><span class="s-arrow">›</span>
-    </button>
-    <button class="settings-btn" onclick="closeSettings();shareApp()">
-      <span class="s-icon">📤</span><span class="s-label">앱 공유하기<br><small style="color:rgba(255,255,255,.35);font-size:.68rem">카카오톡·인스타그램 등으로 공유</small></span><span class="s-arrow">›</span>
-    </button>
-  </div>
-
-  <div style="height:.8rem"></div>
-</div>
-
 </body>
 </html>
