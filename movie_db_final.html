@@ -594,7 +594,7 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
   <div class="mobile-filter-row" id="mobileFilterRow">
     <!-- 카테고리 드롭다운 (전체/영화/드라마/다큐/기타) -->
     <div class="mfr-cat-wrap" id="mfrCatWrap">
-      <button class="mfr-btn" id="mfrCatBtn" onclick="toggleMfrCat()">📂 전체 ▾</button>
+      <button class="mfr-btn" id="mfrCatBtn" onclick="toggleMfrCat(event)" ontouchend="toggleMfrCat(event);event.preventDefault()">📂 전체 ▾</button>
       <div class="mfr-cat-drop" id="mfrCatDrop">
         <button class="mfr-cat-item active" data-cat="all">전체</button>
         <button class="mfr-cat-item" data-cat="movie">🎬 영화</button>
@@ -3455,7 +3455,8 @@ function toggleFilter(type){
 })();
 
 // ── 모바일 카테고리 드롭다운 ──
-function toggleMfrCat(){
+function toggleMfrCat(e){
+  if(e) e.stopPropagation();
   const drop=document.getElementById('mfrCatDrop');
   if(!drop)return;
   drop.classList.toggle('open');
@@ -3465,26 +3466,41 @@ function toggleMfrCat(){
   const drop=document.getElementById('mfrCatDrop');
   const catBtn=document.getElementById('mfrCatBtn');
   if(!drop||!catBtn)return;
+
+  function selectCat(item){
+    const cat=item.dataset.cat;
+    // 레이블 업데이트
+    const label=item.textContent.trim();
+    catBtn.textContent=(cat==='all'?'📂 전체':'📂 '+label)+' ▾';
+    // active 표시
+    drop.querySelectorAll('.mfr-cat-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    drop.classList.remove('open');
+    // 필터 적용
+    curCategory=cat; curSubFilter=''; curGenre=''; curHashtag='';
+    searchKw=''; if(searchInput) searchInput.value='';
+    updateGenreChips(); updateHashtagBar(); render();
+  }
+
   drop.querySelectorAll('.mfr-cat-item').forEach(item=>{
-    item.addEventListener('click',()=>{
-      const cat=item.dataset.cat;
-      // 기존 nav-btn 클릭과 동일하게 처리
-      document.querySelectorAll('[data-category]').forEach(b=>{
-        b.classList.toggle('active',b.dataset.category===cat);
-      });
-      // 레이블 업데이트
-      catBtn.textContent='📂 '+item.textContent.trim()+' ▾';
-      // active 표시
-      drop.querySelectorAll('.mfr-cat-item').forEach(i=>i.classList.remove('active'));
-      item.classList.add('active');
-      drop.classList.remove('open');
-      // 필터 적용 (실제 변수명: curSubFilter, 실제 함수명: updateGenreChips)
-      curCategory=cat; curSubFilter=''; curGenre=''; curHashtag='';
-      updateGenreChips(); updateHashtagBar(); render();
+    // touchend로 즉시 반응 (click보다 먼저 실행 → document.click 충돌 방지)
+    item.addEventListener('touchend', e=>{
+      e.preventDefault(); // click 이벤트 중복 방지
+      e.stopPropagation();
+      selectCat(item);
+    }, {passive:false});
+    // 마우스 클릭 폴백 (데스크탑 or 터치 미지원)
+    item.addEventListener('click', e=>{
+      e.stopPropagation();
+      selectCat(item);
     });
   });
-  // 외부 클릭 시 닫기
-  document.addEventListener('click',e=>{
+
+  // 외부 터치/클릭 시 닫기 (아이템 내부 터치는 위에서 stopPropagation으로 차단됨)
+  document.addEventListener('touchend', e=>{
+    if(!drop.contains(e.target)&&!catBtn.contains(e.target)){drop.classList.remove('open');}
+  },{passive:true});
+  document.addEventListener('click', e=>{
     if(!drop.contains(e.target)&&!catBtn.contains(e.target)){drop.classList.remove('open');}
   },{passive:true});
 })();
