@@ -42,6 +42,7 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 }
 
 .main-nav{background:linear-gradient(135deg,#090f1e,#0e1f3a);border-bottom:1px solid rgba(255,255,255,.06);padding:.6rem 1.2rem}
+@media(max-width:680px){.main-nav{padding:.22rem .7rem;}}
 .nav-inner{max-width:1440px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.5rem}
 .logo h1{font-size:1rem;font-weight:700;color:#eef2ff;white-space:nowrap}
 .stats-badge{background:rgba(100,160,240,.15);border:1px solid rgba(100,160,240,.25);color:#93c5fd;padding:.1rem .5rem;border-radius:16px;font-size:.63rem;font-weight:600;margin-left:.35rem;vertical-align:middle}
@@ -419,12 +420,19 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
     padding:.3rem .7rem;
     background:#111827;
     border-bottom:1px solid rgba(255,255,255,.05);
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
+    /* overflow:visible — 절대위치 드롭다운이 잘리지 않게 */
+    overflow:visible;
     flex-shrink:0;
+    /* 가로 스크롤은 내부 스크롤 래퍼로 처리 */
+    flex-wrap:nowrap;
   }
-  .mobile-filter-row::-webkit-scrollbar{display:none;}
+  /* 카테고리 버튼 왼쪽 고정, 나머지 버튼들만 스크롤 */
+  .mfr-scroll-wrap{
+    display:flex;align-items:center;gap:.3rem;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+    flex:1;
+  }
+  .mfr-scroll-wrap::-webkit-scrollbar{display:none;}
 }
 .mfr-btn{
   background:rgba(255,255,255,.05);
@@ -603,18 +611,21 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
         <button class="mfr-cat-item" onclick="mfrSelectCat(this,'other','📁 기타')">📁 기타</button>
       </div>
     </div>
-    <button class="mfr-btn" id="mfrGenreBtn" onclick="toggleFilter('genre');updateMfrBtn()">🎬 장르 ▾</button>
-    <button class="mfr-btn" id="mfrEmotionBtn" onclick="toggleFilter('emotion');updateMfrBtn()">💜 감정 ▾</button>
-    <select class="mfr-sort" id="mfrSort">
-      <option value="fileDateDesc">정렬: 관람일↓</option>
-      <option value="fileDateAsc">정렬: 관람일↑</option>
-      <option value="noAsc">연번↑</option>
-      <option value="noDesc">연번↓</option>
-      <option value="titleAsc">가나다↑</option>
-      <option value="titleDesc">가나다↓</option>
-      <option value="ratingDesc">평점↓</option>
-      <option value="yearDesc">개봉↓</option>
-    </select>
+    <!-- 장르/감정/정렬은 가로 스크롤 래퍼 안에 -->
+    <div class="mfr-scroll-wrap">
+      <button class="mfr-btn" id="mfrGenreBtn" onclick="toggleFilter('genre');updateMfrBtn()">🎬 장르 ▾</button>
+      <button class="mfr-btn" id="mfrEmotionBtn" onclick="toggleFilter('emotion');updateMfrBtn()">💜 감정 ▾</button>
+      <select class="mfr-sort" id="mfrSort">
+        <option value="fileDateDesc">정렬: 관람일↓</option>
+        <option value="fileDateAsc">정렬: 관람일↑</option>
+        <option value="noAsc">연번↑</option>
+        <option value="noDesc">연번↓</option>
+        <option value="titleAsc">가나다↑</option>
+        <option value="titleDesc">가나다↓</option>
+        <option value="ratingDesc">평점↓</option>
+        <option value="yearDesc">개봉↓</option>
+      </select>
+    </div>
   </div>
 
   <!-- 검색바 (모바일·데스크탑 공통 — 필터행 아래) -->
