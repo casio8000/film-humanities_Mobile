@@ -28,13 +28,12 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 
 /* ── 상단 고정 헤더 ── */
 .sticky-header{position:sticky;top:0;z-index:200;background:#0d1117}
-/* 모바일: fixed + 노치/상태바 safe-area 대응 */
 @media(max-width:680px){
   .sticky-header{
     position:fixed;
     top:0;left:0;right:0;
-    /* safe-area-inset-top 한 번만 적용 (top 위치로만) */
-    top:env(safe-area-inset-top, 0px);
+    /* padding-top으로 safe-area 처리 → background가 상태바까지 채움 */
+    padding-top:env(safe-area-inset-top, 0px);
     z-index:200;
     background:#0d1117;
   }
@@ -253,6 +252,50 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 .bar-fill.green{background:#10b981}
 .bar-fill.purple{background:#8b5cf6}
 .bar-count{font-size:.66rem;color:rgba(255,255,255,.4);width:30px;flex-shrink:0}
+
+/* ── 모바일: 검색바 숨김 (돋보기 오버레이로 대체) ── */
+@media(max-width:680px){ .search-bar{display:none!important;} }
+
+/* ── 모바일 fixed 칩 오버레이 (장르·감정) ── */
+.mfr-chip-overlay{
+  display:none;position:fixed;left:0;right:0;
+  top:var(--header-h,9rem);z-index:300;
+  background:#0f1824;border-bottom:1px solid rgba(255,255,255,.1);
+  padding:.5rem .8rem .65rem;max-height:55vh;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  box-shadow:0 6px 20px rgba(0,0,0,.6);
+}
+.mfr-chip-overlay.open{display:block;}
+.mfr-chip-overlay-title{font-size:.68rem;color:rgba(255,255,255,.35);
+  font-weight:600;margin-bottom:.4rem;display:flex;align-items:center;justify-content:space-between;}
+.mfr-overlay-close{background:none;border:none;color:rgba(255,255,255,.4);
+  font-size:1.1rem;cursor:pointer;padding:.1rem .3rem;-webkit-tap-highlight-color:transparent;}
+.mfr-chip-overlay .filter-chips,
+.mfr-chip-overlay .hashtag-chips-inner{display:flex;flex-wrap:wrap;gap:.3rem;}
+
+/* ── 모바일 fixed 검색 오버레이 ── */
+.mfr-search-overlay{
+  display:none;position:fixed;left:0;right:0;
+  top:var(--header-h,9rem);z-index:300;
+  background:#0f1824;border-bottom:1px solid rgba(255,255,255,.1);
+  padding:.55rem .8rem;box-shadow:0 6px 20px rgba(0,0,0,.6);
+}
+.mfr-search-overlay.open{display:flex;gap:.4rem;align-items:center;}
+.mfr-search-overlay input{flex:1;background:#161e30;border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;padding:.42rem .85rem;color:#e2e8f0;
+  font-size:.82rem;font-family:inherit;outline:none;}
+.mfr-search-overlay input::placeholder{color:rgba(255,255,255,.22);}
+.mfr-search-overlay .mso-btn{background:#e8a020;border:none;border-radius:20px;
+  padding:.42rem .8rem;color:#111;font-weight:700;font-size:.75rem;
+  cursor:pointer;font-family:inherit;white-space:nowrap;}
+.mfr-search-overlay .mso-close{background:rgba(255,255,255,.08);border:none;border-radius:20px;
+  padding:.42rem .7rem;color:rgba(255,255,255,.6);font-size:.75rem;
+  cursor:pointer;font-family:inherit;}
+
+/* ── 오버레이 뒷배경 딤 ── */
+.mfr-overlay-dim{display:none;position:fixed;inset:0;
+  top:var(--header-h,9rem);z-index:290;background:rgba(0,0,0,.45);}
+.mfr-overlay-dim.open{display:block;}
 
 /* ── 도움말 모달 ── */
 .help-modal-box{max-width:640px}
@@ -611,10 +654,11 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
         <button class="mfr-cat-item" onclick="mfrSelectCat(this,'other','📁 기타')">📁 기타</button>
       </div>
     </div>
-    <!-- 장르/감정/정렬은 가로 스크롤 래퍼 안에 -->
+    <!-- 장르/감정/검색/정렬 — 가로 스크롤 래퍼 -->
     <div class="mfr-scroll-wrap">
-      <button class="mfr-btn" id="mfrGenreBtn" onclick="toggleFilter('genre');updateMfrBtn()">🎬 장르 ▾</button>
-      <button class="mfr-btn" id="mfrEmotionBtn" onclick="toggleFilter('emotion');updateMfrBtn()">💜 감정 ▾</button>
+      <button class="mfr-btn" id="mfrGenreBtn" onclick="openMfrOverlay('genre')">🎬 장르 ▾</button>
+      <button class="mfr-btn" id="mfrEmotionBtn" onclick="openMfrOverlay('emotion')">💜 감정 ▾</button>
+      <button class="mfr-btn" id="mfrSearchBtn" onclick="openMfrSearch()" title="검색">🔍</button>
       <select class="mfr-sort" id="mfrSort">
         <option value="fileDateDesc">정렬: 관람일↓</option>
         <option value="fileDateAsc">정렬: 관람일↑</option>
@@ -627,6 +671,25 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
       </select>
     </div>
   </div>
+
+  <!-- 모바일 칩 오버레이 (장르 또는 감정) -->
+  <div class="mfr-chip-overlay" id="mfrChipOverlay">
+    <div class="mfr-chip-overlay-title">
+      <span id="mfrChipTitle">장르</span>
+      <button class="mfr-overlay-close" onclick="closeMfrOverlay()">✕</button>
+    </div>
+    <div class="filter-chips" id="mfrChipBody"></div>
+  </div>
+
+  <!-- 모바일 검색 오버레이 -->
+  <div class="mfr-search-overlay" id="mfrSearchOverlay">
+    <input type="text" id="mfrSearchInput" placeholder="🔍 제목 검색…">
+    <button class="mso-btn" onclick="doMfrSearch()">검색</button>
+    <button class="mso-close" onclick="closeMfrSearch()">✕</button>
+  </div>
+
+  <!-- 딤 배경 -->
+  <div class="mfr-overlay-dim" id="mfrOverlayDim" onclick="closeMfrOverlay();closeMfrSearch()"></div>
 
   <!-- 검색바 (모바일·데스크탑 공통 — 필터행 아래) -->
   <div class="search-bar">
@@ -3501,22 +3564,6 @@ document.addEventListener('click', function(){
   if(drop) drop.classList.remove('open');
 });
 
-// ── 모바일 필터 버튼 상태 업데이트 ──
-function updateMfrBtn(){
-  const gBtn=document.getElementById('mfrGenreBtn');
-  const eBtn=document.getElementById('mfrEmotionBtn');
-  if(gBtn){
-    const gCollapsed=document.getElementById('genreFilterSection')?.classList.contains('filter-collapsed');
-    gBtn.textContent=gCollapsed?'🎬 장르 ▾':'🎬 장르 ▴';
-    gBtn.classList.toggle('active',!gCollapsed);
-  }
-  if(eBtn){
-    const eCollapsed=document.getElementById('emotionFilterSection')?.classList.contains('filter-collapsed');
-    eBtn.textContent=eCollapsed?'💜 감정 ▾':'💜 감정 ▴';
-    eBtn.classList.toggle('active',!eCollapsed);
-  }
-}
-
 // ── mfrSort ↔ sortSelect 동기화 ──
 (function(){
   const mfrSort=document.getElementById('mfrSort');
@@ -3532,6 +3579,139 @@ function updateMfrBtn(){
     sortSelect.addEventListener('change',()=>{mfrSort.value=sortSelect.value;});
   }
 })();
+
+// ══════════════════════════════════════════════════════════════
+// 모바일 오버레이: 장르·감정 칩 & 검색
+// ══════════════════════════════════════════════════════════════
+let _mfrOverlayType = null;
+
+function openMfrOverlay(type) {
+  const overlay = document.getElementById('mfrChipOverlay');
+  const dim     = document.getElementById('mfrOverlayDim');
+  const body    = document.getElementById('mfrChipBody');
+  const title   = document.getElementById('mfrChipTitle');
+  if (!overlay || !body) return;
+
+  closeMfrSearch(); // 검색 오버레이 닫기
+
+  // 이미 같은 타입이 열려 있으면 닫기
+  if (_mfrOverlayType === type && overlay.classList.contains('open')) {
+    closeMfrOverlay(); return;
+  }
+  _mfrOverlayType = type;
+
+  // top 위치를 현재 헤더 높이에 맞게 보정
+  const hh = document.documentElement.style.getPropertyValue('--header-h') || '9rem';
+  overlay.style.top = hh;
+  if (dim) dim.style.top = hh;
+
+  // 칩 목록 생성
+  body.innerHTML = '';
+  if (type === 'genre') {
+    title.textContent = '🎬 장르 선택';
+    // 전체 칩
+    const all = document.createElement('button');
+    all.className = 'chip' + (curGenre === '' ? ' active' : '');
+    all.textContent = '전체';
+    all.onclick = () => { curGenre = ''; refreshMfrChips('genre'); render(); };
+    body.appendChild(all);
+    // 장르 칩 — updateGenreChips 와 동일한 데이터 소스
+    const genres = [...new Set(rawItems.flatMap(i => i.genreList || []))].sort();
+    genres.forEach(g => {
+      const c = document.createElement('button');
+      c.className = 'chip' + (curGenre === g ? ' active' : '');
+      c.textContent = g;
+      c.onclick = () => { curGenre = curGenre === g ? '' : g; refreshMfrChips('genre'); render(); };
+      body.appendChild(c);
+    });
+  } else {
+    title.textContent = '💜 감정태그 선택';
+    const all = document.createElement('button');
+    all.className = 'chip' + (curHashtag === '' ? ' active' : '');
+    all.textContent = '전체';
+    all.onclick = () => { curHashtag = ''; refreshMfrChips('emotion'); render(); };
+    body.appendChild(all);
+    // 감정 칩 — updateHashtagBar 와 동일한 데이터 소스
+    const tagCounts = {};
+    rawItems.forEach(i => (i.hashTags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
+    Object.entries(tagCounts).sort((a,b) => b[1]-a[1]).forEach(([tag, cnt]) => {
+      const c = document.createElement('button');
+      c.className = 'chip' + (curHashtag === tag ? ' active' : '');
+      c.textContent = '#' + tag + ' ' + cnt;
+      c.onclick = () => { curHashtag = curHashtag === tag ? '' : tag; refreshMfrChips('emotion'); render(); };
+      body.appendChild(c);
+    });
+  }
+
+  overlay.classList.add('open');
+  if (dim) dim.classList.add('open');
+}
+
+function refreshMfrChips(type) {
+  // active 상태만 업데이트 (목록 재생성 없이)
+  const body = document.getElementById('mfrChipBody');
+  if (!body) return;
+  body.querySelectorAll('.chip').forEach((c, i) => {
+    if (type === 'genre') {
+      c.classList.toggle('active', i === 0 ? curGenre === '' : c.textContent === curGenre);
+    } else {
+      const tag = c.textContent.replace(/^#/, '').replace(/\s\d+$/, '');
+      c.classList.toggle('active', i === 0 ? curHashtag === '' : curHashtag === tag);
+    }
+  });
+}
+
+function closeMfrOverlay() {
+  _mfrOverlayType = null;
+  const o = document.getElementById('mfrChipOverlay');
+  const d = document.getElementById('mfrOverlayDim');
+  if (o) o.classList.remove('open');
+  if (d) d.classList.remove('open');
+}
+
+function openMfrSearch() {
+  closeMfrOverlay();
+  const o = document.getElementById('mfrSearchOverlay');
+  const d = document.getElementById('mfrOverlayDim');
+  const hh = document.documentElement.style.getPropertyValue('--header-h') || '9rem';
+  if (o) { o.style.top = hh; o.classList.add('open'); }
+  if (d) { d.style.top = hh; d.classList.add('open'); }
+  const inp = document.getElementById('mfrSearchInput');
+  if (inp) { inp.value = searchKw || ''; setTimeout(() => inp.focus(), 80); }
+}
+
+function closeMfrSearch() {
+  const o = document.getElementById('mfrSearchOverlay');
+  const d = document.getElementById('mfrOverlayDim');
+  if (o) o.classList.remove('open');
+  if (!document.getElementById('mfrChipOverlay')?.classList.contains('open')) {
+    if (d) d.classList.remove('open');
+  }
+}
+
+function doMfrSearch() {
+  const inp = document.getElementById('mfrSearchInput');
+  if (!inp) return;
+  searchKw = inp.value.trim();
+  if (searchInput) searchInput.value = searchKw;
+  closeMfrSearch();
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// mfrSearchInput에서 엔터 입력 시 검색 실행
+document.addEventListener('DOMContentLoaded', () => {
+  const msi = document.getElementById('mfrSearchInput');
+  if (msi) msi.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doMfrSearch(); } });
+});
+
+// ── updateMfrBtn: 장르/감정 버튼 active 상태 표시 ──
+function updateMfrBtn() {
+  const gBtn = document.getElementById('mfrGenreBtn');
+  const eBtn = document.getElementById('mfrEmotionBtn');
+  if (gBtn) gBtn.classList.toggle('active', curGenre !== '');
+  if (eBtn) eBtn.classList.toggle('active', curHashtag !== '');
+}
 
 // ══════════════════════════════════════════════════════════════
 // 서브카테고리 드롭다운 이벤트
