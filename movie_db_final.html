@@ -79,7 +79,24 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 .chip.active{background:#e8a020;border-color:#e8a020;color:#111}
 .stats-count{margin-left:auto;font-size:.67rem;color:rgba(255,255,255,.26)}
 
-/* ── 해시태그 필터 바 ── */
+/* ── 접을 수 있는 필터 섹션 ── */
+.collapsible-filter{max-width:1440px;margin:.35rem auto 0;padding:0 1.2rem}
+.filter-toggle-row{display:flex;align-items:center;gap:.4rem;cursor:pointer;padding:.18rem 0;user-select:none;-webkit-tap-highlight-color:transparent}
+.filter-toggle-row:hover .filter-section-label{color:rgba(255,255,255,.65)}
+.filter-section-label{font-size:.68rem;color:rgba(255,255,255,.38);font-weight:600;letter-spacing:.01em}
+.filter-toggle-arrow{font-size:.6rem;color:rgba(255,255,255,.25);transition:transform .2s;margin-left:.1rem;flex-shrink:0}
+.filter-toggle-stats{margin-left:auto;font-size:.67rem;color:rgba(255,255,255,.26)}
+.filter-section-body{overflow:hidden;transition:max-height .22s ease,opacity .2s ease;max-height:200px;opacity:1}
+.filter-collapsed .filter-section-body{max-height:0!important;opacity:0;pointer-events:none}
+.filter-collapsed .filter-toggle-arrow{transform:rotate(-90deg)}
+/* 기존 filter-bar/hashtag-bar 마진 조정 */
+.collapsible-filter .filter-bar{margin:0;padding:.3rem 0}
+.collapsible-filter .hashtag-bar{margin:0;padding:.25rem 0}
+
+/* ── 즐겨찾기 버튼 터치 영역 확대 ── */
+.fav-btn{min-width:2rem;min-height:2rem}
+
+
 .hashtag-bar{max-width:1440px;margin:.3rem auto 0;padding:.3rem 1.2rem;display:flex;flex-wrap:wrap;align-items:center;gap:.22rem}
 .hashtag-label{font-size:.65rem;color:rgba(255,255,255,.28);font-weight:500;margin-right:.1rem}
 .htag{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);color:rgba(167,139,250,.65);padding:.14rem .5rem;border-radius:11px;cursor:pointer;font-size:.64rem;font-weight:500;transition:all .12s}
@@ -418,17 +435,31 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 <!-- 엑셀·폴더 히든 인풋 (이벤트 바인딩 보존용, 화면 미표시) -->
 <input type="file" id="importExcel" accept=".xlsx,.xls" style="display:none">
 
-<!-- 장르 필터 -->
-<div class="filter-bar">
-  <span class="filter-label">장르</span>
-  <div class="filter-chips" id="filterChips"></div>
-  <span class="stats-count" id="statsCount"></span>
+<!-- 장르 필터 (접기/펼치기) -->
+<div class="collapsible-filter" id="genreFilterSection">
+  <div class="filter-toggle-row" onclick="toggleFilter('genre')" title="클릭하면 접기/펼치기">
+    <span class="filter-section-label">🎬 장르</span>
+    <span class="filter-toggle-arrow" id="genreArrow">▾</span>
+    <span class="filter-toggle-stats" id="statsCount"></span>
+  </div>
+  <div class="filter-section-body" id="genreFilterBody">
+    <div class="filter-bar" style="margin:0;padding:.3rem 0">
+      <div class="filter-chips" id="filterChips"></div>
+    </div>
+  </div>
 </div>
 
-<!-- 해시태그(감정) 필터 -->
-<div class="hashtag-bar" id="hashtagBar">
-  <span class="hashtag-label">💜 감정태그</span>
-  <div id="hashtagChips"></div>
+<!-- 해시태그(감정) 필터 (접기/펼치기) -->
+<div class="collapsible-filter" id="emotionFilterSection">
+  <div class="filter-toggle-row" onclick="toggleFilter('emotion')" title="클릭하면 접기/펼치기">
+    <span class="filter-section-label">💜 감정태그</span>
+    <span class="filter-toggle-arrow" id="emotionArrow">▾</span>
+  </div>
+  <div class="filter-section-body" id="emotionFilterBody">
+    <div class="hashtag-bar" id="hashtagBar" style="margin:0;padding:.25rem 0">
+      <div id="hashtagChips"></div>
+    </div>
+  </div>
 </div>
 
 <!-- 카드 그리드 -->
@@ -455,7 +486,9 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
     <button class="fav-close" id="favClose"
       style="flex-shrink:0;min-width:2.4rem;min-height:2.4rem;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(255,255,255,.1);border-radius:50%;border:none;color:rgba(255,255,255,.8);cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,.3)">✕</button>
   </div>
-
+  <div class="fav-cat-bar" id="favCatBar"></div>
+  <div class="fav-list" id="favList" style="-webkit-overflow-scrolling:touch;overflow-y:auto;flex:1"></div>
+</div>
 <script>
 // ══════════════════════════════════════════════════════════════
 // DB v9 추가사항:
@@ -910,10 +943,36 @@ function showToast(msg, type='success', duration=4000){
 // ══════════════════════════════════════════════════════════════
 // 장르/유틸
 // ══════════════════════════════════════════════════════════════
-const GMAP={'멜로':'로맨스','멜로/로맨스':'로맨스','로맨틱 코미디':'로맨스','호러':'공포','스리러':'스릴러','군사':'전쟁','코':'코미디','다큐멘터리':'다큐','SF':'SF','sf':'SF'};
+const GMAP={
+  '멜로':'로맨스','멜로/로맨스':'로맨스','로맨틱 코미디':'로맨스','로맨틱코미디':'로맨스','멜로드라마':'로맨스',
+  '호러':'공포','스리러':'스릴러','서스펜스':'스릴러','Suspense':'스릴러','suspense':'스릴러',
+  '군사':'전쟁','War':'전쟁','war':'전쟁',
+  '코':'코미디','블랙코미디':'코미디','Comedy':'코미디','comedy':'코미디',
+  '다큐멘터리':'다큐','Documentary':'다큐','documentary':'다큐',
+  'SF':'SF','sf':'SF','Sci-Fi':'SF','sci-fi':'SF','SciFi':'SF','과학':'SF',
+  '어드벤처':'모험','Adventure':'모험','adventure':'모험',
+  '애니':'애니메이션','Animation':'애니메이션','animation':'애니메이션','Anime':'애니메이션',
+  'Action':'액션','action':'액션',
+  'Drama':'드라마','drama':'드라마',
+  'Romance':'로맨스','romance':'로맨스',
+  'Thriller':'스릴러','thriller':'스릴러',
+  'Horror':'공포','horror':'공포',
+  'Crime':'범죄','crime':'범죄',
+  'Mystery':'미스터리','mystery':'미스터리',
+  'Fantasy':'판타지','fantasy':'판타지',
+  '역사':'사극','Historical':'사극','historical':'사극','History':'사극','history':'사극',
+  '서부극':'서부','Western':'서부','western':'서부',
+  '법정스릴러':'법정','Court':'법정',
+  '스포츠드라마':'스포츠','Sports':'스포츠','sports':'스포츠',
+  '의학드라마':'의학','Medical':'의학',
+  '재난영화':'재난','Disaster':'재난','disaster':'재난',
+  '정치스릴러':'정치','Political':'정치',
+  '뮤지컬':'기타','Musical':'기타','음악':'기타','Biography':'기타','biography':'기타','전기':'기타'
+};
 const GALLOWED=new Set(['액션','드라마','코미디','로맨스','스릴러','공포','SF','판타지','미스터리','범죄','모험','전쟁','애니메이션','다큐','사극','가족','스포츠','법정','성인','재난','정치','의학','서부','기타']);
 const normGenre=g=>{const t=(g||'').trim(),m=GMAP[t]||t;return GALLOWED.has(m)?m:'기타';};
-const parseGenres=raw=>{if(!raw)return['기타'];const l=[...new Set(raw.split(',').map(g=>normGenre(g)))];return l.length?l:['기타'];};
+// 쉼표·슬래시 모두 구분자로 처리, 공백 트림 포함
+const parseGenres=raw=>{if(!raw)return['기타'];const l=[...new Set(raw.split(/[,\/]+/).map(g=>normGenre(g.trim())).filter(Boolean))];return l.length?l:['기타'];};
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function extractEpisode(runtime){
   if(!runtime)return '';
@@ -3101,6 +3160,31 @@ function openOstModal(){
 }
 
 // ══════════════════════════════════════════════════════════════
+// 장르·감정태그 필터 접기/펼치기
+// ══════════════════════════════════════════════════════════════
+function toggleFilter(type){
+  const sectionId=type==='genre'?'genreFilterSection':'emotionFilterSection';
+  const section=document.getElementById(sectionId);
+  if(!section)return;
+  const collapsed=section.classList.toggle('filter-collapsed');
+  try{localStorage.setItem('filter_collapsed_'+type,collapsed?'1':'0');}catch(e){}
+}
+
+// 저장된 접기 상태 복원
+(function(){
+  ['genre','emotion'].forEach(type=>{
+    try{
+      const v=localStorage.getItem('filter_collapsed_'+type);
+      if(v==='1'){
+        const id=type==='genre'?'genreFilterSection':'emotionFilterSection';
+        const el=document.getElementById(id);
+        if(el)el.classList.add('filter-collapsed');
+      }
+    }catch(e){}
+  });
+})();
+
+// ══════════════════════════════════════════════════════════════
 // 서브카테고리 드롭다운 이벤트
 // ══════════════════════════════════════════════════════════════
 function setupSubDropdowns(){
@@ -3476,10 +3560,6 @@ async function shareApp(){
   debug('영화/드라마 DB final 준비 완료');
 })();
 </script>
-
-  <div class="fav-cat-bar" id="favCatBar"></div>
-  <div class="fav-list" id="favList" style="-webkit-overflow-scrolling:touch;overflow-y:auto;flex:1"></div>
-</div>
 
 <!-- 하단 탭바 (모바일 전용) -->
 <div class="mobile-tabbar" id="mobileTabbar">
