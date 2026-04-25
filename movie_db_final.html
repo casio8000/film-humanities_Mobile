@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>🎬 영화/드라마 DB (final)</title>
 <!-- PWA 설정 -->
 <meta name="mobile-web-app-capable" content="yes">
@@ -283,7 +283,8 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 .mfr-search-overlay.open{display:flex;gap:.4rem;align-items:center;}
 .mfr-search-overlay input{flex:1;background:#161e30;border:1px solid rgba(255,255,255,.12);
   border-radius:20px;padding:.42rem .85rem;color:#e2e8f0;
-  font-size:.82rem;font-family:inherit;outline:none;}
+  /* font-size 16px 이상 — iOS Safari 자동 줌 방지 */
+  font-size:16px;font-family:inherit;outline:none;}
 .mfr-search-overlay input::placeholder{color:rgba(255,255,255,.22);}
 .mfr-search-overlay .mso-btn{background:#e8a020;border:none;border-radius:20px;
   padding:.42rem .8rem;color:#111;font-weight:700;font-size:.75rem;
@@ -3695,9 +3696,51 @@ function doMfrSearch() {
   searchKw = inp.value.trim();
   if (searchInput) searchInput.value = searchKw;
   closeMfrSearch();
+  // 검색 후 입력창 초기화 (다음에 열었을 때 빈 상태)
+  inp.value = '';
   render();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// ── 로고 클릭 → 초기 화면으로 리셋 ──
+(function(){
+  const logo = document.querySelector('.logo');
+  if (!logo) return;
+  logo.style.cursor = 'pointer';
+  logo.addEventListener('click', () => {
+    // 모든 필터·검색 초기화
+    curCategory   = 'all';
+    curSubFilter  = '';
+    curGenre      = '';
+    curHashtag    = '';
+    searchKw      = '';
+    if (searchInput) searchInput.value = '';
+    const msi = document.getElementById('mfrSearchInput');
+    if (msi) msi.value = '';
+    // 오버레이 모두 닫기
+    closeMfrOverlay();
+    closeMfrSearch();
+    // 카테고리 버튼 active 초기화
+    document.querySelectorAll('[data-category]').forEach(b =>
+      b.classList.toggle('active', b.dataset.category === 'all')
+    );
+    // 모바일 카테고리 버튼 레이블 초기화
+    const catBtn = document.getElementById('mfrCatBtn');
+    if (catBtn) catBtn.textContent = '📂 전체 ▾';
+    const catItems = document.querySelectorAll('.mfr-cat-item');
+    catItems.forEach(i => i.classList.toggle('active', i.textContent.trim() === '전체'));
+    // 정렬 초기화 (관람일↓)
+    curSort = 'fileDateDesc';
+    const ms = document.getElementById('mfrSort');
+    if (ms) ms.value = curSort;
+    if (sortSelect) sortSelect.value = curSort;
+    // 렌더링 + 맨 위로
+    updateGenreChips();
+    updateHashtagBar();
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
 
 // mfrSearchInput에서 엔터 입력 시 검색 실행
 document.addEventListener('DOMContentLoaded', () => {
