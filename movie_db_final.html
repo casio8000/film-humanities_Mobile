@@ -20,7 +20,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{overflow-x:hidden;-webkit-text-size-adjust:100%}
-body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e2e8f0;min-height:100vh;padding-bottom:calc(5rem + env(safe-area-inset-bottom));padding-top:env(safe-area-inset-top);overflow-x:hidden;width:100%;max-width:100vw}
+body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e2e8f0;min-height:100vh;padding-bottom:calc(5rem + env(safe-area-inset-bottom));overflow-x:hidden;width:100%;max-width:100vw}
 
 /* ── safe-area 적용 (노치/홈바 겹침 방지) ── */
 .sticky-header{top:env(safe-area-inset-top,0px)}
@@ -29,16 +29,18 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 
 /* ── 상단 고정 헤더 ── */
 .sticky-header{position:sticky;top:0;z-index:200;background:#0d1117}
-/* 모바일: fixed로 변경 — iOS Safari에서 sticky가 깨지는 경우 대응 */
+/* 모바일: fixed로 변경 + 노치/상태바 safe-area 대응 */
 @media(max-width:680px){
   .sticky-header{
     position:fixed;
     top:0;left:0;right:0;
+    top:env(safe-area-inset-top, 0px);
+    padding-top:env(safe-area-inset-top, 0px);
     z-index:200;
     background:#0d1117;
   }
-  /* fixed 헤더 높이만큼 body 콘텐츠 아래로 밀기 */
-  body{padding-top:var(--header-h, 7.5rem);}
+  /* fixed 헤더 높이만큼 body 콘텐츠 아래로 밀기 (setHeaderH가 실제 높이로 덮어씀) */
+  body{padding-top:var(--header-h, 9rem);}
 }
 
 .main-nav{background:linear-gradient(135deg,#090f1e,#0e1f3a);border-bottom:1px solid rgba(255,255,255,.06);padding:.6rem 1.2rem}
@@ -3437,7 +3439,10 @@ function toggleFilter(type){
   if(!header)return;
   function setHeaderH(){
     if(window.innerWidth<=680){
-      const h=header.getBoundingClientRect().height;
+      // getBoundingClientRect().bottom = 헤더 하단의 뷰포트 기준 Y 좌표
+      // → 이 값이 바로 body가 밀려야 할 padding-top
+      const bottom=header.getBoundingClientRect().bottom;
+      const h=Math.max(bottom, header.offsetHeight);
       document.documentElement.style.setProperty('--header-h', h+'px');
     } else {
       document.documentElement.style.removeProperty('--header-h');
