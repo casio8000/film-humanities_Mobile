@@ -79,7 +79,24 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 .chip.active{background:#e8a020;border-color:#e8a020;color:#111}
 .stats-count{margin-left:auto;font-size:.67rem;color:rgba(255,255,255,.26)}
 
-/* ── 해시태그 필터 바 ── */
+/* ── 접을 수 있는 필터 섹션 ── */
+.collapsible-filter{max-width:1440px;margin:.35rem auto 0;padding:0 1.2rem}
+.filter-toggle-row{display:flex;align-items:center;gap:.4rem;cursor:pointer;padding:.18rem 0;user-select:none;-webkit-tap-highlight-color:transparent}
+.filter-toggle-row:hover .filter-section-label{color:rgba(255,255,255,.65)}
+.filter-section-label{font-size:.68rem;color:rgba(255,255,255,.38);font-weight:600;letter-spacing:.01em}
+.filter-toggle-arrow{font-size:.6rem;color:rgba(255,255,255,.25);transition:transform .2s;margin-left:.1rem;flex-shrink:0}
+.filter-toggle-stats{margin-left:auto;font-size:.67rem;color:rgba(255,255,255,.26)}
+.filter-section-body{overflow:hidden;transition:max-height .22s ease,opacity .2s ease;max-height:200px;opacity:1}
+.filter-collapsed .filter-section-body{max-height:0!important;opacity:0;pointer-events:none}
+.filter-collapsed .filter-toggle-arrow{transform:rotate(-90deg)}
+/* 기존 filter-bar/hashtag-bar 마진 조정 */
+.collapsible-filter .filter-bar{margin:0;padding:.3rem 0}
+.collapsible-filter .hashtag-bar{margin:0;padding:.25rem 0}
+
+/* ── 즐겨찾기 버튼 터치 영역 확대 ── */
+.fav-btn{min-width:2rem;min-height:2rem}
+
+
 .hashtag-bar{max-width:1440px;margin:.3rem auto 0;padding:.3rem 1.2rem;display:flex;flex-wrap:wrap;align-items:center;gap:.22rem}
 .hashtag-label{font-size:.65rem;color:rgba(255,255,255,.28);font-weight:500;margin-right:.1rem}
 .htag{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);color:rgba(167,139,250,.65);padding:.14rem .5rem;border-radius:11px;cursor:pointer;font-size:.64rem;font-weight:500;transition:all .12s}
@@ -164,35 +181,6 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 .fav-item-del{background:none;border:none;color:rgba(255,255,255,.2);cursor:pointer;font-size:.75rem;padding:.15rem;flex-shrink:0}
 .fav-item-del:hover{color:#f87171}
 .fav-empty{text-align:center;padding:2rem 1rem;color:rgba(255,255,255,.18);font-size:.78rem;line-height:1.8}
-
-.filter-toggle-bar{ display:none }
-
-
-/* ── 필터 라벨 토글 ── */
-.filter-toggle-label{
-  background:none;border:none;cursor:pointer;font-family:inherit;
-  font-size:.72rem;color:rgba(255,255,255,.45);padding:.1rem .2rem;
-  white-space:nowrap;flex-shrink:0;
-  transition:color .15s;
-}
-.filter-toggle-label:hover{ color:rgba(255,255,255,.75) }
-.filter-chips-wrap,.hashtag-chips-wrap{
-  overflow:hidden;
-  transition:max-height .25s ease, opacity .2s;
-  max-height:200px;
-  opacity:1;
-}
-.filter-chips-wrap.collapsed,.hashtag-chips-wrap.collapsed{
-  max-height:0!important;
-  opacity:0;
-}
-/* 모바일: 장르/태그 기본 숨김 */
-@media(max-width:680px){
-  .filter-chips-wrap,.hashtag-chips-wrap{ max-height:0;opacity:0 }
-  .filter-chips-wrap.expanded,.hashtag-chips-wrap.expanded{ max-height:200px!important;opacity:1 }
-  #genreToggleArrow,#tagToggleArrow{ transition:transform .2s }
-  .filter-chips-wrap.expanded ~ * #genreToggleArrow{ transform:rotate(180deg) }
-}
 
 /* ── 빈 화면 ── */
 .empty-message{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:rgba(255,255,255,.15);font-size:.83rem;line-height:2.2}
@@ -319,11 +307,91 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
   }
 }
 /* iOS Safari 추가 보정 */
-@media(max-width:680px){ .filter-chips-wrap,.hashtag-chips-wrap{ max-height:0!important;opacity:0 } .filter-chips-wrap.expanded,.hashtag-chips-wrap.expanded{ max-height:300px!important;opacity:1 } }
 @supports (-webkit-touch-callout: none){
-  .fav-panel{
-    height:-webkit-fill-available!important;
-  }
+  .fav-panel{height:-webkit-fill-available!important;}
+}
+
+/* ── 모바일 하단 탭바 ── */
+.mobile-tabbar{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:#0b1120;
+  border-top:1px solid rgba(255,255,255,.07);
+  z-index:1500;
+  padding-bottom:env(safe-area-inset-bottom);
+  height:calc(3.6rem + env(safe-area-inset-bottom));
+  align-items:stretch;
+}
+@media(max-width:680px){.mobile-tabbar{display:flex;}}
+.tab-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:none;border:none;color:rgba(255,255,255,.35);
+  font-size:.6rem;font-family:inherit;cursor:pointer;gap:.12rem;
+  padding:.2rem 0;-webkit-tap-highlight-color:transparent;
+  transition:color .13s;
+}
+.tab-btn.active{color:#e8a020;}
+.tab-icon{font-size:1.15rem;line-height:1;}
+
+/* ── 설정 패널 (모바일 바텀 시트) ── */
+.settings-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.55);z-index:1600;
+}
+.settings-overlay.open{display:block;}
+.settings-panel{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#0f1824;
+  border-top:1px solid rgba(255,255,255,.08);
+  border-radius:18px 18px 0 0;
+  z-index:1700;
+  max-height:82dvh;max-height:82vh;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-bottom:env(safe-area-inset-bottom);
+  transform:translateY(100%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+}
+.settings-panel.open{transform:translateY(0);}
+.settings-handle{
+  width:38px;height:4px;border-radius:2px;
+  background:rgba(255,255,255,.18);
+  margin:.65rem auto .3rem;
+}
+.settings-title{
+  font-size:.82rem;font-weight:700;color:#e8edf5;
+  padding:.2rem 1.1rem .65rem;
+}
+.settings-section{padding:0 .8rem .55rem;}
+.settings-section h4{
+  font-size:.66rem;color:rgba(255,255,255,.3);
+  font-weight:600;letter-spacing:.03em;
+  padding:.45rem .25rem .25rem;
+  border-top:1px solid rgba(255,255,255,.05);
+  margin-bottom:.2rem;
+}
+.settings-btn{
+  width:100%;display:flex;align-items:center;gap:.65rem;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:11px;padding:.55rem .75rem;
+  margin-bottom:.3rem;cursor:pointer;font-family:inherit;
+  text-align:left;transition:background .12s;
+  -webkit-tap-highlight-color:rgba(255,255,255,.08);
+}
+.settings-btn:hover,.settings-btn:active{background:rgba(255,255,255,.07);}
+.s-icon{font-size:1.1rem;flex-shrink:0;width:1.5rem;text-align:center;}
+.s-label{flex:1;font-size:.78rem;color:#d1deff;line-height:1.4;}
+.s-arrow{font-size:.8rem;color:rgba(255,255,255,.2);flex-shrink:0;}
+
+/* ── 도움말 모달 모바일 가로 스크롤 방지 ── */
+.modal-box{overflow-x:hidden;word-break:break-word;}
+.help-modal-box code{font-size:.63rem;word-break:break-all;}
+.help-row{overflow-x:hidden;}
+.help-desc code{max-width:100%;display:inline-block;word-break:break-all;}
+@media(max-width:680px){
+  .help-modal-box{padding:.85rem .75rem;}
+  .help-key{font-size:.6rem;max-width:90px;}
+  .help-desc{font-size:.67rem;}
 }
 </style>
 <!-- OpenGraph / SNS 공유 -->
@@ -448,33 +516,31 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
 <!-- 엑셀·폴더 히든 인풋 (이벤트 바인딩 보존용, 화면 미표시) -->
 <input type="file" id="importExcel" accept=".xlsx,.xls" style="display:none">
 
-<!-- 모바일 필터 토글 바 -->
-<div class="filter-toggle-bar" id="filterToggleBar">
-  <button id="toggleGenreBtn" onclick="toggleFilterSection('genre')"
-    style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);padding:.2rem .6rem;border-radius:14px;cursor:pointer;font-size:.62rem;font-family:inherit;-webkit-tap-highlight-color:rgba(255,255,255,.15)">
-    🎭 장르 <span id="genreFilterArrow">▾</span>
-  </button>
-  <button id="toggleTagBtn" onclick="toggleFilterSection('tag')"
-    style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);padding:.2rem .6rem;border-radius:14px;cursor:pointer;font-size:.62rem;font-family:inherit;-webkit-tap-highlight-color:rgba(255,255,255,.15)">
-    💜 감정태그 <span id="tagFilterArrow">▾</span>
-  </button>
-  <span id="statsCount" class="stats-count" style="margin-left:auto;font-size:.6rem;color:rgba(255,255,255,.3)"></span>
+<!-- 장르 필터 (접기/펼치기 — 기본 접힘) -->
+<div class="collapsible-filter filter-collapsed" id="genreFilterSection">
+  <div class="filter-toggle-row" onclick="toggleFilter('genre')" title="클릭하면 접기/펼치기">
+    <span class="filter-section-label">🎬 장르</span>
+    <span class="filter-toggle-arrow" id="genreArrow">▾</span>
+    <span class="filter-toggle-stats" id="statsCount"></span>
+  </div>
+  <div class="filter-section-body" id="genreFilterBody">
+    <div class="filter-bar" style="margin:0;padding:.3rem 0">
+      <div class="filter-chips" id="filterChips"></div>
+    </div>
+  </div>
 </div>
 
-<!-- 장르 필터 -->
-<div class="filter-bar" id="filterBarEl">
-  <button class="filter-label filter-toggle-label" onclick="toggleFilterSection('genre')" title="접기/펼치기">
-    장르 <span id="genreToggleArrow">▾</span>
-  </button>
-  <div class="filter-chips-wrap" id="filterChipsWrap"><div class="filter-chips" id="filterChips"></div></div>
-</div>
-
-<!-- 해시태그(감정) 필터 -->
-<div class="hashtag-bar" id="hashtagBar">
-  <button class="hashtag-label filter-toggle-label" onclick="toggleFilterSection('tag')" title="접기/펼치기">
-    💜 감정태그 <span id="tagToggleArrow">▾</span>
-  </button>
-  <div class="hashtag-chips-wrap" id="hashtagChipsWrap"><div id="hashtagChips"></div></div>
+<!-- 해시태그(감정) 필터 (접기/펼치기 — 기본 접힘) -->
+<div class="collapsible-filter filter-collapsed" id="emotionFilterSection">
+  <div class="filter-toggle-row" onclick="toggleFilter('emotion')" title="클릭하면 접기/펼치기">
+    <span class="filter-section-label">💜 감정태그</span>
+    <span class="filter-toggle-arrow" id="emotionArrow">▾</span>
+  </div>
+  <div class="filter-section-body" id="emotionFilterBody">
+    <div class="hashtag-bar" id="hashtagBar" style="margin:0;padding:.25rem 0">
+      <div id="hashtagChips"></div>
+    </div>
+  </div>
 </div>
 
 <!-- 카드 그리드 -->
@@ -501,7 +567,9 @@ body{font-family:'Noto Sans KR',system-ui,sans-serif;background:#0d1117;color:#e
     <button class="fav-close" id="favClose"
       style="flex-shrink:0;min-width:2.4rem;min-height:2.4rem;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(255,255,255,.1);border-radius:50%;border:none;color:rgba(255,255,255,.8);cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,.3)">✕</button>
   </div>
-
+  <div class="fav-cat-bar" id="favCatBar"></div>
+  <div class="fav-list" id="favList" style="-webkit-overflow-scrolling:touch;overflow-y:auto;flex:1"></div>
+</div>
 <script>
 // ══════════════════════════════════════════════════════════════
 // DB v9 추가사항:
@@ -956,10 +1024,36 @@ function showToast(msg, type='success', duration=4000){
 // ══════════════════════════════════════════════════════════════
 // 장르/유틸
 // ══════════════════════════════════════════════════════════════
-const GMAP={'멜로':'로맨스','멜로/로맨스':'로맨스','로맨틱 코미디':'로맨스','호러':'공포','스리러':'스릴러','군사':'전쟁','코':'코미디','다큐멘터리':'다큐','SF':'SF','sf':'SF'};
+const GMAP={
+  '멜로':'로맨스','멜로/로맨스':'로맨스','로맨틱 코미디':'로맨스','로맨틱코미디':'로맨스','멜로드라마':'로맨스',
+  '호러':'공포','스리러':'스릴러','서스펜스':'스릴러','Suspense':'스릴러','suspense':'스릴러',
+  '군사':'전쟁','War':'전쟁','war':'전쟁',
+  '코':'코미디','블랙코미디':'코미디','Comedy':'코미디','comedy':'코미디',
+  '다큐멘터리':'다큐','Documentary':'다큐','documentary':'다큐',
+  'SF':'SF','sf':'SF','Sci-Fi':'SF','sci-fi':'SF','SciFi':'SF','과학':'SF',
+  '어드벤처':'모험','Adventure':'모험','adventure':'모험',
+  '애니':'애니메이션','Animation':'애니메이션','animation':'애니메이션','Anime':'애니메이션',
+  'Action':'액션','action':'액션',
+  'Drama':'드라마','drama':'드라마',
+  'Romance':'로맨스','romance':'로맨스',
+  'Thriller':'스릴러','thriller':'스릴러',
+  'Horror':'공포','horror':'공포',
+  'Crime':'범죄','crime':'범죄',
+  'Mystery':'미스터리','mystery':'미스터리',
+  'Fantasy':'판타지','fantasy':'판타지',
+  '역사':'사극','Historical':'사극','historical':'사극','History':'사극','history':'사극',
+  '서부극':'서부','Western':'서부','western':'서부',
+  '법정스릴러':'법정','Court':'법정',
+  '스포츠드라마':'스포츠','Sports':'스포츠','sports':'스포츠',
+  '의학드라마':'의학','Medical':'의학',
+  '재난영화':'재난','Disaster':'재난','disaster':'재난',
+  '정치스릴러':'정치','Political':'정치',
+  '뮤지컬':'기타','Musical':'기타','음악':'기타','Biography':'기타','biography':'기타','전기':'기타'
+};
 const GALLOWED=new Set(['액션','드라마','코미디','로맨스','스릴러','공포','SF','판타지','미스터리','범죄','모험','전쟁','애니메이션','다큐','사극','가족','스포츠','법정','성인','재난','정치','의학','서부','기타']);
 const normGenre=g=>{const t=(g||'').trim(),m=GMAP[t]||t;return GALLOWED.has(m)?m:'기타';};
-const parseGenres=raw=>{if(!raw)return['기타'];const l=[...new Set(raw.split(',').map(g=>normGenre(g)))];return l.length?l:['기타'];};
+// 쉼표·슬래시 모두 구분자로 처리, 공백 트림 포함
+const parseGenres=raw=>{if(!raw)return['기타'];const l=[...new Set(raw.split(/[,\/]+/).map(g=>normGenre(g.trim())).filter(Boolean))];return l.length?l:['기타'];};
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function extractEpisode(runtime){
   if(!runtime)return '';
@@ -1063,23 +1157,28 @@ async function importFromExcel(buf){
   for(const row of dataRows){
     const no=parseInt(String(row[H.no]).trim());
 
-    // 제목·링크 추출 — 수식문자열, 셀값, 직접접근 3중 폴백
+    // 제목·링크 추출 — 수식문자열·셀직접접근 3중 폴백
+    // ★ 핵심: SheetJS는 하이퍼링크 URL을 wsCell.l.Target에 별도 저장
+    //    → 제목 파싱 성공 여부와 관계없이 항상 wsCell.l.Target 먼저 확인
     let title='', excelUrl='';
     if(H.title!==undefined){
-      const raw=row[H.title];
-      const parsed=parseTitleCell(raw);
-      title=parsed.text;
-      excelUrl=parsed.url;
-      // SheetJS가 평가된 값(.v)을 이미 준 경우 수식 파싱 불필요 — 단 HYPERLINK 수식은 .f에 있음
-      if(!title || title.startsWith('=') || /HYPERLINK/i.test(title)){
-        // 셀 직접 접근 시도
-        const wsCell=cellRef(H.title, dataIdx);
-        if(wsCell){
-          if(wsCell.l&&wsCell.l.Target) excelUrl=wsCell.l.Target;
-          // .v 는 display 텍스트
-          if(wsCell.v&&!String(wsCell.v).startsWith('=')) title=String(wsCell.v).trim();
-          else if(wsCell.f){ const fp=parseTitleCell('='+wsCell.f); if(fp.text) title=fp.text; if(fp.url) excelUrl=fp.url; }
+      // 1) 셀 직접 접근 → .l.Target (하이퍼링크 URL) 최우선
+      const wsCell=cellRef(H.title, dataIdx);
+      if(wsCell){
+        if(wsCell.l&&wsCell.l.Target) excelUrl=wsCell.l.Target; // URL 최우선
+        if(wsCell.v&&!String(wsCell.v).startsWith('=')) title=String(wsCell.v).trim();
+        else if(wsCell.f){
+          const fp=parseTitleCell('='+wsCell.f);
+          if(fp.text) title=fp.text;
+          if(fp.url&&!excelUrl) excelUrl=fp.url; // .l.Target 없을 때만 수식 URL 사용
         }
+      }
+      // 2) sheet_to_json 값 폴백 (wsCell 접근 실패 또는 제목이 없을 때)
+      if(!title){
+        const raw=row[H.title];
+        const parsed=parseTitleCell(raw);
+        if(parsed.text) title=parsed.text;
+        if(parsed.url&&!excelUrl) excelUrl=parsed.url;
       }
     }
     if(!title || /^=?HYPERLINK/i.test(title)) title=`(제목없음-${no})`;
@@ -1089,10 +1188,7 @@ async function importFromExcel(buf){
     const country=String(row[H.country]||'').trim()||'미분류';
     let year=String(row[H.year]||'').replace('.0','').trim();
     if(!year||isNaN(parseInt(year)))year='';
-    // category 정규화: 공백/개행 제거 + 알려진 값만 허용
-    let category=String(row[H.cat]||'').trim().replace(/\s+/g,' ');
-    const validCats=['영화','드라마','다큐멘터리','기타'];
-    if(!validCats.includes(category)) category='영화'; // 매핑 불가 시 기본값
+    const category=String(row[H.cat]||'영화').trim();
     const genreRaw=String(row[H.genre]||'기타').trim();
     const runtime=String(row[H.runtime]||'—').trim();
     const genreList=parseGenres(genreRaw);
@@ -1145,6 +1241,11 @@ async function importFromExcel(buf){
       }
       // ostLink: 엑셀에 없으면 기존 보존
       if(!it.ostLink && prev.ostLink) it.ostLink = prev.ostLink;
+      // link: 엑셀 B열 HYPERLINK가 있으면 항상 엑셀 URL 우선
+      //       엑셀에 링크 없어서 naver 검색 폴백인 경우, 수동 편집된 실제 URL 보존
+      const itIsNaverFallback = it.link && it.link.includes('search.naver.com');
+      const prevIsReal = prev.link && !prev.link.includes('search.naver.com');
+      if(itIsNaverFallback && prevIsReal) it.link = prev.link;
       // addedAt 보존 (최초 추가 시점 유지)
       if(prev.addedAt) it.addedAt = prev.addedAt;
     }
@@ -1572,18 +1673,8 @@ async function renderFavList(){
   }
 }
 
-function openFavPanel(){
-  if(!favPanel){console.error('favPanel null');return;}
-  showingFav=true;
-  favPanel.classList.add('open');
-  document.body.style.overflow='hidden'; // 배경 스크롤 방지
-}
-function closeFavPanel(){
-  if(!favPanel) return;
-  showingFav=false;
-  favPanel.classList.remove('open');
-  document.body.style.overflow='';
-}
+function openFavPanel(){showingFav=true;favPanel.classList.add('open');}
+function closeFavPanel(){showingFav=false;favPanel.classList.remove('open');}
 function scrollToCard(itemId){
   const el=document.querySelector(`[data-item-id="${itemId}"]`);
   if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
@@ -1659,8 +1750,8 @@ async function refreshData(){
 
 function updateStats(){
   const tot=rawItems.length;
-  const mv=rawItems.filter(i=>(i.category||'').trim()==='영화').length;
-  const dr=rawItems.filter(i=>(i.category||'').trim()==='드라마').length;
+  const mv=rawItems.filter(i=>i.category==='영화').length;
+  const dr=rawItems.filter(i=>i.category==='드라마').length;
   const dc=rawItems.filter(i=>{
     if(i.category==='다큐멘터리') return true;
     const gr=(i.genreRaw||'').split(',').map(g=>g.trim().toLowerCase());
@@ -1701,7 +1792,7 @@ function updateHashtagBar(){
 function filterByCat(items,cat){
   if(cat==='all')return items;
   if(cat==='movie'){
-    let mv=items.filter(i=>(i.category||'').trim()==='영화');
+    let mv=items.filter(i=>i.category==='영화');
     if(curSubFilter){
       if(curSubFilter==='기타'){
         const known=['대한민국','한국','미국','일본','영국','프랑스','중국','이탈리아'];
@@ -1715,7 +1806,7 @@ function filterByCat(items,cat){
     return mv;
   }
   if(cat==='drama'){
-    let d=items.filter(i=>(i.category||'').trim()==='드라마');
+    let d=items.filter(i=>i.category==='드라마');
     if(curSubFilter){
       if(curSubFilter==='기타'){
         const known=['대한민국','한국','미국','일본','중국','영국'];
@@ -1730,7 +1821,7 @@ function filterByCat(items,cat){
   }
   if(cat==='documentary'){
     // category='다큐멘터리' 항목 먼저, 이후 장르에만 '다큐' 있는 항목
-    const byCat=items.filter(i=>(i.category||'').trim()==='다큐멘터리');
+    const byCat=items.filter(i=>i.category==='다큐멘터리');
     const byGenre=items.filter(i=>{
       if(i.category==='다큐멘터리') return false;
       const gr=(i.genreRaw||'').split(',').map(g=>g.trim().toLowerCase());
@@ -1747,7 +1838,7 @@ function filterByCat(items,cat){
   }
   // 기타: 영화·드라마 아니고, 다큐 조건도 아닌 것
   if(cat==='other') return items.filter(i=>{
-    if(['영화','드라마','다큐멘터리'].includes((i.category||'').trim())) return false;
+    if(['영화','드라마','다큐멘터리'].includes(i.category)) return false;
     const gr=(i.genreRaw||'').split(',').map(g=>g.trim().toLowerCase());
     if(gr.some(g=>g==='다큐'||g==='다큐멘터리')) return false;
     return true;
@@ -3160,6 +3251,36 @@ function openOstModal(){
 }
 
 // ══════════════════════════════════════════════════════════════
+// 장르·감정태그 필터 접기/펼치기
+// ══════════════════════════════════════════════════════════════
+function toggleFilter(type){
+  const sectionId=type==='genre'?'genreFilterSection':'emotionFilterSection';
+  const section=document.getElementById(sectionId);
+  if(!section)return;
+  const collapsed=section.classList.toggle('filter-collapsed');
+  try{localStorage.setItem('filter_collapsed_'+type,collapsed?'1':'0');}catch(e){}
+}
+
+// 저장된 접기 상태 복원 (기본값: 접힘 — localStorage에 '0'이 명시된 경우만 펼침)
+(function(){
+  ['genre','emotion'].forEach(type=>{
+    try{
+      const v=localStorage.getItem('filter_collapsed_'+type);
+      const id=type==='genre'?'genreFilterSection':'emotionFilterSection';
+      const el=document.getElementById(id);
+      if(!el)return;
+      if(v==='0'){
+        // 사용자가 명시적으로 열었던 경우만 펼침
+        el.classList.remove('filter-collapsed');
+      } else {
+        // 최초 방문 또는 접혀있던 경우 → 접힘 유지
+        el.classList.add('filter-collapsed');
+      }
+    }catch(e){}
+  });
+})();
+
+// ══════════════════════════════════════════════════════════════
 // 서브카테고리 드롭다운 이벤트
 // ══════════════════════════════════════════════════════════════
 function setupSubDropdowns(){
@@ -3314,20 +3435,8 @@ navBtns.forEach(btn=>{
   });
 });
 
-document.getElementById('favNavBtn').onclick=async()=>{
-  try{
-    await loadFavs();
-    renderFavCatBar();
-    await renderFavList();
-    openFavPanel();
-  }catch(e){
-    console.error('fav open error:',e);
-    // db 미준비 시 재시도
-    if(!db){ await initDB(); await loadFavs(); }
-    renderFavCatBar();
-    await renderFavList();
-    openFavPanel();
-  }
+document.getElementById('favNavBtn').onclick=()=>{
+  loadFavs().then(()=>{renderFavCatBar();renderFavList();openFavPanel();});
 };
 // 즐겨찾기 SNS 공유 — file:// URL 제외, 텍스트+링크 공유
 if(document.getElementById('favShareBtn')) document.getElementById('favShareBtn').onclick=async()=>{
@@ -3408,36 +3517,6 @@ window.addEventListener('scroll',()=>{
 },{passive:true});
 scrollTopBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 
-
-
-// ── 장르/감정태그 접기/펼치기 (PC+모바일 공통) ──
-function toggleFilterSection(type){
-  const isMobile=window.innerWidth<=680;
-  if(type==='genre'){
-    const wrap=document.getElementById('filterChipsWrap');
-    const arrow=document.getElementById('genreToggleArrow');
-    if(!wrap) return;
-    if(isMobile){
-      const open=wrap.classList.toggle('expanded');
-      if(arrow) arrow.textContent=open?'▴':'▾';
-    } else {
-      const collapsed=wrap.classList.toggle('collapsed');
-      if(arrow) arrow.textContent=collapsed?'▸':'▾';
-    }
-  } else {
-    const wrap=document.getElementById('hashtagChipsWrap');
-    const arrow=document.getElementById('tagToggleArrow');
-    if(!wrap) return;
-    if(isMobile){
-      const open=wrap.classList.toggle('expanded');
-      if(arrow) arrow.textContent=open?'▴':'▾';
-    } else {
-      const collapsed=wrap.classList.toggle('collapsed');
-      if(arrow) arrow.textContent=collapsed?'▸':'▾';
-    }
-  }
-}
-
 // ══════════════════════════════════════════════════════════════
 // 모바일 탭바 & 설정 패널
 // ══════════════════════════════════════════════════════════════
@@ -3456,16 +3535,12 @@ function mobileTab(tab){
     // 검색창 포커스
     if(searchInput){ searchInput.scrollIntoView({behavior:'smooth'}); searchInput.focus(); }
   } else if(tab==='fav'){
-    (async()=>{
-      try{ await loadFavs(); }catch(e){ if(!db){await initDB();await loadFavs();} }
-      renderFavCatBar();
-      await renderFavList();
-      openFavPanel();
-    })();
+    loadFavs().then(()=>{renderFavCatBar();renderFavList();openFavPanel();});
+    // fav 탭은 active를 fav 버튼에서 home으로 복귀
     setTimeout(()=>{
       const h=document.getElementById('tabHome');if(h)h.classList.add('active');
       const f=document.getElementById('tabFav');if(f)f.classList.remove('active');
-    }, 200);
+    }, 100);
   } else if(tab==='emotion'){
     openExportHtmlModal();
     setTimeout(()=>{
@@ -3581,10 +3656,6 @@ async function shareApp(){
   debug('영화/드라마 DB final 준비 완료');
 })();
 </script>
-
-  <div class="fav-cat-bar" id="favCatBar"></div>
-  <div class="fav-list" id="favList" style="-webkit-overflow-scrolling:touch;overflow-y:auto;flex:1"></div>
-</div>
 
 <!-- 하단 탭바 (모바일 전용) -->
 <div class="mobile-tabbar" id="mobileTabbar">
