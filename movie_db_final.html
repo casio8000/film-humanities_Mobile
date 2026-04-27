@@ -1643,16 +1643,14 @@ async function fetchAndCacheGithubImage(no){
   try{
     const result=await fetchGithubImageWithFallback(no);
     if(!result) return null;
-    if(result.blob&&result.blob.size>100){
-      // blob 있음: IDB 저장 + ObjectURL
+    if(result.blob){
+      // opaque blob은 size=0이지만 실제 이미지 데이터 포함
       const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
       await saveImageByNo(no,resized,null);
       const objUrl=URL.createObjectURL(resized);
       imgUrlCache.set(no,objUrl);
       return objUrl;
     } else {
-      // direct URL: 메모리 캐시 (세션 유효)
-      imgUrlCache.set(no,result.url);
       return result.url;
     }
   }catch(e){ return null; }
@@ -1660,25 +1658,25 @@ async function fetchAndCacheGithubImage(no){
 
 async function getCachedImgUrl(no){
   if(!no) return null;
-  // 1. 메모리 캐시 — blob:// URL만 (GitHub URL은 캐시 안 함)
+  // 1. 메모리 캐시 (blob: URL)
   if(imgUrlCache.has(no)){
     const cached=imgUrlCache.get(no);
     if(cached&&cached.startsWith('blob:')) return cached;
-    imgUrlCache.delete(no); // blob: 아닌 URL 제거
+    imgUrlCache.delete(no);
   }
-  // 2. IndexedDB에 저장된 blob
+  // 2. IndexedDB blob — size 체크 없음 (opaque blob은 항상 size=0)
+  //    blob 객체 자체가 있으면 유효한 이미지로 간주
   const r=await idbGet(ST_IMAGES,no).catch(()=>null);
-  if(r&&r.blob&&r.blob.size>100){
+  if(r&&r.blob){
     try{
       const url=URL.createObjectURL(r.blob);
-      imgUrlCache.set(no,url); // blob: URL만 캐시
+      imgUrlCache.set(no,url);
       return url;
     }catch(e){
       await idbDel(ST_IMAGES,no).catch(()=>{});
     }
   }
-  // 3. IDB 없음 → GitHub 직접 URL 반환 (캐시에 저장 안 함)
-  //    → 다음에 getCachedImgUrl 호출 시 IDB 재체크 → 동기화 후 자동 전환
+  // 3. IDB 없음 → GitHub URL 직접 사용 (동기화 불필요)
   return getGithubImgUrl(no,'jpg') || null;
 }
 
