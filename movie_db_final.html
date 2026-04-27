@@ -1034,9 +1034,46 @@ async function openImgSyncModal(){
     await refreshData();
     modal.querySelector('#imgSyncStart').disabled=false;
     modal.querySelector('#imgSyncStart').textContent='🖼️ 이미지 동기화 시작';
-    progEl.innerHTML=`<span style="color:#6ee7b7">✅ 완료 — ${done}개 저장, ${failed}개 실패 (전체 ${total}개 대상)</span>`;
+    if(total===0){
+      progEl.innerHTML=`<span style="color:#6ee7b7">✅ 완료 — 모든 이미지가 이미 저장되어 있습니다.</span><br><span style="color:rgba(255,255,255,.4);font-size:.68rem">포스터가 안 보이면 아래 "강제 재동기화"를 시도하세요.</span>`;
+    } else {
+      progEl.innerHTML=`<span style="color:#6ee7b7">✅ 완료 — ${done}개 저장, ${failed}개 실패 (전체 ${total}개 대상)</span>`;
+    }
     showToast(`이미지 동기화 완료 — ${done}개 저장`, 'success', 4000);
   };
+
+  // 강제 재동기화 버튼 (IDB 이미지 스토어 초기화 후 전체 재다운로드)
+  const forceBtn=document.createElement('button');
+  forceBtn.className='mcancel';
+  forceBtn.style.cssText='background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5;margin-top:.4rem';
+  forceBtn.textContent='🔄 강제 재동기화 (전체 초기화 후 재다운로드)';
+  forceBtn.onclick=async()=>{
+    if(!confirm('저장된 모든 포스터 이미지를 삭제하고 처음부터 다시 다운로드합니다.\n계속하시겠습니까?')) return;
+    progEl.innerHTML='이미지 스토어 초기화 중…';
+    try {
+      // IDB 이미지 스토어 전체 삭제
+      await new Promise((res,rej)=>{
+        const tx=db.transaction(ST_IMAGES,'readwrite');
+        const req=tx.objectStore(ST_IMAGES).clear();
+        req.onsuccess=()=>res(); req.onerror=()=>rej(req.error);
+      });
+      // localStorage 캐시도 초기화
+      localStorage.removeItem('img_keys_cache');
+      imgUrlCache.clear();
+    } catch(e){ console.warn('IDB clear error:',e); }
+    const ok=await runDiag();
+    if(!ok){ progEl.innerHTML='<span style="color:#f87171">❌ GitHub 연결 실패</span>'; return; }
+    forceBtn.disabled=true;
+    const items=await loadAllItems();
+    progEl.innerHTML='강제 재동기화 시작…';
+    const {done,failed,total}=await syncImagesFromGithub(items,(cur,tot,d,f)=>{
+      progEl.innerHTML=`⬇️ ${cur}/${tot} — ✅ ${d}개 저장, ❌ ${f}개 실패`;
+    });
+    await refreshData();
+    forceBtn.disabled=false;
+    progEl.innerHTML=`<span style="color:#6ee7b7">✅ 강제 재동기화 완료 — ${done}개 저장, ${failed}개 실패</span>`;
+  };
+  modal.querySelector('.modal-box').appendChild(forceBtn);
 }
 
 async function loadExcelFromGithub(force=false){
