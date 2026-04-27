@@ -919,47 +919,60 @@ if(typeof resizeBlob==='undefined'){
 }
 
 async function syncImagesFromGithub(items, onProgress){
-  // ── IDB 키 전체를 한 번에 조회 (3,425번 개별 await → 1번) ──
-  let storedKeys=new Set();
-  try{
-    const keys=await new Promise((res)=>{
-      const tx=imgDB.transaction(ST_IMAGES,'readonly');
-      const req=tx.objectStore(ST_IMAGES).getAllKeys();
-      req.onsuccess=()=>res(req.result||[]);
-      req.onerror=()=>res([]);
+  // ── IDB 전체 키를 한 번에 조회 — db 변수 사용 (imgDB 오타 수정) ──
+  let storedKeys = new Set();
+  try {
+    const keys = await new Promise((res) => {
+      const tx = db.transaction(ST_IMAGES, 'readonly');
+      const req = tx.objectStore(ST_IMAGES).getAllKeys();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror  = () => res([]);
     });
-    storedKeys=new Set(keys);
-  }catch(e){ storedKeys=new Set(); }
+    storedKeys = new Set(keys);
+  } catch(e) {
+    // db 미준비 시 localStorage 캐시 폴백
+    try {
+      const cached = JSON.parse(localStorage.getItem('img_keys_cache') || '[]');
+      storedKeys = new Set(cached);
+    } catch(e2) { storedKeys = new Set(); }
+  }
 
-  // ★ 핵심 수정: 키가 있으면 blob 유효성 개별 체크 없이 바로 스킵
-  // (개별 idbGet × 3,424번 순차 호출 완전 제거)
-  const missing=items.filter(i=>i.excelNo && !storedKeys.has(i.excelNo));
+  // 키가 있으면 즉시 스킵 — 개별 blob 검증 없음
+  const missing = items.filter(i => i.excelNo && !storedKeys.has(i.excelNo));
 
-  if(!missing.length) return {done:0,failed:0,total:0};
+  if (!missing.length) return {done:0, failed:0, total:0};
 
-  let done=0,failed=0;
-  const BATCH=8;
-  for(let i=0;i<missing.length;i+=BATCH){
-    const batch=missing.slice(i,i+BATCH);
-    await Promise.allSettled(batch.map(async item=>{
-      try{
-        const result=await fetchGithubImageWithFallback(item.excelNo);
-        if(!result){ failed++; return; }
-        if(result.blob){
-          const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
-          await saveImageByNo(item.excelNo,resized,null);
-          const objUrl=URL.createObjectURL(resized);
-          imgUrlCache.set(item.excelNo,objUrl);
+  let done = 0, failed = 0;
+  const BATCH = 8;
+  for (let i = 0; i < missing.length; i += BATCH) {
+    const batch = missing.slice(i, i + BATCH);
+    await Promise.allSettled(batch.map(async item => {
+      try {
+        const result = await fetchGithubImageWithFallback(item.excelNo);
+        if (!result) { failed++; return; }
+        if (result.blob) {
+          const resized = await resizeBlob(result.blob, 300).catch(() => result.blob);
+          await saveImageByNo(item.excelNo, resized, null);
+          const objUrl = URL.createObjectURL(resized);
+          imgUrlCache.set(item.excelNo, objUrl);
+          // 성공한 키를 localStorage 캐시에도 추가
+          storedKeys.add(item.excelNo);
         } else {
-          imgUrlCache.set(item.excelNo,result.url);
+          imgUrlCache.set(item.excelNo, result.url);
         }
         done++;
-      }catch(e){ failed++; }
+      } catch(e) { failed++; }
     }));
-    if(onProgress) onProgress(done+failed,missing.length,done,failed);
-    if(i+BATCH<missing.length) await new Promise(r=>setTimeout(r,20));
+    if (onProgress) onProgress(done + failed, missing.length, done, failed);
+    if (i + BATCH < missing.length) await new Promise(r => setTimeout(r, 20));
   }
-  return {done,failed,total:missing.length};
+
+  // localStorage 키 캐시 갱신 (다음 동기화 때 db 미준비 시 폴백용)
+  try {
+    localStorage.setItem('img_keys_cache', JSON.stringify([...storedKeys]));
+  } catch(e) {}
+
+  return {done, failed, total: missing.length};
 }
 
 async function openImgSyncModal(){
