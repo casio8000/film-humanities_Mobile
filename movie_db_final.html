@@ -863,35 +863,28 @@ function getGithubImgUrl(no, ext='jpg'){
   return base+'/'+folder+'/'+no+'.'+ext;
 }
 
-// ── IDB 저장용: fetch no-cors (opaque) → Blob 추출 시도 ──
-// GitHub Pages는 CORS 미지원 → no-cors가 유일한 fetch 방법
-// opaque response는 blob 추출 가능하나 크기/타입 확인 불가
+// ── IDB 저장용: fetch no-cors (opaque) ──
 async function tryFetchNoCors(url){
   try{
     const resp=await fetch(url,{
       cache:'no-store',
-      mode:'no-cors',          // opaque response — blob 추출은 가능
-      signal:AbortSignal.timeout(15000)
+      mode:'no-cors',
+      signal:AbortSignal.timeout(8000) // 15s→8s
     });
-    // opaque response: resp.ok=false, resp.status=0, blob은 추출 가능
     const blob=await resp.blob();
-    // opaque blob은 size=0으로 보고될 수 있으나 실제 데이터 있음
-    // size가 0이어도 type 체크로 이미지인지 확인
-    if(blob&&(blob.size>0||blob.type.startsWith('image'))) return blob;
-    // size=0, type='' 이면 opaque → 실제 이미지로 판단하고 반환
+    // ★ 핵심 수정: opaque blob은 모바일에서 size=0으로 보고됨 — size 체크 제거
+    // blob 객체 자체가 있으면 이미지 데이터 포함으로 간주
     if(blob) return blob;
     return null;
   }catch(e){ return null; }
 }
 
-// ── Canvas 캡처: crossOrigin 없이 직접 로드 후 Canvas 추출 ──
-// crossOrigin 없으면 CORS 필요 없음 — 단, tainted canvas로 toBlob 실패
-// → crossOrigin='use-credentials'로 재시도
+// Canvas 캡처 (no-cors 실패 시만 사용, 타임아웃 단축)
 function tryImgCanvas(url){
   return new Promise(resolve=>{
     const img=new Image();
     img.crossOrigin='anonymous';
-    const timer=setTimeout(()=>resolve(null),8000);
+    const timer=setTimeout(()=>resolve(null),4000); // 8s→4s
     img.onload=()=>{
       clearTimeout(timer);
       try{
@@ -899,28 +892,24 @@ function tryImgCanvas(url){
         c.width=Math.min(img.naturalWidth||300,300);
         c.height=Math.min(img.naturalHeight||450,450);
         c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-        c.toBlob(b=>{
-          if(b&&b.size>100) resolve(b);
-          else resolve(null);
-        },'image/jpeg',0.82);
+        c.toBlob(b=>{ resolve(b&&b.size>100?b:null); },'image/jpeg',0.82);
       }catch(e){ resolve(null); }
     };
     img.onerror=()=>{ clearTimeout(timer); resolve(null); };
-    img.src=url+'?t='+Date.now(); // 캐시 우회로 CORS 재협상 유도
+    img.src=url+'?t='+Date.now();
   });
 }
 
 async function fetchGithubImageWithFallback(no){
   if(!no) return null;
-  // jpg만 시도 (확장자 루프 제거 — 지연 최소화)
   const url=getGithubImgUrl(no,'jpg');
-  // 1) no-cors fetch 시도 (opaque blob)
+  // 1) no-cors fetch — opaque blob은 size=0이지만 유효한 이미지 데이터 포함
   const blobNoCors=await tryFetchNoCors(url);
-  if(blobNoCors&&blobNoCors.size>100) return {blob:blobNoCors, url, method:'no-cors'};
-  // 2) Canvas 캡처 시도
+  if(blobNoCors) return {blob:blobNoCors, url, method:'no-cors'};
+  // 2) Canvas 폴백 (no-cors 완전 실패 시)
   const blobCanvas=await tryImgCanvas(url);
   if(blobCanvas) return {blob:blobCanvas, url, method:'canvas'};
-  // 3) 실패 시 URL만 반환 — img.src로 직접 표시 (IDB 저장 불가)
+  // 3) URL 직접 표시
   return {blob:null, url, method:'direct'};
 }
 
@@ -930,60 +919,47 @@ if(typeof resizeBlob==='undefined'){
 }
 
 async function syncImagesFromGithub(items, onProgress){
-  // ── 핵심 개선: IDB 키 전체를 한 번에 조회 (3,425번 개별 await → 1번) ──
-  let storedKeys = new Set();
-  try {
-    const keys = await new Promise((res, rej) => {
-      const tx = imgDB.transaction(ST_IMAGES, 'readonly');
-      const req = tx.objectStore(ST_IMAGES).getAllKeys();
-      req.onsuccess = () => res(req.result || []);
-      req.onerror = () => res([]);
+  // ── IDB 키 전체를 한 번에 조회 (3,425번 개별 await → 1번) ──
+  let storedKeys=new Set();
+  try{
+    const keys=await new Promise((res)=>{
+      const tx=imgDB.transaction(ST_IMAGES,'readonly');
+      const req=tx.objectStore(ST_IMAGES).getAllKeys();
+      req.onsuccess=()=>res(req.result||[]);
+      req.onerror=()=>res([]);
     });
-    // 저장된 키 중 blob이 유효한 것만 필터 (빠른 메타 체크)
-    storedKeys = new Set(keys);
-  } catch(e) { storedKeys = new Set(); }
+    storedKeys=new Set(keys);
+  }catch(e){ storedKeys=new Set(); }
 
-  // 누락된 항목만 추출 (IDB에 키 자체가 없거나 blob이 없는 경우)
-  // 키가 없으면 확실히 누락 — 키가 있으면 실제 blob 체크 (최소화)
-  const missing = [];
-  for (const i of items) {
-    if (!i.excelNo) continue;
-    if (!storedKeys.has(i.excelNo)) {
-      missing.push(i); // 키 없음 → 바로 누락 처리
-    } else {
-      // 키는 있지만 blob이 유효한지 확인 (드문 케이스 — 개별 체크)
-      const existing = await idbGet(ST_IMAGES, i.excelNo).catch(() => null);
-      if (!existing || !existing.blob || existing.blob.size < 100) missing.push(i);
-    }
-  }
+  // ★ 핵심 수정: 키가 있으면 blob 유효성 개별 체크 없이 바로 스킵
+  // (개별 idbGet × 3,424번 순차 호출 완전 제거)
+  const missing=items.filter(i=>i.excelNo && !storedKeys.has(i.excelNo));
 
-  if (!missing.length) return {done:0, failed:0, total:0};
+  if(!missing.length) return {done:0,failed:0,total:0};
 
-  let done = 0, failed = 0;
-  // 동시 요청 수 3 → 8 (GitHub Pages는 동시 요청 충분히 처리 가능)
-  const BATCH = 8;
-  for (let i = 0; i < missing.length; i += BATCH) {
-    const batch = missing.slice(i, i + BATCH);
-    await Promise.allSettled(batch.map(async item => {
-      try {
-        const result = await fetchGithubImageWithFallback(item.excelNo);
-        if (!result) { failed++; return; }
-        if (result.blob && result.blob.size > 100) {
-          const resized = await resizeBlob(result.blob, 300).catch(() => result.blob);
-          await saveImageByNo(item.excelNo, resized, null);
-          const objUrl = URL.createObjectURL(resized);
-          imgUrlCache.set(item.excelNo, objUrl);
+  let done=0,failed=0;
+  const BATCH=8;
+  for(let i=0;i<missing.length;i+=BATCH){
+    const batch=missing.slice(i,i+BATCH);
+    await Promise.allSettled(batch.map(async item=>{
+      try{
+        const result=await fetchGithubImageWithFallback(item.excelNo);
+        if(!result){ failed++; return; }
+        if(result.blob){
+          const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
+          await saveImageByNo(item.excelNo,resized,null);
+          const objUrl=URL.createObjectURL(resized);
+          imgUrlCache.set(item.excelNo,objUrl);
         } else {
-          imgUrlCache.set(item.excelNo, result.url);
+          imgUrlCache.set(item.excelNo,result.url);
         }
         done++;
-      } catch(e) { failed++; }
+      }catch(e){ failed++; }
     }));
-    if (onProgress) onProgress(done + failed, missing.length, done, failed);
-    // 딜레이 80ms → 20ms (과부하 방지 최소한만 유지)
-    if (i + BATCH < missing.length) await new Promise(r => setTimeout(r, 20));
+    if(onProgress) onProgress(done+failed,missing.length,done,failed);
+    if(i+BATCH<missing.length) await new Promise(r=>setTimeout(r,20));
   }
-  return {done, failed, total: missing.length};
+  return {done,failed,total:missing.length};
 }
 
 async function openImgSyncModal(){
