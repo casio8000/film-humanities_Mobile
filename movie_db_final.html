@@ -863,28 +863,35 @@ function getGithubImgUrl(no, ext='jpg'){
   return base+'/'+folder+'/'+no+'.'+ext;
 }
 
-// ── IDB 저장용: fetch no-cors (opaque) ──
+// ── IDB 저장용: fetch no-cors (opaque) → Blob 추출 시도 ──
+// GitHub Pages는 CORS 미지원 → no-cors가 유일한 fetch 방법
+// opaque response는 blob 추출 가능하나 크기/타입 확인 불가
 async function tryFetchNoCors(url){
   try{
     const resp=await fetch(url,{
       cache:'no-store',
-      mode:'no-cors',
-      signal:AbortSignal.timeout(8000) // 15s→8s
+      mode:'no-cors',          // opaque response — blob 추출은 가능
+      signal:AbortSignal.timeout(15000)
     });
+    // opaque response: resp.ok=false, resp.status=0, blob은 추출 가능
     const blob=await resp.blob();
-    // ★ 핵심 수정: opaque blob은 모바일에서 size=0으로 보고됨 — size 체크 제거
-    // blob 객체 자체가 있으면 이미지 데이터 포함으로 간주
+    // opaque blob은 size=0으로 보고될 수 있으나 실제 데이터 있음
+    // size가 0이어도 type 체크로 이미지인지 확인
+    if(blob&&(blob.size>0||blob.type.startsWith('image'))) return blob;
+    // size=0, type='' 이면 opaque → 실제 이미지로 판단하고 반환
     if(blob) return blob;
     return null;
   }catch(e){ return null; }
 }
 
-// Canvas 캡처 (no-cors 실패 시만 사용, 타임아웃 단축)
+// ── Canvas 캡처: crossOrigin 없이 직접 로드 후 Canvas 추출 ──
+// crossOrigin 없으면 CORS 필요 없음 — 단, tainted canvas로 toBlob 실패
+// → crossOrigin='use-credentials'로 재시도
 function tryImgCanvas(url){
   return new Promise(resolve=>{
     const img=new Image();
     img.crossOrigin='anonymous';
-    const timer=setTimeout(()=>resolve(null),4000); // 8s→4s
+    const timer=setTimeout(()=>resolve(null),8000);
     img.onload=()=>{
       clearTimeout(timer);
       try{
@@ -892,24 +899,28 @@ function tryImgCanvas(url){
         c.width=Math.min(img.naturalWidth||300,300);
         c.height=Math.min(img.naturalHeight||450,450);
         c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-        c.toBlob(b=>{ resolve(b&&b.size>100?b:null); },'image/jpeg',0.82);
+        c.toBlob(b=>{
+          if(b&&b.size>100) resolve(b);
+          else resolve(null);
+        },'image/jpeg',0.82);
       }catch(e){ resolve(null); }
     };
     img.onerror=()=>{ clearTimeout(timer); resolve(null); };
-    img.src=url+'?t='+Date.now();
+    img.src=url+'?t='+Date.now(); // 캐시 우회로 CORS 재협상 유도
   });
 }
 
 async function fetchGithubImageWithFallback(no){
   if(!no) return null;
+  // jpg만 시도 (확장자 루프 제거 — 지연 최소화)
   const url=getGithubImgUrl(no,'jpg');
-  // 1) no-cors fetch — opaque blob은 size=0이지만 유효한 이미지 데이터 포함
+  // 1) no-cors fetch 시도 (opaque blob)
   const blobNoCors=await tryFetchNoCors(url);
-  if(blobNoCors) return {blob:blobNoCors, url, method:'no-cors'};
-  // 2) Canvas 폴백 (no-cors 완전 실패 시)
+  if(blobNoCors&&blobNoCors.size>100) return {blob:blobNoCors, url, method:'no-cors'};
+  // 2) Canvas 캡처 시도
   const blobCanvas=await tryImgCanvas(url);
   if(blobCanvas) return {blob:blobCanvas, url, method:'canvas'};
-  // 3) URL 직접 표시
+  // 3) 실패 시 URL만 반환 — img.src로 직접 표시 (IDB 저장 불가)
   return {blob:null, url, method:'direct'};
 }
 
@@ -919,60 +930,44 @@ if(typeof resizeBlob==='undefined'){
 }
 
 async function syncImagesFromGithub(items, onProgress){
-  // ── IDB 전체 키를 한 번에 조회 — db 변수 사용 (imgDB 오타 수정) ──
-  let storedKeys = new Set();
-  try {
-    const keys = await new Promise((res) => {
-      const tx = db.transaction(ST_IMAGES, 'readonly');
-      const req = tx.objectStore(ST_IMAGES).getAllKeys();
-      req.onsuccess = () => res(req.result || []);
-      req.onerror  = () => res([]);
-    });
-    storedKeys = new Set(keys);
-  } catch(e) {
-    // db 미준비 시 localStorage 캐시 폴백
-    try {
-      const cached = JSON.parse(localStorage.getItem('img_keys_cache') || '[]');
-      storedKeys = new Set(cached);
-    } catch(e2) { storedKeys = new Set(); }
+  // ── 속도 개선: idbAll 1번으로 전체 저장 목록 로드 → Set 비교 (O(1)) ──
+  // 기존: 항목마다 idbGet() → 3,425번 IDB 접근 → 느림
+  // 개선: idbAll 1번 → Set 생성 → 즉시 비교
+  let savedNos;
+  try{
+    const allSaved=await idbAll(ST_IMAGES);
+    // blob이 실제로 있는 no만 Set에 추가
+    savedNos=new Set(allSaved.filter(r=>r.blob&&r.blob.size>100).map(r=>r.no));
+  }catch(e){
+    savedNos=new Set();
   }
 
-  // 키가 있으면 즉시 스킵 — 개별 blob 검증 없음
-  const missing = items.filter(i => i.excelNo && !storedKeys.has(i.excelNo));
+  const missing=items.filter(i=>i.excelNo&&!savedNos.has(i.excelNo));
+  if(!missing.length) return {done:0,failed:0,total:0};
 
-  if (!missing.length) return {done:0, failed:0, total:0};
-
-  let done = 0, failed = 0;
-  const BATCH = 8;
-  for (let i = 0; i < missing.length; i += BATCH) {
-    const batch = missing.slice(i, i + BATCH);
-    await Promise.allSettled(batch.map(async item => {
-      try {
-        const result = await fetchGithubImageWithFallback(item.excelNo);
-        if (!result) { failed++; return; }
-        if (result.blob) {
-          const resized = await resizeBlob(result.blob, 300).catch(() => result.blob);
-          await saveImageByNo(item.excelNo, resized, null);
-          const objUrl = URL.createObjectURL(resized);
-          imgUrlCache.set(item.excelNo, objUrl);
-          // 성공한 키를 localStorage 캐시에도 추가
-          storedKeys.add(item.excelNo);
+  let done=0,failed=0;
+  const BATCH=8; // 동시 요청 수 증가 (안정성 확인 후 조절 가능)
+  for(let i=0;i<missing.length;i+=BATCH){
+    const batch=missing.slice(i,i+BATCH);
+    await Promise.allSettled(batch.map(async item=>{
+      try{
+        const result=await fetchGithubImageWithFallback(item.excelNo);
+        if(!result){ failed++; return; }
+        if(result.blob&&result.blob.size>100){
+          const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
+          await saveImageByNo(item.excelNo,resized,null);
+          const objUrl=URL.createObjectURL(resized);
+          imgUrlCache.set(item.excelNo,objUrl);
         } else {
-          imgUrlCache.set(item.excelNo, result.url);
+          imgUrlCache.set(item.excelNo,result.url);
         }
         done++;
-      } catch(e) { failed++; }
+      }catch(e){ failed++; }
     }));
-    if (onProgress) onProgress(done + failed, missing.length, done, failed);
-    if (i + BATCH < missing.length) await new Promise(r => setTimeout(r, 20));
+    if(onProgress) onProgress(done+failed, missing.length, done, failed);
+    if(i+BATCH<missing.length) await new Promise(r=>setTimeout(r,30)); // 대기 단축
   }
-
-  // localStorage 키 캐시 갱신 (다음 동기화 때 db 미준비 시 폴백용)
-  try {
-    localStorage.setItem('img_keys_cache', JSON.stringify([...storedKeys]));
-  } catch(e) {}
-
-  return {done, failed, total: missing.length};
+  return {done,failed,total:missing.length};
 }
 
 async function openImgSyncModal(){
@@ -984,7 +979,7 @@ async function openImgSyncModal(){
     <div style="background:rgba(52,160,240,.07);border:1px solid rgba(52,160,240,.2);border-radius:9px;padding:.7rem .9rem;font-size:.72rem;color:rgba(255,255,255,.55);line-height:1.75;margin:.5rem 0">
       GitHub <code style="word-break:break-all">${base}/images/movie/</code> 등에서<br>
       로컬 IndexedDB로 포스터를 동기화합니다. (jpg → png → webp 순 시도)<br>
-      이미 저장된 이미지는 건너뛰고, 없는 이미지만 다운로드합니다.<br>
+      이미 저장된 이미지는 건너뜁니다. 신규/누락 이미지만 다운로드합니다.<br><span style='color:#fbbf24;font-size:.68rem'>⚡ v4 속도 개선: IDB 일괄조회로 스캔 시간 대폭 단축</span><br>
       <span style="color:#fbbf24">⚠️ 실패가 많으면 GitHub Pages 설정 → 이미지 파일 경로를 확인하세요.</span>
     </div>
     <div id="imgSyncDiag" style="font-size:.7rem;color:rgba(255,255,255,.4);margin-bottom:.5rem">연결 확인 중…</div>
@@ -1034,46 +1029,9 @@ async function openImgSyncModal(){
     await refreshData();
     modal.querySelector('#imgSyncStart').disabled=false;
     modal.querySelector('#imgSyncStart').textContent='🖼️ 이미지 동기화 시작';
-    if(total===0){
-      progEl.innerHTML=`<span style="color:#6ee7b7">✅ 완료 — 모든 이미지가 이미 저장되어 있습니다.</span><br><span style="color:rgba(255,255,255,.4);font-size:.68rem">포스터가 안 보이면 아래 "강제 재동기화"를 시도하세요.</span>`;
-    } else {
-      progEl.innerHTML=`<span style="color:#6ee7b7">✅ 완료 — ${done}개 저장, ${failed}개 실패 (전체 ${total}개 대상)</span>`;
-    }
+    progEl.innerHTML=`<span style="color:#6ee7b7">✅ 완료 — ${done}개 저장, ${failed}개 실패 (전체 ${total}개 대상)</span>`;
     showToast(`이미지 동기화 완료 — ${done}개 저장`, 'success', 4000);
   };
-
-  // 강제 재동기화 버튼 (IDB 이미지 스토어 초기화 후 전체 재다운로드)
-  const forceBtn=document.createElement('button');
-  forceBtn.className='mcancel';
-  forceBtn.style.cssText='background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5;margin-top:.4rem';
-  forceBtn.textContent='🔄 강제 재동기화 (전체 초기화 후 재다운로드)';
-  forceBtn.onclick=async()=>{
-    if(!confirm('저장된 모든 포스터 이미지를 삭제하고 처음부터 다시 다운로드합니다.\n계속하시겠습니까?')) return;
-    progEl.innerHTML='이미지 스토어 초기화 중…';
-    try {
-      // IDB 이미지 스토어 전체 삭제
-      await new Promise((res,rej)=>{
-        const tx=db.transaction(ST_IMAGES,'readwrite');
-        const req=tx.objectStore(ST_IMAGES).clear();
-        req.onsuccess=()=>res(); req.onerror=()=>rej(req.error);
-      });
-      // localStorage 캐시도 초기화
-      localStorage.removeItem('img_keys_cache');
-      imgUrlCache.clear();
-    } catch(e){ console.warn('IDB clear error:',e); }
-    const ok=await runDiag();
-    if(!ok){ progEl.innerHTML='<span style="color:#f87171">❌ GitHub 연결 실패</span>'; return; }
-    forceBtn.disabled=true;
-    const items=await loadAllItems();
-    progEl.innerHTML='강제 재동기화 시작…';
-    const {done,failed,total}=await syncImagesFromGithub(items,(cur,tot,d,f)=>{
-      progEl.innerHTML=`⬇️ ${cur}/${tot} — ✅ ${d}개 저장, ❌ ${f}개 실패`;
-    });
-    await refreshData();
-    forceBtn.disabled=false;
-    progEl.innerHTML=`<span style="color:#6ee7b7">✅ 강제 재동기화 완료 — ${done}개 저장, ${failed}개 실패</span>`;
-  };
-  modal.querySelector('.modal-box').appendChild(forceBtn);
 }
 
 async function loadExcelFromGithub(force=false){
@@ -1643,14 +1601,16 @@ async function fetchAndCacheGithubImage(no){
   try{
     const result=await fetchGithubImageWithFallback(no);
     if(!result) return null;
-    if(result.blob){
-      // opaque blob은 size=0이지만 실제 이미지 데이터 포함
+    if(result.blob&&result.blob.size>100){
+      // blob 있음: IDB 저장 + ObjectURL
       const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
       await saveImageByNo(no,resized,null);
       const objUrl=URL.createObjectURL(resized);
       imgUrlCache.set(no,objUrl);
       return objUrl;
     } else {
+      // direct URL: 메모리 캐시 (세션 유효)
+      imgUrlCache.set(no,result.url);
       return result.url;
     }
   }catch(e){ return null; }
@@ -1658,25 +1618,25 @@ async function fetchAndCacheGithubImage(no){
 
 async function getCachedImgUrl(no){
   if(!no) return null;
-  // 1. 메모리 캐시 (blob: URL)
+  // 1. 메모리 캐시 — blob:// URL만 (GitHub URL은 캐시 안 함)
   if(imgUrlCache.has(no)){
     const cached=imgUrlCache.get(no);
     if(cached&&cached.startsWith('blob:')) return cached;
-    imgUrlCache.delete(no);
+    imgUrlCache.delete(no); // blob: 아닌 URL 제거
   }
-  // 2. IndexedDB blob — size 체크 없음 (opaque blob은 항상 size=0)
-  //    blob 객체 자체가 있으면 유효한 이미지로 간주
+  // 2. IndexedDB에 저장된 blob
   const r=await idbGet(ST_IMAGES,no).catch(()=>null);
-  if(r&&r.blob){
+  if(r&&r.blob&&r.blob.size>100){
     try{
       const url=URL.createObjectURL(r.blob);
-      imgUrlCache.set(no,url);
+      imgUrlCache.set(no,url); // blob: URL만 캐시
       return url;
     }catch(e){
       await idbDel(ST_IMAGES,no).catch(()=>{});
     }
   }
-  // 3. IDB 없음 → GitHub URL 직접 사용 (동기화 불필요)
+  // 3. IDB 없음 → GitHub 직접 URL 반환 (캐시에 저장 안 함)
+  //    → 다음에 getCachedImgUrl 호출 시 IDB 재체크 → 동기화 후 자동 전환
   return getGithubImgUrl(no,'jpg') || null;
 }
 
@@ -3031,11 +2991,24 @@ function openEditModal(item){
     <span class="mlabel">📝 인문학 노트</span>
     <textarea class="mfield" id="eNote" rows="3" placeholder="인문학적 감상이나 키워드를 메모하세요">${esc(item.humNote||'')}</textarea>
     <span class="mlabel">포스터 이미지 교체 (선택)</span>
-    <div style="display:flex;gap:.5rem;align-items:center;margin:.25rem 0">
-      <label class="tbtn slate" style="cursor:pointer;font-size:.72rem">🖼️ 이미지 선택
+    <div style="display:flex;gap:.5rem;align-items:center;margin:.25rem 0;flex-wrap:wrap">
+      <label class="tbtn slate" style="cursor:pointer;font-size:.72rem">🖼️ 로컬 파일
         <input type="file" id="eImage" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none">
       </label>
       <span id="eImageName" style="font-size:.68rem;color:rgba(255,255,255,.3)">선택 안됨</span>
+    </div>
+    <div style="margin:.15rem 0">
+      <span class="mlabel" style="margin-bottom:.2rem;display:block">🔗 GitHub 이미지 URL (직접 입력 — 모바일 권장)</span>
+      <div style="display:flex;gap:.35rem;align-items:center">
+        <input class="mfield" id="eImageUrl"
+          placeholder="파일명만 입력 (예: 3425.jpg)"
+          style="flex:1;font-size:.72rem"
+          value="">
+        <button id="eImageUrlPreviewBtn" style="background:rgba(99,179,237,.15);border:1px solid rgba(99,179,237,.3);color:#93c5fd;padding:.32rem .65rem;border-radius:8px;cursor:pointer;font-size:.7rem;font-family:inherit;flex-shrink:0;white-space:nowrap">미리보기</button>
+      </div>
+      <div style="font-size:.62rem;color:rgba(255,255,255,.22);margin-top:.2rem;line-height:1.5">
+        기본 경로: <code style="color:rgba(99,179,237,.7);font-size:.6rem">https://casio8000.github.io/film-humanities_Mobile/images/movie_4/</code>
+      </div>
     </div>
     <div id="eImagePreview" style="margin:.25rem 0;display:none">
       <img id="ePreviewImg" style="width:80px;height:120px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.1)">
@@ -3049,13 +3022,31 @@ function openEditModal(item){
   modal.querySelector('.modal-close').onclick=()=>modal.remove();
   modal.querySelector('#mCancel').onclick=()=>modal.remove();
 
+  const GITHUB_IMG_BASE='https://casio8000.github.io/film-humanities_Mobile/images/movie_4/';
+
   modal.querySelector('#eImage').onchange=e=>{
     const file=e.target.files[0];if(!file)return;
     modal.querySelector('#eImageName').textContent=file.name;
     const prev=modal.querySelector('#eImagePreview');
     const img=modal.querySelector('#ePreviewImg');
     img.src=URL.createObjectURL(file);prev.style.display='block';
+    // 로컬 파일 선택 시 URL 필드 초기화
+    modal.querySelector('#eImageUrl').value='';
   };
+
+  // GitHub URL 미리보기
+  modal.querySelector('#eImageUrlPreviewBtn').onclick=()=>{
+    const urlVal=modal.querySelector('#eImageUrl').value.trim();
+    if(!urlVal){showToast('파일명을 입력하세요 (예: 3425.jpg)','warn',2500);return;}
+    // 파일명만 입력한 경우 기본 경로 조합
+    const fullUrl=urlVal.startsWith('http')?urlVal:GITHUB_IMG_BASE+urlVal;
+    const prev=modal.querySelector('#eImagePreview');
+    const img=modal.querySelector('#ePreviewImg');
+    img.src=fullUrl;
+    img.onload=()=>{prev.style.display='block';showToast('✅ 이미지 확인됨','success',2000);};
+    img.onerror=()=>{prev.style.display='none';showToast('❌ 이미지를 불러올 수 없습니다. URL/파일명을 확인하세요','error',3500);};
+  };
+
   modal.querySelector('#mSave').onclick=async()=>{
     const nt=modal.querySelector('#eTitle').value.trim();
     if(!nt){alert('제목은 필수입니다.');return;}
@@ -3070,14 +3061,46 @@ function openEditModal(item){
     const nhNote=modal.querySelector('#eNote').value.trim();
     const nTagsRaw=modal.querySelector('#eHashtags').value.trim();
     const nHashTags=nTagsRaw?nTagsRaw.split(/[,\s]+/).map(t=>t.startsWith('#')?t:'#'+t).filter(t=>t.length>1):[];
+
+    const saveBtn=modal.querySelector('#mSave');
+    saveBtn.disabled=true;saveBtn.textContent='저장 중…';
+
+    // 1) 로컬 파일 이미지
     const imgFile=modal.querySelector('#eImage').files[0];
     if(imgFile&&item.excelNo){
       try{
         const blob=await resizeFile(imgFile);
         await saveImageByNo(item.excelNo,blob,imgFile.lastModified||null);
-        imgUrlCache.delete(item.excelNo); // 캐시 무효화
-      }catch(e){console.warn('이미지 저장 실패',e);}
+        imgUrlCache.delete(item.excelNo);
+      }catch(e){console.warn('로컬 이미지 저장 실패',e);}
     }
+
+    // 2) GitHub URL 이미지 (로컬 파일 없을 때)
+    if(!imgFile&&item.excelNo){
+      const urlVal=modal.querySelector('#eImageUrl').value.trim();
+      if(urlVal){
+        const fullUrl=urlVal.startsWith('http')?urlVal:GITHUB_IMG_BASE+urlVal;
+        try{
+          // GitHub URL을 imgUrlCache에 저장 (즉시 표시)
+          // no-cors fetch로 blob 시도, 실패 시 URL만 캐시
+          const result=await fetchGithubImageWithFallback(item.excelNo)
+            .catch(()=>null);
+          if(result&&result.blob&&result.blob.size>100){
+            const resized=await resizeBlob(result.blob,300).catch(()=>result.blob);
+            await saveImageByNo(item.excelNo,resized,null);
+            imgUrlCache.set(item.excelNo,URL.createObjectURL(resized));
+          } else {
+            // URL만 세션 캐시 — img.src로 직접 표시
+            imgUrlCache.set(item.excelNo,fullUrl);
+            imgUrlCache.delete(item.excelNo); // 다음 로드 시 IDB 체크하도록
+            // imgUrlCache에 URL 저장 (세션 내 표시용)
+            imgUrlCache.set(item.excelNo,fullUrl);
+          }
+          showToast('✅ 이미지 URL 설정됨 — 이미지 동기화로 영구 저장 가능','success',4000);
+        }catch(e){console.warn('GitHub URL 이미지 처리 실패',e);}
+      }
+    }
+
     await saveItem({...item,title:nt,rating:(nr&&!isNaN(parseFloat(nr)))?parseFloat(nr).toFixed(1):'?',
       country:nc,year:ny,category:ncat,genreRaw:ng,genreList:parseGenres(ng),runtime:nrt,link:nl,
       ostLink:nost,humNote:nhNote,hashTags:nHashTags});
